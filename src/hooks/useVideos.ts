@@ -52,6 +52,50 @@ export function useVideos(options?: { featured?: boolean; limit?: number; catego
   });
 }
 
+export function useVideoById(id: string | undefined) {
+  return useQuery({
+    queryKey: ['video', id],
+    queryFn: async () => {
+      if (!id) return null;
+      const { data, error } = await supabase
+        .from('videos')
+        .select(`
+          *,
+          category:categories(id, name, slug, color)
+        `)
+        .eq('id', id)
+        .single();
+      
+      if (error) throw error;
+      return data as Video;
+    },
+    enabled: !!id,
+  });
+}
+
+export function useRelatedVideos(currentVideoId: string, categoryId: string | null, limit = 4) {
+  return useQuery({
+    queryKey: ['relatedVideos', currentVideoId, categoryId, limit],
+    queryFn: async () => {
+      if (!categoryId) return [];
+      const { data, error } = await supabase
+        .from('videos')
+        .select(`
+          *,
+          category:categories(id, name, slug, color)
+        `)
+        .eq('category_id', categoryId)
+        .neq('id', currentVideoId) // Exclude the current video
+        .order('created_at', { ascending: false })
+        .limit(limit);
+      
+      if (error) throw error;
+      return data as Video[];
+    },
+    enabled: !!categoryId,
+  });
+}
+
 export function useFeaturedVideos(limit = 4) {
   return useVideos({ featured: true, limit });
 }

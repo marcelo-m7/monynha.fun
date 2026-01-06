@@ -1,6 +1,7 @@
 import { Video, formatDuration, formatViewCount } from "@/hooks/useVideos";
 import { Play, Eye } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import { useNavigate } from "react-router-dom"; // Import useNavigate
 
 interface VideoCardProps {
   video: Video;
@@ -8,9 +9,19 @@ interface VideoCardProps {
 }
 
 export const VideoCard = ({ video, onClick }: VideoCardProps) => {
+  const navigate = useNavigate(); // Initialize useNavigate
+
+  const handleClick = () => {
+    if (onClick) {
+      onClick();
+    } else {
+      navigate(`/videos/${video.id}`); // Navigate to video details page
+    }
+  };
+
   return (
     <article
-      onClick={onClick}
+      onClick={handleClick} // Use the new handleClick
       className="group cursor-pointer rounded-2xl bg-card overflow-hidden shadow-sm transition-all duration-300 card-hover hover:shadow-lg border border-border/50"
     >
       {/* Thumbnail */}
