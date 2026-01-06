@@ -4,7 +4,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { useToast } from '@/hooks/use-toast';
+import { toast } from 'sonner'; // Changed import
 import { Play, Mail, Lock, User, ArrowLeft } from 'lucide-react';
 import { z } from 'zod';
 
@@ -20,7 +20,6 @@ export default function Auth() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { signIn, signUp, user, loading } = useAuth();
   const navigate = useNavigate();
-  const { toast } = useToast();
 
   useEffect(() => {
     if (!loading && user) {
@@ -38,10 +37,8 @@ export default function Auth() {
       return true;
     } catch (error) {
       if (error instanceof z.ZodError) {
-        toast({
-          title: 'Erro de validação',
+        toast.error('Erro de validação', { // Changed toast call
           description: error.errors[0].message,
-          variant: 'destructive'
         });
       }
       return false;
@@ -65,14 +62,11 @@ export default function Auth() {
           } else if (error.message.includes('Email not confirmed')) {
             message = 'Por favor, confirme seu email antes de fazer login';
           }
-          toast({
-            title: 'Erro',
+          toast.error('Erro', { // Changed toast call
             description: message,
-            variant: 'destructive'
           });
         } else {
-          toast({
-            title: 'Bem-vindo de volta!',
+          toast.success('Bem-vindo de volta!', { // Changed toast call
             description: 'Login realizado com sucesso'
           });
           navigate('/');
@@ -84,14 +78,11 @@ export default function Auth() {
           if (error.message.includes('already registered')) {
             message = 'Este email já está cadastrado';
           }
-          toast({
-            title: 'Erro',
+          toast.error('Erro', { // Changed toast call
             description: message,
-            variant: 'destructive'
           });
         } else {
-          toast({
-            title: 'Conta criada!',
+          toast.success('Conta criada!', { // Changed toast call
             description: 'Verifique seu email para confirmar o cadastro'
           });
         }

@@ -9,7 +9,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { useToast } from '@/hooks/use-toast';
+import { toast } from 'sonner'; // Changed import
 import { ArrowLeft, Link as LinkIcon, Loader2, Play, CheckCircle, AlertCircle } from 'lucide-react';
 import { z } from 'zod';
 
@@ -29,7 +29,6 @@ export default function Submit() {
   const { data: categories } = useCategories();
   const { metadata, isLoading: metadataLoading, error: metadataError } = useYouTubeMetadata(youtubeUrl);
   const navigate = useNavigate();
-  const { toast } = useToast();
 
   useEffect(() => {
     if (!authLoading && !user) {
@@ -41,19 +40,15 @@ export default function Submit() {
     e.preventDefault();
 
     if (!metadata) {
-      toast({
-        title: 'Erro',
+      toast.error('Erro', { // Changed toast call
         description: 'Por favor, insira uma URL válida do YouTube',
-        variant: 'destructive'
       });
       return;
     }
 
     if (!user) {
-      toast({
-        title: 'Erro',
+      toast.error('Erro', { // Changed toast call
         description: 'Você precisa estar logado para enviar vídeos',
-        variant: 'destructive'
       });
       return;
     }
@@ -69,10 +64,8 @@ export default function Submit() {
         .maybeSingle();
 
       if (existingVideo) {
-        toast({
-          title: 'Vídeo já existe',
+        toast.error('Vídeo já existe', { // Changed toast call
           description: 'Este vídeo já foi enviado por outro usuário',
-          variant: 'destructive'
         });
         setIsSubmitting(false);
         return;
@@ -94,18 +87,15 @@ export default function Submit() {
 
       if (error) throw error;
 
-      toast({
-        title: 'Vídeo enviado!',
+      toast.success('Vídeo enviado!', { // Changed toast call
         description: 'Seu vídeo foi adicionado com sucesso ao acervo',
       });
 
       navigate('/');
     } catch (err) {
       console.error('Error submitting video:', err);
-      toast({
-        title: 'Erro ao enviar',
+      toast.error('Erro ao enviar', { // Changed toast call
         description: 'Ocorreu um erro ao enviar o vídeo. Tente novamente.',
-        variant: 'destructive'
       });
     } finally {
       setIsSubmitting(false);
