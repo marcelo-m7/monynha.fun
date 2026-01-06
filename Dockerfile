@@ -1,5 +1,5 @@
 # Stage 1: Build the React application
-FROM oven/bun:1.1.17-alpine as builder
+FROM oven/bun:1.1.17-alpine AS builder
 
 WORKDIR /app
 
@@ -7,7 +7,7 @@ WORKDIR /app
 COPY package.json bun.lockb ./
 
 # Install dependencies
-RUN bun install --frozen-lockfile
+RUN bun install
 
 # Copy the rest of the application code
 COPY . .
