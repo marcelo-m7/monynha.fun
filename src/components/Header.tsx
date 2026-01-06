@@ -47,12 +47,17 @@ export const Header = () => {
         <div className="flex items-center gap-2">
           {user ? (
             <>
-              <Button variant="hero" size="sm" className="hidden sm:flex gap-2">
+              <Button 
+                variant="hero" 
+                size="sm" 
+                className="hidden sm:flex gap-2"
+                onClick={() => navigate('/submit')}
+              >
                 <Plus className="h-4 w-4" />
                 Enviar Vídeo
               </Button>
               <Button 
-                variant="ghost" 
+                variant="ghost"
                 size="sm" 
                 onClick={handleSignOut}
                 className="hidden sm:flex gap-2 text-muted-foreground hover:text-foreground"
@@ -110,8 +115,12 @@ export const Header = () => {
             </div>
             <div className="flex flex-col gap-2">
               {user ? (
-                <>
-                  <Button variant="hero" className="w-full justify-center gap-2">
+              <>
+                  <Button 
+                    variant="hero" 
+                    className="w-full justify-center gap-2"
+                    onClick={() => { navigate('/submit'); setIsMenuOpen(false); }}
+                  >
                     <Plus className="h-4 w-4" />
                     Enviar Vídeo
                   </Button>
