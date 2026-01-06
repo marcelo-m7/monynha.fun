@@ -40,7 +40,7 @@ export const HeroSection = () => {
               variant="hero" 
               size="xl" 
               className="gap-2 group"
-              onClick={() => navigate('/submit')} {/* Updated link */}
+              onClick={() => navigate('/submit')} // Updated link
             >
               <Youtube className="w-5 h-5" />
               {t('hero.submitVideoButton')}
@@ -49,7 +49,7 @@ export const HeroSection = () => {
             <Button 
               variant="outline" 
               size="lg"
-              onClick={() => navigate('/videos')} {/* Updated link */}
+              onClick={() => navigate('/videos')} // Updated link
             >
               {t('hero.exploreCategoriesButton')}
             </Button>
