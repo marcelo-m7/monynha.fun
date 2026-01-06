@@ -95,7 +95,7 @@ const Index = () => {
                     className="animate-fade-up"
                     style={{ animationDelay: `${index * 0.1}s` }}
                   >
-                    <VideoCard video={video} />
+                    <VideoCard video={video} variant="default" /> {/* Explicitly set default variant */}
                   </div>
                 ))}
               </div>
@@ -144,7 +144,7 @@ const Index = () => {
                     className="animate-fade-up"
                     style={{ animationDelay: `${index * 0.1}s` }}
                   >
-                    <VideoCard video={video} />
+                    <VideoCard video={video} variant="default" /> {/* Explicitly set default variant */}
                   </div>
                 ))}
               </div>

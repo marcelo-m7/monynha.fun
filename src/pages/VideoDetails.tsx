@@ -84,7 +84,7 @@ const VideoDetails = () => {
                 className="w-full h-full"
                 src={getYouTubeEmbedUrl(video.youtube_id)}
                 title={video.title}
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-m edia; gyroscope; picture-in-picture"
                 allowFullScreen
               ></iframe>
             </AspectRatio>
@@ -127,7 +127,7 @@ const VideoDetails = () => {
           </div>
 
           {/* Related Videos Sidebar */}
-          <div className="lg:col-span-1 space-y-6">
+          <div className="lg:col-span-1 space-y-4"> {/* Changed gap to space-y-4 for better spacing */}
             <h2 className="text-xl font-bold">Vídeos Relacionados</h2>
             {relatedLoading ? (
               <div className="space-y-4">
@@ -147,6 +147,7 @@ const VideoDetails = () => {
                   <VideoCard 
                     key={relatedVideo.id} 
                     video={relatedVideo} 
+                    variant="compact" // Use the compact variant here
                     onClick={() => navigate(`/videos/${relatedVideo.id}`)}
                   />
                 ))}
