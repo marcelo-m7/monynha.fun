@@ -9,12 +9,13 @@ import Submit from "./pages/Submit";
 import VideoDetails from "./pages/VideoDetails";
 import Videos from "./pages/Videos";
 import Favorites from "./pages/Favorites";
-import Community from "./pages/Community"; // New import
-import About from "./pages/About";         // New import
-import Rules from "./pages/Rules";         // New import
-import Contact from "./pages/Contact";       // New import
-import FAQ from "./pages/FAQ";             // New import
+import Community from "./pages/Community";
+import About from "./pages/About";
+import Rules from "./pages/Rules";
+import Contact from "./pages/Contact";
+import FAQ from "./pages/FAQ";
 import NotFound from "./pages/NotFound";
+import ScrollToTop from "./components/ScrollToTop"; // Import the new ScrollToTop component
 import './i18n/config'; // Import i18n configuration to initialize it
 
 const queryClient = new QueryClient();
@@ -25,6 +26,7 @@ const App = () => (
       <TooltipProvider>
         <Sonner />
         <BrowserRouter>
+          <ScrollToTop /> {/* Place ScrollToTop inside BrowserRouter */}
           <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/auth" element={<Auth />} />
@@ -32,11 +34,11 @@ const App = () => (
             <Route path="/videos/:videoId" element={<VideoDetails />} />
             <Route path="/videos" element={<Videos />} />
             <Route path="/favorites" element={<Favorites />} />
-            <Route path="/community" element={<Community />} /> {/* New route */}
-            <Route path="/about" element={<About />} />         {/* New route */}
-            <Route path="/rules" element={<Rules />} />         {/* New route */}
-            <Route path="/contact" element={<Contact />} />       {/* New route */}
-            <Route path="/faq" element={<FAQ />} />             {/* New route */}
+            <Route path="/community" element={<Community />} />
+            <Route path="/about" element={<About />} />
+            <Route path="/rules" element={<Rules />} />
+            <Route path="/contact" element={<Contact />} />
+            <Route path="/faq" element={<FAQ />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
