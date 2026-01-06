@@ -114,7 +114,7 @@ export type Database = {
           id: string
           is_featured: boolean
           language: string
-          submitted_by: string
+          submitted_by: string | null
           thumbnail_url: string
           title: string
           updated_at: string
@@ -130,7 +130,7 @@ export type Database = {
           id?: string
           is_featured?: boolean
           language?: string
-          submitted_by: string
+          submitted_by?: string | null
           thumbnail_url: string
           title: string
           updated_at?: string
@@ -146,7 +146,7 @@ export type Database = {
           id?: string
           is_featured?: boolean
           language?: string
-          submitted_by?: string
+          submitted_by?: string | null
           thumbnail_url?: string
           title?: string
           updated_at?: string
