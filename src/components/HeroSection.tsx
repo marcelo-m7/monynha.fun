@@ -1,9 +1,11 @@
 import { ArrowRight, Sparkles, Youtube, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { useTranslation } from 'react-i18next'; // Import useTranslation
+import { useTranslation } from 'react-i18next';
+import { useNavigate } from "react-router-dom"; // Import useNavigate
 
 export const HeroSection = () => {
-  const { t } = useTranslation(); // Initialize useTranslation
+  const { t } = useTranslation();
+  const navigate = useNavigate(); // Initialize useNavigate
 
   return (
     <section className="relative overflow-hidden bg-gradient-to-br from-primary/5 via-background to-accent/5 py-16 md:py-24">
@@ -34,12 +36,21 @@ export const HeroSection = () => {
 
           {/* CTA Buttons */}
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 animate-fade-up" style={{ animationDelay: "0.3s" }}>
-            <Button variant="hero" size="xl" className="gap-2 group">
+            <Button 
+              variant="hero" 
+              size="xl" 
+              className="gap-2 group"
+              onClick={() => navigate('/submit')} {/* Updated link */}
+            >
               <Youtube className="w-5 h-5" />
               {t('hero.submitVideoButton')}
               <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
             </Button>
-            <Button variant="outline" size="lg">
+            <Button 
+              variant="outline" 
+              size="lg"
+              onClick={() => navigate('/videos')} {/* Updated link */}
+            >
               {t('hero.exploreCategoriesButton')}
             </Button>
           </div>
