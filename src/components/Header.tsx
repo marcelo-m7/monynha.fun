@@ -1,12 +1,20 @@
-import { Link } from "react-router-dom";
-import { Search, Plus, Menu, X } from "lucide-react";
+import { Link, useNavigate } from "react-router-dom";
+import { Search, Plus, Menu, X, LogOut, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useState } from "react";
+import { useAuth } from "@/hooks/useAuth";
 
 export const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+  const { user, signOut } = useAuth();
+  const navigate = useNavigate();
+
+  const handleSignOut = async () => {
+    await signOut();
+    navigate('/');
+  };
 
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border/50 bg-background/80 backdrop-blur-xl">
@@ -37,10 +45,43 @@ export const Header = () => {
 
         {/* Actions */}
         <div className="flex items-center gap-2">
-          <Button variant="hero" size="sm" className="hidden sm:flex gap-2">
-            <Plus className="h-4 w-4" />
-            Enviar Vídeo
-          </Button>
+          {user ? (
+            <>
+              <Button variant="hero" size="sm" className="hidden sm:flex gap-2">
+                <Plus className="h-4 w-4" />
+                Enviar Vídeo
+              </Button>
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                onClick={handleSignOut}
+                className="hidden sm:flex gap-2 text-muted-foreground hover:text-foreground"
+              >
+                <LogOut className="h-4 w-4" />
+                Sair
+              </Button>
+            </>
+          ) : (
+            <>
+              <Button 
+                variant="hero" 
+                size="sm" 
+                className="hidden sm:flex gap-2"
+                onClick={() => navigate('/auth')}
+              >
+                <Plus className="h-4 w-4" />
+                Enviar Vídeo
+              </Button>
+              <Button 
+                variant="outline" 
+                size="sm" 
+                className="hidden sm:flex"
+                onClick={() => navigate('/auth')}
+              >
+                Entrar
+              </Button>
+            </>
+          )}
           <Button variant="ghost" size="icon" className="md:hidden">
             <Search className="h-5 w-5" />
           </Button>
@@ -51,9 +92,6 @@ export const Header = () => {
             onClick={() => setIsMenuOpen(!isMenuOpen)}
           >
             {isMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
-          </Button>
-          <Button variant="outline" size="sm" className="hidden sm:flex">
-            Entrar
           </Button>
         </div>
       </div>
@@ -71,13 +109,40 @@ export const Header = () => {
               />
             </div>
             <div className="flex flex-col gap-2">
-              <Button variant="hero" className="w-full justify-center gap-2">
-                <Plus className="h-4 w-4" />
-                Enviar Vídeo
-              </Button>
-              <Button variant="outline" className="w-full">
-                Entrar
-              </Button>
+              {user ? (
+                <>
+                  <Button variant="hero" className="w-full justify-center gap-2">
+                    <Plus className="h-4 w-4" />
+                    Enviar Vídeo
+                  </Button>
+                  <Button 
+                    variant="outline" 
+                    className="w-full gap-2"
+                    onClick={handleSignOut}
+                  >
+                    <LogOut className="h-4 w-4" />
+                    Sair
+                  </Button>
+                </>
+              ) : (
+                <>
+                  <Button 
+                    variant="hero" 
+                    className="w-full justify-center gap-2"
+                    onClick={() => navigate('/auth')}
+                  >
+                    <Plus className="h-4 w-4" />
+                    Enviar Vídeo
+                  </Button>
+                  <Button 
+                    variant="outline" 
+                    className="w-full"
+                    onClick={() => navigate('/auth')}
+                  >
+                    Entrar
+                  </Button>
+                </>
+              )}
             </div>
           </div>
         </div>
