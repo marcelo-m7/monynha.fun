@@ -79,12 +79,12 @@ const Videos = () => {
             />
           </div>
 
-          <Select value={selectedCategory} onValueChange={setSelectedCategory}>
+          <Select value={selectedCategory} onValueChange={(value) => setSelectedCategory(value === "all" ? "" : value)}>
             <SelectTrigger className="w-full md:w-[200px] bg-muted/50 border-0 focus:ring-primary/30">
               <SelectValue placeholder={t('videos.allCategories')} />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="">{t('videos.allCategories')}</SelectItem>
+              <SelectItem value="all">{t('videos.allCategories')}</SelectItem>
               {categoriesLoading ? (
                 <div className="p-2 text-muted-foreground">{t('videos.loadingCategories')}</div>
               ) : (
@@ -97,12 +97,12 @@ const Videos = () => {
             </SelectContent>
           </Select>
 
-          <Select value={selectedLanguage} onValueChange={setSelectedLanguage}>
+          <Select value={selectedLanguage} onValueChange={(value) => setSelectedLanguage(value === "all" ? "" : value)}>
             <SelectTrigger className="w-full md:w-[150px] bg-muted/50 border-0 focus:ring-primary/30">
               <SelectValue placeholder={t('videos.allLanguages')} />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="">{t('videos.allLanguages')}</SelectItem>
+              <SelectItem value="all">{t('videos.allLanguages')}</SelectItem>
               {availableLanguages.map((lang) => (
                 <SelectItem key={lang.value} value={lang.value}>
                   {lang.label}
