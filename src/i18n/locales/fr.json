@@ -164,5 +164,25 @@
     "title": "404",
     "description": "Oups ! Page introuvable",
     "returnHome": "Retour à l'accueil"
+  },
+  "community": {
+    "title": "Communauté",
+    "description": "Connectez-vous avec d'autres curateurs et passionnés de vidéo."
+  },
+  "about": {
+    "title": "À Propos de Nous",
+    "description": "En savoir plus sur la mission et la vision de Monynha Fun."
+  },
+  "rules": {
+    "title": "Règles de la Communauté",
+    "description": "Lignes directrices pour maintenir un environnement positif et productif."
+  },
+  "contact": {
+    "title": "Contact",
+    "description": "Contactez-nous pour des questions, des suggestions ou du support."
+  },
+  "faq": {
+    "title": "Foire Aux Questions",
+    "description": "Trouvez des réponses aux questions les plus courantes sur la plateforme."
   }
 }

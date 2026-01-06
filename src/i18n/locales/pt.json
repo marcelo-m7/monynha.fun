@@ -164,5 +164,25 @@
     "title": "404",
     "description": "Oops! Página não encontrada",
     "returnHome": "Voltar para Home"
+  },
+  "community": {
+    "title": "Comunidade",
+    "description": "Conecte-se com outros curadores e entusiastas de vídeo."
+  },
+  "about": {
+    "title": "Sobre Nós",
+    "description": "Saiba mais sobre a missão e a visão da Monynha Fun."
+  },
+  "rules": {
+    "title": "Regras da Comunidade",
+    "description": "Diretrizes para manter um ambiente positivo e produtivo."
+  },
+  "contact": {
+    "title": "Contato",
+    "description": "Entre em contato conosco para dúvidas, sugestões ou suporte."
+  },
+  "faq": {
+    "title": "Perguntas Frequentes",
+    "description": "Encontre respostas para as perguntas mais comuns sobre a plataforma."
   }
 }
