@@ -1,5 +1,5 @@
-import { Video, formatDuration, formatViewCount, categories } from "@/data/mockData";
-import { Play, Eye, Clock } from "lucide-react";
+import { Video, formatDuration, formatViewCount } from "@/hooks/useVideos";
+import { Play, Eye } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 
 interface VideoCardProps {
@@ -8,8 +8,6 @@ interface VideoCardProps {
 }
 
 export const VideoCard = ({ video, onClick }: VideoCardProps) => {
-  const category = categories.find((c) => c.id === video.category_id);
-
   return (
     <article
       onClick={onClick}
@@ -38,7 +36,7 @@ export const VideoCard = ({ video, onClick }: VideoCardProps) => {
         {/* Language badge */}
         <Badge
           variant="secondary"
-          className="absolute top-2 left-2 text-xs font-medium bg-background/90 backdrop-blur-sm"
+          className="absolute top-2 left-2 text-xs font-medium bg-background/90 backdrop-blur-sm uppercase"
         >
           {video.language}
         </Badge>
@@ -59,9 +57,13 @@ export const VideoCard = ({ video, onClick }: VideoCardProps) => {
             <Eye className="w-3.5 h-3.5" />
             <span>{formatViewCount(video.view_count)}</span>
           </div>
-          {category && (
-            <Badge variant="outline" className="text-xs px-2 py-0.5">
-              {category.icon} {category.name}
+          {video.category && (
+            <Badge 
+              variant="outline" 
+              className="text-xs px-2 py-0.5"
+              style={{ borderColor: video.category.color, color: video.category.color }}
+            >
+              {video.category.name}
             </Badge>
           )}
         </div>

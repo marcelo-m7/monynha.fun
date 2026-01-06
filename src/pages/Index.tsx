@@ -3,11 +3,17 @@ import { HeroSection } from "@/components/HeroSection";
 import { CategoryCard } from "@/components/CategoryCard";
 import { VideoCard } from "@/components/VideoCard";
 import { Footer } from "@/components/Footer";
-import { categories, videos } from "@/data/mockData";
-import { ArrowRight, TrendingUp, Clock } from "lucide-react";
+import { useCategories } from "@/hooks/useCategories";
+import { useFeaturedVideos, useRecentVideos } from "@/hooks/useVideos";
+import { ArrowRight, TrendingUp, Clock, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
 
 const Index = () => {
+  const { data: categories, isLoading: categoriesLoading } = useCategories();
+  const { data: featuredVideos, isLoading: featuredLoading } = useFeaturedVideos(4);
+  const { data: recentVideos, isLoading: recentLoading } = useRecentVideos(4);
+
   return (
     <div className="min-h-screen flex flex-col">
       <Header />
@@ -30,17 +36,25 @@ const Index = () => {
               </Button>
             </div>
 
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
-              {categories.map((category, index) => (
-                <div
-                  key={category.id}
-                  className="animate-fade-up"
-                  style={{ animationDelay: `${index * 0.05}s` }}
-                >
-                  <CategoryCard category={category} />
-                </div>
-              ))}
-            </div>
+            {categoriesLoading ? (
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-7 gap-4">
+                {Array.from({ length: 7 }).map((_, i) => (
+                  <Skeleton key={i} className="h-32 rounded-2xl" />
+                ))}
+              </div>
+            ) : (
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-7 gap-4">
+                {categories?.map((category, index) => (
+                  <div
+                    key={category.id}
+                    className="animate-fade-up"
+                    style={{ animationDelay: `${index * 0.05}s` }}
+                  >
+                    <CategoryCard category={category} />
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         </section>
 
@@ -63,17 +77,33 @@ const Index = () => {
               </Button>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-              {videos.slice(0, 4).map((video, index) => (
-                <div
-                  key={video.id}
-                  className="animate-fade-up"
-                  style={{ animationDelay: `${index * 0.1}s` }}
-                >
-                  <VideoCard video={video} />
-                </div>
-              ))}
-            </div>
+            {featuredLoading ? (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                {Array.from({ length: 4 }).map((_, i) => (
+                  <div key={i} className="space-y-3">
+                    <Skeleton className="aspect-video rounded-2xl" />
+                    <Skeleton className="h-4 w-3/4" />
+                    <Skeleton className="h-3 w-1/2" />
+                  </div>
+                ))}
+              </div>
+            ) : featuredVideos && featuredVideos.length > 0 ? (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                {featuredVideos.map((video, index) => (
+                  <div
+                    key={video.id}
+                    className="animate-fade-up"
+                    style={{ animationDelay: `${index * 0.1}s` }}
+                  >
+                    <VideoCard video={video} />
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="text-center py-12 text-muted-foreground">
+                Nenhum vídeo em destaque ainda.
+              </div>
+            )}
           </div>
         </section>
 
@@ -96,17 +126,33 @@ const Index = () => {
               </Button>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-              {videos.slice(4, 8).map((video, index) => (
-                <div
-                  key={video.id}
-                  className="animate-fade-up"
-                  style={{ animationDelay: `${index * 0.1}s` }}
-                >
-                  <VideoCard video={video} />
-                </div>
-              ))}
-            </div>
+            {recentLoading ? (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                {Array.from({ length: 4 }).map((_, i) => (
+                  <div key={i} className="space-y-3">
+                    <Skeleton className="aspect-video rounded-2xl" />
+                    <Skeleton className="h-4 w-3/4" />
+                    <Skeleton className="h-3 w-1/2" />
+                  </div>
+                ))}
+              </div>
+            ) : recentVideos && recentVideos.length > 0 ? (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                {recentVideos.map((video, index) => (
+                  <div
+                    key={video.id}
+                    className="animate-fade-up"
+                    style={{ animationDelay: `${index * 0.1}s` }}
+                  >
+                    <VideoCard video={video} />
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="text-center py-12 text-muted-foreground">
+                Nenhum vídeo recente ainda. Seja o primeiro a enviar!
+              </div>
+            )}
           </div>
         </section>
 
