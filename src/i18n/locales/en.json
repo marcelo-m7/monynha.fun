@@ -45,6 +45,7 @@
   "auth": {
     "loginTitle": "Log in to your account",
     "signupTitle": "Create your account",
+    "forgotPasswordTitle": "Reset Password",
     "usernameLabel": "Username (optional)",
     "usernamePlaceholder": "your_username",
     "emailLabel": "Email",
@@ -58,19 +59,25 @@
     "hasAccount": "Already have an account? Log in",
     "termsAgreement": "By continuing, you agree to the terms of use and privacy policy.",
     "loading": "Loading...",
+    "forgotPasswordLink": "Forgot password?",
+    "sendResetLinkButton": "Send Reset Link",
+    "backToLogin": "Back to Login",
     "error": {
       "validationTitle": "Validation Error",
       "loginGeneric": "Error logging in",
       "invalidCredentials": "Incorrect email or password",
       "emailNotConfirmed": "Please confirm your email before logging in",
       "signupGeneric": "Error creating account",
-      "emailRegistered": "This email is already registered"
+      "emailRegistered": "This email is already registered",
+      "forgotPasswordGeneric": "Error sending reset link"
     },
     "success": {
       "welcomeBack": "Welcome back!",
       "loginSuccess": "Login successful",
       "accountCreated": "Account created!",
-      "confirmEmail": "Check your email to confirm your registration"
+      "confirmEmail": "Check your email to confirm your registration",
+      "passwordResetEmailSent": "Password reset email sent!",
+      "checkEmailForReset": "Check your inbox for the password reset link."
     }
   },
   "submit": {

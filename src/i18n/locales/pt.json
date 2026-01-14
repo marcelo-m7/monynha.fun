@@ -45,6 +45,7 @@
   "auth": {
     "loginTitle": "Entre na sua conta",
     "signupTitle": "Crie sua conta",
+    "forgotPasswordTitle": "Redefinir Senha",
     "usernameLabel": "Username (opcional)",
     "usernamePlaceholder": "seu_username",
     "emailLabel": "Email",
@@ -58,19 +59,25 @@
     "hasAccount": "Já tem conta? Faça login",
     "termsAgreement": "Ao continuar, você concorda com os termos de uso e política de privacidade.",
     "loading": "Carregando...",
+    "forgotPasswordLink": "Esqueceu a senha?",
+    "sendResetLinkButton": "Enviar Link de Redefinição",
+    "backToLogin": "Voltar para o Login",
     "error": {
       "validationTitle": "Erro de validação",
       "loginGeneric": "Erro ao fazer login",
       "invalidCredentials": "Email ou senha incorretos",
       "emailNotConfirmed": "Por favor, confirme seu email antes de fazer login",
       "signupGeneric": "Erro ao criar conta",
-      "emailRegistered": "Este email já está cadastrado"
+      "emailRegistered": "Este email já está cadastrado",
+      "forgotPasswordGeneric": "Erro ao enviar link de redefinição"
     },
     "success": {
       "welcomeBack": "Bem-vindo de volta!",
       "loginSuccess": "Login realizado com sucesso",
       "accountCreated": "Conta criada!",
-      "confirmEmail": "Verifique seu email para confirmar o cadastro"
+      "confirmEmail": "Verifique seu email para confirmar o cadastro",
+      "passwordResetEmailSent": "Email de redefinição enviado!",
+      "checkEmailForReset": "Verifique sua caixa de entrada para o link de redefinição de senha."
     }
   },
   "submit": {

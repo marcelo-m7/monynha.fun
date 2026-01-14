@@ -45,6 +45,7 @@
   "auth": {
     "loginTitle": "Inicia sesión en tu cuenta",
     "signupTitle": "Crea tu cuenta",
+    "forgotPasswordTitle": "Restablecer Contraseña",
     "usernameLabel": "Nombre de usuario (opcional)",
     "usernamePlaceholder": "tu_nombre_de_usuario",
     "emailLabel": "Correo electrónico",
@@ -58,19 +59,25 @@
     "hasAccount": "¿Ya tienes una cuenta? Inicia sesión",
     "termsAgreement": "Al continuar, aceptas los términos de uso y la política de privacidad.",
     "loading": "Cargando...",
+    "forgotPasswordLink": "¿Olvidaste tu contraseña?",
+    "sendResetLinkButton": "Enviar Enlace de Restablecimiento",
+    "backToLogin": "Volver al Inicio de Sesión",
     "error": {
       "validationTitle": "Error de Validación",
       "loginGeneric": "Error al iniciar sesión",
       "invalidCredentials": "Correo electrónico o contraseña incorrectos",
       "emailNotConfirmed": "Por favor, confirma tu correo electrónico antes de iniciar sesión",
       "signupGeneric": "Error al crear cuenta",
-      "emailRegistered": "Este correo electrónico ya está registrado"
+      "emailRegistered": "Este correo electrónico ya está registrado",
+      "forgotPasswordGeneric": "Error al enviar enlace de restablecimiento"
     },
     "success": {
       "welcomeBack": "¡Bienvenido de nuevo!",
       "loginSuccess": "Inicio de sesión exitoso",
       "accountCreated": "¡Cuenta creada!",
-      "confirmEmail": "Verifica tu correo electrónico para confirmar el registro"
+      "confirmEmail": "Verifica tu correo electrónico para confirmar el registro",
+      "passwordResetEmailSent": "¡Correo de restablecimiento de contraseña enviado!",
+      "checkEmailForReset": "Revisa tu bandeja de entrada para el enlace de restablecimiento de contraseña."
     }
   },
   "submit": {

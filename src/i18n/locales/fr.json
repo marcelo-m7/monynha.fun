@@ -45,6 +45,7 @@
   "auth": {
     "loginTitle": "Connectez-vous à votre compte",
     "signupTitle": "Créez votre compte",
+    "forgotPasswordTitle": "Réinitialiser le Mot de Passe",
     "usernameLabel": "Nom d'utilisateur (facultatif)",
     "usernamePlaceholder": "votre_nom_utilisateur",
     "emailLabel": "Email",
@@ -58,19 +59,25 @@
     "hasAccount": "Déjà un compte ? Connectez-vous",
     "termsAgreement": "En continuant, vous acceptez les conditions d'utilisation et la politique de confidentialité.",
     "loading": "Chargement...",
+    "forgotPasswordLink": "Mot de passe oublié ?",
+    "sendResetLinkButton": "Envoyer le Lien de Réinitialisation",
+    "backToLogin": "Retour à la Connexion",
     "error": {
       "validationTitle": "Erreur de Validation",
       "loginGeneric": "Erreur de connexion",
       "invalidCredentials": "Email ou mot de passe incorrect",
       "emailNotConfirmed": "Veuillez confirmer votre email avant de vous connecter",
       "signupGeneric": "Erreur lors de la création du compte",
-      "emailRegistered": "Cet email est déjà enregistré"
+      "emailRegistered": "Cet email est déjà enregistré",
+      "forgotPasswordGeneric": "Erreur lors de l'envoi du lien de réinitialisation"
     },
     "success": {
       "welcomeBack": "Bienvenue de retour !",
       "loginSuccess": "Connexion réussie",
       "accountCreated": "Compte créé !",
-      "confirmEmail": "Vérifiez votre email pour confirmer votre inscription"
+      "confirmEmail": "Vérifiez votre email pour confirmer votre inscription",
+      "passwordResetEmailSent": "Email de réinitialisation du mot de passe envoyé !",
+      "checkEmailForReset": "Vérifiez votre boîte de réception pour le lien de réinitialisation du mot de passe."
     }
   },
   "submit": {
