@@ -54,6 +54,7 @@ const VideoDetails = () => {
       <div className="min-h-screen flex flex-col">
         <Header />
         <main className="flex-1 container py-8">
+          <Skeleton className="h-10 w-48 mb-6" /> {/* Added skeleton for back button */}
           <div className="grid lg:grid-cols-3 gap-8">
             <div className="lg:col-span-2 space-y-6">
               <Skeleton className="aspect-video w-full rounded-xl" />
@@ -93,7 +94,7 @@ const VideoDetails = () => {
           </p>
           <Button onClick={() => navigate('/')}>
             <ArrowLeft className="w-4 h-4 mr-2" />
-            {t('videoDetails.backToHome')}
+            {t('common.backToHome')}
           </Button>
         </main>
         <Footer />
@@ -105,6 +106,15 @@ const VideoDetails = () => {
     <div className="min-h-screen flex flex-col">
       <Header />
       <main className="flex-1 container py-8">
+        <Button
+          variant="ghost"
+          onClick={() => navigate(-1)} // Navigates back to the previous page
+          className="text-muted-foreground hover:text-foreground mb-6"
+        >
+          <ArrowLeft className="w-4 h-4 mr-2" />
+          {t('common.back')}
+        </Button>
+
         <div className="grid lg:grid-cols-3 gap-8">
           {/* Main Video Content */}
           <div className="lg:col-span-2 space-y-6">
