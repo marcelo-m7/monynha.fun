@@ -75,7 +75,11 @@
       "emailNotConfirmed": "Por favor, confirma tu correo electrónico antes de iniciar sesión",
       "signupGeneric": "Error al crear cuenta",
       "emailRegistered": "Este correo electrónico ya está registrado",
-      "forgotPasswordGeneric": "Error al enviar enlace de restablecimiento"
+      "forgotPasswordGeneric": "Error al enviar enlace de restablecimiento",
+      "invalidEmail": "Dirección de correo electrónico inválida",
+      "passwordMinLength": "La contraseña debe tener al menos 6 caracteres",
+      "usernameMinLength": "El nombre de usuario debe tener al menos 3 caracteres",
+      "genericAuthError": "Ocurrió un error de autenticación. Por favor, inténtalo de nuevo."
     },
     "success": {
       "welcomeBack": "¡Bienvenido de nuevo!",

@@ -7,23 +7,54 @@ import { Label } from '@/components/ui/label';
 import { toast } from 'sonner';
 import { Play, Mail, Lock, User, ArrowLeft, KeyRound } from 'lucide-react';
 import { z } from 'zod';
-import { useTranslation } from 'react-i18next'; // Import useTranslation
-import { supabase } from '@/integrations/supabase/client'; // Import supabase client for password reset
+import { useTranslation } from 'react-i18next';
+import { supabase } from '@/integrations/supabase/client';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
 
-const emailSchema = z.string().email('Email inválido');
-const passwordSchema = z.string().min(6, 'Senha deve ter pelo menos 6 caracteres');
-const usernameSchema = z.string().min(3, 'Username deve ter pelo menos 3 caracteres').optional();
+// Define Zod schemas for validation
+const loginSchema = z.object({
+  email: z.string().email('auth.error.invalidEmail'),
+  password: z.string().min(6, 'auth.error.passwordMinLength'),
+});
+
+const signupSchema = z.object({
+  username: z.string().min(3, 'auth.error.usernameMinLength').optional().or(z.literal('')),
+  email: z.string().email('auth.error.invalidEmail'),
+  password: z.string().min(6, 'auth.error.passwordMinLength'),
+});
+
+const forgotPasswordSchema = z.object({
+  email: z.string().email('auth.error.invalidEmail'),
+});
 
 export default function Auth() {
-  const { t } = useTranslation(); // Initialize useTranslation
+  const { t } = useTranslation();
   const [isLogin, setIsLogin] = useState(true);
   const [showForgotPassword, setShowForgotPassword] = useState(false);
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [username, setUsername] = useState('');
-  const [isSubmitting, setIsSubmitting] = useState(false);
   const { signIn, signUp, user, loading } = useAuth();
   const navigate = useNavigate();
+
+  // Form setup for login/signup
+  const { register, handleSubmit, formState: { errors, isSubmitting }, reset, watch } = useForm<z.infer<typeof loginSchema> | z.infer<typeof signupSchema>>({
+    resolver: zodResolver(isLogin ? loginSchema : signupSchema),
+    defaultValues: {
+      email: '',
+      password: '',
+      ...(isLogin ? {} : { username: '' }),
+    },
+  });
+
+  // Form setup for forgot password
+  const { register: registerForgotPassword, handleSubmit: handleSubmitForgotPassword, formState: { errors: forgotPasswordErrors, isSubmitting: isForgotPasswordSubmitting }, reset: resetForgotPassword } = useForm<z.infer<typeof forgotPasswordSchema>>({
+    resolver: zodResolver(forgotPasswordSchema),
+    defaultValues: {
+      email: '',
+    },
+  });
+
+  // Watch email field for forgot password to pre-fill if coming from login
+  const emailForForgotPassword = watch('email');
 
   useEffect(() => {
     if (!loading && user) {
@@ -31,36 +62,14 @@ export default function Auth() {
     }
   }, [user, loading, navigate]);
 
-  const validateForm = () => {
-    try {
-      emailSchema.parse(email);
-      if (!showForgotPassword) { // Only validate password/username if not in forgot password mode
-        passwordSchema.parse(password);
-        if (!isLogin && username) {
-          usernameSchema.parse(username);
-        }
-      }
-      return true;
-    } catch (error) {
-      if (error instanceof z.ZodError) {
-        toast.error(t('auth.error.validationTitle'), {
-          description: error.errors[0].message,
-        });
-      }
-      return false;
-    }
-  };
+  useEffect(() => {
+    reset(); // Reset form fields when switching between login/signup
+  }, [isLogin, reset]);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    if (!validateForm()) return;
-    
-    setIsSubmitting(true);
-
+  const onSubmit = async (values: z.infer<typeof loginSchema> | z.infer<typeof signupSchema>) => {
     try {
       if (isLogin) {
-        const { error } = await signIn(email, password);
+        const { error } = await signIn(values.email, values.password);
         if (error) {
           let message = t('auth.error.loginGeneric');
           if (error.message.includes('Invalid login credentials')) {
@@ -78,7 +87,8 @@ export default function Auth() {
           navigate('/');
         }
       } else {
-        const { error } = await signUp(email, password, username || undefined);
+        const signupValues = values as z.infer<typeof signupSchema>;
+        const { error } = await signUp(signupValues.email, signupValues.password, signupValues.username || undefined);
         if (error) {
           let message = t('auth.error.signupGeneric');
           if (error.message.includes('already registered')) {
@@ -93,29 +103,18 @@ export default function Auth() {
           });
         }
       }
-    } finally {
-      setIsSubmitting(false);
+    } catch (err) {
+      console.error('Auth submission error:', err);
+      toast.error(t('auth.error.genericAuthError'), {
+        description: err instanceof Error ? err.message : String(err),
+      });
     }
   };
 
-  const handleForgotPassword = async (e: React.FormEvent) => {
-    e.preventDefault();
-
+  const onForgotPasswordSubmit = async (values: z.infer<typeof forgotPasswordSchema>) => {
     try {
-      emailSchema.parse(email);
-    } catch (error) {
-      if (error instanceof z.ZodError) {
-        toast.error(t('auth.error.validationTitle'), {
-          description: error.errors[0].message,
-        });
-      }
-      return;
-    }
-
-    setIsSubmitting(true);
-    try {
-      const { error } = await supabase.auth.resetPasswordForEmail(email, {
-        redirectTo: `${window.location.origin}/auth?reset=true`, // Redirect to auth page with a reset param
+      const { error } = await supabase.auth.resetPasswordForEmail(values.email, {
+        redirectTo: `${window.location.origin}/auth?reset=true`,
       });
 
       if (error) {
@@ -126,11 +125,14 @@ export default function Auth() {
         toast.success(t('auth.success.passwordResetEmailSent'), {
           description: t('auth.success.checkEmailForReset'),
         });
-        setShowForgotPassword(false); // Go back to login form
-        setEmail(''); // Clear email field
+        setShowForgotPassword(false);
+        resetForgotPassword();
       }
-    } finally {
-      setIsSubmitting(false);
+    } catch (err) {
+      console.error('Forgot password error:', err);
+      toast.error(t('auth.error.genericAuthError'), {
+        description: err instanceof Error ? err.message : String(err),
+      });
     }
   };
 
@@ -146,8 +148,8 @@ export default function Auth() {
     <div className="min-h-screen bg-background flex flex-col">
       {/* Header */}
       <header className="p-4">
-        <Button 
-          variant="ghost" 
+        <Button
+          variant="ghost"
           onClick={() => navigate('/')}
           className="text-muted-foreground hover:text-foreground"
         >
@@ -177,31 +179,32 @@ export default function Auth() {
           {/* Form Card */}
           <div className="bg-card border border-border rounded-2xl p-8 shadow-elegant">
             {showForgotPassword ? (
-              <form onSubmit={handleForgotPassword} className="space-y-5">
+              <form onSubmit={handleSubmitForgotPassword(onForgotPasswordSubmit)} className="space-y-5">
                 <div className="space-y-2">
-                  <Label htmlFor="email" className="text-foreground">
+                  <Label htmlFor="forgot-email" className="text-foreground">
                     {t('auth.emailLabel')}
                   </Label>
                   <div className="relative">
                     <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
                     <Input
-                      id="email"
+                      id="forgot-email"
                       type="email"
                       placeholder={t('auth.emailPlaceholder')}
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      required
+                      {...registerForgotPassword('email')}
                       className="pl-10"
                     />
                   </div>
+                  {forgotPasswordErrors.email && (
+                    <p className="text-sm text-destructive">{t(forgotPasswordErrors.email.message as string)}</p>
+                  )}
                 </div>
-                <Button 
-                  type="submit" 
-                  className="w-full" 
+                <Button
+                  type="submit"
+                  className="w-full"
                   size="lg"
-                  disabled={isSubmitting}
+                  disabled={isForgotPasswordSubmitting}
                 >
-                  {isSubmitting 
+                  {isForgotPasswordSubmitting
                     ? t('auth.submittingButton')
                     : t('auth.sendResetLinkButton')
                   }
@@ -209,7 +212,11 @@ export default function Auth() {
                 <div className="mt-6 text-center">
                   <button
                     type="button"
-                    onClick={() => setShowForgotPassword(false)}
+                    onClick={() => {
+                      setShowForgotPassword(false);
+                      resetForgotPassword();
+                      reset({ email: emailForForgotPassword, password: '', username: '' }); // Pre-fill email back to login form
+                    }}
                     className="text-sm text-muted-foreground hover:text-primary transition-colors"
                   >
                     {t('auth.backToLogin')}
@@ -217,7 +224,7 @@ export default function Auth() {
                 </div>
               </form>
             ) : (
-              <form onSubmit={handleSubmit} className="space-y-5">
+              <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
                 {!isLogin && (
                   <div className="space-y-2">
                     <Label htmlFor="username" className="text-foreground">
@@ -229,11 +236,13 @@ export default function Auth() {
                         id="username"
                         type="text"
                         placeholder={t('auth.usernamePlaceholder')}
-                        value={username}
-                        onChange={(e) => setUsername(e.target.value)}
+                        {...register('username')}
                         className="pl-10"
                       />
                     </div>
+                    {errors.username && (
+                      <p className="text-sm text-destructive">{t(errors.username.message as string)}</p>
+                    )}
                   </div>
                 )}
 
@@ -247,12 +256,13 @@ export default function Auth() {
                       id="email"
                       type="email"
                       placeholder={t('auth.emailPlaceholder')}
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      required
+                      {...register('email')}
                       className="pl-10"
                     />
                   </div>
+                  {errors.email && (
+                    <p className="text-sm text-destructive">{t(errors.email.message as string)}</p>
+                  )}
                 </div>
 
                 <div className="space-y-2">
@@ -265,19 +275,23 @@ export default function Auth() {
                       id="password"
                       type="password"
                       placeholder={t('auth.passwordPlaceholder')}
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
-                      required
+                      {...register('password')}
                       className="pl-10"
                     />
                   </div>
+                  {errors.password && (
+                    <p className="text-sm text-destructive">{t(errors.password.message as string)}</p>
+                  )}
                 </div>
 
                 {isLogin && (
                   <div className="text-right">
                     <button
                       type="button"
-                      onClick={() => setShowForgotPassword(true)}
+                      onClick={() => {
+                        setShowForgotPassword(true);
+                        resetForgotPassword({ email: watch('email') }); // Pre-fill email to forgot password form
+                      }}
                       className="text-sm text-muted-foreground hover:text-primary transition-colors"
                     >
                       {t('auth.forgotPasswordLink')}
@@ -285,15 +299,15 @@ export default function Auth() {
                   </div>
                 )}
 
-                <Button 
-                  type="submit" 
-                  className="w-full" 
+                <Button
+                  type="submit"
+                  className="w-full"
                   size="lg"
                   disabled={isSubmitting}
                 >
-                  {isSubmitting 
+                  {isSubmitting
                     ? t('auth.submittingButton')
-                    : isLogin 
+                    : isLogin
                       ? t('auth.loginButton')
                       : t('auth.signupButton')
                   }
@@ -308,7 +322,7 @@ export default function Auth() {
                   onClick={() => setIsLogin(!isLogin)}
                   className="text-sm text-muted-foreground hover:text-primary transition-colors"
                 >
-                  {isLogin 
+                  {isLogin
                     ? t('auth.noAccount')
                     : t('auth.hasAccount')
                   }

@@ -75,7 +75,11 @@
       "emailNotConfirmed": "Please confirm your email before logging in",
       "signupGeneric": "Error creating account",
       "emailRegistered": "This email is already registered",
-      "forgotPasswordGeneric": "Error sending reset link"
+      "forgotPasswordGeneric": "Error sending reset link",
+      "invalidEmail": "Invalid email address",
+      "passwordMinLength": "Password must be at least 6 characters",
+      "usernameMinLength": "Username must be at least 3 characters",
+      "genericAuthError": "An authentication error occurred. Please try again."
     },
     "success": {
       "welcomeBack": "Welcome back!",

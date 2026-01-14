@@ -75,7 +75,11 @@
       "emailNotConfirmed": "Por favor, confirme seu email antes de fazer login",
       "signupGeneric": "Erro ao criar conta",
       "emailRegistered": "Este email já está cadastrado",
-      "forgotPasswordGeneric": "Erro ao enviar link de redefinição"
+      "forgotPasswordGeneric": "Erro ao enviar link de redefinição",
+      "invalidEmail": "Email inválido",
+      "passwordMinLength": "Senha deve ter pelo menos 6 caracteres",
+      "usernameMinLength": "Username deve ter pelo menos 3 caracteres",
+      "genericAuthError": "Ocorreu um erro de autenticação. Tente novamente."
     },
     "success": {
       "welcomeBack": "Bem-vindo de volta!",

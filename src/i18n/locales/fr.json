@@ -75,7 +75,11 @@
       "emailNotConfirmed": "Veuillez confirmer votre email avant de vous connecter",
       "signupGeneric": "Erreur lors de la création du compte",
       "emailRegistered": "Cet email est déjà enregistré",
-      "forgotPasswordGeneric": "Erreur lors de l'envoi du lien de réinitialisation"
+      "forgotPasswordGeneric": "Erreur lors de l'envoi du lien de réinitialisation",
+      "invalidEmail": "Adresse e-mail invalide",
+      "passwordMinLength": "Le mot de passe doit contenir au moins 6 caractères",
+      "usernameMinLength": "Le nom d'utilisateur doit contenir au moins 3 caractères",
+      "genericAuthError": "Une erreur d'authentification est survenue. Veuillez réessayer."
     },
     "success": {
       "welcomeBack": "Bienvenue de retour !",
