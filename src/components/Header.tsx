@@ -14,6 +14,7 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/co
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
 import { NavLink } from "@/components/NavLink";
+import { Label } from "@/components/ui/label"; // Import Label
 
 export const Header = () => {
   const { t } = useTranslation();
