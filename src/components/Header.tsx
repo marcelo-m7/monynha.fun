@@ -211,10 +211,7 @@ export const Header = () => {
                     </span>
                   </Link>
                 </SheetTitle>
-                <Button variant="ghost" size="icon" onClick={() => setIsSheetOpen(false)}>
-                  <X className="h-5 w-5" />
-                  <span className="sr-only">{t('header.closeMenu')}</span>
-                </Button>
+
               </SheetHeader>
               <ScrollArea className="flex-1 py-4">
                 <div className="space-y-6">
