@@ -1,15 +1,20 @@
-import { useParams, useNavigate } from 'react-router-dom';
-import { usePlaylistById, usePlaylistVideos, useDeletePlaylist } from '@/hooks/usePlaylists';
+import { useParams, useNavigate, Link } from 'react-router-dom';
+import { usePlaylistById, usePlaylistVideos, useDeletePlaylist, useAddVideoToPlaylist, useRemoveVideoFromPlaylist } from '@/hooks/usePlaylists';
 import { Header } from '@/components/Header';
 import { Footer } from '@/components/Footer';
 import { VideoCard } from '@/components/VideoCard';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
-import { ArrowLeft, ListVideo, BookOpen, Code, Globe, Trash2, Edit, Loader2 } from 'lucide-react';
+import { ArrowLeft, ListVideo, BookOpen, Code, Globe, Trash2, Edit, Loader2, Plus, Search, XCircle } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '@/hooks/useAuth';
 import { toast } from 'sonner';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import { useState } from 'react';
+import { useVideos } from '@/hooks/useVideos';
+import { ScrollArea } from '@/components/ui/scroll-area';
 
 const PlaylistDetails = () => {
   const { t } = useTranslation();
@@ -20,14 +25,41 @@ const PlaylistDetails = () => {
   const { data: playlist, isLoading: playlistLoading, isError: playlistError } = usePlaylistById(playlistId);
   const { data: playlistVideos, isLoading: videosLoading, isError: videosError } = usePlaylistVideos(playlistId);
   const deletePlaylistMutation = useDeletePlaylist();
+  const addVideoToPlaylistMutation = useAddVideoToPlaylist();
+  const removeVideoFromPlaylistMutation = useRemoveVideoFromPlaylist();
 
   const isAuthor = user && playlist && user.id === playlist.author_id;
+
+  const [addVideoSearchQuery, setAddVideoSearchQuery] = useState('');
+  const [isAddVideoDialogOpen, setIsAddVideoDialogOpen] = useState(false);
+  const { data: availableVideos, isLoading: availableVideosLoading } = useVideos({ searchQuery: addVideoSearchQuery });
 
   const handleDeletePlaylist = async () => {
     if (!playlistId) return;
     try {
       await deletePlaylistMutation.mutateAsync(playlistId);
       navigate('/playlists');
+    } catch (error) {
+      // Error handled by mutation hook's onError
+    }
+  };
+
+  const handleAddVideo = async (videoId: string) => {
+    if (!playlistId) return;
+    try {
+      await addVideoToPlaylistMutation.mutateAsync({ playlistId, videoId });
+      // Optionally close dialog or clear search
+      setAddVideoSearchQuery('');
+      setIsAddVideoDialogOpen(false);
+    } catch (error) {
+      // Error handled by mutation hook's onError
+    }
+  };
+
+  const handleRemoveVideo = async (videoId: string) => {
+    if (!playlistId) return;
+    try {
+      await removeVideoFromPlaylistMutation.mutateAsync({ playlistId, videoId });
     } catch (error) {
       // Error handled by mutation hook's onError
     }
@@ -124,6 +156,74 @@ const PlaylistDetails = () => {
               <Button variant="outline" size="sm" className="gap-2" onClick={() => navigate(`/playlists/${playlist.id}/edit`)}>
                 <Edit className="w-4 h-4" /> {t('playlistDetails.editPlaylist')}
               </Button>
+              <Dialog open={isAddVideoDialogOpen} onOpenChange={setIsAddVideoDialogOpen}>
+                <DialogTrigger asChild>
+                  <Button variant="secondary" size="sm" className="gap-2">
+                    <Plus className="w-4 h-4" /> {t('playlistDetails.addVideos')}
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="sm:max-w-[600px] h-[80vh] flex flex-col">
+                  <DialogHeader>
+                    <DialogTitle>{t('playlistDetails.addVideoDialogTitle')}</DialogTitle>
+                    <DialogDescription>{t('playlistDetails.addVideoDialogDescription')}</DialogDescription>
+                  </DialogHeader>
+                  <div className="relative mb-4">
+                    <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                    <Input
+                      placeholder={t('playlistDetails.searchVideosPlaceholder')}
+                      value={addVideoSearchQuery}
+                      onChange={(e) => setAddVideoSearchQuery(e.target.value)}
+                      className="pl-10"
+                    />
+                    {addVideoSearchQuery && (
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="absolute right-2 top-1/2 -translate-y-1/2 h-8 w-8 text-muted-foreground"
+                        onClick={() => setAddVideoSearchQuery('')}
+                      >
+                        <XCircle className="h-4 w-4" />
+                      </Button>
+                    )}
+                  </div>
+                  <ScrollArea className="flex-1 pr-4">
+                    {availableVideosLoading ? (
+                      <div className="space-y-4">
+                        {Array.from({ length: 5 }).map((_, i) => (
+                          <div key={i} className="flex items-center space-x-4">
+                            <Skeleton className="w-24 h-16 rounded-md" />
+                            <div className="flex-1 space-y-2">
+                              <Skeleton className="h-4 w-full" />
+                              <Skeleton className="h-3 w-3/4" />
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    ) : availableVideos && availableVideos.length > 0 ? (
+                      <div className="space-y-4">
+                        {availableVideos.map((video) => (
+                          <div key={video.id} className="flex items-center justify-between gap-4 p-2 border rounded-lg">
+                            <VideoCard video={video} variant="compact" onClick={() => {}} />
+                            <Button
+                              size="sm"
+                              onClick={() => handleAddVideo(video.id)}
+                              disabled={addVideoToPlaylistMutation.isPending || playlistVideos?.some(pv => pv.video_id === video.id)}
+                            >
+                              {addVideoToPlaylistMutation.isPending && addVideoToPlaylistMutation.variables?.videoId === video.id ? (
+                                <Loader2 className="w-4 h-4 animate-spin" />
+                              ) : (
+                                playlistVideos?.some(pv => pv.video_id === video.id) ? t('playlistDetails.added') : t('playlistDetails.add')
+                              )}
+                            </Button>
+                          </div>
+                        ))}
+                      </div>
+                    ) : (
+                      <p className="text-center text-muted-foreground">{t('playlistDetails.noVideosFound')}</p>
+                    )}
+                  </ScrollArea>
+                </DialogContent>
+              </Dialog>
               <AlertDialog>
                 <AlertDialogTrigger asChild>
                   <Button variant="destructive" size="sm" className="gap-2">
@@ -164,10 +264,25 @@ const PlaylistDetails = () => {
               pv.video && (
                 <div
                   key={pv.video_id}
-                  className="animate-fade-up"
+                  className="animate-fade-up relative"
                   style={{ animationDelay: `${index * 0.05}s` }}
                 >
                   <VideoCard video={pv.video} variant="default" />
+                  {isAuthor && (
+                    <Button
+                      variant="destructive"
+                      size="icon"
+                      className="absolute top-3 right-3 z-10 h-8 w-8 rounded-full"
+                      onClick={() => handleRemoveVideo(pv.video_id)}
+                      disabled={removeVideoFromPlaylistMutation.isPending && removeVideoFromPlaylistMutation.variables?.videoId === pv.video_id}
+                    >
+                      {removeVideoFromPlaylistMutation.isPending && removeVideoFromPlaylistMutation.variables?.videoId === pv.video_id ? (
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                      ) : (
+                        <XCircle className="h-4 w-4" />
+                      )}
+                    </Button>
+                  )}
                 </div>
               )
             ))}
@@ -178,7 +293,7 @@ const PlaylistDetails = () => {
             <p className="text-lg font-medium mb-2">{t('playlistDetails.noVideosTitle')}</p>
             <p className="mb-6">{t('playlistDetails.noVideosDescription')}</p>
             {isAuthor && (
-              <Button onClick={() => toast.info(t('playlistDetails.addVideoPrompt'))}>
+              <Button onClick={() => setIsAddVideoDialogOpen(true)}>
                 {t('playlistDetails.addVideos')}
               </Button>
             )}

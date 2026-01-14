@@ -213,7 +213,12 @@
     "noVideosTitle": "Aún no hay videos en esta lista de reproducción.",
     "noVideosDescription": "¡Añade videos para empezar a construir tu ruta de aprendizaje!",
     "addVideos": "Añadir Videos",
-    "addVideoPrompt": "¡La funcionalidad de añadir/reordenar videos se implementará pronto!"
+    "addVideoDialogTitle": "Añadir Video a la Lista de Reproducción",
+    "addVideoDialogDescription": "Busca y selecciona videos para añadir a esta lista de reproducción.",
+    "searchVideosPlaceholder": "Buscar videos...",
+    "noVideosFound": "No se encontraron videos.",
+    "add": "Añadir",
+    "added": "Añadido"
   },
   "createEditPlaylist": {
     "createTitle": "Crear Nueva Lista de Reproducción",

@@ -213,7 +213,12 @@
     "noVideosTitle": "Nenhum vídeo nesta playlist ainda.",
     "noVideosDescription": "Adicione vídeos para começar a construir seu caminho de aprendizado!",
     "addVideos": "Adicionar Vídeos",
-    "addVideoPrompt": "Funcionalidade de adicionar/reordenar vídeos será implementada em breve!"
+    "addVideoDialogTitle": "Adicionar Vídeo à Playlist",
+    "addVideoDialogDescription": "Pesquise e selecione vídeos para adicionar a esta playlist.",
+    "searchVideosPlaceholder": "Buscar vídeos...",
+    "noVideosFound": "Nenhum vídeo encontrado.",
+    "add": "Adicionar",
+    "added": "Adicionado"
   },
   "createEditPlaylist": {
     "createTitle": "Criar Nova Playlist",
