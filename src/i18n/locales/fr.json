@@ -9,14 +9,19 @@
       "other": "Autre"
     },
     "allCategories": "Toutes les Catégories",
-    "allLanguages": "Toutes les Langues"
+    "allLanguages": "Toutes les Langues",
+    "backToHome": "Retour à l'accueil",
+    "validationError": "Erreur de Validation",
+    "cancel": "Annuler",
+    "delete": "Supprimer"
   },
   "header": {
     "searchPlaceholder": "Rechercher des vidéos, des chaînes...",
     "favorites": "Favoris",
     "submitVideo": "Soumettre une Vidéo",
     "logout": "Déconnexion",
-    "login": "Connexion"
+    "login": "Connexion",
+    "playlists": "Playlists"
   },
   "footer": {
     "description": "Une plateforme de curation collective de vidéos YouTube. Préserver et découvrir du contenu précieux ensemble.",
@@ -135,7 +140,7 @@
   "videoDetails": {
     "videoNotFoundTitle": "Vidéo introuvable",
     "videoNotFoundDescription": "La vidéo que vous recherchez n'existe peut-être pas ou a été supprimée.",
-    "backToHome": "Retour à la page d'accueil",
+    "backToHome": "Retour à l'accueil",
     "views": "{{count}} vues",
     "descriptionTitle": "Description",
     "noDescription": "Aucune description fournie pour cette vidéo.",
@@ -177,6 +182,67 @@
     "description": "Connectez-vous avec d'autres curateurs et passionnés de vidéo.",
     "totalContributors": "Total des Contributeurs",
     "contributorsCount": "{{count}} utilisateurs"
+  },
+  "playlists": {
+    "title": "Playlists",
+    "description": "Parcours d'apprentissage et collections de vidéos organisés.",
+    "searchPlaceholder": "Rechercher des playlists...",
+    "createPlaylist": "Créer une Playlist",
+    "videoCount": "{{count}} vidéos",
+    "noDescription": "Aucune description fournie.",
+    "noPlaylistsTitle": "Aucune playlist trouvée.",
+    "noPlaylistsDescription": "Soyez le premier à créer une playlist et à organiser les connaissances !",
+    "createFirstPlaylist": "Créer votre première playlist",
+    "loadingErrorTitle": "Erreur de chargement des playlists",
+    "loadingErrorDescription": "Impossible de charger les playlists. Veuillez réessayer plus tard."
+  },
+  "playlistDetails": {
+    "notFoundTitle": "Playlist introuvable",
+    "notFoundDescription": "La playlist que vous recherchez n'existe peut-être pas ou a été supprimée.",
+    "backToPlaylists": "Retour aux Playlists",
+    "byAuthor": "Par {{author}}",
+    "anonymousAuthor": "Par auteur anonyme",
+    "noDescription": "Aucune description fournie pour cette playlist.",
+    "editPlaylist": "Modifier la Playlist",
+    "deletePlaylist": "Supprimer la Playlist",
+    "confirmDeleteTitle": "Êtes-vous sûr ?",
+    "confirmDeleteDescription": "Cette action est irréversible. Cela supprimera définitivement la playlist '{{playlistName}}' et toutes les vidéos associées.",
+    "videosInPlaylist": "Vidéos dans cette Playlist",
+    "noVideosTitle": "Aucune vidéo dans cette playlist pour l'instant.",
+    "noVideosDescription": "Ajoutez des vidéos pour commencer à construire votre parcours d'apprentissage !",
+    "addVideos": "Ajouter des Vidéos",
+    "addVideoPrompt": "La fonctionnalité d'ajout/réorganisation des vidéos sera bientôt implémentée !"
+  },
+  "createEditPlaylist": {
+    "createTitle": "Créer une Nouvelle Playlist",
+    "createDescription": "Organisez les vidéos en parcours d'apprentissage cohérents.",
+    "editTitle": "Modifier la Playlist",
+    "editDescription": "Mettez à jour les détails de votre playlist.",
+    "loadErrorTitle": "Erreur de chargement de la playlist",
+    "loadErrorDescription": "Impossible de charger les détails de la playlist. Veuillez réessayer plus tard.",
+    "backToPlaylists": "Retour aux Playlists",
+    "form": {
+      "nameLabel": "Nom de la Playlist",
+      "namePlaceholder": "Nom de votre playlist",
+      "slugLabel": "Slug de la Playlist",
+      "slugPlaceholder": "nom-de-votre-playlist",
+      "slugHint": "Un identifiant unique pour l'URL (lettres minuscules, chiffres et tirets uniquement).",
+      "descriptionLabel": "Description",
+      "descriptionPlaceholder": "Une brève description de ce que couvre cette playlist.",
+      "courseCodeLabel": "Code du Cours (FACODI)",
+      "courseCodePlaceholder": "Ex: LESTI-ALG1",
+      "courseCodeHint": "Le code du cours auquel cette playlist appartient (facultatif).",
+      "unitCodeLabel": "Code de l'Unité (FACODI)",
+      "unitCodePlaceholder": "Ex: INTRO-ALGORITHMS",
+      "unitCodeHint": "Le code de l'unité au sein du cours (facultatif).",
+      "languageLabel": "Langue de la Playlist",
+      "languagePlaceholder": "Sélectionner la langue",
+      "isPublicLabel": "Rendre Publique",
+      "isPublicHint": "Les playlists publiques sont visibles par tous les utilisateurs.",
+      "submittingButton": "Enregistrement...",
+      "saveButton": "Enregistrer la Playlist",
+      "createButton": "Créer la Playlist"
+    }
   },
   "about": {
     "title": "À Propos de Nous",

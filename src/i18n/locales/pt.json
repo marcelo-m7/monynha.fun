@@ -9,14 +9,19 @@
       "other": "Outro"
     },
     "allCategories": "Todas as Categorias",
-    "allLanguages": "Todos os Idiomas"
+    "allLanguages": "Todos os Idiomas",
+    "backToHome": "Voltar para a página inicial",
+    "validationError": "Erro de validação",
+    "cancel": "Cancelar",
+    "delete": "Excluir"
   },
   "header": {
     "searchPlaceholder": "Buscar vídeos, canais...",
     "favorites": "Favoritos",
     "submitVideo": "Enviar Vídeo",
     "logout": "Sair",
-    "login": "Entrar"
+    "login": "Entrar",
+    "playlists": "Playlists"
   },
   "footer": {
     "description": "Uma plataforma de curadoria coletiva de vídeos do YouTube. Preservando e descobrindo conteúdos valiosos juntos.",
@@ -177,6 +182,67 @@
     "description": "Conecte-se com outros curadores e entusiastas de vídeo.",
     "totalContributors": "Total de Contribuidores",
     "contributorsCount": "{{count}} usuários"
+  },
+  "playlists": {
+    "title": "Playlists",
+    "description": "Caminhos de aprendizado curados e coleções de vídeos.",
+    "searchPlaceholder": "Buscar playlists...",
+    "createPlaylist": "Criar Playlist",
+    "videoCount": "{{count}} vídeos",
+    "noDescription": "Nenhuma descrição fornecida.",
+    "noPlaylistsTitle": "Nenhuma playlist encontrada.",
+    "noPlaylistsDescription": "Seja o primeiro a criar uma playlist e organizar o conhecimento!",
+    "createFirstPlaylist": "Criar sua primeira playlist",
+    "loadingErrorTitle": "Erro ao carregar playlists",
+    "loadingErrorDescription": "Não foi possível carregar as playlists. Por favor, tente novamente mais tarde."
+  },
+  "playlistDetails": {
+    "notFoundTitle": "Playlist não encontrada",
+    "notFoundDescription": "A playlist que você está procurando pode não existir ou ter sido removida.",
+    "backToPlaylists": "Voltar para Playlists",
+    "byAuthor": "Por {{author}}",
+    "anonymousAuthor": "Por autor anônimo",
+    "noDescription": "Nenhuma descrição fornecida para esta playlist.",
+    "editPlaylist": "Editar Playlist",
+    "deletePlaylist": "Excluir Playlist",
+    "confirmDeleteTitle": "Tem certeza?",
+    "confirmDeleteDescription": "Esta ação não pode ser desfeita. Isso excluirá permanentemente a playlist '{{playlistName}}' e todos os seus vídeos associados.",
+    "videosInPlaylist": "Vídeos nesta Playlist",
+    "noVideosTitle": "Nenhum vídeo nesta playlist ainda.",
+    "noVideosDescription": "Adicione vídeos para começar a construir seu caminho de aprendizado!",
+    "addVideos": "Adicionar Vídeos",
+    "addVideoPrompt": "Funcionalidade de adicionar/reordenar vídeos será implementada em breve!"
+  },
+  "createEditPlaylist": {
+    "createTitle": "Criar Nova Playlist",
+    "createDescription": "Organize vídeos em caminhos de aprendizado coerentes.",
+    "editTitle": "Editar Playlist",
+    "editDescription": "Atualize os detalhes da sua playlist.",
+    "loadErrorTitle": "Erro ao carregar playlist",
+    "loadErrorDescription": "Não foi possível carregar os detalhes da playlist. Por favor, tente novamente mais tarde.",
+    "backToPlaylists": "Voltar para Playlists",
+    "form": {
+      "nameLabel": "Nome da Playlist",
+      "namePlaceholder": "Nome da sua playlist",
+      "slugLabel": "Slug da Playlist",
+      "slugPlaceholder": "nome-da-sua-playlist",
+      "slugHint": "Um identificador único para a URL (apenas letras minúsculas, números e hífens).",
+      "descriptionLabel": "Descrição",
+      "descriptionPlaceholder": "Uma breve descrição do que esta playlist aborda.",
+      "courseCodeLabel": "Código do Curso (FACODI)",
+      "courseCodePlaceholder": "Ex: LESTI-ALG1",
+      "courseCodeHint": "O código do curso ao qual esta playlist pertence (opcional).",
+      "unitCodeLabel": "Código da Unidade (FACODI)",
+      "unitCodePlaceholder": "Ex: INTRO-ALGORITMOS",
+      "unitCodeHint": "O código da unidade dentro do curso (opcional).",
+      "languageLabel": "Idioma da Playlist",
+      "languagePlaceholder": "Selecione o idioma",
+      "isPublicLabel": "Tornar Pública",
+      "isPublicHint": "Playlists públicas são visíveis para todos os usuários.",
+      "submittingButton": "Salvando...",
+      "saveButton": "Salvar Playlist",
+      "createButton": "Criar Playlist"
+    }
   },
   "about": {
     "title": "Sobre Nós",

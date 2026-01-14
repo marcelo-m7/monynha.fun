@@ -14,6 +14,9 @@ import About from "./pages/About";
 import Rules from "./pages/Rules";
 import Contact from "./pages/Contact";
 import FAQ from "./pages/FAQ";
+import Playlists from "./pages/Playlists"; // Import new Playlists page
+import PlaylistDetails from "./pages/PlaylistDetails"; // Import new PlaylistDetails page
+import CreateEditPlaylist from "./pages/CreateEditPlaylist"; // Import new CreateEditPlaylist page
 import NotFound from "./pages/NotFound";
 import ScrollToTop from "./components/ScrollToTop"; // Import the new ScrollToTop component
 import './i18n/config'; // Import i18n configuration to initialize it
@@ -39,6 +42,10 @@ const App = () => (
             <Route path="/rules" element={<Rules />} />
             <Route path="/contact" element={<Contact />} />
             <Route path="/faq" element={<FAQ />} />
+            <Route path="/playlists" element={<Playlists />} /> {/* New route */}
+            <Route path="/playlists/new" element={<CreateEditPlaylist />} /> {/* New route */}
+            <Route path="/playlists/:playlistId" element={<PlaylistDetails />} /> {/* New route */}
+            <Route path="/playlists/:playlistId/edit" element={<CreateEditPlaylist />} /> {/* New route */}
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>

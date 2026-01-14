@@ -9,14 +9,19 @@
       "other": "Other"
     },
     "allCategories": "All Categories",
-    "allLanguages": "All Languages"
+    "allLanguages": "All Languages",
+    "backToHome": "Back to Home",
+    "validationError": "Validation Error",
+    "cancel": "Cancel",
+    "delete": "Delete"
   },
   "header": {
     "searchPlaceholder": "Search videos, channels...",
     "favorites": "Favorites",
     "submitVideo": "Submit Video",
     "logout": "Logout",
-    "login": "Login"
+    "login": "Login",
+    "playlists": "Playlists"
   },
   "footer": {
     "description": "A collective curation platform for YouTube videos. Preserving and discovering valuable content together.",
@@ -177,6 +182,67 @@
     "description": "Connect with other curators and video enthusiasts.",
     "totalContributors": "Total Contributors",
     "contributorsCount": "{{count}} users"
+  },
+  "playlists": {
+    "title": "Playlists",
+    "description": "Curated learning paths and video collections.",
+    "searchPlaceholder": "Search playlists...",
+    "createPlaylist": "Create Playlist",
+    "videoCount": "{{count}} videos",
+    "noDescription": "No description provided.",
+    "noPlaylistsTitle": "No playlists found.",
+    "noPlaylistsDescription": "Be the first to create a playlist and organize knowledge!",
+    "createFirstPlaylist": "Create your first playlist",
+    "loadingErrorTitle": "Error loading playlists",
+    "loadingErrorDescription": "Could not load playlists. Please try again later."
+  },
+  "playlistDetails": {
+    "notFoundTitle": "Playlist not found",
+    "notFoundDescription": "The playlist you are looking for may not exist or have been removed.",
+    "backToPlaylists": "Back to Playlists",
+    "byAuthor": "By {{author}}",
+    "anonymousAuthor": "By anonymous author",
+    "noDescription": "No description provided for this playlist.",
+    "editPlaylist": "Edit Playlist",
+    "deletePlaylist": "Delete Playlist",
+    "confirmDeleteTitle": "Are you sure?",
+    "confirmDeleteDescription": "This action cannot be undone. This will permanently delete the '{{playlistName}}' playlist and all its associated videos.",
+    "videosInPlaylist": "Videos in this Playlist",
+    "noVideosTitle": "No videos in this playlist yet.",
+    "noVideosDescription": "Add videos to start building your learning path!",
+    "addVideos": "Add Videos",
+    "addVideoPrompt": "Add/reorder videos functionality will be implemented soon!"
+  },
+  "createEditPlaylist": {
+    "createTitle": "Create New Playlist",
+    "createDescription": "Organize videos into coherent learning paths.",
+    "editTitle": "Edit Playlist",
+    "editDescription": "Update the details of your playlist.",
+    "loadErrorTitle": "Error loading playlist",
+    "loadErrorDescription": "Could not load playlist details. Please try again later.",
+    "backToPlaylists": "Back to Playlists",
+    "form": {
+      "nameLabel": "Playlist Name",
+      "namePlaceholder": "Your playlist name",
+      "slugLabel": "Playlist Slug",
+      "slugPlaceholder": "your-playlist-name",
+      "slugHint": "A unique identifier for the URL (lowercase letters, numbers, and hyphens only).",
+      "descriptionLabel": "Description",
+      "descriptionPlaceholder": "A brief description of what this playlist covers.",
+      "courseCodeLabel": "Course Code (FACODI)",
+      "courseCodePlaceholder": "Ex: LESTI-ALG1",
+      "courseCodeHint": "The course code this playlist belongs to (optional).",
+      "unitCodeLabel": "Unit Code (FACODI)",
+      "unitCodePlaceholder": "Ex: INTRO-ALGORITHMS",
+      "unitCodeHint": "The unit code within the course (optional).",
+      "languageLabel": "Playlist Language",
+      "languagePlaceholder": "Select language",
+      "isPublicLabel": "Make Public",
+      "isPublicHint": "Public playlists are visible to all users.",
+      "submittingButton": "Saving...",
+      "saveButton": "Save Playlist",
+      "createButton": "Create Playlist"
+    }
   },
   "about": {
     "title": "About Us",

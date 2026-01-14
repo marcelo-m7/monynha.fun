@@ -1,5 +1,5 @@
 import { Link, useNavigate } from "react-router-dom";
-import { Search, Plus, Menu, X, LogOut, Heart, Globe } from "lucide-react";
+import { Search, Plus, Menu, X, LogOut, Heart, Globe, ListVideo } from "lucide-react"; // Import ListVideo icon
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useState } from "react";
@@ -64,6 +64,15 @@ export const Header = () => {
         <div className="flex items-center gap-2">
           {user ? (
             <>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="hidden sm:flex gap-2 text-muted-foreground hover:text-foreground"
+                onClick={() => navigate('/playlists')}
+              >
+                <ListVideo className="h-4 w-4" />
+                {t('header.playlists')}
+              </Button>
               <Button
                 variant="ghost"
                 size="sm"
@@ -161,6 +170,14 @@ export const Header = () => {
             <div className="flex flex-col gap-2">
               {user ? (
                 <>
+                  <Button
+                    variant="ghost"
+                    className="w-full justify-center gap-2 text-muted-foreground hover:text-foreground"
+                    onClick={() => { navigate('/playlists'); setIsMenuOpen(false); }}
+                  >
+                    <ListVideo className="h-4 w-4" />
+                    {t('header.playlists')}
+                  </Button>
                   <Button
                     variant="ghost"
                     className="w-full justify-center gap-2 text-muted-foreground hover:text-foreground"

@@ -9,14 +9,19 @@
       "other": "Otro"
     },
     "allCategories": "Todas las Categorías",
-    "allLanguages": "Todos los Idiomas"
+    "allLanguages": "Todos los Idiomas",
+    "backToHome": "Volver a la página de inicio",
+    "validationError": "Error de Validación",
+    "cancel": "Cancelar",
+    "delete": "Eliminar"
   },
   "header": {
     "searchPlaceholder": "Buscar videos, canales...",
     "favorites": "Favoritos",
     "submitVideo": "Enviar Video",
     "logout": "Cerrar Sesión",
-    "login": "Iniciar Sesión"
+    "login": "Iniciar Sesión",
+    "playlists": "Listas de Reproducción"
   },
   "footer": {
     "description": "Una plataforma de curación colectiva de videos de YouTube. Preservando y descubriendo contenido valioso juntos.",
@@ -177,6 +182,67 @@
     "description": "Conéctate con otros curadores y entusiastas de videos.",
     "totalContributors": "Total de Contribuidores",
     "contributorsCount": "{{count}} usuarios"
+  },
+  "playlists": {
+    "title": "Listas de Reproducción",
+    "description": "Rutas de aprendizaje curadas y colecciones de videos.",
+    "searchPlaceholder": "Buscar listas de reproducción...",
+    "createPlaylist": "Crear Lista de Reproducción",
+    "videoCount": "{{count}} videos",
+    "noDescription": "No se proporcionó ninguna descripción.",
+    "noPlaylistsTitle": "No se encontraron listas de reproducción.",
+    "noPlaylistsDescription": "¡Sé el primero en crear una lista de reproducción y organizar el conocimiento!",
+    "createFirstPlaylist": "Crear tu primera lista de reproducción",
+    "loadingErrorTitle": "Error al cargar listas de reproducción",
+    "loadingErrorDescription": "No se pudieron cargar las listas de reproducción. Por favor, inténtalo de nuevo más tarde."
+  },
+  "playlistDetails": {
+    "notFoundTitle": "Lista de reproducción no encontrada",
+    "notFoundDescription": "La lista de reproducción que buscas puede no existir o haber sido eliminada.",
+    "backToPlaylists": "Volver a Listas de Reproducción",
+    "byAuthor": "Por {{author}}",
+    "anonymousAuthor": "Por autor anónimo",
+    "noDescription": "No se proporcionó ninguna descripción para esta lista de reproducción.",
+    "editPlaylist": "Editar Lista de Reproducción",
+    "deletePlaylist": "Eliminar Lista de Reproducción",
+    "confirmDeleteTitle": "¿Estás seguro?",
+    "confirmDeleteDescription": "Esta acción no se puede deshacer. Esto eliminará permanentemente la lista de reproducción '{{playlistName}}' y todos sus videos asociados.",
+    "videosInPlaylist": "Videos en esta Lista de Reproducción",
+    "noVideosTitle": "Aún no hay videos en esta lista de reproducción.",
+    "noVideosDescription": "¡Añade videos para empezar a construir tu ruta de aprendizaje!",
+    "addVideos": "Añadir Videos",
+    "addVideoPrompt": "¡La funcionalidad de añadir/reordenar videos se implementará pronto!"
+  },
+  "createEditPlaylist": {
+    "createTitle": "Crear Nueva Lista de Reproducción",
+    "createDescription": "Organiza videos en rutas de aprendizaje coherentes.",
+    "editTitle": "Editar Lista de Reproducción",
+    "editDescription": "Actualiza los detalles de tu lista de reproducción.",
+    "loadErrorTitle": "Error al cargar lista de reproducción",
+    "loadErrorDescription": "No se pudieron cargar los detalles de la lista de reproducción. Por favor, inténtalo de nuevo más tarde.",
+    "backToPlaylists": "Volver a Listas de Reproducción",
+    "form": {
+      "nameLabel": "Nombre de la Lista de Reproducción",
+      "namePlaceholder": "Nombre de tu lista de reproducción",
+      "slugLabel": "Slug de la Lista de Reproducción",
+      "slugPlaceholder": "nombre-de-tu-lista-de-reproduccion",
+      "slugHint": "Un identificador único para la URL (solo letras minúsculas, números y guiones).",
+      "descriptionLabel": "Descripción",
+      "descriptionPlaceholder": "Una breve descripción de lo que cubre esta lista de reproducción.",
+      "courseCodeLabel": "Código del Curso (FACODI)",
+      "courseCodePlaceholder": "Ej: LESTI-ALG1",
+      "courseCodeHint": "El código del curso al que pertenece esta lista de reproducción (opcional).",
+      "unitCodeLabel": "Código de la Unidad (FACODI)",
+      "unitCodePlaceholder": "Ej: INTRO-ALGORITMOS",
+      "unitCodeHint": "El código de la unidad dentro del curso (opcional).",
+      "languageLabel": "Idioma de la Lista de Reproducción",
+      "languagePlaceholder": "Seleccionar idioma",
+      "isPublicLabel": "Hacer Pública",
+      "isPublicHint": "Las listas de reproducción públicas son visibles para todos los usuarios.",
+      "submittingButton": "Guardando...",
+      "saveButton": "Guardar Lista de Reproducción",
+      "createButton": "Crear Lista de Reproducción"
+    }
   },
   "about": {
     "title": "Acerca de Nosotros",
