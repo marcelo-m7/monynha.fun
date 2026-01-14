@@ -23,7 +23,11 @@
     "login": "Login",
     "playlists": "Playlists",
     "myProfile": "My Profile",
-    "editProfile": "Edit Profile"
+    "editProfile": "Edit Profile",
+    "home": "Home",
+    "toggleMenu": "Toggle menu",
+    "closeMenu": "Close menu",
+    "languageLabel": "Language"
   },
   "footer": {
     "description": "A collective curation platform for YouTube videos. Preserving and discovering valuable content together.",
@@ -37,7 +41,8 @@
     "rules": "Rules",
     "contact": "Contact",
     "faq": "FAQ",
-    "madeWithLove": "Made with {{heartIcon}} by Monynha Softwares"
+    "madeWithLove": "Made with",
+    "byMonynhaSoftwares": "by Monynha Softwares"
   },
   "hero": {
     "badge": "Collective video curation",
@@ -76,7 +81,11 @@
       "emailNotConfirmed": "Please confirm your email before logging in",
       "signupGeneric": "Error creating account",
       "emailRegistered": "This email is already registered",
-      "forgotPasswordGeneric": "Error sending reset link"
+      "forgotPasswordGeneric": "Error sending reset link",
+      "invalidEmail": "Invalid email address",
+      "passwordMinLength": "Password must be at least 6 characters",
+      "usernameMinLength": "Username must be at least 3 characters",
+      "genericAuthError": "An authentication error occurred. Please try again."
     },
     "success": {
       "welcomeBack": "Welcome back!",
@@ -118,15 +127,15 @@
       "genericSubmitTitle": "Submission Error",
       "genericSubmitDescription": "An error occurred while submitting the video. Please try again.",
       "aiEnrichmentFailedTitle": "AI Enrichment Error",
-      "aiEnrichmentFailedDescription": "Failed to start AI enrichment for the video."
+      "aiEnrichmentFailedDescription": "Failed to start AI enrichment for the video.",
+      "invalidUrl": "Invalid URL",
+      "notYoutubeUrl": "Only YouTube URLs are accepted",
+      "descriptionMaxLength": "Description cannot exceed 500 characters",
+      "languageRequired": "Language is required"
     },
     "success": {
       "videoSubmittedTitle": "Video Submitted!",
       "videoSubmittedDescription": "Your video has been successfully added to the collection"
-    },
-    "info": {
-      "aiEnrichmentStartedTitle": "AI Enrichment Started",
-      "aiEnrichmentStartedDescription": "AI is now processing the video metadata for enrichment."
     }
   },
   "videos": {
@@ -249,6 +258,19 @@
       "submittingButton": "Saving...",
       "saveButton": "Save Playlist",
       "createButton": "Create Playlist"
+    },
+    "error": {
+      "nameMinLength": "Playlist name must be at least 3 characters",
+      "nameMaxLength": "Playlist name cannot exceed 100 characters",
+      "slugMinLength": "Slug must be at least 3 characters",
+      "slugMaxLength": "Slug cannot exceed 100 characters",
+      "slugInvalidFormat": "Slug must contain only lowercase letters, numbers, and hyphens",
+      "descriptionMaxLength": "Description cannot exceed 500 characters",
+      "courseCodeMaxLength": "Course code cannot exceed 50 characters",
+      "unitCodeMaxLength": "Unit code cannot exceed 50 characters",
+      "languageRequired": "Language is required",
+      "notLoggedInTitle": "Error",
+      "notLoggedInDescription": "You need to be logged in to create or edit playlists."
     }
   },
   "profile": {
@@ -285,7 +307,9 @@
         "displayNameMinLength": "Display name must be at least 3 characters",
         "displayNameMaxLength": "Display name cannot exceed 50 characters",
         "invalidAvatarUrl": "Invalid avatar URL",
-        "bioMaxLength": "Bio cannot exceed 300 characters"
+        "bioMaxLength": "Bio cannot exceed 300 characters",
+        "notLoggedInTitle": "Error",
+        "notLoggedInDescription": "You need to be logged in to edit your profile."
       }
     }
   },

@@ -14,7 +14,7 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/co
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
 import { NavLink } from "@/components/NavLink";
-import { Label } from "@/components/ui/label"; // Import Label
+import { Label } from "@/components/ui/label";
 
 export const Header = () => {
   const { t } = useTranslation();
@@ -44,7 +44,7 @@ export const Header = () => {
   };
 
   const navLinks = [
-    { to: "/", label: t('footer.home'), icon: Home },
+    { to: "/", label: t('header.home'), icon: Home },
     { to: "/videos", label: t('footer.categories'), icon: ListVideo },
     { to: "/playlists", label: t('header.playlists'), icon: ListVideo },
     { to: "/community", label: t('footer.community'), icon: Users },
@@ -135,11 +135,11 @@ export const Header = () => {
                     </div>
                   </DropdownMenuLabel>
                   <DropdownMenuSeparator />
-                  <DropdownMenuItem onClick={() => navigate(`/profile/${profile?.username}`)}>
+                  <DropdownMenuItem onClick={() => { navigate(`/profile/${profile?.username}`); setIsSheetOpen(false); }}>
                     <UserIcon className="mr-2 h-4 w-4" />
                     <span>{t('header.myProfile')}</span>
                   </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => navigate('/profile/edit')}>
+                  <DropdownMenuItem onClick={() => { navigate('/profile/edit'); setIsSheetOpen(false); }}>
                     <Settings className="mr-2 h-4 w-4" />
                     <span>{t('header.editProfile')}</span>
                   </DropdownMenuItem>
@@ -213,7 +213,7 @@ export const Header = () => {
                 </SheetTitle>
                 <Button variant="ghost" size="icon" onClick={() => setIsSheetOpen(false)}>
                   <X className="h-5 w-5" />
-                  <span className="sr-only">{t('common.close')}</span>
+                  <span className="sr-only">{t('header.closeMenu')}</span>
                 </Button>
               </SheetHeader>
               <ScrollArea className="flex-1 py-4">
@@ -342,7 +342,7 @@ export const Header = () => {
                   {/* Language Switcher (Mobile) */}
                   <div className="px-4 py-2">
                     <Label htmlFor="mobile-language-switcher" className="text-sm font-medium mb-2 block">
-                      {t('common.language.label')}
+                      {t('header.languageLabel')}
                     </Label>
                     <Select value={i18n.language} onValueChange={changeLanguage}>
                       <SelectTrigger id="mobile-language-switcher" className="w-full h-9 bg-muted/50 border-0 focus:ring-primary/30">

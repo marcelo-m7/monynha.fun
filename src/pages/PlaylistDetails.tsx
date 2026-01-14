@@ -50,7 +50,7 @@ const PlaylistDetails = () => {
       await addVideoToPlaylistMutation.mutateAsync({ playlistId, videoId });
       // Optionally close dialog or clear search
       setAddVideoSearchQuery('');
-      setIsAddVideoDialogOpen(false);
+      // Keep dialog open to allow adding multiple videos
     } catch (error) {
       // Error handled by mutation hook's onError
     }
@@ -207,7 +207,7 @@ const PlaylistDetails = () => {
                             <Button
                               size="sm"
                               onClick={() => handleAddVideo(video.id)}
-                              disabled={addVideoToPlaylistMutation.isPending || playlistVideos?.some(pv => pv.video_id === video.id)}
+                              disabled={addVideoToPlaylistMutation.isPending && addVideoToPlaylistMutation.variables?.videoId === video.id || playlistVideos?.some(pv => pv.video_id === video.id)}
                             >
                               {addVideoToPlaylistMutation.isPending && addVideoToPlaylistMutation.variables?.videoId === video.id ? (
                                 <Loader2 className="w-4 h-4 animate-spin" />

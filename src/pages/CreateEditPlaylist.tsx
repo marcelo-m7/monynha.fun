@@ -12,16 +12,22 @@ import { toast } from 'sonner';
 import { ArrowLeft, ListVideo, Loader2, Save, BookOpen, Code, Globe } from 'lucide-react';
 import { z } from 'zod';
 import { useTranslation } from 'react-i18next';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { Header } from '@/components/Header';
+import { Footer } from '@/components/Footer';
 
 const playlistSchema = z.object({
-  name: z.string().min(3, 'Nome deve ter pelo menos 3 caracteres'),
-  slug: z.string().min(3, 'Slug deve ter pelo menos 3 caracteres').regex(/^[a-z0-9-]+$/, 'Slug deve conter apenas letras minúsculas, números e hífens'),
-  description: z.string().max(500, 'Descrição não pode exceder 500 caracteres').optional(),
-  course_code: z.string().optional(),
-  unit_code: z.string().optional(),
-  language: z.string().min(2, 'Idioma é obrigatório'),
+  name: z.string().min(3, 'createEditPlaylist.error.nameMinLength').max(100, 'createEditPlaylist.error.nameMaxLength'),
+  slug: z.string().min(3, 'createEditPlaylist.error.slugMinLength').max(100, 'createEditPlaylist.error.slugMaxLength').regex(/^[a-z0-9-]+$/, 'createEditPlaylist.error.slugInvalidFormat'),
+  description: z.string().max(500, 'createEditPlaylist.error.descriptionMaxLength').optional().or(z.literal('')),
+  course_code: z.string().max(50, 'createEditPlaylist.error.courseCodeMaxLength').optional().or(z.literal('')),
+  unit_code: z.string().max(50, 'createEditPlaylist.error.unitCodeMaxLength').optional().or(z.literal('')),
+  language: z.string().min(2, 'createEditPlaylist.error.languageRequired'),
   is_public: z.boolean(),
 });
+
+type PlaylistFormValues = z.infer<typeof playlistSchema>;
 
 export default function CreateEditPlaylist() {
   const { t } = useTranslation();
@@ -34,14 +40,26 @@ export default function CreateEditPlaylist() {
   const createPlaylistMutation = useCreatePlaylist();
   const updatePlaylistMutation = useUpdatePlaylist();
 
-  const [name, setName] = useState('');
-  const [slug, setSlug] = useState('');
-  const [description, setDescription] = useState('');
-  const [courseCode, setCourseCode] = useState('');
-  const [unitCode, setUnitCode] = useState('');
-  const [language, setLanguage] = useState('pt');
-  const [isPublic, setIsPublic] = useState(true);
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const { register, handleSubmit, watch, setValue, formState: { errors }, reset } = useForm<PlaylistFormValues>({
+    resolver: zodResolver(playlistSchema),
+    defaultValues: {
+      name: '',
+      slug: '',
+      description: '',
+      course_code: '',
+      unit_code: '',
+      language: 'pt',
+      is_public: true,
+    },
+  });
+
+  const name = watch('name');
+  const slug = watch('slug');
+  const description = watch('description');
+  const courseCode = watch('course_code');
+  const unitCode = watch('unit_code');
+  const language = watch('language');
+  const isPublic = watch('is_public');
 
   useEffect(() => {
     if (!authLoading && !user) {
@@ -51,42 +69,37 @@ export default function CreateEditPlaylist() {
 
   useEffect(() => {
     if (isEditing && existingPlaylist) {
-      setName(existingPlaylist.name);
-      setSlug(existingPlaylist.slug);
-      setDescription(existingPlaylist.description || '');
-      setCourseCode(existingPlaylist.course_code || '');
-      setUnitCode(existingPlaylist.unit_code || '');
-      setLanguage(existingPlaylist.language);
-      setIsPublic(existingPlaylist.is_public);
+      reset({
+        name: existingPlaylist.name,
+        slug: existingPlaylist.slug,
+        description: existingPlaylist.description || '',
+        course_code: existingPlaylist.course_code || '',
+        unit_code: existingPlaylist.unit_code || '',
+        language: existingPlaylist.language,
+        is_public: existingPlaylist.is_public,
+      });
     }
-  }, [isEditing, existingPlaylist]);
+  }, [isEditing, existingPlaylist, reset]);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-
-    const playlistData = {
-      name,
-      slug,
-      description: description || null,
-      course_code: courseCode || null,
-      unit_code: unitCode || null,
-      language,
-      is_public: isPublic,
-    };
-
-    try {
-      playlistSchema.parse(playlistData);
-    } catch (error) {
-      if (error instanceof z.ZodError) {
-        toast.error(t('common.validationError'), {
-          description: error.errors[0].message,
-        });
-      }
+  const onSubmit = async (values: PlaylistFormValues) => {
+    if (!user) {
+      toast.error(t('createEditPlaylist.error.notLoggedInTitle'), {
+        description: t('createEditPlaylist.error.notLoggedInDescription'),
+      });
       return;
     }
 
-    setIsSubmitting(true);
     try {
+      const playlistData = {
+        name: values.name,
+        slug: values.slug,
+        description: values.description || null,
+        course_code: values.course_code || null,
+        unit_code: values.unit_code || null,
+        language: values.language,
+        is_public: values.is_public,
+      };
+
       if (isEditing) {
         await updatePlaylistMutation.mutateAsync({ id: playlistId!, ...playlistData });
         navigate(`/playlists/${playlistId}`);
@@ -96,8 +109,6 @@ export default function CreateEditPlaylist() {
       }
     } catch (error) {
       // Error handled by mutation hooks' onError
-    } finally {
-      setIsSubmitting(false);
     }
   };
 
@@ -163,7 +174,7 @@ export default function CreateEditPlaylist() {
           </div>
 
           <div className="bg-card border border-border rounded-2xl p-6 shadow-sm">
-            <form onSubmit={handleSubmit} className="space-y-6">
+            <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
               {/* Name */}
               <div className="space-y-2">
                 <Label htmlFor="name">{t('createEditPlaylist.form.nameLabel')} *</Label>
@@ -171,10 +182,12 @@ export default function CreateEditPlaylist() {
                   id="name"
                   type="text"
                   placeholder={t('createEditPlaylist.form.namePlaceholder')}
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  required
+                  {...register('name')}
+                  aria-invalid={errors.name ? "true" : "false"}
                 />
+                {errors.name && (
+                  <p role="alert" className="text-sm text-destructive">{t(errors.name.message as string)}</p>
+                )}
               </div>
 
               {/* Slug */}
@@ -184,10 +197,12 @@ export default function CreateEditPlaylist() {
                   id="slug"
                   type="text"
                   placeholder={t('createEditPlaylist.form.slugPlaceholder')}
-                  value={slug}
-                  onChange={(e) => setSlug(e.target.value)}
-                  required
+                  {...register('slug')}
+                  aria-invalid={errors.slug ? "true" : "false"}
                 />
+                {errors.slug && (
+                  <p role="alert" className="text-sm text-destructive">{t(errors.slug.message as string)}</p>
+                )}
                 <p className="text-xs text-muted-foreground">{t('createEditPlaylist.form.slugHint')}</p>
               </div>
 
@@ -197,14 +212,17 @@ export default function CreateEditPlaylist() {
                 <Textarea
                   id="description"
                   placeholder={t('createEditPlaylist.form.descriptionPlaceholder')}
-                  value={description}
-                  onChange={(e) => setDescription(e.target.value)}
+                  {...register('description')}
                   rows={3}
                   maxLength={500}
+                  aria-invalid={errors.description ? "true" : "false"}
                 />
                 <p className="text-xs text-muted-foreground text-right">
                   {description.length}/500
                 </p>
+                {errors.description && (
+                  <p role="alert" className="text-sm text-destructive">{t(errors.description.message as string)}</p>
+                )}
               </div>
 
               {/* Course Code */}
@@ -216,11 +234,14 @@ export default function CreateEditPlaylist() {
                     id="course-code"
                     type="text"
                     placeholder={t('createEditPlaylist.form.courseCodePlaceholder')}
-                    value={courseCode}
-                    onChange={(e) => setCourseCode(e.target.value)}
+                    {...register('course_code')}
                     className="pl-10"
+                    aria-invalid={errors.course_code ? "true" : "false"}
                   />
                 </div>
+                {errors.course_code && (
+                  <p role="alert" className="text-sm text-destructive">{t(errors.course_code.message as string)}</p>
+                )}
                 <p className="text-xs text-muted-foreground">{t('createEditPlaylist.form.courseCodeHint')}</p>
               </div>
 
@@ -233,18 +254,21 @@ export default function CreateEditPlaylist() {
                     id="unit-code"
                     type="text"
                     placeholder={t('createEditPlaylist.form.unitCodePlaceholder')}
-                    value={unitCode}
-                    onChange={(e) => setUnitCode(e.target.value)}
+                    {...register('unit_code')}
                     className="pl-10"
+                    aria-invalid={errors.unit_code ? "true" : "false"}
                   />
                 </div>
+                {errors.unit_code && (
+                  <p role="alert" className="text-sm text-destructive">{t(errors.unit_code.message as string)}</p>
+                )}
                 <p className="text-xs text-muted-foreground">{t('createEditPlaylist.form.unitCodeHint')}</p>
               </div>
 
               {/* Language */}
               <div className="space-y-2">
                 <Label htmlFor="language">{t('createEditPlaylist.form.languageLabel')} *</Label>
-                <Select value={language} onValueChange={setLanguage}>
+                <Select value={language} onValueChange={(value) => setValue('language', value)}>
                   <SelectTrigger>
                     <SelectValue placeholder={t('createEditPlaylist.form.languagePlaceholder')} />
                   </SelectTrigger>
@@ -256,6 +280,9 @@ export default function CreateEditPlaylist() {
                     <SelectItem value="other">{t('common.language.other')}</SelectItem>
                   </SelectContent>
                 </Select>
+                {errors.language && (
+                  <p role="alert" className="text-sm text-destructive">{t(errors.language.message as string)}</p>
+                )}
               </div>
 
               {/* Is Public Switch */}
@@ -267,7 +294,7 @@ export default function CreateEditPlaylist() {
                 <Switch
                   id="is-public"
                   checked={isPublic}
-                  onCheckedChange={setIsPublic}
+                  onCheckedChange={(checked) => setValue('is_public', checked)}
                 />
               </div>
 
@@ -276,9 +303,9 @@ export default function CreateEditPlaylist() {
                 type="submit"
                 className="w-full"
                 size="lg"
-                disabled={isSubmitting || createPlaylistMutation.isPending || updatePlaylistMutation.isPending}
+                disabled={createPlaylistMutation.isPending || updatePlaylistMutation.isPending}
               >
-                {isSubmitting || createPlaylistMutation.isPending || updatePlaylistMutation.isPending ? (
+                {createPlaylistMutation.isPending || updatePlaylistMutation.isPending ? (
                   <>
                     <Loader2 className="w-4 h-4 mr-2 animate-spin" />
                     {t('createEditPlaylist.form.submittingButton')}

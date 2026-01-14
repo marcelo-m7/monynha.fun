@@ -23,7 +23,11 @@
     "login": "Connexion",
     "playlists": "Playlists",
     "myProfile": "Mon Profil",
-    "editProfile": "Modifier le Profil"
+    "editProfile": "Modifier le Profil",
+    "home": "Accueil",
+    "toggleMenu": "Basculer le menu",
+    "closeMenu": "Fermer le menu",
+    "languageLabel": "Langue"
   },
   "footer": {
     "description": "Une plateforme de curation collective de vidéos YouTube. Préserver et découvrir du contenu précieux ensemble.",
@@ -37,7 +41,8 @@
     "rules": "Règles",
     "contact": "Contact",
     "faq": "FAQ",
-    "madeWithLove": "Fait avec {{heartIcon}} par Monynha Softwares"
+    "madeWithLove": "Fait avec",
+    "byMonynhaSoftwares": "par Monynha Softwares"
   },
   "hero": {
     "badge": "Curation collective de vidéos",
@@ -76,7 +81,11 @@
       "emailNotConfirmed": "Veuillez confirmer votre email avant de vous connecter",
       "signupGeneric": "Erreur lors de la création du compte",
       "emailRegistered": "Cet email est déjà enregistré",
-      "forgotPasswordGeneric": "Erreur lors de l'envoi du lien de réinitialisation"
+      "forgotPasswordGeneric": "Erreur lors de l'envoi du lien de réinitialisation",
+      "invalidEmail": "Adresse e-mail invalide",
+      "passwordMinLength": "Le mot de passe doit contenir au moins 6 caractères",
+      "usernameMinLength": "Le nom d'utilisateur doit contenir au moins 3 caractères",
+      "genericAuthError": "Une erreur d'authentification est survenue. Veuillez réessayer."
     },
     "success": {
       "welcomeBack": "Bienvenue de retour !",
@@ -118,7 +127,11 @@
       "genericSubmitTitle": "Erreur de Soumission",
       "genericSubmitDescription": "Une erreur est survenue lors de la soumission de la vidéo. Veuillez réessayer.",
       "aiEnrichmentFailedTitle": "Erreur d'Enrichissement IA",
-      "aiEnrichmentFailedDescription": "Échec du démarrage de l'enrichissement IA pour la vidéo."
+      "aiEnrichmentFailedDescription": "Échec du démarrage de l'enrichissement IA pour la vidéo.",
+      "invalidUrl": "URL invalide",
+      "notYoutubeUrl": "Seules les URLs YouTube sont acceptées",
+      "descriptionMaxLength": "La description ne peut pas dépasser 500 caractères",
+      "languageRequired": "La langue est obligatoire"
     },
     "success": {
       "videoSubmittedTitle": "Vidéo Soumise !",
@@ -142,7 +155,7 @@
   "videoDetails": {
     "videoNotFoundTitle": "Vidéo introuvable",
     "videoNotFoundDescription": "La vidéo que vous recherchez n'existe peut-être pas ou a été supprimée.",
-    "backToHome": "Retour à la page d'accueil",
+    "backToHome": "Retour à l'accueil",
     "views": "{{count}} vues",
     "descriptionTitle": "Description",
     "noDescription": "Aucune description fournie pour cette vidéo.",
@@ -249,6 +262,19 @@
       "submittingButton": "Enregistrement...",
       "saveButton": "Enregistrer la Playlist",
       "createButton": "Créer la Playlist"
+    },
+    "error": {
+      "nameMinLength": "Le nom doit contenir au moins 3 caractères",
+      "nameMaxLength": "Le nom ne peut pas dépasser 100 caractères",
+      "slugMinLength": "Le slug doit contenir au moins 3 caractères",
+      "slugMaxLength": "Le slug ne peut pas dépasser 100 caractères",
+      "slugInvalidFormat": "Le slug doit contenir uniquement des lettres minuscules, des chiffres et des tirets",
+      "descriptionMaxLength": "La description ne peut pas dépasser 500 caractères",
+      "courseCodeMaxLength": "Le code du cours ne peut pas dépasser 50 caractères",
+      "unitCodeMaxLength": "Le code de l'unité ne peut pas dépasser 50 caractères",
+      "languageRequired": "La langue est obligatoire",
+      "notLoggedInTitle": "Erreur",
+      "notLoggedInDescription": "Vous devez être connecté pour créer ou modifier des playlists."
     }
   },
   "profile": {
@@ -285,7 +311,9 @@
         "displayNameMinLength": "Le nom d'affichage doit contenir au moins 3 caractères",
         "displayNameMaxLength": "Le nom d'affichage ne peut pas dépasser 50 caractères",
         "invalidAvatarUrl": "URL d'avatar invalide",
-        "bioMaxLength": "La bio ne peut pas dépasser 300 caractères"
+        "bioMaxLength": "La bio ne peut pas dépasser 300 caractères",
+        "notLoggedInTitle": "Erreur",
+        "notLoggedInDescription": "Vous devez être connecté pour modifier votre profil."
       }
     }
   },

@@ -23,7 +23,11 @@
     "login": "Iniciar Sesión",
     "playlists": "Listas de Reproducción",
     "myProfile": "Mi Perfil",
-    "editProfile": "Editar Perfil"
+    "editProfile": "Editar Perfil",
+    "home": "Inicio",
+    "toggleMenu": "Alternar menú",
+    "closeMenu": "Cerrar menú",
+    "languageLabel": "Idioma"
   },
   "footer": {
     "description": "Una plataforma de curación colectiva de videos de YouTube. Preservando y descubriendo contenido valioso juntos.",
@@ -37,7 +41,8 @@
     "rules": "Reglas",
     "contact": "Contacto",
     "faq": "Preguntas Frecuentes",
-    "madeWithLove": "Hecho con {{heartIcon}} por Monynha Softwares"
+    "madeWithLove": "Hecho con",
+    "byMonynhaSoftwares": "por Monynha Softwares"
   },
   "hero": {
     "badge": "Curación colectiva de videos",
@@ -76,7 +81,11 @@
       "emailNotConfirmed": "Por favor, confirma tu correo electrónico antes de iniciar sesión",
       "signupGeneric": "Error al crear cuenta",
       "emailRegistered": "Este correo electrónico ya está registrado",
-      "forgotPasswordGeneric": "Error al enviar enlace de restablecimiento"
+      "forgotPasswordGeneric": "Error al enviar enlace de restablecimiento",
+      "invalidEmail": "Dirección de correo electrónico inválida",
+      "passwordMinLength": "La contraseña debe tener al menos 6 caracteres",
+      "usernameMinLength": "El nombre de usuario debe tener al menos 3 caracteres",
+      "genericAuthError": "Ocurrió un error de autenticación. Por favor, inténtalo de nuevo."
     },
     "success": {
       "welcomeBack": "¡Bienvenido de nuevo!",
@@ -118,7 +127,11 @@
       "genericSubmitTitle": "Error de Envío",
       "genericSubmitDescription": "Ocurrió un error al enviar el video. Por favor, inténtalo de nuevo.",
       "aiEnrichmentFailedTitle": "Error de Enriquecimiento de IA",
-      "aiEnrichmentFailedDescription": "No se pudo iniciar el enriquecimiento de IA para el video."
+      "aiEnrichmentFailedDescription": "No se pudo iniciar el enriquecimiento de IA para el video.",
+      "invalidUrl": "URL inválida",
+      "notYoutubeUrl": "Solo se aceptan URLs de YouTube",
+      "descriptionMaxLength": "La descripción no puede exceder los 500 caracteres",
+      "languageRequired": "El idioma es obligatorio"
     },
     "success": {
       "videoSubmittedTitle": "¡Video Enviado!",
@@ -249,6 +262,19 @@
       "submittingButton": "Guardando...",
       "saveButton": "Guardar Lista de Reproducción",
       "createButton": "Crear Lista de Reproducción"
+    },
+    "error": {
+      "nameMinLength": "El nombre debe tener al menos 3 caracteres",
+      "nameMaxLength": "El nombre no puede exceder los 100 caracteres",
+      "slugMinLength": "El slug debe tener al menos 3 caracteres",
+      "slugMaxLength": "El slug no puede exceder los 100 caracteres",
+      "slugInvalidFormat": "El slug debe contener solo letras minúsculas, números y guiones",
+      "descriptionMaxLength": "La descripción no puede exceder los 500 caracteres",
+      "courseCodeMaxLength": "El código del curso no puede exceder los 50 caracteres",
+      "unitCodeMaxLength": "El código de la unidad no puede exceder los 50 caracteres",
+      "languageRequired": "El idioma es obligatorio",
+      "notLoggedInTitle": "Error",
+      "notLoggedInDescription": "Debes iniciar sesión para crear o editar listas de reproducción."
     }
   },
   "profile": {
@@ -285,7 +311,9 @@
         "displayNameMinLength": "El nombre a mostrar debe tener al menos 3 caracteres",
         "displayNameMaxLength": "El nombre a mostrar no puede exceder los 50 caracteres",
         "invalidAvatarUrl": "URL de avatar inválida",
-        "bioMaxLength": "La biografía no puede exceder los 300 caracteres"
+        "bioMaxLength": "La biografía no puede exceder los 300 caracteres",
+        "notLoggedInTitle": "Error",
+        "notLoggedInDescription": "Debes iniciar sesión para modificar tu perfil."
       }
     }
   },

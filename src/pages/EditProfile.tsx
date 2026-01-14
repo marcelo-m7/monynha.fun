@@ -12,13 +12,17 @@ import { z } from 'zod';
 import { useTranslation } from 'react-i18next';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Header } from '@/components/Header';
-import { Footer } from '@/components/Footer'; // Import Footer
+import { Footer } from '@/components/Footer';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
 
 const editProfileSchema = z.object({
   display_name: z.string().min(3, 'profile.edit.error.displayNameMinLength').max(50, 'profile.edit.error.displayNameMaxLength'),
   avatar_url: z.string().url('profile.edit.error.invalidAvatarUrl').optional().or(z.literal('')),
   bio: z.string().max(300, 'profile.edit.error.bioMaxLength').optional().or(z.literal('')),
 });
+
+type EditProfileFormValues = z.infer<typeof editProfileSchema>;
 
 export default function EditProfile() {
   const { t } = useTranslation();
@@ -27,10 +31,18 @@ export default function EditProfile() {
   const { data: profile, isLoading: profileLoading, isError: profileLoadError } = useProfileById(user?.id);
   const updateProfileMutation = useUpdateProfile();
 
-  const [displayName, setDisplayName] = useState('');
-  const [avatarUrl, setAvatarUrl] = useState('');
-  const [bio, setBio] = useState('');
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const { register, handleSubmit, watch, setValue, formState: { errors }, reset } = useForm<EditProfileFormValues>({
+    resolver: zodResolver(editProfileSchema),
+    defaultValues: {
+      display_name: '',
+      avatar_url: '',
+      bio: '',
+    },
+  });
+
+  const displayName = watch('display_name');
+  const avatarUrl = watch('avatar_url');
+  const bio = watch('bio');
 
   useEffect(() => {
     if (!authLoading && !user) {
@@ -40,40 +52,31 @@ export default function EditProfile() {
 
   useEffect(() => {
     if (profile) {
-      setDisplayName(profile.display_name || '');
-      setAvatarUrl(profile.avatar_url || '');
-      setBio(profile.bio || '');
+      reset({
+        display_name: profile.display_name || '',
+        avatar_url: profile.avatar_url || '',
+        bio: profile.bio || '',
+      });
     }
-  }, [profile]);
+  }, [profile, reset]);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-
-    const profileData = {
-      display_name: displayName,
-      avatar_url: avatarUrl || null,
-      bio: bio || null,
-    };
-
-    try {
-      editProfileSchema.parse(profileData);
-    } catch (error) {
-      if (error instanceof z.ZodError) {
-        toast.error(t('common.validationError'), {
-          description: t(error.errors[0].message),
-        });
-      }
+  const onSubmit = async (values: EditProfileFormValues) => {
+    if (!user || !profile) {
+      toast.error(t('profile.edit.error.notLoggedInTitle'), {
+        description: t('profile.edit.error.notLoggedInDescription'),
+      });
       return;
     }
 
-    setIsSubmitting(true);
     try {
-      await updateProfileMutation.mutateAsync(profileData);
-      navigate(`/profile/${profile?.username}`);
+      await updateProfileMutation.mutateAsync({
+        display_name: values.display_name,
+        avatar_url: values.avatar_url || null,
+        bio: values.bio || null,
+      });
+      navigate(`/profile/${profile.username}`);
     } catch (error) {
       // Error handled by mutation hook's onError
-    } finally {
-      setIsSubmitting(false);
     }
   };
 
@@ -139,7 +142,7 @@ export default function EditProfile() {
           </div>
 
           <div className="bg-card border border-border rounded-2xl p-6 shadow-sm">
-            <form onSubmit={handleSubmit} className="space-y-6">
+            <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
               {/* Avatar Preview */}
               <div className="flex flex-col items-center gap-4 mb-6">
                 <Avatar className="w-24 h-24 border-2 border-primary">
@@ -158,10 +161,12 @@ export default function EditProfile() {
                   id="display-name"
                   type="text"
                   placeholder={t('profile.edit.form.displayNamePlaceholder')}
-                  value={displayName}
-                  onChange={(e) => setDisplayName(e.target.value)}
-                  required
+                  {...register('display_name')}
+                  aria-invalid={errors.display_name ? "true" : "false"}
                 />
+                {errors.display_name && (
+                  <p role="alert" className="text-sm text-destructive">{t(errors.display_name.message as string)}</p>
+                )}
               </div>
 
               {/* Avatar URL */}
@@ -173,11 +178,14 @@ export default function EditProfile() {
                     id="avatar-url"
                     type="url"
                     placeholder={t('profile.edit.form.avatarUrlPlaceholder')}
-                    value={avatarUrl}
-                    onChange={(e) => setAvatarUrl(e.target.value)}
+                    {...register('avatar_url')}
                     className="pl-10"
+                    aria-invalid={errors.avatar_url ? "true" : "false"}
                   />
                 </div>
+                {errors.avatar_url && (
+                  <p role="alert" className="text-sm text-destructive">{t(errors.avatar_url.message as string)}</p>
+                )}
                 <p className="text-xs text-muted-foreground">{t('profile.edit.form.avatarUrlHint')}</p>
               </div>
 
@@ -187,14 +195,17 @@ export default function EditProfile() {
                 <Textarea
                   id="bio"
                   placeholder={t('profile.edit.form.bioPlaceholder')}
-                  value={bio}
-                  onChange={(e) => setBio(e.target.value)}
+                  {...register('bio')}
                   rows={4}
                   maxLength={300}
+                  aria-invalid={errors.bio ? "true" : "false"}
                 />
                 <p className="text-xs text-muted-foreground text-right">
                   {bio.length}/300
                 </p>
+                {errors.bio && (
+                  <p role="alert" className="text-sm text-destructive">{t(errors.bio.message as string)}</p>
+                )}
               </div>
 
               {/* Submit Button */}
@@ -202,9 +213,9 @@ export default function EditProfile() {
                 type="submit"
                 className="w-full"
                 size="lg"
-                disabled={isSubmitting || updateProfileMutation.isPending}
+                disabled={updateProfileMutation.isPending}
               >
-                {isSubmitting || updateProfileMutation.isPending ? (
+                {updateProfileMutation.isPending ? (
                   <>
                     <Loader2 className="w-4 h-4 mr-2 animate-spin" />
                     {t('profile.edit.form.savingButton')}

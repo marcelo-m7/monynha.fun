@@ -12,25 +12,48 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { toast } from 'sonner';
 import { ArrowLeft, Link as LinkIcon, Loader2, Play, CheckCircle, AlertCircle } from 'lucide-react';
 import { z } from 'zod';
-import { useTranslation } from 'react-i18next'; // Import useTranslation
+import { useTranslation } from 'react-i18next';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
 
-const urlSchema = z.string().url('URL inválida').refine(
-  (url) => url.includes('youtube.com') || url.includes('youtu.be'),
-  'Apenas URLs do YouTube são aceitas'
-);
+const submitVideoSchema = z.object({
+  youtubeUrl: z.string()
+    .url('submit.error.invalidUrl')
+    .refine(
+      (url) => url.includes('youtube.com') || url.includes('youtu.be'),
+      'submit.error.notYoutubeUrl'
+    ),
+  description: z.string().max(500, 'submit.error.descriptionMaxLength').optional().or(z.literal('')),
+  language: z.string().min(2, 'submit.error.languageRequired'),
+  categoryId: z.string().optional().or(z.literal('')),
+});
+
+type SubmitVideoFormValues = z.infer<typeof submitVideoSchema>;
 
 export default function Submit() {
-  const { t } = useTranslation(); // Initialize useTranslation
-  const [youtubeUrl, setYoutubeUrl] = useState('');
-  const [description, setDescription] = useState('');
-  const [language, setLanguage] = useState('pt');
-  const [categoryId, setCategoryId] = useState<string>('');
+  const { t } = useTranslation();
   const [isSubmitting, setIsSubmitting] = useState(false);
   
   const { user, loading: authLoading } = useAuth();
   const { data: categories } = useCategories();
-  const { metadata, isLoading: metadataLoading, error: metadataError } = useYouTubeMetadata(youtubeUrl);
   const navigate = useNavigate();
+
+  const { register, handleSubmit, watch, setValue, formState: { errors } } = useForm<SubmitVideoFormValues>({
+    resolver: zodResolver(submitVideoSchema),
+    defaultValues: {
+      youtubeUrl: '',
+      description: '',
+      language: 'pt',
+      categoryId: '',
+    },
+  });
+
+  const youtubeUrl = watch('youtubeUrl');
+  const description = watch('description');
+  const language = watch('language');
+  const categoryId = watch('categoryId');
+
+  const { metadata, isLoading: metadataLoading, error: metadataError } = useYouTubeMetadata(youtubeUrl);
 
   useEffect(() => {
     if (!authLoading && !user) {
@@ -38,9 +61,7 @@ export default function Submit() {
     }
   }, [user, authLoading, navigate]);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-
+  const onSubmit = async (values: SubmitVideoFormValues) => {
     if (!metadata) {
       toast.error(t('submit.error.invalidUrlTitle'), {
         description: t('submit.error.invalidUrlDescription'),
@@ -79,11 +100,11 @@ export default function Submit() {
         .insert({
           youtube_id: metadata.videoId,
           title: metadata.title,
-          description: description || metadata.description || null,
+          description: values.description || metadata.description || null,
           channel_name: metadata.channelName,
           thumbnail_url: metadata.thumbnailUrl,
-          language,
-          category_id: categoryId || null,
+          language: values.language,
+          category_id: values.categoryId || null,
           submitted_by: user.id
         })
         .select()
@@ -126,7 +147,7 @@ export default function Submit() {
     } catch (err) {
       console.error('Error submitting video:', err);
       toast.error(t('submit.error.genericSubmitTitle'), {
-        description: t('submit.error.genericSubmitDescription'),
+        description: err instanceof Error ? err.message : String(err),
       });
     } finally {
       setIsSubmitting(false);
@@ -178,7 +199,7 @@ export default function Submit() {
           <div className="grid lg:grid-cols-2 gap-8">
             {/* Form */}
             <div className="bg-card border border-border rounded-2xl p-6 shadow-sm">
-              <form onSubmit={handleSubmit} className="space-y-6">
+              <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
                 {/* YouTube URL */}
                 <div className="space-y-2">
                   <Label htmlFor="youtube-url">{t('submit.form.youtubeUrlLabel')} *</Label>
@@ -188,22 +209,24 @@ export default function Submit() {
                       id="youtube-url"
                       type="url"
                       placeholder={t('submit.form.youtubeUrlPlaceholder')}
-                      value={youtubeUrl}
-                      onChange={(e) => setYoutubeUrl(e.target.value)}
+                      {...register('youtubeUrl')}
                       className="pl-10"
-                      required
+                      aria-invalid={errors.youtubeUrl ? "true" : "false"}
                     />
                     {metadataLoading && (
                       <Loader2 className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 animate-spin text-muted-foreground" />
                     )}
-                    {metadata && !metadataLoading && (
+                    {metadata && !metadataError && !metadataLoading && (
                       <CheckCircle className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-green-500" />
                     )}
-                    {metadataError && !metadataLoading && (
+                    {(metadataError || errors.youtubeUrl) && !metadataLoading && (
                       <AlertCircle className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-destructive" />
                     )}
                   </div>
-                  {metadataError && (
+                  {errors.youtubeUrl && (
+                    <p role="alert" className="text-sm text-destructive">{t(errors.youtubeUrl.message as string)}</p>
+                  )}
+                  {metadataError && !errors.youtubeUrl && (
                     <p className="text-sm text-destructive">{metadataError}</p>
                   )}
                 </div>
@@ -214,20 +237,23 @@ export default function Submit() {
                   <Textarea
                     id="description"
                     placeholder={t('submit.form.descriptionPlaceholder')}
-                    value={description}
-                    onChange={(e) => setDescription(e.target.value)}
+                    {...register('description')}
                     rows={3}
                     maxLength={500}
+                    aria-invalid={errors.description ? "true" : "false"}
                   />
                   <p className="text-xs text-muted-foreground text-right">
                     {description.length}/500
                   </p>
+                  {errors.description && (
+                    <p role="alert" className="text-sm text-destructive">{t(errors.description.message as string)}</p>
+                  )}
                 </div>
 
                 {/* Language */}
                 <div className="space-y-2">
                   <Label htmlFor="language">{t('submit.form.languageLabel')}</Label>
-                  <Select value={language} onValueChange={setLanguage}>
+                  <Select value={language} onValueChange={(value) => setValue('language', value)}>
                     <SelectTrigger>
                       <SelectValue placeholder={t('submit.form.languagePlaceholder')} />
                     </SelectTrigger>
@@ -239,12 +265,15 @@ export default function Submit() {
                       <SelectItem value="other">{t('common.language.other')}</SelectItem>
                     </SelectContent>
                   </Select>
+                  {errors.language && (
+                    <p role="alert" className="text-sm text-destructive">{t(errors.language.message as string)}</p>
+                  )}
                 </div>
 
                 {/* Category */}
                 <div className="space-y-2">
                   <Label htmlFor="category">{t('submit.form.categoryLabel')}</Label>
-                  <Select value={categoryId} onValueChange={setCategoryId}>
+                  <Select value={categoryId} onValueChange={(value) => setValue('categoryId', value)}>
                     <SelectTrigger>
                       <SelectValue placeholder={t('submit.form.categoryPlaceholder')} />
                     </SelectTrigger>
@@ -256,6 +285,9 @@ export default function Submit() {
                       ))}
                     </SelectContent>
                   </Select>
+                  {errors.categoryId && (
+                    <p role="alert" className="text-sm text-destructive">{t(errors.categoryId.message as string)}</p>
+                  )}
                 </div>
 
                 {/* Submit Button */}
