@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { useCreatePlaylist, usePlaylistById, useUpdatePlaylist } from '@/hooks/usePlaylists';

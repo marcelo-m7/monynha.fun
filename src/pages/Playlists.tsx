@@ -4,7 +4,7 @@ import { usePlaylists } from '@/hooks/usePlaylists';
 import { useTranslation } from 'react-i18next';
 import { Link, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { Plus, ListVideo, Loader2, BookOpen, Code, Globe } from 'lucide-react';
+import { Plus, ListVideo, BookOpen, Code, Globe } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Input } from '@/components/ui/input';
 import { useState } from 'react';
@@ -13,7 +13,7 @@ const Playlists = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState('');
-  const { data: playlists, isLoading, isError } = usePlaylists({ searchQuery: searchQuery || undefined });
+  const { data: playlists, isLoading, isError } = usePlaylists({ searchQuery: searchQuery || undefined, isPublic: true });
 
   if (isLoading) {
     return (

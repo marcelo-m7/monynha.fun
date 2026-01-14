@@ -19,10 +19,16 @@ const Profile = () => {
   const { user: authUser, loading: authLoading } = useAuth();
 
   const { data: profile, isLoading: profileLoading, isError: profileError } = useProfileByUsername(username);
-  const { data: userVideos, isLoading: videosLoading } = useVideos({ submitted_by: profile?.id });
-  const { data: userPlaylists, isLoading: playlistsLoading } = usePlaylists({ authorId: profile?.id });
-
   const isCurrentUser = authUser && profile && authUser.id === profile.id;
+  const { data: userVideos, isLoading: videosLoading } = useVideos({
+    submittedBy: profile?.id,
+    enabled: !!profile?.id,
+  });
+  const { data: userPlaylists, isLoading: playlistsLoading } = usePlaylists({
+    authorId: profile?.id,
+    isPublic: isCurrentUser ? undefined : true,
+    enabled: !!profile?.id,
+  });
 
   if (profileLoading || authLoading) {
     return (

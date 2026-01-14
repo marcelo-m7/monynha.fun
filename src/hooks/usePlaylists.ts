@@ -34,7 +34,7 @@ export interface PlaylistVideo {
 
 // --- Playlists CRUD Hooks ---
 
-export function usePlaylists(options?: { authorId?: string; isPublic?: boolean; searchQuery?: string }) {
+export function usePlaylists(options?: { authorId?: string; isPublic?: boolean; searchQuery?: string; enabled?: boolean }) {
   return useQuery<Playlist[], Error>({
     queryKey: ['playlists', options],
     queryFn: async () => {
@@ -64,10 +64,11 @@ export function usePlaylists(options?: { authorId?: string; isPublic?: boolean; 
 
       return data.map(p => ({
         ...p,
-        video_count: p.video_count ? p.video_count[0].count : 0,
+        video_count: p.video_count?.[0]?.count ?? 0,
         author: p.author as { username: string } | undefined
       })) as Playlist[];
     },
+    enabled: options?.enabled ?? true,
   });
 }
 

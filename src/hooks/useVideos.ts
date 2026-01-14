@@ -31,6 +31,8 @@ export function useVideos(options?: {
   searchQuery?: string; 
   categoryId?: string; 
   language?: string;
+  submittedBy?: string;
+  enabled?: boolean;
 }) {
   return useQuery({
     queryKey: ['videos', options],
@@ -64,12 +66,17 @@ export function useVideos(options?: {
       if (options?.language) {
         query = query.eq('language', options.language);
       }
+
+      if (options?.submittedBy) {
+        query = query.eq('submitted_by', options.submittedBy);
+      }
       
       const { data, error } = await query;
       
       if (error) throw error;
       return data as Video[];
-    }
+    },
+    enabled: options?.enabled ?? true,
   });
 }
 

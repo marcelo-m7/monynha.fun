@@ -1,4 +1,4 @@
-import { useParams, useNavigate, Link } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { usePlaylistById, usePlaylistVideos, useDeletePlaylist, useAddVideoToPlaylist, useRemoveVideoFromPlaylist } from '@/hooks/usePlaylists';
 import { Header } from '@/components/Header';
 import { Footer } from '@/components/Footer';
@@ -8,7 +8,6 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { ArrowLeft, ListVideo, BookOpen, Code, Globe, Trash2, Edit, Loader2, Plus, Search, XCircle } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '@/hooks/useAuth';
-import { toast } from 'sonner';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
@@ -32,7 +31,10 @@ const PlaylistDetails = () => {
 
   const [addVideoSearchQuery, setAddVideoSearchQuery] = useState('');
   const [isAddVideoDialogOpen, setIsAddVideoDialogOpen] = useState(false);
-  const { data: availableVideos, isLoading: availableVideosLoading } = useVideos({ searchQuery: addVideoSearchQuery });
+  const { data: availableVideos, isLoading: availableVideosLoading } = useVideos({
+    searchQuery: addVideoSearchQuery,
+    enabled: isAuthor && isAddVideoDialogOpen,
+  });
 
   const handleDeletePlaylist = async () => {
     if (!playlistId) return;
@@ -97,6 +99,25 @@ const PlaylistDetails = () => {
           <h1 className="text-3xl font-bold mb-4">{t('playlistDetails.notFoundTitle')}</h1>
           <p className="text-muted-foreground mb-8">
             {t('playlistDetails.notFoundDescription')}
+          </p>
+          <Button onClick={() => navigate('/playlists')}>
+            <ArrowLeft className="w-4 h-4 mr-2" />
+            {t('playlistDetails.backToPlaylists')}
+          </Button>
+        </main>
+        <Footer />
+      </div>
+    );
+  }
+
+  if (!playlist.is_public && !isAuthor) {
+    return (
+      <div className="min-h-screen flex flex-col">
+        <Header />
+        <main className="flex-1 container py-16 text-center">
+          <h1 className="text-3xl font-bold mb-4">{t('playlistDetails.privateTitle')}</h1>
+          <p className="text-muted-foreground mb-8">
+            {t('playlistDetails.privateDescription')}
           </p>
           <Button onClick={() => navigate('/playlists')}>
             <ArrowLeft className="w-4 h-4 mr-2" />
@@ -257,6 +278,12 @@ const PlaylistDetails = () => {
             {Array.from({ length: 4 }).map((_, i) => (
               <Skeleton key={i} className="h-64 rounded-2xl" />
             ))}
+          </div>
+        ) : videosError ? (
+          <div className="text-center py-12 text-muted-foreground">
+            <ListVideo className="w-16 h-16 mb-4 opacity-50 mx-auto" />
+            <p className="text-lg font-medium mb-2">{t('playlistDetails.videosLoadErrorTitle')}</p>
+            <p className="mb-6">{t('playlistDetails.videosLoadErrorDescription')}</p>
           </div>
         ) : playlistVideos && playlistVideos.length > 0 ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
