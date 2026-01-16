@@ -19,12 +19,16 @@ export function usePlaylists(options: UsePlaylistsOptions = {}) {
   return useQuery<Playlist[], Error>({
     queryKey: ['playlists', { authorId, isPublic, searchQuery, filter, userId: user?.id }],
     queryFn: async () => {
+      const selectStr = `*, author:profiles!playlists_author_id_fkey(id, username, display_name, avatar_url)`;
+
+      // Debug: show constructed query pieces to help inspect network request
+      // (will appear in the browser console)
+      // eslint-disable-next-line no-console
+      console.debug('Playlists query', { select: selectStr, authorId, isPublic, searchQuery, filter, userId: user?.id });
+
       let query = supabase
         .from('playlists')
-        .select(`
-          *,
-          author:profiles!playlists_author_id_fkey(id, username, display_name, avatar_url)
-        `)
+        .select(selectStr)
         .order('created_at', { ascending: false });
 
       if (authorId) {
@@ -46,7 +50,12 @@ export function usePlaylists(options: UsePlaylistsOptions = {}) {
 
       const { data, error } = await query;
 
-      if (error) throw error;
+      if (error) {
+        // Log full error for easier inspection in browser devtools
+        // eslint-disable-next-line no-console
+        console.error('Supabase playlists error', error, { select: selectStr, authorId, isPublic, searchQuery, filter, userId: user?.id });
+        throw error;
+      }
 
       // Fetch video counts separately for each playlist
       const playlistsWithCounts = await Promise.all((data || []).map(async (playlist: any) => {
