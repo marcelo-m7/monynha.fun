@@ -3,6 +3,7 @@ import { Play, Eye } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils"; // Import cn for conditional class names
+import { supabase } from "@/integrations/supabase/client";
 
 interface VideoCardProps {
   video: Video;
@@ -14,6 +15,15 @@ export const VideoCard = ({ video, onClick, variant = 'default' }: VideoCardProp
   const navigate = useNavigate();
 
   const handleClick = () => {
+    // Optimistically increment view count via RPC, then navigate
+    try {
+      // fire-and-forget: increment on the server (atomic in DB function)
+      supabase.rpc('increment_video_view_count', { p_video_id: video.id });
+    } catch (e) {
+      // ignore errors — navigation should still happen
+      console.debug('increment view failed', e);
+    }
+
     if (onClick) {
       onClick();
     } else {

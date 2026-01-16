@@ -6,6 +6,7 @@ import { Footer } from "@/components/Footer";
 import { useCategories } from "@/hooks/useCategories";
 import { useFeaturedVideos, useRecentVideos } from "@/hooks/useVideos";
 import { ArrowRight, TrendingUp, Clock, Loader2 } from "lucide-react";
+import { FeaturedHero } from "@/components/FeaturedHero";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useNavigate } from "react-router-dom";
@@ -93,26 +94,40 @@ const Index = () => {
             </div>
 
             {featuredLoading ? (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                {Array.from({ length: 4 }).map((_, i) => (
-                  <div key={i} className="space-y-3">
-                    <Skeleton className="aspect-video rounded-2xl" />
-                    <Skeleton className="h-4 w-3/4" />
-                    <Skeleton className="h-3 w-1/2" />
+              <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+                <div className="lg:col-span-2">
+                  <div className="space-y-3">
+                    <Skeleton className="aspect-video rounded-3xl" />
+                    <Skeleton className="h-6 w-3/4 mt-2" />
+                    <Skeleton className="h-4 w-1/2 mt-1" />
                   </div>
-                ))}
+                </div>
+                <div className="lg:col-span-2 grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  {Array.from({ length: 3 }).map((_, i) => (
+                    <div key={i} className="space-y-2">
+                      <Skeleton className="aspect-video rounded-2xl" />
+                      <Skeleton className="h-4 w-3/4" />
+                    </div>
+                  ))}
+                </div>
               </div>
             ) : featuredVideos && featuredVideos.length > 0 ? (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                {featuredVideos.map((video, index) => (
-                  <div
-                    key={video.id}
-                    className="animate-fade-up"
-                    style={{ animationDelay: `${index * 0.1}s` }}
-                  >
-                    <VideoCard video={video} variant="default" />
+              <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 items-start">
+                {/* Highlight the first featured video */}
+                <div className="lg:col-span-2">
+                  <div className="animate-fade-up" style={{ animationDelay: `0s` }}>
+                    <FeaturedHero video={featuredVideos[0]} />
                   </div>
-                ))}
+                </div>
+
+                {/* The rest of featured videos as compact cards */}
+                <div className="lg:col-span-2 grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  {featuredVideos.slice(1).map((video, index) => (
+                    <div key={video.id} className="animate-fade-up" style={{ animationDelay: `${(index + 1) * 0.08}s` }}>
+                      <VideoCard video={video} variant="compact" />
+                    </div>
+                  ))}
+                </div>
               </div>
             ) : (
               <div className="text-center py-12 text-muted-foreground">
