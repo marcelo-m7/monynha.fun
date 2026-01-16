@@ -14,6 +14,7 @@ import { Footer } from '@/components/Footer';
 import { VideoCard } from '@/components/VideoCard';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
+import { Badge } from '@/components/ui/badge'; // Import Badge component
 import { ArrowLeft, ListVideo, BookOpen, Code, Globe, Trash2, Edit, Loader2, Plus, Search, XCircle, Lock, GraduationCap } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '@/hooks/useAuth';
@@ -23,9 +24,9 @@ import { Input } from '@/components/ui/input';
 import { useState } from 'react';
 import { useVideos } from '@/hooks/useVideos';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { PlaylistProgressBar } from '@/components/playlist/PlaylistProgressBar'; // NEW
-import { SortableVideoList } from '@/components/playlist/SortableVideoList'; // NEW
-import { PlaylistCollaboratorsDialog } from '@/components/playlist/PlaylistCollaboratorsDialog'; // NEW
+import { PlaylistProgressBar } from '@/components/playlist/PlaylistProgressBar';
+import { SortableVideoList } from '@/components/playlist/SortableVideoList';
+import { PlaylistCollaboratorsDialog } from '@/components/playlist/PlaylistCollaboratorsDialog';
 
 const PlaylistDetails = () => {
   const { t } = useTranslation();
