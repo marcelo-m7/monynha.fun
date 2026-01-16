@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   DndContext,
@@ -18,6 +18,7 @@ import {
 import { SortableVideoItem } from './SortableVideoItem';
 import { PlaylistVideo, useReorderPlaylistVideos, useRemoveVideoFromPlaylist, useMarkVideoWatched, PlaylistProgress } from '@/hooks/usePlaylists';
 import { useAuth } from '@/hooks/useAuth';
+import { toast } from 'sonner';
 
 interface SortableVideoListProps {
   playlistId: string;
@@ -34,6 +35,11 @@ export function SortableVideoList({ playlistId, videos, progress, canEdit, isOrd
   const reorderMutation = useReorderPlaylistVideos();
   const removeMutation = useRemoveVideoFromPlaylist();
   const markWatchedMutation = useMarkVideoWatched();
+
+  // Update local state when videos prop changes (e.g., after adding/removing a video)
+  useEffect(() => {
+    setItems(videos);
+  }, [videos]);
 
   const sensors = useSensors(
     useSensor(PointerSensor),
@@ -61,7 +67,7 @@ export function SortableVideoList({ playlistId, videos, progress, canEdit, isOrd
   };
 
   const handleRemove = (videoId: string) => {
-    setItems(items.filter(item => item.video_id !== videoId));
+    setItems(items.filter(item => item.video_id !== videoId)); // Optimistic update
     removeMutation.mutate({ playlistId, videoId });
   };
 
@@ -78,7 +84,7 @@ export function SortableVideoList({ playlistId, videos, progress, canEdit, isOrd
   };
 
   // If can't edit, just render a static list
-  if (!canEdit) {
+  if (!canEdit && !user) { // If not editable and not logged in, no progress tracking
     return (
       <div className="space-y-3">
         {videos.map((item, index) => (
@@ -88,10 +94,10 @@ export function SortableVideoList({ playlistId, videos, progress, canEdit, isOrd
             index={index}
             isOrdered={isOrdered}
             canEdit={false}
-            canTrackProgress={!!user}
-            isWatched={getVideoProgress(item.video_id)?.watched || false}
+            canTrackProgress={false}
+            isWatched={false}
             onRemove={() => {}}
-            onToggleWatched={() => handleToggleWatched(item.video_id, getVideoProgress(item.video_id)?.watched || false)}
+            onToggleWatched={() => {}}
           />
         ))}
       </div>

@@ -2,31 +2,45 @@ import { Header } from '@/components/Header';
 import { Footer } from '@/components/Footer';
 import { usePlaylists } from '@/hooks/usePlaylists';
 import { useTranslation } from 'react-i18next';
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { Plus, ListVideo, BookOpen, Code, Globe } from 'lucide-react';
+import { Plus, ListVideo, Search, Filter } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Input } from '@/components/ui/input';
 import { useState } from 'react';
+import { PlaylistCard } from '@/components/playlist/PlaylistCard'; // Import the new PlaylistCard
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { useAuth } from '@/hooks/useAuth';
 
 const Playlists = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const { user } = useAuth();
+
   const [searchQuery, setSearchQuery] = useState('');
-  const { data: playlists, isLoading, isError } = usePlaylists({ searchQuery: searchQuery || undefined, isPublic: true });
+  const [filter, setFilter] = useState<'all' | 'my' | 'collaborating'>('all');
+
+  const { data: playlists, isLoading, isError } = usePlaylists({
+    searchQuery: searchQuery || undefined,
+    filter: filter,
+    enabled: filter !== 'my' || !!user, // Only enable 'my' filter if user is logged in
+  });
 
   if (isLoading) {
     return (
       <div className="min-h-screen flex flex-col">
         <Header />
         <main className="flex-1 container py-8">
-          <div className="flex justify-between items-center mb-8">
+          <div className="flex flex-col md:flex-row justify-between items-center mb-8 gap-4">
             <Skeleton className="h-10 w-48" />
-            <Skeleton className="h-10 w-32" />
+            <div className="flex gap-2 w-full md:w-auto">
+              <Skeleton className="h-10 flex-1 md:w-64" />
+              <Skeleton className="h-10 w-32" />
+            </div>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {Array.from({ length: 6 }).map((_, i) => (
-              <Skeleton key={i} className="h-48 rounded-2xl" />
+              <Skeleton key={i} className="h-64 rounded-2xl" />
             ))}
           </div>
         </main>
@@ -60,15 +74,33 @@ const Playlists = () => {
             <h1 className="text-3xl font-bold">{t('playlists.title')}</h1>
             <p className="text-muted-foreground mt-2">{t('playlists.description')}</p>
           </div>
-          <div className="flex gap-2 w-full md:w-auto">
-            <Input
-              type="search"
-              placeholder={t('playlists.searchPlaceholder')}
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="flex-1 md:flex-none md:w-64"
-            />
-            <Button onClick={() => navigate('/playlists/new')} className="gap-2">
+          <div className="flex flex-col sm:flex-row gap-2 w-full md:w-auto">
+            <div className="relative flex-1">
+              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+              <Input
+                type="search"
+                placeholder={t('playlists.searchPlaceholder')}
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full pl-10 pr-4 h-10 bg-muted/50 border-0 focus-visible:ring-primary/30"
+              />
+            </div>
+            <Select value={filter} onValueChange={(value: 'all' | 'my' | 'collaborating') => setFilter(value)}>
+              <SelectTrigger className="w-full sm:w-[180px] bg-muted/50 border-0 focus:ring-primary/30">
+                <Filter className="w-4 h-4 mr-2 text-muted-foreground" />
+                <SelectValue placeholder={t('playlists.filter.all')} />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">{t('playlists.filter.all')}</SelectItem>
+                {user && (
+                  <>
+                    <SelectItem value="my">{t('playlists.filter.myPlaylists')}</SelectItem>
+                    <SelectItem value="collaborating">{t('playlists.filter.collaborating')}</SelectItem>
+                  </>
+                )}
+              </SelectContent>
+            </Select>
+            <Button onClick={() => navigate('/playlists/new')} className="gap-2 w-full sm:w-auto">
               <Plus className="w-4 h-4" />
               {t('playlists.createPlaylist')}
             </Button>
@@ -78,43 +110,7 @@ const Playlists = () => {
         {playlists && playlists.length > 0 ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {playlists.map((playlist, index) => (
-              <Link
-                key={playlist.id}
-                to={`/playlists/${playlist.id}`}
-                className="group bg-card border border-border rounded-2xl p-6 shadow-sm hover:shadow-lg transition-all duration-300 card-hover animate-fade-up"
-                style={{ animationDelay: `${index * 0.05}s` }}
-              >
-                <div className="flex items-center gap-4 mb-4">
-                  <div className="w-12 h-12 rounded-xl bg-primary/10 text-primary flex items-center justify-center">
-                    <ListVideo className="w-6 h-6" />
-                  </div>
-                  <div>
-                    <h2 className="font-semibold text-lg group-hover:text-primary transition-colors line-clamp-1">{playlist.name}</h2>
-                    <p className="text-sm text-muted-foreground">
-                      {t('playlists.videoCount', { count: playlist.video_count || 0 })}
-                      {playlist.author?.username && ` • ${playlist.author.username}`}
-                    </p>
-                  </div>
-                </div>
-                <p className="text-muted-foreground text-sm line-clamp-2 mb-4">
-                  {playlist.description || t('playlists.noDescription')}
-                </p>
-                <div className="flex flex-wrap gap-2 text-xs text-muted-foreground">
-                  {playlist.course_code && (
-                    <span className="flex items-center gap-1 px-2 py-1 rounded-full bg-muted/50">
-                      <BookOpen className="w-3 h-3" /> {playlist.course_code}
-                    </span>
-                  )}
-                  {playlist.unit_code && (
-                    <span className="flex items-center gap-1 px-2 py-1 rounded-full bg-muted/50">
-                      <Code className="w-3 h-3" /> {playlist.unit_code}
-                    </span>
-                  )}
-                  <span className="flex items-center gap-1 px-2 py-1 rounded-full bg-muted/50 uppercase">
-                    <Globe className="w-3 h-3" /> {playlist.language}
-                  </span>
-                </div>
-              </Link>
+              <PlaylistCard key={playlist.id} playlist={playlist} index={index} />
             ))}
           </div>
         ) : (

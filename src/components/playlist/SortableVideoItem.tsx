@@ -2,10 +2,9 @@ import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
-import { GripVertical, X, Check, Circle } from 'lucide-react';
+import { GripVertical, X, Check } from 'lucide-react';
 import { PlaylistVideo } from '@/hooks/usePlaylists';
 import { Button } from '@/components/ui/button';
-import { Checkbox } from '@/components/ui/checkbox';
 import { cn } from '@/lib/utils';
 
 interface SortableVideoItemProps {
@@ -45,7 +44,7 @@ export function SortableVideoItem({
   };
 
   const formatDuration = (seconds: number | null) => {
-    if (!seconds) return '';
+    if (!seconds) return '0:00';
     const mins = Math.floor(seconds / 60);
     const secs = seconds % 60;
     return `${mins}:${secs.toString().padStart(2, '0')}`;
@@ -106,6 +105,11 @@ export function SortableVideoItem({
           src={item.video?.thumbnail_url || '/placeholder.svg'}
           alt={item.video?.title}
           className="w-full h-full object-cover"
+          onError={(e) => {
+            const target = e.target as HTMLImageElement;
+            target.src = '/placeholder.svg'; // Fallback to placeholder
+            target.onerror = null;
+          }}
         />
         {item.video?.duration_seconds && (
           <span className="absolute bottom-1 right-1 px-1.5 py-0.5 bg-black/80 text-white text-xs rounded">

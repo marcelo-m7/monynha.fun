@@ -9,22 +9,25 @@ import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
 import { toast } from 'sonner';
-import { ArrowLeft, ListVideo, Loader2, Save, BookOpen, Code, Globe } from 'lucide-react';
+import { ArrowLeft, ListVideo, Loader2, Save, BookOpen, Code, Globe, Image, GraduationCap } from 'lucide-react';
 import { z } from 'zod';
 import { useTranslation } from 'react-i18next';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Header } from '@/components/Header';
 import { Footer } from '@/components/Footer';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'; // NEW
 
 const playlistSchema = z.object({
   name: z.string().min(3, 'createEditPlaylist.error.nameMinLength').max(100, 'createEditPlaylist.error.nameMaxLength'),
   slug: z.string().min(3, 'createEditPlaylist.error.slugMinLength').max(100, 'createEditPlaylist.error.slugMaxLength').regex(/^[a-z0-9-]+$/, 'createEditPlaylist.error.slugInvalidFormat'),
   description: z.string().max(500, 'createEditPlaylist.error.descriptionMaxLength').optional().or(z.literal('')),
+  thumbnail_url: z.string().url('createEditPlaylist.error.invalidThumbnailUrl').optional().or(z.literal('')), // NEW
   course_code: z.string().max(50, 'createEditPlaylist.error.courseCodeMaxLength').optional().or(z.literal('')),
   unit_code: z.string().max(50, 'createEditPlaylist.error.unitCodeMaxLength').optional().or(z.literal('')),
   language: z.string().min(2, 'createEditPlaylist.error.languageRequired'),
   is_public: z.boolean(),
+  is_ordered: z.boolean(), // NEW
 });
 
 type PlaylistFormValues = z.infer<typeof playlistSchema>;
@@ -46,20 +49,24 @@ export default function CreateEditPlaylist() {
       name: '',
       slug: '',
       description: '',
+      thumbnail_url: '', // NEW
       course_code: '',
       unit_code: '',
       language: 'pt',
       is_public: true,
+      is_ordered: true, // NEW: Default to learning path
     },
   });
 
   const name = watch('name');
   const slug = watch('slug');
   const description = watch('description');
+  const thumbnailUrl = watch('thumbnail_url'); // NEW
   const courseCode = watch('course_code');
   const unitCode = watch('unit_code');
   const language = watch('language');
   const isPublic = watch('is_public');
+  const isOrdered = watch('is_ordered'); // NEW
 
   useEffect(() => {
     if (!authLoading && !user) {
@@ -73,10 +80,12 @@ export default function CreateEditPlaylist() {
         name: existingPlaylist.name,
         slug: existingPlaylist.slug,
         description: existingPlaylist.description || '',
+        thumbnail_url: existingPlaylist.thumbnail_url || '', // NEW
         course_code: existingPlaylist.course_code || '',
         unit_code: existingPlaylist.unit_code || '',
         language: existingPlaylist.language,
         is_public: existingPlaylist.is_public,
+        is_ordered: existingPlaylist.is_ordered, // NEW
       });
     }
   }, [isEditing, existingPlaylist, reset]);
@@ -94,10 +103,12 @@ export default function CreateEditPlaylist() {
         name: values.name,
         slug: values.slug,
         description: values.description || null,
+        thumbnail_url: values.thumbnail_url || null, // NEW
         course_code: values.course_code || null,
         unit_code: values.unit_code || null,
         language: values.language,
         is_public: values.is_public,
+        is_ordered: values.is_ordered, // NEW
       };
 
       if (isEditing) {
@@ -225,6 +236,26 @@ export default function CreateEditPlaylist() {
                 )}
               </div>
 
+              {/* Thumbnail URL */}
+              <div className="space-y-2">
+                <Label htmlFor="thumbnail-url">{t('createEditPlaylist.form.thumbnailUrlLabel')}</Label>
+                <div className="relative">
+                  <Image className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
+                  <Input
+                    id="thumbnail-url"
+                    type="url"
+                    placeholder={t('createEditPlaylist.form.thumbnailUrlPlaceholder')}
+                    {...register('thumbnail_url')}
+                    className="pl-10"
+                    aria-invalid={errors.thumbnail_url ? "true" : "false"}
+                  />
+                </div>
+                {errors.thumbnail_url && (
+                  <p role="alert" className="text-sm text-destructive">{t(errors.thumbnail_url.message as string)}</p>
+                )}
+                <p className="text-xs text-muted-foreground">{t('createEditPlaylist.form.thumbnailUrlHint')}</p>
+              </div>
+
               {/* Course Code */}
               <div className="space-y-2">
                 <Label htmlFor="course-code">{t('createEditPlaylist.form.courseCodeLabel')}</Label>
@@ -283,6 +314,27 @@ export default function CreateEditPlaylist() {
                 {errors.language && (
                   <p role="alert" className="text-sm text-destructive">{t(errors.language.message as string)}</p>
                 )}
+              </div>
+
+              {/* Playlist Type (is_ordered) */}
+              <div className="space-y-2">
+                <Label>{t('createEditPlaylist.form.playlistTypeLabel')}</Label>
+                <RadioGroup
+                  value={isOrdered ? 'ordered' : 'unordered'}
+                  onValueChange={(value) => setValue('is_ordered', value === 'ordered')}
+                  className="flex flex-col space-y-1"
+                >
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="ordered" id="ordered" />
+                    <Label htmlFor="ordered">{t('createEditPlaylist.form.learningPath')}</Label>
+                  </div>
+                  <p className="text-xs text-muted-foreground ml-6 -mt-1 mb-2">{t('createEditPlaylist.form.learningPathHint')}</p>
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="unordered" id="unordered" />
+                    <Label htmlFor="unordered">{t('createEditPlaylist.form.collection')}</Label>
+                  </div>
+                  <p className="text-xs text-muted-foreground ml-6 -mt-1">{t('createEditPlaylist.form.collectionHint')}</p>
+                </RadioGroup>
               </div>
 
               {/* Is Public Switch */}

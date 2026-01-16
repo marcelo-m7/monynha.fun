@@ -190,12 +190,12 @@ export function PlaylistCollaboratorsDialog({ playlistId, isAuthor }: PlaylistCo
                         <SelectContent>
                           <SelectItem value="editor">
                             <span className="flex items-center gap-1">
-                              <Shield className="w-3 h-3" /> Editor
+                              <Shield className="w-3 h-3" /> {t('playlistDetails.collaborators.roleEditor')}
                             </span>
                           </SelectItem>
                           <SelectItem value="viewer">
                             <span className="flex items-center gap-1">
-                              <Eye className="w-3 h-3" /> Viewer
+                              <Eye className="w-3 h-3" /> {t('playlistDetails.collaborators.roleViewer')}
                             </span>
                           </SelectItem>
                         </SelectContent>
@@ -213,11 +213,11 @@ export function PlaylistCollaboratorsDialog({ playlistId, isAuthor }: PlaylistCo
                     <span className="text-xs text-muted-foreground flex items-center gap-1">
                       {collab.role === 'editor' ? (
                         <>
-                          <Shield className="w-3 h-3" /> Editor
+                          <Shield className="w-3 h-3" /> {t('playlistDetails.collaborators.roleEditor')}
                         </>
                       ) : (
                         <>
-                          <Eye className="w-3 h-3" /> Viewer
+                          <Eye className="w-3 h-3" /> {t('playlistDetails.collaborators.roleViewer')}
                         </>
                       )}
                     </span>

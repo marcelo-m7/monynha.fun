@@ -4,6 +4,7 @@ import { ListVideo, BookOpen, Code, Globe, Lock, Users, GraduationCap } from 'lu
 import { Playlist, usePlaylistProgress, usePlaylistVideos } from '@/hooks/usePlaylists';
 import { Progress } from '@/components/ui/progress';
 import { useAuth } from '@/hooks/useAuth';
+import { Skeleton } from '@/components/ui/skeleton'; // Import Skeleton for loading states
 
 interface PlaylistCardProps {
   playlist: Playlist;
@@ -13,8 +14,8 @@ interface PlaylistCardProps {
 export function PlaylistCard({ playlist, index = 0 }: PlaylistCardProps) {
   const { t } = useTranslation();
   const { user } = useAuth();
-  const { data: videos } = usePlaylistVideos(playlist.id);
-  const { data: progress } = usePlaylistProgress(playlist.id);
+  const { data: videos, isLoading: videosLoading } = usePlaylistVideos(playlist.id);
+  const { data: progress, isLoading: progressLoading } = usePlaylistProgress(playlist.id);
 
   // Calculate progress percentage
   const totalVideos = videos?.length || 0;
@@ -37,6 +38,11 @@ export function PlaylistCard({ playlist, index = 0 }: PlaylistCardProps) {
             src={thumbnailUrl} 
             alt={playlist.name}
             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+            onError={(e) => {
+              const target = e.target as HTMLImageElement;
+              target.src = '/placeholder.svg'; // Fallback to placeholder
+              target.onerror = null;
+            }}
           />
         ) : (
           <div className="w-full h-full flex items-center justify-center">
@@ -91,7 +97,12 @@ export function PlaylistCard({ playlist, index = 0 }: PlaylistCardProps) {
         </p>
 
         {/* Progress bar for logged-in users */}
-        {user && totalVideos > 0 && (
+        {user && (videosLoading || progressLoading) ? (
+          <div className="mb-3 space-y-1">
+            <Skeleton className="h-4 w-full" />
+            <Skeleton className="h-2 w-full" />
+          </div>
+        ) : user && totalVideos > 0 && (
           <div className="mb-3">
             <div className="flex justify-between text-xs text-muted-foreground mb-1">
               <span>{t('playlists.progress')}</span>

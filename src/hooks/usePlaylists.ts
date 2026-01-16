@@ -1,6 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
+import { toast } from 'sonner';
 
 // ==================== TYPE DEFINITIONS ====================
 
@@ -15,7 +16,7 @@ export interface Playlist {
   unit_code: string | null;
   language: string;
   is_public: boolean;
-  is_ordered: boolean;
+  is_ordered: boolean; // NEW: for learning paths vs collections
   created_at: string;
   updated_at: string;
   // Joined data
@@ -25,11 +26,11 @@ export interface Playlist {
     display_name: string | null;
     avatar_url: string | null;
   } | null;
-  video_count?: number;
+  video_count?: number; // Count from playlist_videos
 }
 
 export interface PlaylistVideo {
-  id: string;
+  id: string; // NEW: explicit primary key for playlist_videos
   playlist_id: string;
   video_id: string;
   position: number;
@@ -88,7 +89,7 @@ export function usePlaylists(options: UsePlaylistsOptions = {}) {
   const { user } = useAuth();
   const { authorId, isPublic, searchQuery, enabled = true, filter = 'all' } = options;
 
-  return useQuery({
+  return useQuery<Playlist[], Error>({
     queryKey: ['playlists', { authorId, isPublic, searchQuery, filter, userId: user?.id }],
     queryFn: async () => {
       let query = supabase
@@ -146,7 +147,7 @@ export function usePlaylists(options: UsePlaylistsOptions = {}) {
 }
 
 export function usePlaylistById(id: string | undefined) {
-  return useQuery({
+  return useQuery<Playlist, Error>({
     queryKey: ['playlist', id],
     queryFn: async () => {
       if (!id) throw new Error('Playlist ID is required');
@@ -177,8 +178,8 @@ export function useCreatePlaylist() {
   const queryClient = useQueryClient();
   const { user } = useAuth();
 
-  return useMutation({
-    mutationFn: async (playlist: Omit<Playlist, 'id' | 'author_id' | 'created_at' | 'updated_at' | 'author' | 'video_count'>) => {
+  return useMutation<Playlist, Error, Omit<Playlist, 'id' | 'author_id' | 'created_at' | 'updated_at' | 'author' | 'video_count'>>({
+    mutationFn: async (playlist) => {
       if (!user) throw new Error('Must be logged in to create a playlist');
 
       const { data, error } = await supabase
@@ -195,6 +196,10 @@ export function useCreatePlaylist() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['playlists'] });
+      toast.success('Playlist created successfully!');
+    },
+    onError: (error) => {
+      toast.error('Failed to create playlist', { description: error.message });
     },
   });
 }
@@ -202,8 +207,8 @@ export function useCreatePlaylist() {
 export function useUpdatePlaylist() {
   const queryClient = useQueryClient();
 
-  return useMutation({
-    mutationFn: async (playlist: Partial<Omit<Playlist, 'author_id' | 'created_at' | 'author' | 'video_count'>> & { id: string }) => {
+  return useMutation<Playlist, Error, Partial<Omit<Playlist, 'author_id' | 'created_at' | 'author' | 'video_count'>> & { id: string }>({
+    mutationFn: async (playlist) => {
       const { data, error } = await supabase
         .from('playlists')
         .update({
@@ -215,7 +220,7 @@ export function useUpdatePlaylist() {
           unit_code: playlist.unit_code,
           language: playlist.language,
           is_public: playlist.is_public,
-          is_ordered: playlist.is_ordered,
+          is_ordered: playlist.is_ordered, // NEW
         })
         .eq('id', playlist.id)
         .select()
@@ -227,6 +232,10 @@ export function useUpdatePlaylist() {
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ['playlists'] });
       queryClient.invalidateQueries({ queryKey: ['playlist', data.id] });
+      toast.success('Playlist updated successfully!');
+    },
+    onError: (error) => {
+      toast.error('Failed to update playlist', { description: error.message });
     },
   });
 }
@@ -234,8 +243,8 @@ export function useUpdatePlaylist() {
 export function useDeletePlaylist() {
   const queryClient = useQueryClient();
 
-  return useMutation({
-    mutationFn: async (playlistId: string) => {
+  return useMutation<void, Error, string>({
+    mutationFn: async (playlistId) => {
       const { error } = await supabase
         .from('playlists')
         .delete()
@@ -245,6 +254,10 @@ export function useDeletePlaylist() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['playlists'] });
+      toast.success('Playlist deleted successfully!');
+    },
+    onError: (error) => {
+      toast.error('Failed to delete playlist', { description: error.message });
     },
   });
 }
@@ -252,10 +265,10 @@ export function useDeletePlaylist() {
 // ==================== PLAYLIST VIDEOS HOOKS ====================
 
 export function usePlaylistVideos(playlistId: string | undefined) {
-  return useQuery({
+  return useQuery<PlaylistVideo[], Error>({
     queryKey: ['playlist-videos', playlistId],
     queryFn: async () => {
-      if (!playlistId) throw new Error('Playlist ID is required');
+      if (!playlistId) return [];
 
       const { data, error } = await supabase
         .from('playlist_videos')
@@ -281,8 +294,8 @@ export function useAddVideoToPlaylist() {
   const queryClient = useQueryClient();
   const { user } = useAuth();
 
-  return useMutation({
-    mutationFn: async ({ playlistId, videoId, notes }: { playlistId: string; videoId: string; notes?: string }) => {
+  return useMutation<PlaylistVideo, Error, { playlistId: string; videoId: string; notes?: string }>({
+    mutationFn: async ({ playlistId, videoId, notes }) => {
       // Get the max position
       const { data: existingVideos } = await supabase
         .from('playlist_videos')
@@ -310,8 +323,12 @@ export function useAddVideoToPlaylist() {
     },
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: ['playlist-videos', variables.playlistId] });
-      queryClient.invalidateQueries({ queryKey: ['playlist', variables.playlistId] });
-      queryClient.invalidateQueries({ queryKey: ['playlists'] });
+      queryClient.invalidateQueries({ queryKey: ['playlist', variables.playlistId] }); // To update video_count
+      queryClient.invalidateQueries({ queryKey: ['playlists'] }); // To update video_count in list
+      toast.success('Video added to playlist!');
+    },
+    onError: (error) => {
+      toast.error('Failed to add video to playlist', { description: error.message });
     },
   });
 }
@@ -319,8 +336,8 @@ export function useAddVideoToPlaylist() {
 export function useRemoveVideoFromPlaylist() {
   const queryClient = useQueryClient();
 
-  return useMutation({
-    mutationFn: async ({ playlistId, videoId }: { playlistId: string; videoId: string }) => {
+  return useMutation<void, Error, { playlistId: string; videoId: string }>({
+    mutationFn: async ({ playlistId, videoId }) => {
       const { error } = await supabase
         .from('playlist_videos')
         .delete()
@@ -331,8 +348,12 @@ export function useRemoveVideoFromPlaylist() {
     },
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: ['playlist-videos', variables.playlistId] });
-      queryClient.invalidateQueries({ queryKey: ['playlist', variables.playlistId] });
-      queryClient.invalidateQueries({ queryKey: ['playlists'] });
+      queryClient.invalidateQueries({ queryKey: ['playlist', variables.playlistId] }); // To update video_count
+      queryClient.invalidateQueries({ queryKey: ['playlists'] }); // To update video_count in list
+      toast.success('Video removed from playlist!');
+    },
+    onError: (error) => {
+      toast.error('Failed to remove video from playlist', { description: error.message });
     },
   });
 }
@@ -340,9 +361,9 @@ export function useRemoveVideoFromPlaylist() {
 export function useReorderPlaylistVideos() {
   const queryClient = useQueryClient();
 
-  return useMutation({
-    mutationFn: async ({ playlistId, orderedVideoIds }: { playlistId: string; orderedVideoIds: string[] }) => {
-      // Update positions for all videos
+  return useMutation<void, Error, { playlistId: string; orderedVideoIds: string[] }>({
+    mutationFn: async ({ playlistId, orderedVideoIds }) => {
+      // Create an array of update promises
       const updates = orderedVideoIds.map((videoId, index) =>
         supabase
           .from('playlist_videos')
@@ -351,10 +372,21 @@ export function useReorderPlaylistVideos() {
           .eq('video_id', videoId)
       );
 
-      await Promise.all(updates);
+      // Execute all updates concurrently
+      const results = await Promise.all(updates);
+
+      // Check for any errors
+      const errors = results.filter(result => result.error);
+      if (errors.length > 0) {
+        throw new Error(errors.map(e => e.error?.message).join(', '));
+      }
     },
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: ['playlist-videos', variables.playlistId] });
+      toast.success('Playlist reordered successfully!');
+    },
+    onError: (error) => {
+      toast.error('Failed to reorder playlist', { description: error.message });
     },
   });
 }
@@ -362,10 +394,10 @@ export function useReorderPlaylistVideos() {
 // ==================== COLLABORATOR HOOKS ====================
 
 export function usePlaylistCollaborators(playlistId: string | undefined) {
-  return useQuery({
+  return useQuery<PlaylistCollaborator[], Error>({
     queryKey: ['playlist-collaborators', playlistId],
     queryFn: async () => {
-      if (!playlistId) throw new Error('Playlist ID is required');
+      if (!playlistId) return [];
 
       const { data, error } = await supabase
         .from('playlist_collaborators')
@@ -389,8 +421,8 @@ export function usePlaylistCollaborators(playlistId: string | undefined) {
 export function useAddCollaborator() {
   const queryClient = useQueryClient();
 
-  return useMutation({
-    mutationFn: async ({ playlistId, userId, role = 'editor' }: { playlistId: string; userId: string; role?: 'editor' | 'viewer' }) => {
+  return useMutation<PlaylistCollaborator, Error, { playlistId: string; userId: string; role?: 'editor' | 'viewer' }>({
+    mutationFn: async ({ playlistId, userId, role = 'editor' }) => {
       const { data, error } = await supabase
         .from('playlist_collaborators')
         .insert({
@@ -406,6 +438,11 @@ export function useAddCollaborator() {
     },
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: ['playlist-collaborators', variables.playlistId] });
+      queryClient.invalidateQueries({ queryKey: ['playlists'] }); // To update collaboration status in list
+      toast.success('Collaborator added!');
+    },
+    onError: (error) => {
+      toast.error('Failed to add collaborator', { description: error.message });
     },
   });
 }
@@ -413,8 +450,8 @@ export function useAddCollaborator() {
 export function useUpdateCollaboratorRole() {
   const queryClient = useQueryClient();
 
-  return useMutation({
-    mutationFn: async ({ playlistId, userId, role }: { playlistId: string; userId: string; role: 'editor' | 'viewer' }) => {
+  return useMutation<void, Error, { playlistId: string; userId: string; role: 'editor' | 'viewer' }>({
+    mutationFn: async ({ playlistId, userId, role }) => {
       const { error } = await supabase
         .from('playlist_collaborators')
         .update({ role })
@@ -425,6 +462,10 @@ export function useUpdateCollaboratorRole() {
     },
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: ['playlist-collaborators', variables.playlistId] });
+      toast.success('Collaborator role updated!');
+    },
+    onError: (error) => {
+      toast.error('Failed to update collaborator role', { description: error.message });
     },
   });
 }
@@ -432,8 +473,8 @@ export function useUpdateCollaboratorRole() {
 export function useRemoveCollaborator() {
   const queryClient = useQueryClient();
 
-  return useMutation({
-    mutationFn: async ({ playlistId, userId }: { playlistId: string; userId: string }) => {
+  return useMutation<void, Error, { playlistId: string; userId: string }>({
+    mutationFn: async ({ playlistId, userId }) => {
       const { error } = await supabase
         .from('playlist_collaborators')
         .delete()
@@ -444,6 +485,11 @@ export function useRemoveCollaborator() {
     },
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: ['playlist-collaborators', variables.playlistId] });
+      queryClient.invalidateQueries({ queryKey: ['playlists'] }); // To update collaboration status in list
+      toast.success('Collaborator removed!');
+    },
+    onError: (error) => {
+      toast.error('Failed to remove collaborator', { description: error.message });
     },
   });
 }
@@ -453,7 +499,7 @@ export function useRemoveCollaborator() {
 export function usePlaylistProgress(playlistId: string | undefined) {
   const { user } = useAuth();
 
-  return useQuery({
+  return useQuery<PlaylistProgress[], Error>({
     queryKey: ['playlist-progress', playlistId, user?.id],
     queryFn: async () => {
       if (!playlistId || !user?.id) return [];
@@ -475,8 +521,8 @@ export function useMarkVideoWatched() {
   const queryClient = useQueryClient();
   const { user } = useAuth();
 
-  return useMutation({
-    mutationFn: async ({ playlistId, videoId, watched }: { playlistId: string; videoId: string; watched: boolean }) => {
+  return useMutation<PlaylistProgress, Error, { playlistId: string; videoId: string; watched: boolean; lastPositionSeconds?: number }>({
+    mutationFn: async ({ playlistId, videoId, watched, lastPositionSeconds = 0 }) => {
       if (!user?.id) throw new Error('Must be logged in to track progress');
 
       // Upsert the progress record
@@ -488,6 +534,7 @@ export function useMarkVideoWatched() {
           video_id: videoId,
           watched,
           watched_at: watched ? new Date().toISOString() : null,
+          last_position_seconds: lastPositionSeconds,
         }, {
           onConflict: 'playlist_id,user_id,video_id',
         })
@@ -499,6 +546,10 @@ export function useMarkVideoWatched() {
     },
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: ['playlist-progress', variables.playlistId, user?.id] });
+      toast.success(variables.watched ? 'Video marked as watched!' : 'Video marked as unwatched!');
+    },
+    onError: (error) => {
+      toast.error('Failed to update video progress', { description: error.message });
     },
   });
 }

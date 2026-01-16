@@ -13,7 +13,8 @@
     "backToHome": "Volver a la página de inicio",
     "validationError": "Error de Validación",
     "cancel": "Cancelar",
-    "delete": "Eliminar"
+    "delete": "Eliminar",
+    "anonymous": "Anónimo"
   },
   "header": {
     "searchPlaceholder": "Buscar videos, canales...",
@@ -210,7 +211,15 @@
     "noPlaylistsDescription": "¡Sé el primero en crear una lista de reproducción y organizar el conocimiento!",
     "createFirstPlaylist": "Crear tu primera lista de reproducción",
     "loadingErrorTitle": "Error al cargar listas de reproducción",
-    "loadingErrorDescription": "No se pudieron cargar las listas de reproducción. Por favor, inténtalo de nuevo más tarde."
+    "loadingErrorDescription": "No se pudieron cargar las listas de reproducción. Por favor, inténtalo de nuevo más tarde.",
+    "learningPath": "Ruta de Aprendizaje",
+    "collection": "Colección",
+    "progress": "Progreso",
+    "filter": {
+      "all": "Todas las Listas",
+      "myPlaylists": "Mis Listas",
+      "collaborating": "Colaborando"
+    }
   },
   "playlistDetails": {
     "notFoundTitle": "Lista de reproducción no encontrada",
@@ -224,7 +233,7 @@
     "confirmDeleteTitle": "¿Estás seguro?",
     "confirmDeleteDescription": "Esta acción no se puede deshacer. Esto eliminará permanentemente la lista de reproducción '{{playlistName}}' y todos sus videos asociados.",
     "privateTitle": "Lista de reproducción privada",
-    "privateDescription": "Esta lista de reproducción es privada y solo puede verla su autor.",
+    "privateDescription": "Esta lista de reproducción es privada y solo puede verla su autor o colaboradores.",
     "videosInPlaylist": "Videos en esta Lista de Reproducción",
     "noVideosTitle": "Aún no hay videos en esta lista de reproducción.",
     "noVideosDescription": "¡Añade videos para empezar a construir tu ruta de aprendizaje!",
@@ -236,11 +245,31 @@
     "searchVideosPlaceholder": "Buscar videos...",
     "noVideosFound": "No se encontraron videos.",
     "add": "Añadir",
-    "added": "Añadido"
+    "added": "Añadido",
+    "yourProgress": "Tu Progreso",
+    "videosWatched": "videos vistos",
+    "playlistComplete": "¡Lista de reproducción completada!",
+    "collaborators": {
+      "manage": "Gestionar Colaboradores",
+      "title": "Colaboradores de la Lista de Reproducción",
+      "description": "Gestiona quién puede ver y editar esta lista de reproducción.",
+      "usernamePlaceholder": "Nombre de usuario del colaborador",
+      "userNotFound": "Usuario no encontrado.",
+      "alreadyAdded": "El usuario ya es un colaborador.",
+      "addedSuccess": "¡Colaborador añadido con éxito!",
+      "addError": "Error al añadir colaborador.",
+      "roleUpdated": "Rol de colaborador actualizado.",
+      "roleUpdateError": "Error al actualizar el rol del colaborador.",
+      "removed": "Colaborador eliminado.",
+      "removeError": "Error al eliminar colaborador.",
+      "noCollaborators": "Aún no hay colaboradores.",
+      "roleEditor": "Editor",
+      "roleViewer": "Espectador"
+    }
   },
   "createEditPlaylist": {
     "createTitle": "Crear Nueva Lista de Reproducción",
-    "createDescription": "Organiza videos en rutas de aprendizaje coherentes.",
+    "createDescription": "Organiza videos en rutas de aprendizaje coherentes o colecciones.",
     "editTitle": "Editar Lista de Reproducción",
     "editDescription": "Actualiza los detalles de tu lista de reproducción.",
     "loadErrorTitle": "Error al cargar lista de reproducción",
@@ -254,6 +283,9 @@
       "slugHint": "Un identificador único para la URL (solo letras minúsculas, números y guiones).",
       "descriptionLabel": "Descripción",
       "descriptionPlaceholder": "Una breve descripción de lo que cubre esta lista de reproducción.",
+      "thumbnailUrlLabel": "URL de la Miniatura (opcional)",
+      "thumbnailUrlPlaceholder": "https://ejemplo.com/miniatura-de-lista.jpg",
+      "thumbnailUrlHint": "Enlace directo a una imagen personalizada para tu lista de reproducción. Si está vacío, se usará la miniatura del primer video.",
       "courseCodeLabel": "Código del Curso (FACODI)",
       "courseCodePlaceholder": "Ej: LESTI-ALG1",
       "courseCodeHint": "El código del curso al que pertenece esta lista de reproducción (opcional).",
@@ -264,6 +296,11 @@
       "languagePlaceholder": "Seleccionar idioma",
       "isPublicLabel": "Hacer Pública",
       "isPublicHint": "Las listas de reproducción públicas son visibles para todos los usuarios.",
+      "playlistTypeLabel": "Tipo de Lista de Reproducción",
+      "learningPath": "Ruta de Aprendizaje",
+      "learningPathHint": "Los videos están ordenados y deben seguirse secuencialmente.",
+      "collection": "Colección",
+      "collectionHint": "Los videos son un conjunto curado, el orden no es estrictamente obligatorio.",
       "submittingButton": "Guardando...",
       "saveButton": "Guardar Lista de Reproducción",
       "createButton": "Crear Lista de Reproducción"
@@ -275,6 +312,7 @@
       "slugMaxLength": "El slug no puede exceder los 100 caracteres",
       "slugInvalidFormat": "El slug debe contener solo letras minúsculas, números y guiones",
       "descriptionMaxLength": "La descripción no puede exceder los 500 caracteres",
+      "invalidThumbnailUrl": "URL de miniatura inválida",
       "courseCodeMaxLength": "El código del curso no puede exceder los 50 caracteres",
       "unitCodeMaxLength": "El código de la unidad no puede exceder los 50 caracteres",
       "languageRequired": "El idioma es obligatorio",

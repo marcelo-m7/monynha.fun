@@ -13,7 +13,8 @@
     "backToHome": "Voltar para a página inicial",
     "validationError": "Erro de validação",
     "cancel": "Cancelar",
-    "delete": "Excluir"
+    "delete": "Excluir",
+    "anonymous": "Anônimo"
   },
   "header": {
     "searchPlaceholder": "Buscar vídeos, canais...",
@@ -210,7 +211,15 @@
     "noPlaylistsDescription": "Seja o primeiro a criar uma playlist e organizar o conhecimento!",
     "createFirstPlaylist": "Criar sua primeira playlist",
     "loadingErrorTitle": "Erro ao carregar playlists",
-    "loadingErrorDescription": "Não foi possível carregar as playlists. Por favor, tente novamente mais tarde."
+    "loadingErrorDescription": "Não foi possível carregar as playlists. Por favor, tente novamente mais tarde.",
+    "learningPath": "Caminho de Aprendizado",
+    "collection": "Coleção",
+    "progress": "Progresso",
+    "filter": {
+      "all": "Todas as Playlists",
+      "myPlaylists": "Minhas Playlists",
+      "collaborating": "Colaborando"
+    }
   },
   "playlistDetails": {
     "notFoundTitle": "Playlist não encontrada",
@@ -224,7 +233,7 @@
     "confirmDeleteTitle": "Tem certeza?",
     "confirmDeleteDescription": "Esta ação não pode ser desfeita. Isso excluirá permanentemente a playlist '{{playlistName}}' e todos os seus vídeos associados.",
     "privateTitle": "Playlist privada",
-    "privateDescription": "Esta playlist é privada e só pode ser vista pelo autor.",
+    "privateDescription": "Esta playlist é privada e só pode ser vista pelo autor ou colaboradores.",
     "videosInPlaylist": "Vídeos nesta Playlist",
     "noVideosTitle": "Nenhum vídeo nesta playlist ainda.",
     "noVideosDescription": "Adicione vídeos para começar a construir seu caminho de aprendizado!",
@@ -236,11 +245,31 @@
     "searchVideosPlaceholder": "Buscar vídeos...",
     "noVideosFound": "Nenhum vídeo encontrado.",
     "add": "Adicionar",
-    "added": "Adicionado"
+    "added": "Adicionado",
+    "yourProgress": "Seu Progresso",
+    "videosWatched": "vídeos assistidos",
+    "playlistComplete": "Playlist concluída!",
+    "collaborators": {
+      "manage": "Gerenciar Colaboradores",
+      "title": "Colaboradores da Playlist",
+      "description": "Gerencie quem pode ver e editar esta playlist.",
+      "usernamePlaceholder": "Username do colaborador",
+      "userNotFound": "Usuário não encontrado.",
+      "alreadyAdded": "Usuário já é um colaborador.",
+      "addedSuccess": "Colaborador adicionado com sucesso!",
+      "addError": "Falha ao adicionar colaborador.",
+      "roleUpdated": "Função do colaborador atualizada.",
+      "roleUpdateError": "Falha ao atualizar a função do colaborador.",
+      "removed": "Colaborador removido.",
+      "removeError": "Falha ao remover colaborador.",
+      "noCollaborators": "Nenhum colaborador ainda.",
+      "roleEditor": "Editor",
+      "roleViewer": "Visualizador"
+    }
   },
   "createEditPlaylist": {
     "createTitle": "Criar Nova Playlist",
-    "createDescription": "Organize vídeos em caminhos de aprendizado coerentes.",
+    "createDescription": "Organize vídeos em caminhos de aprendizado coerentes ou coleções.",
     "editTitle": "Editar Playlist",
     "editDescription": "Atualize os detalhes da sua playlist.",
     "loadErrorTitle": "Erro ao carregar playlist",
@@ -254,6 +283,9 @@
       "slugHint": "Um identificador único para a URL (apenas letras minúsculas, números e hífens).",
       "descriptionLabel": "Descrição",
       "descriptionPlaceholder": "Uma breve descrição do que esta playlist aborda.",
+      "thumbnailUrlLabel": "URL da Miniatura (opcional)",
+      "thumbnailUrlPlaceholder": "https://exemplo.com/miniatura-da-playlist.jpg",
+      "thumbnailUrlHint": "Link direto para uma imagem personalizada para sua playlist. Se vazio, a miniatura do primeiro vídeo será usada.",
       "courseCodeLabel": "Código do Curso (FACODI)",
       "courseCodePlaceholder": "Ex: LESTI-ALG1",
       "courseCodeHint": "O código do curso ao qual esta playlist pertence (opcional).",
@@ -264,6 +296,11 @@
       "languagePlaceholder": "Selecione o idioma",
       "isPublicLabel": "Tornar Pública",
       "isPublicHint": "Playlists públicas são visíveis para todos os usuários.",
+      "playlistTypeLabel": "Tipo de Playlist",
+      "learningPath": "Caminho de Aprendizado",
+      "learningPathHint": "Vídeos são ordenados e devem ser seguidos sequencialmente.",
+      "collection": "Coleção",
+      "collectionHint": "Vídeos são um conjunto curado, a ordem não é estritamente imposta.",
       "submittingButton": "Salvando...",
       "saveButton": "Salvar Playlist",
       "createButton": "Criar Playlist"
@@ -275,6 +312,7 @@
       "slugMaxLength": "Slug não pode exceder 100 caracteres",
       "slugInvalidFormat": "Slug deve conter apenas letras minúsculas, números e hífens",
       "descriptionMaxLength": "Descrição não pode exceder 500 caracteres",
+      "invalidThumbnailUrl": "URL da miniatura inválida",
       "courseCodeMaxLength": "Código do curso não pode exceder 50 caracteres",
       "unitCodeMaxLength": "Código da unidade não pode exceder 50 caracteres",
       "languageRequired": "Idioma é obrigatório",
