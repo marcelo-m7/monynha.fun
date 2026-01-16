@@ -1,69 +1,401 @@
-# Monynha Fun
+# Monynha Fun – Cultural Video Curation Platform 🎬
 
-## Project Info
+![Monynha Fun Hero](./monynha-fun-hero.png)
 
-**Monynha Fun** is a cultural video curation platform by **Monynha Softwares**. It's dedicated to preserving and discovering valuable YouTube content that traditional algorithms often overlook. Our mission is to democratize technology, value human curation assisted by AI, and resist predatory algorithmic logic.
+> *A passion project by **Marcelo Santos**, crafted with care to bring together the best of cultural video content that gets lost in the algorithmic noise.*
 
-**URL**: https://monynha.com/fun
+**🌐 Live Platform**: https://monynha.com/fun
 
-## How can I edit this code?
+---
 
-There are several ways of editing your application.
+## 💭 What's This All About?
 
-**Use your preferred IDE**
+Look, I built Monynha Fun because I was fed up, sabe? Scrolling through YouTube, seeing the same algorithm-driven trash, while *amazing* cultural content just... disappears. So here's the deal:
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in your deployment environment.
+We're creating a space where **human taste matters**. A place where curators (like you, like me) can say "ey, this video is worth your time" – and mean it. AI helps us out, sure, but **humans are in charge**. No predatory engagement metrics. No dark patterns. Just good content, properly organized.
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+### The Vision
+- 🤝 **People > Algorithms**: Real human expertise, enhanced by AI (not replaced by it)
+- 🌍 **Cultural Preservation**: Keeping the gems that YouTube's algorithm would bury
+- 📚 **Community-Driven**: Every curator brings their taste, their knowledge, their soul
+- 🎓 **Learning Through Playlists**: Organize videos into beautiful learning paths
+- 🔓 **Open & Accessible**: Quality content for everyone, no gatekeeping
 
-Follow these steps:
+---
 
-```sh
-# Step 1: Clone the repository.
+## 📸 See It In Action
+
+### Homepage – Where Magic Happens ✨
+![Homepage Screenshot](./monynha-homepage.png)
+
+Your first impression matters, né? Clean hero section, easy access to what's hot right now, and categories that actually make sense. No fluff.
+
+### Discover Videos 🔍
+![Video Discovery](./monynha-videos.png)
+
+Browse through categories that real people organized. Search, filter, read about *why* someone added a video. Simple as that.
+
+### Create Playlists Like You Own The Place 📋
+![Playlists](./monynha-playlists.png)
+
+Build learning paths. Curate collections. Share with friends or the whole community. Your taste, your rules. You can even invite collaborators to help build something together.
+
+### Your Profile 👤
+![User Profile](./monynha-profile.png)
+
+Show the world what you're passionate about. Add a bio, customize your presence. People will see the videos *you* curated. Be proud of that.
+
+---
+
+## 🛠 The Tech Behind It All
+
+I chose a stack that's modern, scalable, and – honestly – a joy to work with. No bloat, no unnecessary complexity.
+
+### Frontend Magic ✨
+- **React.js** + **TypeScript** – Because bugs are embarrassing
+- **Vite** – Lightning-fast builds and dev server. Makes coding pleasant
+- **Tailwind CSS** – Utility-first styling without CSS headaches
+- **shadcn/ui** – Beautiful components that just work
+- **React Router DOM** – Smooth navigation experience
+
+### State & Data Management 🧠
+- **TanStack Query** – Smart caching and server state (no data soup)
+- **React Hook Form** – Forms that don't suck
+- **Zod** – Type-safe validation from day one
+
+### Backend Backbone 🔧
+- **Supabase** – PostgreSQL, Auth, and Edge Functions in one place
+- **Supabase RLS** – Row-level security, properly implemented
+- **Edge Functions** – AI enrichment and smart automations
+
+### UX Polish 🎨
+- **Lucide React** – Clean icons
+- **Sonner** – Toast notifications that don't annoy
+- **date-fns** – Dates done right
+- **i18next** – Portuguese, English, and more
+
+---
+
+## 🎯 What Can You Do Here?
+
+### 🔍 Discover Videos
+Browse intelligently organized content. Search, filter by category, see what real curators think about each video. No dark patterns, just honest recommendations.
+
+### 📋 Build Playlists
+Create learning paths, collections, whatever makes sense to you. Share with the community or keep it personal. Invite friends to collaborate – yeah, we support that.
+
+### 👥 User System
+Sign up securely. Create a profile that represents *you*. Show everyone your curated taste. Your contribution matters here.
+
+### ⭐ Save Favorites
+Keep track of videos that hit different. Your personal collection grows with you.
+
+### 🌍 Community
+See who else is curating. Check out their playlists. Learn from other people's taste. Share knowledge.
+
+### 📹 Submit Content
+Found an amazing video the world should see? Add it to Monynha Fun. Our AI will help enrich it with metadata.
+
+### 🌐 Multi-Language
+Portuguese, English – we're building for everyone. More languages coming.
+
+---
+
+## 🚀 Getting Started (It's Easy, I Promise)
+
+### What You'll Need
+- **Node.js** – [Install via nvm](https://github.com/nvm-sh/nvm) if you haven't
+- **npm** or **pnpm**
+- **Git**
+
+### Set It Up Locally
+
+```bash
+# Clone the repo
 git clone <YOUR_GIT_URL>
 
-# Step 2: Navigate to the project directory.
+# Go into the folder
 cd monynha-fun
 
-# Step 3: Install the necessary dependencies.
+# Install dependencies
 npm i
+# or if you're pnpm gang:
+pnpm install
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
+# Fire it up!
 npm run dev
 ```
 
-**Edit a file directly in GitHub**
+Open **http://localhost:5173** and boom – you're in.
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+### Environment Setup
 
-**Use GitHub Codespaces**
+Create a `.env.local` file (ask Marcelo for the keys, or set up your own Supabase project):
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+```env
+VITE_SUPABASE_URL=your_supabase_url_here
+VITE_SUPABASE_PUBLISHABLE_KEY=your_anon_key_here
+```
 
-## What technologies are used for this project?
+---
 
-This project is built with:
+## 📁 How The Code Is Organized
 
-- Vite
-- TypeScript
-- React
-- shadcn/ui
-- Tailwind CSS
-- Supabase (Postgres, Auth, Edge Functions)
-- React Router DOM
-- TanStack Query
-- i18next (for internationalization)
+The structure is clean and logical – I hate messy codebases:
 
-## How can I deploy this project?
+```
+src/
+├── components/              # Reusable UI pieces
+│   ├── ui/                 # shadcn/ui components (don't touch upstream)
+│   ├── playlist/           # Playlist-specific components
+│   ├── Header.tsx
+│   ├── Footer.tsx
+│   └── ...
+├── pages/                   # Page-level components (one per route)
+│   ├── Index.tsx           # Homepage
+│   ├── Auth.tsx            # Login/Signup
+│   ├── Videos.tsx          # Video browse
+│   ├── VideoDetails.tsx    # Single video view
+│   ├── Playlists.tsx       # Playlist manager
+│   ├── PlaylistDetails.tsx
+│   ├── Profile.tsx         # User profiles
+│   ├── EditProfile.tsx
+│   ├── Favorites.tsx
+│   ├── Community.tsx
+│   ├── Submit.tsx          # Add videos
+│   └── ...more pages
+├── hooks/                   # Data & logic hooks
+│   ├── useAuth.tsx         # Auth context
+│   ├── useVideos.ts        # Fetch videos (TanStack Query)
+│   ├── usePlaylists.ts     # Playlist CRUD
+│   ├── useFavorites.ts     # Manage favorites
+│   ├── useProfile.ts       # User profiles
+│   └── ...
+├── integrations/            # External services
+│   └── supabase/           # Supabase client setup
+├── lib/                     # Utilities
+│   ├── utils.ts            # Helpers (cn, etc)
+│   └── youtube.ts          # YouTube URL parsing, oEmbed
+├── i18n/                    # Translations
+│   ├── config.ts           # i18next setup
+│   └── locales/            # PT, EN, etc
+├── App.tsx                  # Main app & routes
+└── main.tsx                 # Entry point
+```
 
-This project is designed to be deployed using platforms like Coolify or Docker. Ensure your environment variables for Supabase are correctly configured.
+Every folder has a purpose. No random files lying around.
 
-## Can I connect a custom domain to my Monynha Fun project?
+---
 
-Yes, you can! Refer to your deployment platform's documentation for connecting custom domains.
+## � Available Commands
+
+```bash
+# Development server with hot reload (what you'll use most)
+npm run dev
+
+# Build for production (minified, optimized)
+npm run build
+
+# Build with dev settings (if debugging production)
+npm run build:dev
+
+# Preview the production build locally
+npm run preview
+
+# Run the linter (keep code clean)
+npm run lint
+```
+
+---
+
+## 🐳 Deploying This Thing
+
+We use Docker to keep everything consistent. Nginx serves the static build.
+
+```bash
+# Build the image
+docker build -t monynha-fun .
+
+# Run it locally
+docker run -p 80:80 monynha-fun
+```
+
+Then hit `http://localhost` and you're golden.
+
+### Platforms That Work
+- **Coolify** (recommended – simple, clean)
+- Any Docker-compatible host (AWS, DigitalOcean, Heroku, whatever)
+- Vercel/Netlify (if you prefer that workflow)
+
+Just make sure your Supabase env vars are set. That's it.
+
+---
+
+## 🔐 Making It Work – Environment Variables
+
+You need two things from Supabase:
+
+```env
+VITE_SUPABASE_URL=https://your-project.supabase.co
+VITE_SUPABASE_ANON_KEY=your_anon_key_here
+```
+
+These are public (it's fine, Supabase uses RLS to protect data). Create a `.env.local` file in the root and paste them in.
+
+---
+
+## 🗄️ The Database (Where The Magic Happens)
+
+I designed the database with security and simplicity in mind:
+
+### Core Tables
+- **profiles** – User info (name, bio, avatar)
+- **videos** – The actual content (title, description, YouTube ID)
+- **categories** – Organized tags (Tech, Arts, Education, etc)
+- **favorites** – Videos you bookmarked
+- **playlists** – Your collections
+- **playlist_videos** – Links videos to playlists (with ordering!)
+- **ai_enrichments** – AI-generated metadata for each video
+- **playlist_collaborators** – Share playlists with friends
+- **playlist_progress** – Track watched videos in learning playlists
+
+### Security First 🔒
+Every table has Row-Level Security (RLS) enabled. Users can only see/edit their own data. Period.
+
+No data leaks. No shortcuts. We take that seriously.
+
+---
+
+## 🎨 The Design System
+
+### Tailwind CSS
+No CSS files. No modules. Just clean utility classes. Responsive by default.
+
+### shadcn/ui Components
+High-quality, accessible components. We extend them when needed but don't modify the source (keeps upgrades smooth).
+
+### Icons from Lucide React
+Simple, beautiful, consistent. Covers almost everything.
+
+---
+
+## 🌍 Languages & Internationalization
+
+Built with i18next so we can add languages super easily. Right now:
+- 🇧🇷 **Portuguese (PT-BR)**
+- 🇺🇸 **English (EN-US)**
+
+More languages? Easy. Just ask or add translations to `src/i18n/locales/`.
+
+---
+
+## 🤝 Want to Contribute?
+
+Great! You can work locally or directly on GitHub. Here's how:
+
+### Option 1: Local Development (The Pro Way)
+```bash
+git clone <repo-url>
+cd monynha-fun
+npm i
+npm run dev
+```
+Make changes, test locally, push to your branch.
+
+### Option 2: GitHub Web Editor (Quick Fixes)
+1. Go to a file
+2. Click the pencil icon
+3. Edit and commit
+
+### Option 3: GitHub Codespaces (If You're Feeling Fancy)
+1. Click "Code" → "Codespaces" → "New codespace"
+2. Edit directly in the browser
+3. Commit and push
+
+---
+
+## 🔗 Custom Domain
+
+Want your own domain? Your deployment platform probably has docs for that. Set DNS records, done.
+
+---
+
+## 📞 More Resources
+
+- **About Page** – Learn what we're really doing here
+- **FAQ Page** – Answers to stuff people ask
+- **Rules Page** – How to behave (spoiler: just be cool)
+- **Contact Page** – Hit me up if you have questions
+
+---
+
+## 📊 What Gets Tracked
+
+- How many videos are curated
+- Who's contributing
+- View counts (so we can feature the good stuff)
+- Category popularity
+
+Nothing creepy. No ads. No surveillance.
+
+---
+
+## 🆘 Running Into Problems?
+
+### Port Already In Use?
+```bash
+npm run dev -- --port 3000
+```
+
+### Dependencies Missing?
+```bash
+# Clear and reinstall
+rm pnpm-lock.yaml
+pnpm install
+```
+
+### Build Failing?
+```bash
+# Clear the cache
+rm -rf dist
+npm run build
+```
+
+### Something Else?
+Check the [Supabase docs](https://supabase.com/docs) or [Vite docs](https://vitejs.dev). Or just message me (@marcellosantos).
+
+---
+
+## 📝 About This Project
+
+**Built by**: Marcelo Santos  
+**Organization**: Monynha Softwares  
+**License**: Check the LICENSE file  
+**Version**: 0.0.0 (and growing!)
+
+---
+
+## 🌟 What's Next?
+
+We're constantly improving. On the roadmap:
+- Real AI integration (actual enrichment, not simulated)
+- Video search with full-text indexing
+- Smart recommendations
+- Community comments & ratings
+- Better mobile experience
+- Maybe a mobile app someday
+
+---
+
+## 🎉 Get Involved
+
+- 📹 **Submit videos** – Share the good stuff
+- 📋 **Create playlists** – Build learning paths
+- 🐛 **Report bugs** – Help us improve
+- 💡 **Suggest features** – What's missing?
+- 🤝 **Spread the word** – Tell your friends
+
+---
+
+**Visit us at**: https://monynha.com/fun  
+**Made with** ☕ **and** 💡 **by Marcelo Santos**
