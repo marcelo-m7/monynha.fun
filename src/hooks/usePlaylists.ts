@@ -96,8 +96,7 @@ export function usePlaylists(options: UsePlaylistsOptions = {}) {
         .from('playlists')
         .select(`
           *,
-          author:profiles!playlists_author_id_fkey(id, username, display_name, avatar_url),
-          playlist_videos(count)
+          author:profiles!playlists_author_id_fkey(id, username, display_name, avatar_url)
         `)
         .order('created_at', { ascending: false });
 
@@ -122,11 +121,23 @@ export function usePlaylists(options: UsePlaylistsOptions = {}) {
 
       if (error) throw error;
 
-      // For collaborating filter, we need to check collaborators table
-      let result = (data || []).map((playlist: any) => ({
+      // Fetch video counts separately for each playlist
+      const playlistsWithCounts = await Promise.all((data || []).map(async (playlist: any) => {
+        const { count, error: countError } = await supabase
+          .from('playlist_videos')
+          .select('*', { count: 'exact', head: true })
+          .eq('playlist_id', playlist.id);
+
+        if (countError) {
+          console.error(`Error fetching video count for playlist ${playlist.id}:`, countError);
+          return { ...playlist, video_count: 0 };
+        }
+        return { ...playlist, video_count: count || 0 };
+      }));
+
+      let result = playlistsWithCounts.map((playlist: any) => ({
         ...playlist,
         author: playlist.author,
-        video_count: playlist.playlist_videos?.[0]?.count || 0,
       })) as Playlist[];
 
       // If filtering by collaborating, fetch collaborator playlists
@@ -156,18 +167,32 @@ export function usePlaylistById(id: string | undefined) {
         .from('playlists')
         .select(`
           *,
-          author:profiles!playlists_author_id_fkey(id, username, display_name, avatar_url),
-          playlist_videos(count)
+          author:profiles!playlists_author_id_fkey(id, username, display_name, avatar_url)
         `)
         .eq('id', id)
         .single();
 
       if (error) throw error;
 
+      // Fetch video count separately for this playlist
+      const { count, error: countError } = await supabase
+        .from('playlist_videos')
+        .select('*', { count: 'exact', head: true })
+        .eq('playlist_id', data.id);
+
+      if (countError) {
+        console.error(`Error fetching video count for playlist ${data.id}:`, countError);
+        return {
+          ...data,
+          author: data.author,
+          video_count: 0,
+        } as Playlist;
+      }
+
       return {
         ...data,
         author: data.author,
-        video_count: (data as any).playlist_videos?.[0]?.count || 0,
+        video_count: count || 0,
       } as Playlist;
     },
     enabled: !!id,
