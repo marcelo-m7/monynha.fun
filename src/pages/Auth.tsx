@@ -240,7 +240,7 @@ export default function Auth() {
                         className="pl-10"
                       />
                     </div>
-                    {errors.username && (
+                    {'username' in errors && errors.username && (
                       <p className="text-sm text-destructive">{t(errors.username.message as string)}</p>
                     )}
                   </div>

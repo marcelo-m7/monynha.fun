@@ -62,10 +62,24 @@ export function usePlaylists(options?: { authorId?: string; isPublic?: boolean; 
       const { data, error } = await query;
       if (error) throw error;
 
-      return data.map(p => ({
+      return (data as unknown as Array<{
+        id: string;
+        name: string;
+        slug: string;
+        description: string | null;
+        author_id: string | null;
+        course_code: string | null;
+        unit_code: string | null;
+        language: string;
+        is_public: boolean;
+        created_at: string;
+        updated_at: string;
+        author: { username: string } | null;
+        video_count: Array<{ count: number }>;
+      }>).map(p => ({
         ...p,
         video_count: p.video_count?.[0]?.count ?? 0,
-        author: p.author as { username: string } | undefined
+        author: p.author ?? undefined
       })) as Playlist[];
     },
     enabled: options?.enabled ?? true,
@@ -87,9 +101,23 @@ export function usePlaylistById(id: string | undefined) {
         .single();
 
       if (error) throw error;
+      const typedData = data as unknown as {
+        id: string;
+        name: string;
+        slug: string;
+        description: string | null;
+        author_id: string | null;
+        course_code: string | null;
+        unit_code: string | null;
+        language: string;
+        is_public: boolean;
+        created_at: string;
+        updated_at: string;
+        author: { username: string } | null;
+      };
       return {
-        ...data,
-        author: data.author as { username: string } | undefined
+        ...typedData,
+        author: typedData.author ?? undefined
       } as Playlist;
     },
     enabled: !!id,
@@ -194,9 +222,17 @@ export function usePlaylistVideos(playlistId: string | undefined) {
         .order('position', { ascending: true });
 
       if (error) throw error;
-      return data.map(pv => ({
+      return (data as unknown as Array<{
+        playlist_id: string;
+        video_id: string;
+        position: number;
+        added_by: string | null;
+        notes: string | null;
+        created_at: string;
+        video: Video;
+      }>).map(pv => ({
         ...pv,
-        video: pv.video as Video // Type assertion for nested video object
+        video: pv.video
       })) as PlaylistVideo[];
     },
     enabled: !!playlistId,

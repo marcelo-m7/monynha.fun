@@ -151,7 +151,7 @@ const VideoDetails = () => {
               <div className="flex flex-wrap items-center gap-4 text-sm text-muted-foreground">
                 <div className="flex items-center gap-1">
                   <Eye className="w-4 h-4" />
-                  <span>{t('videoDetails.views', { count: formatViewCount(video.view_count) })}</span>
+                  <span>{formatViewCount(video.view_count)} {t('videoDetails.viewsLabel')}</span>
                 </div>
                 {video.duration_seconds && (
                   <div className="flex items-center gap-1">

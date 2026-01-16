@@ -16,7 +16,7 @@ export type Database = {
     Tables: {
       ai_enrichments: {
         Row: {
-          created_at: string
+          created_at: string | null
           cultural_relevance: string | null
           id: string
           language: string | null
@@ -29,7 +29,7 @@ export type Database = {
           video_id: string
         }
         Insert: {
-          created_at?: string
+          created_at?: string | null
           cultural_relevance?: string | null
           id?: string
           language?: string | null
@@ -42,7 +42,7 @@ export type Database = {
           video_id: string
         }
         Update: {
-          created_at?: string
+          created_at?: string | null
           cultural_relevance?: string | null
           id?: string
           language?: string | null
@@ -134,10 +134,96 @@ export type Database = {
           },
         ]
       }
+      playlist_videos: {
+        Row: {
+          added_by: string | null
+          created_at: string | null
+          notes: string | null
+          playlist_id: string
+          position: number
+          video_id: string
+        }
+        Insert: {
+          added_by?: string | null
+          created_at?: string | null
+          notes?: string | null
+          playlist_id: string
+          position: number
+          video_id: string
+        }
+        Update: {
+          added_by?: string | null
+          created_at?: string | null
+          notes?: string | null
+          playlist_id?: string
+          position?: number
+          video_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "playlist_videos_playlist_id_fkey"
+            columns: ["playlist_id"]
+            isOneToOne: false
+            referencedRelation: "playlists"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "playlist_videos_video_id_fkey"
+            columns: ["video_id"]
+            isOneToOne: false
+            referencedRelation: "videos"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      playlists: {
+        Row: {
+          author_id: string | null
+          course_code: string | null
+          created_at: string | null
+          description: string | null
+          id: string
+          is_public: boolean
+          language: string
+          name: string
+          slug: string
+          unit_code: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          author_id?: string | null
+          course_code?: string | null
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          is_public?: boolean
+          language?: string
+          name: string
+          slug: string
+          unit_code?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          author_id?: string | null
+          course_code?: string | null
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          is_public?: boolean
+          language?: string
+          name?: string
+          slug?: string
+          unit_code?: string | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           avatar_url: string | null
+          bio: string | null
           created_at: string
+          display_name: string | null
           id: string
           submissions_count: number
           updated_at: string
@@ -145,7 +231,9 @@ export type Database = {
         }
         Insert: {
           avatar_url?: string | null
+          bio?: string | null
           created_at?: string
+          display_name?: string | null
           id: string
           submissions_count?: number
           updated_at?: string
@@ -153,7 +241,9 @@ export type Database = {
         }
         Update: {
           avatar_url?: string | null
+          bio?: string | null
           created_at?: string
+          display_name?: string | null
           id?: string
           submissions_count?: number
           updated_at?: string

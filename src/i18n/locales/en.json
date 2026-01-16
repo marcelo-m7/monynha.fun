@@ -153,6 +153,7 @@
     "videoNotFoundDescription": "The video you are looking for may not exist or have been removed.",
     "backToHome": "Back to Home",
     "views": "{{count}} views",
+    "viewsLabel": "views",
     "descriptionTitle": "Description",
     "noDescription": "No description provided for this video.",
     "relatedVideosTitle": "Related Videos",
