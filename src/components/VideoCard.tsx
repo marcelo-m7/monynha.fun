@@ -4,6 +4,8 @@ import { Badge } from "@/components/ui/badge";
 import { useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils"; // Import cn for conditional class names
 import { supabase } from "@/integrations/supabase/client";
+import { useState } from "react";
+import { useTranslation } from 'react-i18next';
 
 interface VideoCardProps {
   video: Video;
@@ -12,10 +14,17 @@ interface VideoCardProps {
 }
 
 export const VideoCard = ({ video, onClick, variant = 'default' }: VideoCardProps) => {
+  const { t } = useTranslation();
   const navigate = useNavigate();
+  const [viewCount, setViewCount] = useState<number>(video.view_count || 0);
+  const [showPlus, setShowPlus] = useState(false);
 
   const handleClick = () => {
-    // Optimistically increment view count via RPC, then navigate
+    // optimistic UI: increment local counter and show +1 briefly
+    setViewCount((v) => v + 1);
+    setShowPlus(true);
+    setTimeout(() => setShowPlus(false), 700);
+
     try {
       // fire-and-forget: increment on the server (atomic in DB function)
       supabase.rpc('increment_video_view_count', { p_video_id: video.id });
@@ -47,6 +56,7 @@ export const VideoCard = ({ video, onClick, variant = 'default' }: VideoCardProp
         <img
           src={video.thumbnail_url}
           alt={video.title}
+          loading="lazy"
           className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
           onError={(e) => {
             const target = e.target as HTMLImageElement;
@@ -54,7 +64,16 @@ export const VideoCard = ({ video, onClick, variant = 'default' }: VideoCardProp
             target.onerror = null; // Prevent infinite loop if placeholder also fails
           }}
         />
-        
+
+        {/* Featured badge */}
+        {video.is_featured && variant === 'default' && (
+          <div className="absolute left-2 top-2 z-10">
+            <Badge variant="secondary" className="uppercase px-2 py-1 text-xs">
+              {t('labels.featured')}
+            </Badge>
+          </div>
+        )}
+
         {/* Overlay on hover */}
         <div className="absolute inset-0 bg-foreground/0 group-hover:bg-foreground/20 transition-colors duration-300 flex items-center justify-center">
           <div className={cn(
@@ -110,9 +129,12 @@ export const VideoCard = ({ video, onClick, variant = 'default' }: VideoCardProp
           "flex items-center justify-between text-xs text-muted-foreground",
           variant === 'compact' && "hidden" // Hide view count and category in compact view
         )}>
-          <div className="flex items-center gap-1">
+          <div className="flex items-center gap-1 relative">
             <Eye className="w-3.5 h-3.5" />
-            <span>{formatViewCount(video.view_count)}</span>
+            <span>{formatViewCount(viewCount)}</span>
+            {showPlus && (
+              <span className="absolute -right-6 -top-1 text-xs text-green-400 font-semibold transition-all duration-700 ease-out transform">+1</span>
+            )}
           </div>
           {video.category && (
             <Badge 

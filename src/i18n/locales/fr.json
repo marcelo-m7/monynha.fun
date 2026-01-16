@@ -45,6 +45,9 @@
     "madeWithLove": "Fait avec",
     "byMonynhaSoftwares": "par Monynha Softwares"
   },
+  "labels": {
+    "featured": "En Vedette"
+  },
   "hero": {
     "badge": "Curation collective de vidéos",
     "headingPart1": "Découvrez des vidéos qui",

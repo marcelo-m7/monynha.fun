@@ -45,6 +45,9 @@
     "madeWithLove": "Made with",
     "byMonynhaSoftwares": "by Monynha Softwares"
   },
+  "labels": {
+    "featured": "Featured"
+  },
   "hero": {
     "badge": "Collective video curation",
     "headingPart1": "Discover videos that",

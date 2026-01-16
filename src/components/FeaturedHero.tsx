@@ -1,23 +1,35 @@
 import { Video, formatDuration, formatViewCount } from "@/hooks/useVideos";
 import { Play } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
+import { useState } from "react";
+import { useTranslation } from 'react-i18next';
 
 interface FeaturedHeroProps {
   video: Video;
 }
 
 export const FeaturedHero = ({ video }: FeaturedHeroProps) => {
+  const { t } = useTranslation();
   const navigate = useNavigate();
+  const [viewCount, setViewCount] = useState<number>(video.view_count || 0);
+  const [showPlus, setShowPlus] = useState(false);
 
   const handleClick = async () => {
-    // increment views
+    // optimistic UI: increment local counter and show +1 animation
+    setViewCount((v) => v + 1);
+    setShowPlus(true);
+    setTimeout(() => setShowPlus(false), 900);
+
+    // increment views on the server
     try {
       await supabase.rpc('increment_video_view_count', { p_video_id: video.id });
     } catch (e) {
       console.debug('increment view failed', e);
     }
+
     navigate(`/videos/${video.id}`);
   };
 
@@ -28,9 +40,17 @@ export const FeaturedHero = ({ video }: FeaturedHeroProps) => {
       aria-label={`Featured: ${video.title}`}
     >
       <div className="relative aspect-video">
+        {/* Featured badge */}
+        <div className="absolute left-4 top-4 z-20">
+          <Badge variant="secondary" className="uppercase px-2 py-1 text-xs">
+            {t('labels.featured')}
+          </Badge>
+        </div>
+
         <img
           src={video.thumbnail_url}
           alt={video.title}
+          loading="lazy"
           className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
           onError={(e) => {
             const target = e.target as HTMLImageElement;
@@ -48,7 +68,14 @@ export const FeaturedHero = ({ video }: FeaturedHeroProps) => {
                 <Play className="w-4 h-4" />
                 <span>{formatDuration(video.duration_seconds)}</span>
               </div>
-              <div className="text-sm text-white/90">{formatViewCount(video.view_count)}</div>
+              <div className="relative text-sm text-white/90">
+                <span className="font-semibold">{formatViewCount(viewCount)}</span>
+                {showPlus && (
+                  <span className="absolute -right-8 -top-1 text-sm text-green-300 font-semibold transition-all duration-700 ease-out transform">
+                    +1
+                  </span>
+                )}
+              </div>
               <Button variant="ghost" className="ml-auto text-white/95 bg-white/5 hover:bg-white/10" onClick={(e) => { e.stopPropagation(); handleClick(); }}>
                 Watch
               </Button>
