@@ -1,24 +1,74 @@
+# Dependencies
 node_modules
+**/node_modules
+.pnp
+.pnp.js
+
+# Build outputs
 dist
+build
+.next
+.turbo
+out
+
+# Git
 .git
 .gitignore
+.gitattributes
+
+# Environment files
 .env
 .env.local
 .env.*.local
-pnpm-lock.yaml
-npm-shrinkwrap.json
-.npm
+.env.development
+.env.test
+.env.production
+
+# Lock files (will be copied explicitly)
+# Removed pnpm-lock.yaml from ignore to ensure consistent builds
+
+# Logs
 *.log
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
-.DS_Store
-.vscode
-.idea
-*.swp
-*.swo
-.next
-.turbo
+lerna-debug.log*
+pnpm-debug.log*
+
+# Testing
 coverage
 .nyc_output
+test-results
+playwright-report
+
+# Cache
 .cache
+.parcel-cache
+.eslintcache
+.stylelintcache
+
+# Misc
+.DS_Store
+*.swp
+*.swo
+*~
+
+# IDE
+.vscode
+.idea
+*.sublime-project
+*.sublime-workspace
+
+# Documentation
+*.md
+!README.md
+docs
+
+# CI/CD
+.github
+.gitlab-ci.yml
+
+# Docker
+Dockerfile*
+docker-compose*.yml
+.dockerignore
