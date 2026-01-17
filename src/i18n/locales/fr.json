@@ -339,6 +339,23 @@
     "noPlaylistsTitle": "Aucune playlist créée pour l'instant.",
     "noPlaylistsDescription": "Cet utilisateur n'a pas encore créé de playlists.",
     "createFirstPlaylist": "Créez votre première playlist",
+    "avatar": {
+      "upload": "Télécharger Photo",
+      "remove": "Supprimer",
+      "hint": "JPG, PNG, WebP ou GIF. Max 5MB.",
+      "invalidType": "Veuillez sélectionner un fichier image valide (JPG, PNG, WebP ou GIF).",
+      "fileTooLarge": "La taille du fichier doit être inférieure à 5MB.",
+      "uploadSuccess": "Avatar téléchargé avec succès !",
+      "uploadError": "Échec du téléchargement de l'avatar. Veuillez réessayer.",
+      "removeSuccess": "Avatar supprimé avec succès !",
+      "removeError": "Échec de la suppression de l'avatar. Veuillez réessayer.",
+      "cropTitle": "Recadrer l'Avatar",
+      "cropDescription": "Ajustez la zone de recadrage et le zoom pour votre avatar.",
+      "zoom": "Zoom",
+      "rotate": "Rotation",
+      "cropAndUpload": "Recadrer et Télécharger",
+      "cropError": "Échec du recadrage de l'image. Veuillez réessayer."
+    },
     "edit": {
       "title": "Modifier le Profil",
       "description": "Mettez à jour vos informations publiques.",

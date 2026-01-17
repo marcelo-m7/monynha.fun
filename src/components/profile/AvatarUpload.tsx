@@ -1,10 +1,11 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useCallback } from 'react';
 import { supabase } from '@/shared/api/supabase/supabaseClient';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { User, Upload, Loader2, X } from 'lucide-react';
 import { toast } from 'sonner';
 import { useTranslation } from 'react-i18next';
+import { AvatarCropperDialog } from './AvatarCropperDialog'; // Import the new cropper dialog
 
 interface AvatarUploadProps {
   userId: string;
@@ -23,7 +24,7 @@ export function AvatarUpload({
 }: AvatarUploadProps) {
   const { t } = useTranslation();
   const [isUploading, setIsUploading] = useState(false);
-  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [imageToCrop, setImageToCrop] = useState<string | null>(null); // State for image to be cropped
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleFileSelect = async (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -43,14 +44,20 @@ export function AvatarUpload({
       return;
     }
 
-    // Create preview
-    const objectUrl = URL.createObjectURL(file);
-    setPreviewUrl(objectUrl);
+    // Read file as Data URL and open cropper
+    const reader = new FileReader();
+    reader.addEventListener('load', () => {
+      setImageToCrop(reader.result as string);
+    });
+    reader.readAsDataURL(file);
+  };
 
-    // Upload file
+  const handleCropAndUpload = useCallback(async (croppedImageBlob: Blob) => {
     setIsUploading(true);
+    setImageToCrop(null); // Close cropper dialog
+
     try {
-      const fileExt = file.name.split('.').pop();
+      const fileExt = croppedImageBlob.type.split('/')[1];
       const fileName = `${userId}/avatar-${Date.now()}.${fileExt}`;
 
       // Delete old avatar if exists in storage
@@ -63,9 +70,10 @@ export function AvatarUpload({
 
       const { error: uploadError } = await supabase.storage
         .from('avatars')
-        .upload(fileName, file, {
+        .upload(fileName, croppedImageBlob, {
           cacheControl: '3600',
           upsert: true,
+          contentType: croppedImageBlob.type,
         });
 
       if (uploadError) throw uploadError;
@@ -80,7 +88,6 @@ export function AvatarUpload({
     } catch (error) {
       console.error('Avatar upload error:', error);
       toast.error(t('profile.avatar.uploadError'));
-      setPreviewUrl(null);
     } finally {
       setIsUploading(false);
       // Reset input
@@ -88,14 +95,28 @@ export function AvatarUpload({
         fileInputRef.current.value = '';
       }
     }
-  };
+  }, [userId, currentAvatarUrl, onUploadComplete, t]);
 
-  const handleRemoveAvatar = () => {
-    setPreviewUrl(null);
-    onUploadComplete('');
-  };
+  const handleRemoveAvatar = useCallback(async () => {
+    setIsUploading(true);
+    try {
+      if (currentAvatarUrl?.includes('avatars')) {
+        const oldPath = currentAvatarUrl.split('/avatars/')[1];
+        if (oldPath) {
+          await supabase.storage.from('avatars').remove([oldPath]);
+        }
+      }
+      onUploadComplete(''); // Clear avatar URL in parent component
+      toast.success(t('profile.avatar.removeSuccess'));
+    } catch (error) {
+      console.error('Avatar removal error:', error);
+      toast.error(t('profile.avatar.removeError'));
+    } finally {
+      setIsUploading(false);
+    }
+  }, [currentAvatarUrl, onUploadComplete, t]);
 
-  const displayedUrl = previewUrl || currentAvatarUrl;
+  const displayedUrl = currentAvatarUrl; // Avatar is updated via onUploadComplete
   const fallbackChar = displayName?.[0]?.toUpperCase() || username?.[0]?.toUpperCase();
 
   return (
@@ -153,6 +174,15 @@ export function AvatarUpload({
       <p className="text-xs text-muted-foreground text-center">
         {t('profile.avatar.hint')}
       </p>
+
+      {imageToCrop && (
+        <AvatarCropperDialog
+          imageSrc={imageToCrop}
+          open={!!imageToCrop}
+          onClose={() => setImageToCrop(null)}
+          onCropComplete={handleCropAndUpload}
+        />
+      )}
     </div>
   );
 }

@@ -346,7 +346,15 @@
       "invalidType": "Please select a valid image file (JPG, PNG, WebP, or GIF).",
       "fileTooLarge": "File size must be less than 5MB.",
       "uploadSuccess": "Avatar uploaded successfully!",
-      "uploadError": "Failed to upload avatar. Please try again."
+      "uploadError": "Failed to upload avatar. Please try again.",
+      "removeSuccess": "Avatar removed successfully!",
+      "removeError": "Failed to remove avatar. Please try again.",
+      "cropTitle": "Crop Avatar",
+      "cropDescription": "Adjust the crop area and zoom to fit your avatar.",
+      "zoom": "Zoom",
+      "rotate": "Rotate",
+      "cropAndUpload": "Crop & Upload",
+      "cropError": "Failed to crop image. Please try again."
     },
     "edit": {
       "title": "Edit Profile",

@@ -339,6 +339,23 @@
     "noPlaylistsTitle": "Aún no hay listas de reproducción creadas.",
     "noPlaylistsDescription": "Este usuario aún no ha creado ninguna lista de reproducción.",
     "createFirstPlaylist": "Crea tu primera lista de reproducción",
+    "avatar": {
+      "upload": "Subir Foto",
+      "remove": "Eliminar",
+      "hint": "JPG, PNG, WebP o GIF. Máx. 5MB.",
+      "invalidType": "Por favor, selecciona un archivo de imagen válido (JPG, PNG, WebP o GIF).",
+      "fileTooLarge": "El tamaño del archivo debe ser inferior a 5MB.",
+      "uploadSuccess": "¡Avatar subido con éxito!",
+      "uploadError": "Error al subir el avatar. Por favor, inténtalo de nuevo.",
+      "removeSuccess": "¡Avatar eliminado con éxito!",
+      "removeError": "Error al eliminar el avatar. Por favor, inténtalo de nuevo.",
+      "cropTitle": "Recortar Avatar",
+      "cropDescription": "Ajusta el área de recorte y el zoom para tu avatar.",
+      "zoom": "Zoom",
+      "rotate": "Rotar",
+      "cropAndUpload": "Recortar y Subir",
+      "cropError": "Error al recortar la imagen. Por favor, inténtalo de nuevo."
+    },
     "edit": {
       "title": "Editar Perfil",
       "description": "Actualiza tu información pública.",
