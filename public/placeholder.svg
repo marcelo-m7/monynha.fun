@@ -1,5 +1,0 @@
-<svg width="100%" height="100%" viewBox="0 0 160 90" fill="none" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice">
-  <rect x="0" y="0" width="160" height="90" rx="8" fill="hsl(var(--muted)/50)"/>
-  <rect x="50" y="30" width="60" height="30" rx="6" fill="hsl(var(--primary)/10)"/>
-  <rect x="60" y="25" width="48" height="24" rx="5" fill="hsl(var(--accent)/10)" opacity="0.8"/>
-</svg>
