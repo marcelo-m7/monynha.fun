@@ -164,13 +164,6 @@ export type Database = {
             referencedRelation: "playlists"
             referencedColumns: ["id"]
           },
-          {
-            foreignKeyName: "playlist_collaborators_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
         ]
       }
       playlist_progress: {
@@ -216,13 +209,6 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "playlist_progress_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
-          {
             foreignKeyName: "playlist_progress_video_id_fkey"
             columns: ["video_id"]
             isOneToOne: false
@@ -261,13 +247,6 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: "playlist_videos_added_by_fkey"
-            columns: ["added_by"]
-            isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
-          {
             foreignKeyName: "playlist_videos_playlist_id_fkey"
             columns: ["playlist_id"]
             isOneToOne: false
@@ -296,8 +275,10 @@ export type Database = {
           name: string
           slug: string
           thumbnail_url: string | null
+          total_duration_seconds: number | null
           unit_code: string | null
           updated_at: string | null
+          video_count: number | null
         }
         Insert: {
           author_id: string
@@ -311,8 +292,10 @@ export type Database = {
           name: string
           slug: string
           thumbnail_url?: string | null
+          total_duration_seconds?: number | null
           unit_code?: string | null
           updated_at?: string | null
+          video_count?: number | null
         }
         Update: {
           author_id?: string
@@ -326,8 +309,10 @@ export type Database = {
           name?: string
           slug?: string
           thumbnail_url?: string | null
+          total_duration_seconds?: number | null
           unit_code?: string | null
           updated_at?: string | null
+          video_count?: number | null
         }
         Relationships: [
           {
@@ -443,7 +428,28 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      increment_video_view_count: {
+        Args: { p_video_id: string }
+        Returns: number
+      }
+      mark_top_videos_as_featured: {
+        Args: { p_limit?: number }
+        Returns: number
+      }
+      playlist_accessible_to_user:
+        | { Args: { p_playlist_id: string }; Returns: boolean }
+        | {
+            Args: { p_playlist_id: string; p_user_id: string }
+            Returns: boolean
+          }
+      update_playlist_derived_fields: {
+        Args: { p_playlist_id: string }
+        Returns: undefined
+      }
+      update_playlist_thumbnail_from_first_video: {
+        Args: { p_playlist_id: string }
+        Returns: undefined
+      }
     }
     Enums: {
       [_ in never]: never

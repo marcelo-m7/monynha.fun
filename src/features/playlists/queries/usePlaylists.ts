@@ -42,7 +42,7 @@ export function useCreatePlaylist() {
   const queryClient = useQueryClient();
   const { user } = useAuth();
 
-  return useMutation<Playlist, Error, Omit<Playlist, 'id' | 'author_id' | 'created_at' | 'updated_at' | 'author' | 'video_count'>>({
+  return useMutation<Playlist, Error, Omit<Playlist, 'id' | 'author_id' | 'created_at' | 'updated_at' | 'author' | 'video_count' | 'total_duration_seconds'>>({
     mutationFn: async (playlist) => {
       if (!user) throw new Error('Must be logged in to create a playlist');
       return createPlaylist({

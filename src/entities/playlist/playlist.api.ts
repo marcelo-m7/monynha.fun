@@ -202,20 +202,28 @@ export async function reorderPlaylistVideos(payload: { playlistId: string; order
 export async function listPlaylistCollaborators(playlistId: string) {
   const { data, error } = await supabase
     .from('playlist_collaborators')
-    .select(
-      `
-      *,
-      profile:profiles!playlist_collaborators_user_id_fkey(id, username, display_name, avatar_url)
-    `,
-    )
+    .select('*')
     .eq('playlist_id', playlistId);
 
   if (error) throw error;
 
-  return (data || []).map((c: PlaylistCollaborator) => ({
-    ...c,
-    profile: c.profile,
-  })) as PlaylistCollaborator[];
+  // Fetch profiles separately since there's no direct foreign key relation
+  const collaboratorsWithProfiles = await Promise.all(
+    (data || []).map(async (c) => {
+      const { data: profileData } = await supabase
+        .from('profiles')
+        .select('id, username, display_name, avatar_url')
+        .eq('id', c.user_id)
+        .single();
+
+      return {
+        ...c,
+        profile: profileData || null,
+      } as PlaylistCollaborator;
+    }),
+  );
+
+  return collaboratorsWithProfiles;
 }
 
 export async function addCollaborator(payload: { playlistId: string; userId: string; role?: 'editor' | 'viewer' }) {

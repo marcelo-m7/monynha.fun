@@ -210,7 +210,7 @@ export default function Auth() {
                     onClick={() => {
                       setShowForgotPassword(false);
                       resetForgotPassword();
-                      reset({ email: emailForForgotPassword, password: '', username: '' }); // Pre-fill email back to login form
+                      reset({ email: '', password: '' }); // Reset form on back
                     }}
                     className="text-sm text-muted-foreground hover:text-primary transition-colors"
                   >
