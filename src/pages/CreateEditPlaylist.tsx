@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { useAuth } from '@/hooks/useAuth';
-import { useCreatePlaylist, usePlaylistById, useUpdatePlaylist } from '@/hooks/usePlaylists';
+import { useAuth } from '@/features/auth/useAuth';
+import { useCreatePlaylist, usePlaylistById, useUpdatePlaylist } from '@/features/playlists/queries/usePlaylists';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';

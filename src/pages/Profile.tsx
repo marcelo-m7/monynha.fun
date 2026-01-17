@@ -1,15 +1,15 @@
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { Header } from '@/components/Header';
 import { Footer } from '@/components/Footer';
-import { useProfileByUsername } from '@/hooks/useProfile';
-import { useVideos } from '@/hooks/useVideos';
-import { usePlaylists } from '@/hooks/usePlaylists';
+import { useProfileByUsername } from '@/features/profile/queries/useProfile';
+import { useVideos } from '@/features/videos/queries/useVideos';
+import { usePlaylists } from '@/features/playlists/queries/usePlaylists';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { CalendarDays, User as UserIcon, Video as VideoIcon, ListVideo, ArrowLeft, Edit } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { useAuth } from '@/hooks/useAuth';
+import { useAuth } from '@/features/auth/useAuth';
 import { VideoCard } from '@/components/VideoCard';
 
 const Profile = () => {

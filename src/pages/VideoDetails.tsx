@@ -1,8 +1,9 @@
 import { useParams, useNavigate } from 'react-router-dom';
-import { useVideoById, useRelatedVideos, formatDuration, formatViewCount } from '@/hooks/useVideos';
-import { useAuth } from '@/hooks/useAuth';
-import { useIsFavorited, useAddFavorite, useRemoveFavorite } from '@/hooks/useFavorites';
-import { getYouTubeEmbedUrl } from '@/lib/youtube';
+import { useVideoById, useRelatedVideos } from '@/features/videos/queries/useVideos';
+import { formatDuration, formatViewCount } from '@/shared/lib/format';
+import { useAuth } from '@/features/auth/useAuth';
+import { useIsFavorited, useAddFavorite, useRemoveFavorite } from '@/features/favorites/queries/useFavorites';
+import { getYouTubeEmbedUrl } from '@/shared/lib/youtube';
 import { Header } from '@/components/Header';
 import { Footer } from '@/components/Footer';
 import { VideoCard } from '@/components/VideoCard';

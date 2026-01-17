@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { ArrowLeft, Users } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
-import { useContributorCount } from '@/hooks/useContributorCount';
+import { useContributorCount } from '@/features/profile/queries/useProfile';
 import { Skeleton } from '@/components/ui/skeleton';
 
 const Community = () => {

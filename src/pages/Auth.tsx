@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '@/hooks/useAuth';
+import { useAuth } from '@/features/auth/useAuth';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -8,7 +8,7 @@ import { toast } from 'sonner';
 import { Play, Mail, Lock, User, ArrowLeft, KeyRound } from 'lucide-react';
 import { z } from 'zod';
 import { useTranslation } from 'react-i18next';
-import { supabase } from '@/integrations/supabase/client';
+import { requestPasswordReset } from '@/features/auth/auth.api';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 
@@ -113,9 +113,7 @@ export default function Auth() {
 
   const onForgotPasswordSubmit = async (values: z.infer<typeof forgotPasswordSchema>) => {
     try {
-      const { error } = await supabase.auth.resetPasswordForEmail(values.email, {
-        redirectTo: `${window.location.origin}/auth?reset=true`,
-      });
+      const { error } = await requestPasswordReset(values.email);
 
       if (error) {
         toast.error(t('auth.error.forgotPasswordGeneric'), {

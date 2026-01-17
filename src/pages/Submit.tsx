@@ -1,9 +1,9 @@
-import { useState, useEffect } from 'react';
+import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '@/hooks/useAuth';
-import { useCategories } from '@/hooks/useCategories';
-import { useYouTubeMetadata } from '@/hooks/useYouTubeMetadata';
-import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/features/auth/useAuth';
+import { useCategories } from '@/features/categories/queries/useCategories';
+import { useYouTubeMetadata } from '@/features/submit/useYouTubeMetadata';
+import { useSubmitVideo } from '@/features/submit/useSubmitVideo';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -11,31 +11,17 @@ import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { toast } from 'sonner';
 import { ArrowLeft, Link as LinkIcon, Loader2, Play, CheckCircle, AlertCircle } from 'lucide-react';
-import { z } from 'zod';
+import { submitVideoSchema, SubmitVideoFormValues } from '@/features/submit/submitVideoSchema';
 import { useTranslation } from 'react-i18next';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 
-const submitVideoSchema = z.object({
-  youtubeUrl: z.string()
-    .url('submit.error.invalidUrl')
-    .refine(
-      (url) => url.includes('youtube.com') || url.includes('youtu.be'),
-      'submit.error.notYoutubeUrl'
-    ),
-  description: z.string().max(500, 'submit.error.descriptionMaxLength').optional().or(z.literal('')),
-  language: z.string().min(2, 'submit.error.languageRequired'),
-  categoryId: z.string().optional().or(z.literal('')),
-});
-
-type SubmitVideoFormValues = z.infer<typeof submitVideoSchema>;
-
 export default function Submit() {
   const { t } = useTranslation();
-  const [isSubmitting, setIsSubmitting] = useState(false);
   
   const { user, loading: authLoading } = useAuth();
   const { data: categories } = useCategories();
+  const submitVideoMutation = useSubmitVideo();
   const navigate = useNavigate();
 
   const { register, handleSubmit, watch, setValue, formState: { errors } } = useForm<SubmitVideoFormValues>({
@@ -76,71 +62,36 @@ export default function Submit() {
       return;
     }
 
-    setIsSubmitting(true);
-
     try {
-      // Check if video already exists
-      const { data: existingVideo } = await supabase
-        .from('videos')
-        .select('id')
-        .eq('youtube_id', metadata.videoId)
-        .maybeSingle();
+      const result = await submitVideoMutation.mutateAsync({
+        metadata,
+        description: values.description,
+        language: values.language,
+        categoryId: values.categoryId || undefined,
+        userId: user.id,
+        youtubeUrl,
+      });
 
-      if (existingVideo) {
+      if (result.status === 'exists') {
         toast.error(t('submit.error.videoExistsTitle'), {
           description: t('submit.error.videoExistsDescription'),
         });
-        setIsSubmitting(false);
         return;
       }
-
-      // Insert new video
-      const { data: newVideo, error } = await supabase
-        .from('videos')
-        .insert({
-          youtube_id: metadata.videoId,
-          title: metadata.title,
-          description: values.description || metadata.description || null,
-          channel_name: metadata.channelName,
-          thumbnail_url: metadata.thumbnailUrl,
-          language: values.language,
-          category_id: values.categoryId || null,
-          submitted_by: user.id
-        })
-        .select()
-        .single();
-
-      if (error) throw error;
 
       toast.success(t('submit.success.videoSubmittedTitle'), {
         description: t('submit.success.videoSubmittedDescription'),
       });
 
-      // Trigger AI enrichment Edge Function
-      if (newVideo) {
-        toast.info(t('submit.info.aiEnrichmentStartedTitle'), {
-          description: t('submit.info.aiEnrichmentStartedDescription'),
-        });
-        try {
-          const { data: edgeFunctionData, error: edgeFunctionError } = await supabase.functions.invoke('enrich-video', {
-            body: { videoId: newVideo.id, youtubeUrl: youtubeUrl },
-            headers: { 'Content-Type': 'application/json' },
-          });
+      toast.info(t('submit.info.aiEnrichmentStartedTitle'), {
+        description: t('submit.info.aiEnrichmentStartedDescription'),
+      });
 
-          if (edgeFunctionError) {
-            console.error('Error invoking AI enrichment function:', edgeFunctionError);
-            toast.error(t('submit.error.aiEnrichmentFailedTitle'), {
-              description: t('submit.error.aiEnrichmentFailedDescription'),
-            });
-          } else {
-            console.log('AI enrichment function invoked successfully:', edgeFunctionData);
-          }
-        } catch (edgeErr) {
-          console.error('Unexpected error invoking AI enrichment function:', edgeErr);
-          toast.error(t('submit.error.aiEnrichmentFailedTitle'), {
-            description: t('submit.error.aiEnrichmentFailedDescription'),
-          });
-        }
+      if (result.edgeError) {
+        console.error('Error invoking AI enrichment function:', result.edgeError);
+        toast.error(t('submit.error.aiEnrichmentFailedTitle'), {
+          description: t('submit.error.aiEnrichmentFailedDescription'),
+        });
       }
 
       navigate('/');
@@ -149,8 +100,6 @@ export default function Submit() {
       toast.error(t('submit.error.genericSubmitTitle'), {
         description: err instanceof Error ? err.message : String(err),
       });
-    } finally {
-      setIsSubmitting(false);
     }
   };
 
@@ -295,9 +244,9 @@ export default function Submit() {
                   type="submit" 
                   className="w-full" 
                   size="lg"
-                  disabled={isSubmitting || !metadata || metadataLoading}
+                  disabled={submitVideoMutation.isPending || !metadata || metadataLoading}
                 >
-                  {isSubmitting ? (
+                  {submitVideoMutation.isPending ? (
                     <>
                       <Loader2 className="w-4 h-4 mr-2 animate-spin" />
                       {t('submit.form.submittingButton')}

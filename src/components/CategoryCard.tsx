@@ -1,4 +1,4 @@
-import { Category } from "@/hooks/useCategories";
+import type { Category } from "@/entities/category/category.types";
 import { 
   BookOpen, 
   ChefHat, 

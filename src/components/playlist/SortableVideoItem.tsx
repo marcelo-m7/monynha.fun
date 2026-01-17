@@ -3,7 +3,7 @@ import { CSS } from '@dnd-kit/utilities';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import { GripVertical, X, Check } from 'lucide-react';
-import { PlaylistVideo } from '@/hooks/usePlaylists';
+import type { PlaylistVideo } from '@/features/playlists';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 

@@ -1,14 +1,15 @@
-import { Video, formatDuration, formatViewCount } from "@/hooks/useVideos";
+import type { VideoWithCategory } from "@/entities/video/video.types";
+import { incrementVideoViewCount } from "@/entities/video/video.api";
+import { formatDuration, formatViewCount } from "@/shared/lib/format";
 import { Play } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { useTranslation } from 'react-i18next';
 
 interface FeaturedHeroProps {
-  video: Video;
+  video: VideoWithCategory;
 }
 
 export const FeaturedHero = ({ video }: FeaturedHeroProps) => {
@@ -25,7 +26,7 @@ export const FeaturedHero = ({ video }: FeaturedHeroProps) => {
 
     // increment views on the server
     try {
-      await supabase.rpc('increment_video_view_count', { p_video_id: video.id });
+      await incrementVideoViewCount(video.id);
     } catch (e) {
       console.debug('increment view failed', e);
     }

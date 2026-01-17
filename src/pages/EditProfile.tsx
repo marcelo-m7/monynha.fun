@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '@/hooks/useAuth';
-import { useProfileById, useUpdateProfile } from '@/hooks/useProfile';
+import { useAuth } from '@/features/auth/useAuth';
+import { useProfileById, useUpdateProfile } from '@/features/profile/queries/useProfile';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';

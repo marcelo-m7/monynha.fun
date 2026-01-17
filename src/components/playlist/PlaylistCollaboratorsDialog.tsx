@@ -20,14 +20,14 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { toast } from 'sonner';
-import { supabase } from '@/integrations/supabase/client';
 import {
   PlaylistCollaborator,
   usePlaylistCollaborators,
   useAddCollaborator,
   useUpdateCollaboratorRole,
   useRemoveCollaborator,
-} from '@/hooks/usePlaylists';
+} from '@/features/playlists';
+import { findProfileByUsername } from '@/entities/profile/profile.api';
 
 interface PlaylistCollaboratorsDialogProps {
   playlistId: string;
@@ -51,13 +51,9 @@ export function PlaylistCollaboratorsDialog({ playlistId, isAuthor }: PlaylistCo
     setSearchLoading(true);
     try {
       // Find user by username
-      const { data: profile, error } = await supabase
-        .from('profiles')
-        .select('id, username')
-        .eq('username', username.trim())
-        .single();
+      const profile = await findProfileByUsername(username.trim());
 
-      if (error || !profile) {
+      if (!profile) {
         toast.error(t('playlistDetails.collaborators.userNotFound'));
         return;
       }

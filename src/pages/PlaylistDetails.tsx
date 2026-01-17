@@ -1,14 +1,8 @@
 import { useParams, useNavigate } from 'react-router-dom';
-import {
-  usePlaylistById,
-  usePlaylistVideos,
-  useDeletePlaylist,
-  useAddVideoToPlaylist,
-  useRemoveVideoFromPlaylist,
-  usePlaylistProgress,
-  useCanEditPlaylist,
-  useIsPlaylistAuthor,
-} from '@/hooks/usePlaylists';
+import { usePlaylistById, useDeletePlaylist } from '@/features/playlists/queries/usePlaylists';
+import { usePlaylistVideos, useAddVideoToPlaylist, useRemoveVideoFromPlaylist } from '@/features/playlists/queries/usePlaylistVideos';
+import { usePlaylistProgress } from '@/features/playlists/queries/usePlaylistProgress';
+import { useCanEditPlaylist, useIsPlaylistAuthor } from '@/features/playlists/usePlaylistUtils';
 import { Header } from '@/components/Header';
 import { Footer } from '@/components/Footer';
 import { VideoCard } from '@/components/VideoCard';
@@ -17,12 +11,12 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { Badge } from '@/components/ui/badge'; // Import Badge component
 import { ArrowLeft, ListVideo, BookOpen, Code, Globe, Trash2, Edit, Loader2, Plus, Search, XCircle, Lock, GraduationCap } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { useAuth } from '@/hooks/useAuth';
+import { useAuth } from '@/features/auth/useAuth';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { useState } from 'react';
-import { useVideos } from '@/hooks/useVideos';
+import { useVideos } from '@/features/videos/queries/useVideos';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { PlaylistProgressBar } from '@/components/playlist/PlaylistProgressBar';
 import { SortableVideoList } from '@/components/playlist/SortableVideoList';

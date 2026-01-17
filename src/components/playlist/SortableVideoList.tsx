@@ -16,8 +16,8 @@ import {
   verticalListSortingStrategy,
 } from '@dnd-kit/sortable';
 import { SortableVideoItem } from './SortableVideoItem';
-import { PlaylistVideo, useReorderPlaylistVideos, useRemoveVideoFromPlaylist, useMarkVideoWatched, PlaylistProgress } from '@/hooks/usePlaylists';
-import { useAuth } from '@/hooks/useAuth';
+import { PlaylistVideo, useReorderPlaylistVideos, useRemoveVideoFromPlaylist, useMarkVideoWatched, PlaylistProgress } from '@/features/playlists';
+import { useAuth } from '@/features/auth/useAuth';
 import { toast } from 'sonner';
 
 interface SortableVideoListProps {

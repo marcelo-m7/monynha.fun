@@ -1,14 +1,15 @@
-import { Video, formatDuration, formatViewCount } from "@/hooks/useVideos";
+import type { VideoWithCategory } from "@/entities/video/video.types";
+import { incrementVideoViewCount } from "@/entities/video/video.api";
+import { formatDuration, formatViewCount } from "@/shared/lib/format";
 import { Play, Eye } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils"; // Import cn for conditional class names
-import { supabase } from "@/integrations/supabase/client";
 import { useState } from "react";
 import { useTranslation } from 'react-i18next';
 
 interface VideoCardProps {
-  video: Video;
+  video: VideoWithCategory;
   onClick?: () => void;
   variant?: 'default' | 'compact'; // Add variant prop
 }
@@ -27,7 +28,7 @@ export const VideoCard = ({ video, onClick, variant = 'default' }: VideoCardProp
 
     try {
       // fire-and-forget: increment on the server (atomic in DB function)
-      supabase.rpc('increment_video_view_count', { p_video_id: video.id });
+      incrementVideoViewCount(video.id);
     } catch (e) {
       // ignore errors — navigation should still happen
       console.debug('increment view failed', e);

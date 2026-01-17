@@ -4,9 +4,9 @@ import { Input } from "@/components/ui/input";
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
-import { useVideoCount } from "@/hooks/useVideoCount"; // Import the new hook
-import { useContributorCount } from "@/hooks/useContributorCount"; // Import the new hook
-import { useCategories } from "@/hooks/useCategories";
+import { useVideoCount } from "@/features/videos/queries/useVideos"; // Import the new hook
+import { useContributorCount } from "@/features/profile/queries/useProfile"; // Import the new hook
+import { useCategories } from "@/features/categories/queries/useCategories";
 import { Skeleton } from "@/components/ui/skeleton"; // Import Skeleton for loading state
 
 export const HeroSection = () => {

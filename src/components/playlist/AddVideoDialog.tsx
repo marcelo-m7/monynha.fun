@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Plus, Search, Check, Loader2 } from 'lucide-react';
-import { useQuery } from '@tanstack/react-query';
 import {
   Dialog,
   DialogContent,
@@ -12,8 +11,8 @@ import {
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { supabase } from '@/integrations/supabase/client';
-import { useAddVideoToPlaylist, PlaylistVideo } from '@/hooks/usePlaylists';
+import { useAddVideoToPlaylist, PlaylistVideo } from '@/features/playlists';
+import { useVideos } from '@/features/videos/queries/useVideos';
 import { toast } from 'sonner';
 
 interface AddVideoDialogProps {
@@ -29,23 +28,9 @@ export function AddVideoDialog({ playlistId, existingVideos }: AddVideoDialogPro
 
   const existingVideoIds = existingVideos.map(v => v.video_id);
 
-  const { data: videos, isLoading } = useQuery({
-    queryKey: ['videos-search', searchQuery],
-    queryFn: async () => {
-      let query = supabase
-        .from('videos')
-        .select('id, title, youtube_id, thumbnail_url, channel_name')
-        .order('created_at', { ascending: false })
-        .limit(20);
-
-      if (searchQuery) {
-        query = query.or(`title.ilike.%${searchQuery}%,channel_name.ilike.%${searchQuery}%`);
-      }
-
-      const { data, error } = await query;
-      if (error) throw error;
-      return data;
-    },
+  const { data: videos, isLoading } = useVideos({
+    searchQuery,
+    limit: 20,
     enabled: open,
   });
 

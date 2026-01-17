@@ -1,9 +1,9 @@
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { ListVideo, BookOpen, Code, Globe, Lock, Users, GraduationCap } from 'lucide-react';
-import { Playlist, usePlaylistProgress, usePlaylistVideos } from '@/hooks/usePlaylists';
+import { Playlist, usePlaylistProgress, usePlaylistVideos } from '@/features/playlists';
 import { Progress } from '@/components/ui/progress';
-import { useAuth } from '@/hooks/useAuth';
+import { useAuth } from '@/features/auth/useAuth';
 import { Skeleton } from '@/components/ui/skeleton'; // Import Skeleton for loading states
 
 interface PlaylistCardProps {
