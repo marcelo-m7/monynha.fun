@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/features/auth/useAuth';
 import { useProfileById, useUpdateProfile } from '@/features/profile/queries/useProfile';
@@ -7,18 +7,18 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { toast } from 'sonner';
-import { ArrowLeft, User, Image, Info, Loader2, Save } from 'lucide-react';
+import { ArrowLeft, User, Loader2, Save } from 'lucide-react';
 import { z } from 'zod';
 import { useTranslation } from 'react-i18next';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Header } from '@/components/Header';
 import { Footer } from '@/components/Footer';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { AvatarUpload } from '@/components/profile/AvatarUpload';
 
 const editProfileSchema = z.object({
   display_name: z.string().min(3, 'profile.edit.error.displayNameMinLength').max(50, 'profile.edit.error.displayNameMaxLength'),
-  avatar_url: z.string().url('profile.edit.error.invalidAvatarUrl').optional().or(z.literal('')),
+  avatar_url: z.string().optional().or(z.literal('')),
   bio: z.string().max(300, 'profile.edit.error.bioMaxLength').optional().or(z.literal('')),
 });
 
@@ -143,15 +143,15 @@ export default function EditProfile() {
 
           <div className="bg-card border border-border rounded-2xl p-6 shadow-sm">
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-              {/* Avatar Preview */}
-              <div className="flex flex-col items-center gap-4 mb-6">
-                <Avatar className="w-24 h-24 border-2 border-primary">
-                  <AvatarImage src={avatarUrl || undefined} alt={displayName || profile.username || 'User'} />
-                  <AvatarFallback className="bg-primary/20 text-primary text-3xl font-semibold">
-                    {displayName ? displayName[0].toUpperCase() : (profile.username ? profile.username[0].toUpperCase() : <User className="w-12 h-12" />)}
-                  </AvatarFallback>
-                </Avatar>
-                <p className="text-sm text-muted-foreground">{t('profile.edit.avatarPreview')}</p>
+              {/* Avatar Upload */}
+              <div className="mb-6">
+                <AvatarUpload
+                  userId={user!.id}
+                  currentAvatarUrl={avatarUrl}
+                  displayName={displayName}
+                  username={profile.username}
+                  onUploadComplete={(url) => setValue('avatar_url', url)}
+                />
               </div>
 
               {/* Display Name */}
@@ -167,26 +167,6 @@ export default function EditProfile() {
                 {errors.display_name && (
                   <p role="alert" className="text-sm text-destructive">{t(errors.display_name.message as string)}</p>
                 )}
-              </div>
-
-              {/* Avatar URL */}
-              <div className="space-y-2">
-                <Label htmlFor="avatar-url">{t('profile.edit.form.avatarUrlLabel')}</Label>
-                <div className="relative">
-                  <Image className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
-                  <Input
-                    id="avatar-url"
-                    type="url"
-                    placeholder={t('profile.edit.form.avatarUrlPlaceholder')}
-                    {...register('avatar_url')}
-                    className="pl-10"
-                    aria-invalid={errors.avatar_url ? "true" : "false"}
-                  />
-                </div>
-                {errors.avatar_url && (
-                  <p role="alert" className="text-sm text-destructive">{t(errors.avatar_url.message as string)}</p>
-                )}
-                <p className="text-xs text-muted-foreground">{t('profile.edit.form.avatarUrlHint')}</p>
               </div>
 
               {/* Bio */}

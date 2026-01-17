@@ -339,6 +339,15 @@
     "noPlaylistsTitle": "No playlists created yet.",
     "noPlaylistsDescription": "This user has not created any playlists yet.",
     "createFirstPlaylist": "Create your first playlist",
+    "avatar": {
+      "upload": "Upload Photo",
+      "remove": "Remove",
+      "hint": "JPG, PNG, WebP or GIF. Max 5MB.",
+      "invalidType": "Please select a valid image file (JPG, PNG, WebP, or GIF).",
+      "fileTooLarge": "File size must be less than 5MB.",
+      "uploadSuccess": "Avatar uploaded successfully!",
+      "uploadError": "Failed to upload avatar. Please try again."
+    },
     "edit": {
       "title": "Edit Profile",
       "description": "Update your public information.",
