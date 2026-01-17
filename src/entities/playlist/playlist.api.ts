@@ -27,7 +27,10 @@ async function getPlaylistVideoCount(playlistId: string) {
 }
 
 export async function listPlaylists(params: ListPlaylistsParams = {}) {
-  let query = supabase.from('playlists').select('*').order('created_at', { ascending: false });
+  let query = supabase
+    .from('playlists')
+    .select('*, author:profiles(id, username, display_name, avatar_url)')
+    .order('created_at', { ascending: false });
 
   if (params.authorId) {
     query = query.eq('author_id', params.authorId);
@@ -80,35 +83,22 @@ export async function listPlaylists(params: ListPlaylistsParams = {}) {
 export async function getPlaylistById(id: string) {
   const { data, error } = await supabase
     .from('playlists')
-    .select('*')
+    .select('*, author:profiles(id, username, display_name, avatar_url)')
     .eq('id', id)
     .single();
 
   if (error) throw error;
 
-  // Fetch author separately from profiles table
-  let author = null;
-  if (data.author_id) {
-    const { data: authorData } = await supabase
-      .from('profiles')
-      .select('id, username, display_name, avatar_url')
-      .eq('id', data.author_id)
-      .single();
-    author = authorData;
-  }
-
   try {
     const videoCount = await getPlaylistVideoCount(data.id);
     return {
       ...data,
-      author,
       video_count: videoCount,
     } as Playlist;
   } catch (countError) {
     console.error(`Error fetching video count for playlist ${data.id}:`, countError);
     return {
       ...data,
-      author,
       video_count: 0,
     } as Playlist;
   }
