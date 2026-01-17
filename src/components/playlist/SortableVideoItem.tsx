@@ -6,6 +6,7 @@ import { GripVertical, X, Check } from 'lucide-react';
 import type { PlaylistVideo } from '@/features/playlists';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
+import { formatDuration } from '@/shared/lib/format'; // Import shared formatDuration
 
 interface SortableVideoItemProps {
   item: PlaylistVideo;
@@ -43,12 +44,7 @@ export function SortableVideoItem({
     transition,
   };
 
-  const formatDuration = (seconds: number | null) => {
-    if (!seconds) return '0:00';
-    const mins = Math.floor(seconds / 60);
-    const secs = seconds % 60;
-    return `${mins}:${secs.toString().padStart(2, '0')}`;
-  };
+  // Removed local formatDuration function, now using the imported one
 
   return (
     <div
@@ -111,7 +107,7 @@ export function SortableVideoItem({
             target.onerror = null;
           }}
         />
-        {item.video?.duration_seconds && (
+        {item.video?.duration_seconds && item.video.duration_seconds > 0 && (
           <span className="absolute bottom-1 right-1 px-1.5 py-0.5 bg-black/80 text-white text-xs rounded">
             {formatDuration(item.video.duration_seconds)}
           </span>

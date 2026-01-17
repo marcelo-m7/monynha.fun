@@ -52,10 +52,12 @@ export const FeaturedHero = ({ video }: FeaturedHeroProps) => {
             <h3 className="text-2xl md:text-3xl font-bold line-clamp-2">{video.title}</h3>
             <p className="mt-2 text-sm max-w-2xl line-clamp-2 text-white/90">{video.description}</p>
             <div className="mt-4 flex items-center gap-4">
-              <div className="flex items-center gap-2 text-sm text-white/90">
-                <Play className="w-4 h-4" />
-                <span>{formatDuration(video.duration_seconds)}</span>
-              </div>
+              {video.duration_seconds && video.duration_seconds > 0 && (
+                <div className="flex items-center gap-2 text-sm text-white/90">
+                  <Play className="w-4 h-4" />
+                  <span>{formatDuration(video.duration_seconds)}</span>
+                </div>
+              )}
               <div className="relative text-sm text-white/90">
                 <span className="font-semibold">{formatViewCount(viewCount)}</span>
                 {showPlus && (

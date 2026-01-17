@@ -154,7 +154,7 @@ const VideoDetails = () => {
                   <Eye className="w-4 h-4" />
                   <span>{formatViewCount(video.view_count)} {t('videoDetails.viewsLabel')}</span>
                 </div>
-                {video.duration_seconds && (
+                {video.duration_seconds && video.duration_seconds > 0 && (
                   <div className="flex items-center gap-1">
                     <Clock className="w-4 h-4" />
                     <span>{formatDuration(video.duration_seconds)}</span>

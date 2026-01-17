@@ -76,7 +76,7 @@ export const VideoCard = ({ video, onClick, variant = 'default' }: VideoCardProp
         </div>
 
         {/* Duration badge */}
-        {variant === 'default' && (
+        {variant === 'default' && video.duration_seconds && video.duration_seconds > 0 && (
           <div className="absolute bottom-2 right-2 px-2 py-1 rounded-md bg-foreground/80 text-background text-xs font-medium backdrop-blur-sm">
             {formatDuration(video.duration_seconds)}
           </div>
