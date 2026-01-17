@@ -16,8 +16,8 @@ export const FeaturedHero = ({ video }: FeaturedHeroProps) => {
   const navigate = useNavigate();
   const { viewCount, showPlus, handleViewIncrement } = useVideoViewIncrement(video.view_count || 0, 900);
 
-  const handleClick = async () => {
-    await handleViewIncrement(video.id);
+  const handleClick = () => {
+    handleViewIncrement(video.id);
     navigate(`/videos/${video.id}`);
   };
 

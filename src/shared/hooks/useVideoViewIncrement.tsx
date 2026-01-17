@@ -26,13 +26,11 @@ export function useVideoViewIncrement(initialViewCount: number, animationDuratio
       timeoutRef.current = null;
     }, animationDuration);
 
-    try {
-      // Fire-and-forget: increment on the server (atomic in DB function)
-      await incrementVideoViewCount(videoId);
-    } catch (e) {
+    // Fire-and-forget: increment on the server (atomic in DB function)
+    incrementVideoViewCount(videoId).catch((e) => {
       // Ignore errors - view count is not critical for UX
       console.debug('increment view failed', e);
-    }
+    });
   }, [animationDuration]);
 
   return { viewCount, showPlus, handleViewIncrement };
