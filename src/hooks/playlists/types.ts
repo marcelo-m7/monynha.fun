@@ -1,4 +1,4 @@
-import { Video } from '@/hooks/useVideos'; // Assuming Video type is defined in useVideos
+import type { Video } from '@/features/videos';
 
 export interface Playlist {
   id: string;

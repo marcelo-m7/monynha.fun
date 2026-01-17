@@ -1,4 +1,4 @@
-import { Category } from "@/hooks/useCategories";
+import { Category } from "@/features/categories";
 import { 
   BookOpen, 
   ChefHat, 

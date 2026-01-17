@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
-import { useCategories } from '@/hooks/useCategories';
+import { useCategories } from '@/features/categories';
 import { useYouTubeMetadata } from '@/hooks/useYouTubeMetadata';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';

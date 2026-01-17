@@ -6,7 +6,7 @@ import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { useVideoCount } from "@/hooks/useVideoCount"; // Import the new hook
 import { useContributorCount } from "@/hooks/useContributorCount"; // Import the new hook
-import { useCategories } from "@/hooks/useCategories";
+import { useCategories } from "@/features/categories";
 import { Skeleton } from "@/components/ui/skeleton"; // Import Skeleton for loading state
 
 export const HeroSection = () => {

@@ -1,4 +1,4 @@
-import { Video, formatDuration, formatViewCount } from "@/hooks/useVideos";
+import { Video, formatDuration, formatViewCount } from "@/features/videos";
 import { Play, Eye } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { useNavigate } from "react-router-dom";

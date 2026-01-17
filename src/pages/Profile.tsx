@@ -2,7 +2,7 @@ import { useParams, useNavigate, Link } from 'react-router-dom';
 import { Header } from '@/components/Header';
 import { Footer } from '@/components/Footer';
 import { useProfileByUsername } from '@/hooks/useProfile';
-import { useVideos } from '@/hooks/useVideos';
+import { useVideos } from '@/features/videos';
 import { usePlaylists } from '@/hooks/usePlaylists';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';

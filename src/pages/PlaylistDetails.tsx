@@ -22,7 +22,7 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { useState } from 'react';
-import { useVideos } from '@/hooks/useVideos';
+import { useVideos } from '@/features/videos';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { PlaylistProgressBar } from '@/components/playlist/PlaylistProgressBar';
 import { SortableVideoList } from '@/components/playlist/SortableVideoList';

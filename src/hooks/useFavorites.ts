@@ -2,7 +2,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from './useAuth';
 import { toast } from 'sonner';
-import { Video } from './useVideos';
+import type { Video } from '@/features/videos';
 
 export interface Favorite {
   id: string;
