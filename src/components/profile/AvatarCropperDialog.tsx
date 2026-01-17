@@ -35,7 +35,10 @@ export function AvatarCropperDialog({ imageSrc, open, onClose, onCropComplete }:
     setRotation(rotation[0]);
   }, []);
 
-  const onCropCompleteCallback = useCallback((croppedArea: any, croppedAreaPixels: any) => {
+  const onCropCompleteCallback = useCallback((
+    croppedArea: { x: number; y: number; width: number; height: number },
+    croppedAreaPixels: { x: number; y: number; width: number; height: number }
+  ) => {
     setCroppedAreaPixels(croppedAreaPixels);
   }, []);
 
