@@ -262,3 +262,30 @@ export async function markVideoWatched(payload: {
   if (error) throw error;
   return data as PlaylistProgress;
 }
+
+export async function checkPlaylistAccess(playlistId: string, userId: string | undefined): Promise<boolean> {
+  if (!userId) {
+    // If no user is logged in, check if the playlist is public
+    const { data, error } = await supabase
+      .from('playlists')
+      .select('is_public')
+      .eq('id', playlistId)
+      .single();
+    if (error) {
+      console.error("[checkPlaylistAccess] Error fetching public status:", error.message);
+      return false;
+    }
+    return data?.is_public || false;
+  }
+
+  const { data, error } = await supabase.rpc('playlist_accessible_to_user', {
+    p_playlist_id: playlistId,
+    p_user_id: userId,
+  });
+
+  if (error) {
+    console.error("[checkPlaylistAccess] Error calling RPC playlist_accessible_to_user:", error.message);
+    throw error;
+  }
+  return data || false;
+}

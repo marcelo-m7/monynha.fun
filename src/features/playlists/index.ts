@@ -4,3 +4,4 @@ export { usePlaylistVideos, useAddVideoToPlaylist, useRemoveVideoFromPlaylist, u
 export { usePlaylistCollaborators, useAddCollaborator, useUpdateCollaboratorRole, useRemoveCollaborator } from './queries/usePlaylistCollaborators';
 export { usePlaylistProgress, useMarkVideoWatched } from './queries/usePlaylistProgress';
 export { useCanEditPlaylist, useIsPlaylistAuthor } from './usePlaylistUtils';
+export { usePlaylistAccess } from './queries/usePlaylistAccess';

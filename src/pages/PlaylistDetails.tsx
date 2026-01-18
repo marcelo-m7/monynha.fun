@@ -1,14 +1,14 @@
 import { useParams, useNavigate } from 'react-router-dom';
 import { usePlaylistById, useDeletePlaylist } from '@/features/playlists/queries/usePlaylists';
 import { usePlaylistVideos, useAddVideoToPlaylist, useRemoveVideoFromPlaylist } from '@/features/playlists/queries/usePlaylistVideos';
-import { usePlaylistProgress } from '@/features/playlists/queries/usePlaylistProgress';
+import { usePlaylistProgress, usePlaylistAccess } from '@/features/playlists'; // Import usePlaylistAccess
 import { useCanEditPlaylist, useIsPlaylistAuthor } from '@/features/playlists/usePlaylistUtils';
 import { Header } from '@/components/Header';
 import { Footer } from '@/components/Footer';
 import { VideoCard } from '@/components/VideoCard';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Badge } from '@/components/ui/badge'; // Import Badge component
+import { Badge } from '@/components/ui/badge';
 import { ArrowLeft, ListVideo, BookOpen, Code, Globe, Trash2, Edit, Loader2, Plus, Search, XCircle, Lock, GraduationCap } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '@/features/auth/useAuth';
@@ -31,6 +31,7 @@ const PlaylistDetails = () => {
   const { data: playlist, isLoading: playlistLoading, isError: playlistError } = usePlaylistById(playlistId);
   const { data: playlistVideos, isLoading: videosLoading, isError: videosError } = usePlaylistVideos(playlistId);
   const { data: playlistProgress, isLoading: progressLoading } = usePlaylistProgress(playlistId);
+  const { data: canViewPlaylist, isLoading: accessLoading } = usePlaylistAccess(playlistId); // New hook for access check
 
   const deletePlaylistMutation = useDeletePlaylist();
   const addVideoToPlaylistMutation = useAddVideoToPlaylist();
@@ -68,7 +69,7 @@ const PlaylistDetails = () => {
   const totalVideos = playlistVideos?.length || 0;
   const watchedVideos = playlistProgress?.filter(p => p.watched).length || 0;
 
-  if (playlistLoading || authLoading || videosLoading || progressLoading) {
+  if (playlistLoading || authLoading || videosLoading || progressLoading || accessLoading) {
     return (
       <div className="min-h-screen flex flex-col">
         <Header />
@@ -126,10 +127,8 @@ const PlaylistDetails = () => {
     );
   }
 
-  // Check if user can view the playlist (public, author, or collaborator)
-  const canView = playlist.is_public || isAuthor || (playlistProgress && playlistProgress.length > 0); // Simplified check for collaborators for now
-
-  if (!canView) {
+  // Use the result from the new hook for access control
+  if (!canViewPlaylist) {
     return (
       <div className="min-h-screen flex flex-col">
         <Header />
