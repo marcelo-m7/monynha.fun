@@ -463,5 +463,21 @@
       "question": "Quem administra a Monynha Fun?",
       "answer": "É desenvolvida pela Monynha Softwares, um estúdio de tecnologia inclusivo fundado por Marcelo Santos, com o apoio da comunidade open-source."
     }
+  },
+  "comments": {
+    "title": "Comentários",
+    "form": {
+      "placeholder": "Adicione um comentário...",
+      "submitButton": "Comentar",
+      "submitting": "Enviando...",
+      "contentRequired": "O comentário não pode estar vazio.",
+      "contentMaxLength": "O comentário não pode exceder 500 caracteres."
+    },
+    "loginToComment": "Você precisa estar logado para comentar.",
+    "loginToCommentPrompt": "Faça login para adicionar seu comentário.",
+    "loginAction": "Entrar",
+    "noComments": "Nenhum comentário ainda. Seja o primeiro a comentar!",
+    "loadError": "Erro ao carregar comentários.",
+    "deleteError": "Falha ao excluir o comentário."
   }
 }

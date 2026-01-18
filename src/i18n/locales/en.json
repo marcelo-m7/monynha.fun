@@ -455,5 +455,21 @@
       "question": "Who runs Monynha Fun?",
       "answer": "It is developed by Monynha Softwares, an inclusive tech studio founded by Marcelo Santos, with support from the open-source community."
     }
+  },
+  "comments": {
+    "title": "Comments",
+    "form": {
+      "placeholder": "Add a comment...",
+      "submitButton": "Comment",
+      "submitting": "Submitting...",
+      "contentRequired": "Comment cannot be empty.",
+      "contentMaxLength": "Comment cannot exceed 500 characters."
+    },
+    "loginToComment": "You need to be logged in to comment.",
+    "loginToCommentPrompt": "Log in to add your comment.",
+    "loginAction": "Login",
+    "noComments": "No comments yet. Be the first to comment!",
+    "loadError": "Error loading comments.",
+    "deleteError": "Failed to delete comment."
   }
 }

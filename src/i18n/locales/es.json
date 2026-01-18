@@ -455,5 +455,21 @@
       "question": "¿Quién dirige Monynha Fun?",
       "answer": "Es desarrollada por Monynha Softwares, un estudio de tecnología inclusivo fundado por Marcelo Santos, con el apoyo de la comunidad de código abierto."
     }
+  },
+  "comments": {
+    "title": "Comentarios",
+    "form": {
+      "placeholder": "Añade un comentario...",
+      "submitButton": "Comentar",
+      "submitting": "Enviando...",
+      "contentRequired": "El comentario no puede estar vacío.",
+      "contentMaxLength": "El comentario no puede exceder los 500 caracteres."
+    },
+    "loginToComment": "Debes iniciar sesión para comentar.",
+    "loginToCommentPrompt": "Inicia sesión para añadir tu comentario.",
+    "loginAction": "Iniciar Sesión",
+    "noComments": "Aún no hay comentarios. ¡Sé el primero en comentar!",
+    "loadError": "Error al cargar comentarios.",
+    "deleteError": "Error al eliminar el comentario."
   }
 }
