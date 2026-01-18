@@ -50,7 +50,15 @@ export const Footer = () => {
         {/* Bottom */}
         <div className="flex flex-col md:flex-row items-center justify-between gap-4 pt-8 mt-8 border-t border-border/50">
           <p className="text-sm text-muted-foreground flex items-center gap-1">
-            {t('footer.madeWithLove')} <Heart className="w-4 h-4 text-primary fill-primary inline-block" /> {t('footer.byMonynhaSoftwares')}
+            {t('footer.madeWithLove')} <Heart className="w-4 h-4 text-primary fill-primary inline-block" />{" "}
+            <a 
+              href="https://monynha.com" 
+              target="_blank" 
+              rel="noopener noreferrer" 
+              className="hover:text-primary transition-colors"
+            >
+              {t('footer.byMonynhaSoftwares')}
+            </a>
           </p>
           <div className="flex items-center gap-4">
             <a href="https://monynha.com" target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-primary transition-colors">
