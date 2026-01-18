@@ -2,7 +2,7 @@ import { supabase } from '@/shared/api/supabase/supabaseClient';
 import type { Profile, ProfileUpdate } from './profile.types';
 
 export async function getProfileById(userId: string) {
-  const { data, error } = await supabase.from('profiles').select('*').eq('id', userId).single();
+  const { data, error } = await supabase.from('profiles').select('*, avatar_path').eq('id', userId).single();
   if (error) throw error;
   return data as Profile;
 }
@@ -10,7 +10,7 @@ export async function getProfileById(userId: string) {
 export async function getProfileByUsername(username: string) {
   const { data, error } = await supabase
     .from('profiles')
-    .select('*')
+    .select('*, avatar_path')
     .eq('username', username)
     .single();
 
@@ -21,12 +21,12 @@ export async function getProfileByUsername(username: string) {
 export async function findProfileByUsername(username: string) {
   const { data, error } = await supabase
     .from('profiles')
-    .select('id, username')
+    .select('id, username, avatar_path')
     .eq('username', username)
     .maybeSingle();
 
   if (error) throw error;
-  return data as Pick<Profile, 'id' | 'username'> | null;
+  return data as Pick<Profile, 'id' | 'username' | 'avatar_path'> | null;
 }
 
 export async function updateProfile(userId: string, updates: ProfileUpdate) {

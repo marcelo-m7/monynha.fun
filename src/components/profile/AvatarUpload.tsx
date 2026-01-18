@@ -10,14 +10,16 @@ import { AvatarCropperDialog } from './AvatarCropperDialog'; // Import the new c
 interface AvatarUploadProps {
   userId: string;
   currentAvatarUrl?: string | null;
+  currentAvatarPath?: string | null; // New prop for storage path
   displayName?: string | null;
   username?: string | null;
-  onUploadComplete: (url: string) => void;
+  onUploadComplete: (url: string, path: string) => void; // Modified callback
 }
 
 export function AvatarUpload({
   userId,
   currentAvatarUrl,
+  currentAvatarPath,
   displayName,
   username,
   onUploadComplete,
@@ -58,13 +60,14 @@ export function AvatarUpload({
 
     try {
       const fileExt = croppedImageBlob.type.split('/')[1];
-      const fileName = `${userId}/avatar-${Date.now()}.${fileExt}`;
+      const fileName = `${userId}/avatar-${Date.now()}.${fileExt}`; // This is the storage path
 
-      // Delete old avatar if exists in storage
-      if (currentAvatarUrl?.includes('avatars')) {
-        const oldPath = currentAvatarUrl.split('/avatars/')[1];
-        if (oldPath) {
-          await supabase.storage.from('avatars').remove([oldPath]);
+      // Delete old avatar if a path is stored
+      if (currentAvatarPath) {
+        const { error: removeError } = await supabase.storage.from('avatars').remove([currentAvatarPath]);
+        if (removeError) {
+          console.warn(`[AvatarUpload] Failed to remove old avatar at path ${currentAvatarPath}:`, removeError.message);
+          // Don't throw, continue with new upload
         }
       }
 
@@ -83,7 +86,7 @@ export function AvatarUpload({
         .from('avatars')
         .getPublicUrl(fileName);
 
-      onUploadComplete(publicUrl);
+      onUploadComplete(publicUrl, fileName); // Pass both URL and path
       toast.success(t('profile.avatar.uploadSuccess'));
     } catch (error) {
       console.error('Avatar upload error:', error);
@@ -95,18 +98,16 @@ export function AvatarUpload({
         fileInputRef.current.value = '';
       }
     }
-  }, [userId, currentAvatarUrl, onUploadComplete, t]);
+  }, [userId, currentAvatarPath, onUploadComplete, t]);
 
   const handleRemoveAvatar = useCallback(async () => {
     setIsUploading(true);
     try {
-      if (currentAvatarUrl?.includes('avatars')) {
-        const oldPath = currentAvatarUrl.split('/avatars/')[1];
-        if (oldPath) {
-          await supabase.storage.from('avatars').remove([oldPath]);
-        }
+      if (currentAvatarPath) {
+        const { error: removeError } = await supabase.storage.from('avatars').remove([currentAvatarPath]);
+        if (removeError) throw removeError;
       }
-      onUploadComplete(''); // Clear avatar URL in parent component
+      onUploadComplete('', ''); // Clear both URL and path in parent component
       toast.success(t('profile.avatar.removeSuccess'));
     } catch (error) {
       console.error('Avatar removal error:', error);
@@ -114,7 +115,7 @@ export function AvatarUpload({
     } finally {
       setIsUploading(false);
     }
-  }, [currentAvatarUrl, onUploadComplete, t]);
+  }, [currentAvatarPath, onUploadComplete, t]);
 
   const displayedUrl = currentAvatarUrl; // Avatar is updated via onUploadComplete
   const fallbackChar = displayName?.[0]?.toUpperCase() || username?.[0]?.toUpperCase();

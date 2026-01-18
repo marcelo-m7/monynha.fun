@@ -19,6 +19,7 @@ import { AvatarUpload } from '@/components/profile/AvatarUpload';
 const editProfileSchema = z.object({
   display_name: z.string().min(3, 'profile.edit.error.displayNameMinLength').max(50, 'profile.edit.error.displayNameMaxLength'),
   avatar_url: z.string().optional().or(z.literal('')),
+  avatar_path: z.string().optional().or(z.literal('')), // New field for storage path
   bio: z.string().max(300, 'profile.edit.error.bioMaxLength').optional().or(z.literal('')),
 });
 
@@ -36,6 +37,7 @@ export default function EditProfile() {
     defaultValues: {
       display_name: '',
       avatar_url: '',
+      avatar_path: '', // Initialize new field
       bio: '',
     },
   });
@@ -55,6 +57,7 @@ export default function EditProfile() {
       reset({
         display_name: profile.display_name || '',
         avatar_url: profile.avatar_url || '',
+        avatar_path: profile.avatar_path || '', // Set initial avatar_path
         bio: profile.bio || '',
       });
     }
@@ -72,6 +75,7 @@ export default function EditProfile() {
       await updateProfileMutation.mutateAsync({
         display_name: values.display_name,
         avatar_url: values.avatar_url || null,
+        avatar_path: values.avatar_path || null, // Include avatar_path in update
         bio: values.bio || null,
       });
       navigate(`/profile/${profile.username}`);
@@ -148,9 +152,13 @@ export default function EditProfile() {
                 <AvatarUpload
                   userId={user!.id}
                   currentAvatarUrl={avatarUrl}
+                  currentAvatarPath={profile.avatar_path} // Pass current avatar path
                   displayName={displayName}
                   username={profile.username}
-                  onUploadComplete={(url) => setValue('avatar_url', url)}
+                  onUploadComplete={(url, path) => {
+                    setValue('avatar_url', url);
+                    setValue('avatar_path', path);
+                  }}
                 />
               </div>
 
