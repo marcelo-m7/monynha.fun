@@ -189,10 +189,12 @@ export async function listPlaylistCollaborators(playlistId: string) {
 export async function addCollaborator(payload: { playlistId: string; userId: string; role?: 'editor' | 'viewer' }) {
   const { data, error } = await supabase
     .from('playlist_collaborators')
-    .insert({
+    .upsert({
       playlist_id: payload.playlistId,
       user_id: payload.userId,
       role: payload.role ?? 'editor',
+    }, {
+      onConflict: 'playlist_id,user_id', // Specify the unique constraint to handle conflicts
     })
     .select()
     .single();
