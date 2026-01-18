@@ -15,6 +15,7 @@ import { Footer } from '@/components/Footer';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { AvatarUpload } from '@/components/profile/AvatarUpload';
+import { SocialAccountManager } from '@/components/profile/SocialAccountManager'; // Import the new component
 
 const editProfileSchema = z.object({
   display_name: z.string().min(3, 'profile.edit.error.displayNameMinLength').max(50, 'profile.edit.error.displayNameMaxLength'),
@@ -145,14 +146,14 @@ export default function EditProfile() {
             </p>
           </div>
 
-          <div className="bg-card border border-border rounded-2xl p-6 shadow-sm">
+          <div className="bg-card border border-border rounded-2xl p-6 shadow-sm space-y-6">
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
               {/* Avatar Upload */}
               <div className="mb-6">
                 <AvatarUpload
                   userId={user!.id}
                   currentAvatarUrl={avatarUrl}
-                  currentAvatarPath={profile.avatar_path} // Pass current avatar path
+                  currentAvatarPath={profile.avatar_path}
                   displayName={displayName}
                   username={profile.username}
                   onUploadComplete={(url, path) => {
@@ -216,6 +217,13 @@ export default function EditProfile() {
                 )}
               </Button>
             </form>
+
+            {/* Social Account Manager */}
+            {user && (
+              <div className="border-t border-border/50 pt-6 mt-6">
+                <SocialAccountManager userId={user.id} />
+              </div>
+            )}
           </div>
         </div>
       </main>

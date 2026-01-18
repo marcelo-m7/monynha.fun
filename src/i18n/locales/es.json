@@ -12,7 +12,7 @@
     "allLanguages": "Todos los Idiomas",
     "backToHome": "Volver a la página de inicio",
     "validationError": "Error de Validación",
-    "cancel": "Cancelar",
+    "cancel": "Eliminar",
     "delete": "Eliminar",
     "anonymous": "Anónimo"
   },
@@ -385,6 +385,28 @@
         "bioMaxLength": "La biografía no puede exceder los 300 caracteres",
         "notLoggedInTitle": "Error",
         "notLoggedInDescription": "Debes iniciar sesión para modificar tu perfil."
+      }
+    },
+    "social": {
+      "title": "Cuentas Sociales",
+      "addAccount": "Añadir Cuenta Social",
+      "noAccounts": "Aún no se han añadido cuentas sociales.",
+      "editAccountTitle": "Editar Cuenta Social",
+      "editAccountDescription": "Actualiza los detalles de tu cuenta social.",
+      "addAccountTitle": "Añadir Nueva Cuenta Social",
+      "addAccountDescription": "Añade enlaces a tus cuentas sociales para que otros usuarios puedan encontrarte.",
+      "website": "Sitio Web",
+      "other": "Otro",
+      "form": {
+        "platformLabel": "Plataforma",
+        "platformPlaceholder": "Selecciona una plataforma",
+        "urlLabel": "URL",
+        "urlPlaceholder": "https://...",
+        "invalidUrl": "URL inválida",
+        "platformRequired": "La plataforma es obligatoria",
+        "saving": "Guardando...",
+        "saveChanges": "Guardar Cambios",
+        "add": "Añadir"
       }
     }
   },

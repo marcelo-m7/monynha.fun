@@ -386,6 +386,28 @@
         "notLoggedInTitle": "Erro",
         "notLoggedInDescription": "Você precisa estar logado para editar seu perfil."
       }
+    },
+    "social": {
+      "title": "Contas Sociais",
+      "addAccount": "Adicionar Conta Social",
+      "noAccounts": "Nenhuma conta social adicionada ainda.",
+      "editAccountTitle": "Editar Conta Social",
+      "editAccountDescription": "Atualize os detalhes da sua conta social.",
+      "addAccountTitle": "Adicionar Nova Conta Social",
+      "addAccountDescription": "Adicione links para suas contas sociais para que outros usuários possam encontrá-lo.",
+      "website": "Website",
+      "other": "Outro",
+      "form": {
+        "platformLabel": "Plataforma",
+        "platformPlaceholder": "Selecione uma plataforma",
+        "urlLabel": "URL",
+        "urlPlaceholder": "https://...",
+        "invalidUrl": "URL inválida",
+        "platformRequired": "Plataforma é obrigatória",
+        "saving": "Salvando...",
+        "saveChanges": "Salvar Alterações",
+        "add": "Adicionar"
+      }
     }
   },
   "about": {
