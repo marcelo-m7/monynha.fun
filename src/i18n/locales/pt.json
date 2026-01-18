@@ -385,18 +385,78 @@
   },
   "about": {
     "title": "Sobre Nós",
-    "description": "Saiba mais sobre a missão e a visão da Monynha Fun."
+    "description": "Saiba mais sobre a missão e a visão da Monynha Fun.",
+    "missionTitle": "Nossa Missão",
+    "missionDescription": "Monynha Fun é uma plataforma de vídeo desenvolvida pela Monynha Softwares, criada para celebrar conteúdos atemporais e valiosos e promover a inclusão tecnológica. Nossa missão é democratizar o acesso a vídeos culturais e educacionais — curando conteúdos que elevam comunidades frequentemente ignoradas pelas plataformas mainstream.",
+    "founderTitle": "Sobre o Fundador",
+    "founderName": "Marcelo Santos",
+    "founderDescription": "Engenheiro de Software e fundador da Monynha Softwares. Apaixonado por open-source, automação e experiências digitais inclusivas.",
+    "valuesTitle": "Valores",
+    "value1": "Orgulho",
+    "value2": "Honestidade",
+    "value3": "Humildade",
+    "value4": "Resiliência",
+    "value5": "Acolhimento",
+    "philosophyTitle": "Filosofia",
+    "philosophyDescription": "Construído com acessibilidade, transparência e uma forte voz social. Inspirado pelo orgulho LGBTQIA+ e pelos movimentos de tecnologia aberta."
   },
   "rules": {
-    "title": "Regras da Comunidade",
-    "description": "Diretrizes para manter um ambiente positivo e produtivo."
+    "title": "Diretrizes da Plataforma",
+    "description": "Diretrizes para manter um ambiente positivo e produtivo.",
+    "rule1": "Respeite as identidades, culturas e origens dos outros.",
+    "rule2": "Sem discurso de ódio, assédio ou desinformação.",
+    "rule3": "Apenas links do YouTube são permitidos nas submissões.",
+    "rule4": "Os vídeos devem refletir valor genuíno: cultural, educacional, histórico ou artístico.",
+    "rule5": "A equipe de moderação pode remover conteúdo inadequado ou de baixa qualidade.",
+    "rule6": "Seja gentil. Este espaço foi feito para elevar — não para excluir.",
+    "rule7": "Monynha Fun é impulsionada por ideais de código aberto. O feedback da comunidade é bem-vindo."
   },
   "contact": {
-    "title": "Contato",
-    "description": "Entre em contato conosco para dúvidas, sugestões ou suporte."
+    "title": "Entre em Contato",
+    "description": "Entre em contato conosco para dúvidas, sugestões ou suporte.",
+    "form": {
+      "nameLabel": "Nome",
+      "namePlaceholder": "Seu nome",
+      "emailLabel": "Email",
+      "emailPlaceholder": "seu@email.com",
+      "subjectLabel": "Assunto",
+      "subjectPlaceholder": "Assunto da mensagem",
+      "messageLabel": "Mensagem",
+      "messagePlaceholder": "Sua mensagem...",
+      "sendButton": "Enviar Mensagem"
+    },
+    "directEmailLabel": "Email para Contato Direto",
+    "locationLabel": "Localização",
+    "locationValue": "Faro, Portugal",
+    "responseTimeLabel": "Tempo de Resposta",
+    "responseTimeValue": "Respondemos em 2-5 dias úteis.",
+    "feedbackTitle": "Feedback e Sugestões",
+    "feedbackDescription": "Estamos abertos a ouvir criadores, colaboradores e mentes curiosas.",
+    "successMessage": "Sua mensagem foi enviada com sucesso! Entraremos em contato em breve.",
+    "errorMessage": "Ocorreu um erro ao enviar sua mensagem. Por favor, tente novamente."
   },
   "faq": {
-    "title": "Perguntas Frequentes",
-    "description": "Encontre respostas para as perguntas mais comuns sobre a plataforma."
+    "title": "FAQ – Perguntas Frequentes",
+    "description": "Encontre respostas para as perguntas mais comuns sobre a plataforma.",
+    "q1": {
+      "question": "Posso fazer upload dos meus próprios vídeos?",
+      "answer": "Não diretamente. Você pode enviar links para vídeos do YouTube. Nosso sistema enriquece automaticamente os metadados e os torna públicos."
+    },
+    "q2": {
+      "question": "Existem restrições de conteúdo?",
+      "answer": "Sim. Focamos em vídeos com valor duradouro — educacional, artístico ou historicamente relevante. Conteúdo inadequado ou spam será filtrado."
+    },
+    "q3": {
+      "question": "Esta plataforma é open source?",
+      "answer": "Com certeza. Você pode acessar o código-fonte em GitHub.com/Monynha-Softwares/video-vault."
+    },
+    "q4": {
+      "question": "Posso contribuir?",
+      "answer": "Sim! Confira nosso repositório no GitHub, sugira recursos ou envie pull requests."
+    },
+    "q5": {
+      "question": "Quem administra a Monynha Fun?",
+      "answer": "É desenvolvida pela Monynha Softwares, um estúdio de tecnologia inclusivo fundado por Marcelo Santos, com o apoio da comunidade open-source."
+    }
   }
 }

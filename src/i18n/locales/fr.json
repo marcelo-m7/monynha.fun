@@ -383,20 +383,72 @@
       }
     }
   },
-  "about": {
-    "title": "À Propos de Nous",
-    "description": "En savoir plus sur la mission et la vision de Monynha Fun."
+  "aboutPage": {
+    "missionTitle": "Notre Mission",
+    "missionDescription": "Monynha Fun est une plateforme vidéo propulsée par Monynha Softwares, créée pour célébrer le contenu intemporel et précieux et promouvoir l'inclusion technologique. Notre mission est de démocratiser l'accès aux vidéos culturelles et éducatives — en curant du contenu qui élève les communautés souvent ignorées par les plateformes grand public.",
+    "founderTitle": "À Propos du Fondateur",
+    "founderName": "Marcelo Santos",
+    "founderDescription": "Ingénieur logiciel et fondateur de Monynha Softwares. Passionné par l'open-source, l'automatisation et les expériences numériques inclusives.",
+    "valuesTitle": "Valeurs",
+    "value1": "Fierté",
+    "value2": "Honnêteté",
+    "value3": "Humilité",
+    "value4": "Résilience",
+    "value5": "Accueil",
+    "philosophyTitle": "Philosophie",
+    "philosophyDescription": "Construit avec accessibilité, transparence et une forte voix sociale. Inspiré par la fierté LGBTQIA+ et les mouvements de technologie ouverte."
   },
-  "rules": {
-    "title": "Règles de la Communauté",
-    "description": "Lignes directrices pour maintenir un environnement positif et productif."
+  "rulesPage": {
+    "rule1": "Respectez les identités, les cultures et les origines des autres.",
+    "rule2": "Pas de discours de haine, de harcèlement ou de désinformation.",
+    "rule3": "Seuls les liens YouTube sont autorisés dans les soumissions.",
+    "rule4": "Les vidéos doivent refléter une valeur authentique : culturelle, éducative, historique ou artistique.",
+    "rule5": "L'équipe de modération peut supprimer le contenu inapproprié ou de faible qualité.",
+    "rule6": "Soyez bienveillant. Cet espace est fait pour élever — pas pour exclure.",
+    "rule7": "Monynha Fun est alimentée par des idéaux open-source. Les commentaires de la communauté sont les bienvenus."
   },
-  "contact": {
-    "title": "Contact",
-    "description": "Contactez-nous pour des questions, des suggestions ou du support."
+  "contactPage": {
+    "form": {
+      "nameLabel": "Nom",
+      "namePlaceholder": "Votre nom",
+      "emailLabel": "Email",
+      "emailPlaceholder": "votre@email.com",
+      "subjectLabel": "Sujet",
+      "subjectPlaceholder": "Sujet de votre message",
+      "messageLabel": "Message",
+      "messagePlaceholder": "Votre message...",
+      "sendButton": "Envoyer le Message"
+    },
+    "directEmailLabel": "Email pour Contact Direct",
+    "locationLabel": "Localisation",
+    "locationValue": "Faro, Portugal",
+    "responseTimeLabel": "Temps de Réponse",
+    "responseTimeValue": "Nous répondons sous 2 à 5 jours ouvrables.",
+    "feedbackTitle": "Commentaires et Suggestions",
+    "feedbackDescription": "Nous sommes ouverts aux créateurs, collaborateurs et esprits curieux.",
+    "successMessage": "Votre message a été envoyé avec succès ! Nous vous recontacterons sous peu.",
+    "errorMessage": "Une erreur est survenue lors de l'envoi de votre message. Veuillez réessayer."
   },
-  "faq": {
-    "title": "Foire Aux Questions",
-    "description": "Trouvez des réponses aux questions les plus courantes sur la plateforme."
+  "faqPage": {
+    "q1": {
+      "question": "Puis-je télécharger mes propres vidéos ?",
+      "answer": "Non directement. Vous pouvez soumettre des liens vers des vidéos YouTube. Notre système enrichit automatiquement les métadonnées et les rend publiques."
+    },
+    "q2": {
+      "question": "Y a-t-il des restrictions de contenu ?",
+      "answer": "Oui. Nous nous concentrons sur les vidéos ayant une valeur durable — éducative, artistique ou historiquement pertinente. Le contenu inapproprié ou spam sera filtré."
+    },
+    "q3": {
+      "question": "Cette plateforme est-elle open source ?",
+      "answer": "Absolument. Vous pouvez accéder au code source sur GitHub.com/Monynha-Softwares/video-vault."
+    },
+    "q4": {
+      "question": "Puis-je contribuer ?",
+      "answer": "Oui ! Consultez notre dépôt GitHub, suggérez des fonctionnalités ou soumettez des pull requests."
+    },
+    "q5": {
+      "question": "Qui gère Monynha Fun ?",
+      "answer": "Elle est développée par Monynha Softwares, un studio de technologie inclusif fondé par Marcelo Santos, avec le soutien de la communauté open-source."
+    }
   }
 }
