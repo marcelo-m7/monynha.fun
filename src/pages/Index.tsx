@@ -32,6 +32,59 @@ const Index = () => {
         {/* Categories Section */}
         <CategorySection />
 
+        {/* Recent Videos Section */}
+        <section className="py-16 bg-muted/30"> {/* Changed background to differentiate */}
+          <div className="container">
+            <div className="flex items-center justify-between mb-8">
+              <div className="flex items-center gap-3">
+                <div className="p-2 rounded-xl bg-primary/10"> {/* Changed icon background to primary */}
+                  <Clock className="w-5 h-5 text-primary" /> {/* Changed icon color to primary */}
+                </div>
+                <div>
+                  <h2 className="text-2xl md:text-3xl font-bold">{t('index.recentTitle')}</h2>
+                  <p className="text-muted-foreground mt-1">{t('index.recentDescription')}</p>
+                </div>
+              </div>
+              <Button 
+                variant="ghost" 
+                className="gap-2 group"
+                onClick={() => navigate('/videos?recent=true')}
+              >
+                {t('index.viewAll')}
+                <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
+              </Button>
+            </div>
+
+            {recentLoading ? (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                {Array.from({ length: 4 }).map((_, i) => (
+                  <div key={i} className="space-y-3">
+                    <Skeleton className="aspect-video rounded-2xl" />
+                    <Skeleton className="h-4 w-3/4" />
+                    <Skeleton className="h-3 w-1/2" />
+                  </div>
+                ))}
+              </div>
+            ) : recentVideos && recentVideos.length > 0 ? (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                {recentVideos.map((video, index) => (
+                  <div
+                    key={video.id}
+                    className="animate-fade-up"
+                    style={{ animationDelay: `${index * 0.1}s` }}
+                  >
+                    <VideoCard video={video} variant="default" />
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="text-center py-12 text-muted-foreground">
+                {t('index.noRecentVideos')}
+              </div>
+            )}
+          </div>
+        </section>
+
         {/* Featured Videos Section */}
         <section className="py-16 bg-muted/30">
           <div className="container">
@@ -144,59 +197,6 @@ const Index = () => {
                 <p className="text-lg font-medium mb-2">{t('index.noPlaylistsTitle')}</p>
                 <p className="mb-6">{t('index.noPlaylistsDescription')}</p>
                 <Button onClick={() => navigate('/playlists/new')}>{t('index.createFirstPlaylist')}</Button>
-              </div>
-            )}
-          </div>
-        </section>
-
-        {/* Recent Videos Section */}
-        <section className="py-16 bg-muted/30"> {/* Changed background to differentiate */}
-          <div className="container">
-            <div className="flex items-center justify-between mb-8">
-              <div className="flex items-center gap-3">
-                <div className="p-2 rounded-xl bg-primary/10"> {/* Changed icon background to primary */}
-                  <Clock className="w-5 h-5 text-primary" /> {/* Changed icon color to primary */}
-                </div>
-                <div>
-                  <h2 className="text-2xl md:text-3xl font-bold">{t('index.recentTitle')}</h2>
-                  <p className="text-muted-foreground mt-1">{t('index.recentDescription')}</p>
-                </div>
-              </div>
-              <Button 
-                variant="ghost" 
-                className="gap-2 group"
-                onClick={() => navigate('/videos?recent=true')}
-              >
-                {t('index.viewAll')}
-                <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
-              </Button>
-            </div>
-
-            {recentLoading ? (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                {Array.from({ length: 4 }).map((_, i) => (
-                  <div key={i} className="space-y-3">
-                    <Skeleton className="aspect-video rounded-2xl" />
-                    <Skeleton className="h-4 w-3/4" />
-                    <Skeleton className="h-3 w-1/2" />
-                  </div>
-                ))}
-              </div>
-            ) : recentVideos && recentVideos.length > 0 ? (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                {recentVideos.map((video, index) => (
-                  <div
-                    key={video.id}
-                    className="animate-fade-up"
-                    style={{ animationDelay: `${index * 0.1}s` }}
-                  >
-                    <VideoCard video={video} variant="default" />
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <div className="text-center py-12 text-muted-foreground">
-                {t('index.noRecentVideos')}
               </div>
             )}
           </div>
