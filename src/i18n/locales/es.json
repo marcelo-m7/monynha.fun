@@ -240,6 +240,7 @@
         "urlPlaceholder": "https://www.youtube.com/playlist?list=...",
         "nameLabel": "Nombre de la Lista de Reproducción",
         "namePlaceholder": "Nombre para tu nueva lista de reproducción",
+        "defaultPlaylistName": "Lista de Reproducción Importada do YouTube",
         "modeLabel": "Modo de Importación",
         "minimalMode": "Importación Mínima",
         "minimalModeHint": "Crea una lista de reproducción con la URL y una descripción predeterminada. No se importarán videos.",
@@ -272,7 +273,8 @@
       },
       "warning": {
         "videoMetadataFailed": "No se pudieron obtener los metadatos del video. Se añadirá con información básica.",
-        "noVideoInUrl": "No se encontró un ID de video único en la URL proporcionada para la importación mejorada."
+        "noVideoInUrl": "No se encontró un ID de video único en la URL proporcionada para la importación mejorada.",
+        "noVideoInUrlForEnhanced": "Nenhum ID de vídeo único encontrado na URL fornecida para importação aprimorada. Apenas o modo minimalista é possível."
       },
       "apiLimitationInfo": "Debido a las restricciones de la API de YouTube y las políticas de seguridad del navegador (CORS), Monynha Fun no puede obtener de forma fiable una lista completa de videos de una URL de lista de reproducción de YouTube directamente desde tu navegador. Para una importación completa, se requeriría un servicio de backend."
     }

@@ -29,7 +29,7 @@ interface PlaylistImportDialogProps {
 
 const importSchema = z.object({
   playlistUrl: z.string().url('playlists.import.error.invalidUrl').refine(
-    (url) => url.includes('youtube.com/playlist') || url.includes('youtube.com/watch') && url.includes('list='),
+    (url) => url.includes('youtube.com/playlist') || (url.includes('youtube.com/watch') && url.includes('list=')),
     'playlists.import.error.notYoutubePlaylistUrl'
   ),
   importMode: z.enum(['minimal', 'enhanced']),
@@ -63,7 +63,12 @@ export const PlaylistImportDialog: React.FC<PlaylistImportDialogProps> = ({ chil
 
   const playlistUrl = watch('playlistUrl');
   const importMode = watch('importMode');
-  const { metadata: videoMetadata, isLoading: videoMetadataLoading, error: videoMetadataError } = useYouTubeMetadata(playlistUrl);
+
+  // Only fetch video metadata if a video ID is present in the URL (for enhanced mode)
+  const extractedVideoId = extractYouTubeId(playlistUrl);
+  const { metadata: videoMetadata, isLoading: videoMetadataLoading, error: videoMetadataError } = useYouTubeMetadata(
+    importMode === 'enhanced' && extractedVideoId ? playlistUrl : ''
+  );
 
   useEffect(() => {
     if (!open) {
@@ -72,10 +77,14 @@ export const PlaylistImportDialog: React.FC<PlaylistImportDialogProps> = ({ chil
   }, [open, reset]);
 
   useEffect(() => {
+    // Pre-fill playlist name if video metadata is available and name is empty
     if (videoMetadata && !watch('playlistName')) {
       setValue('playlistName', videoMetadata.title);
+    } else if (!videoMetadata && !watch('playlistName') && playlistUrl.includes('youtube.com/playlist')) {
+      // If it's a pure playlist URL and no video metadata, provide a generic name
+      setValue('playlistName', t('playlists.import.defaultPlaylistName'));
     }
-  }, [videoMetadata, setValue, watch]);
+  }, [videoMetadata, setValue, watch, playlistUrl, t]);
 
   const onSubmit = async (values: ImportFormValues) => {
     if (!user) {
@@ -105,45 +114,38 @@ export const PlaylistImportDialog: React.FC<PlaylistImportDialogProps> = ({ chil
 
       // 2. Handle video import based on mode
       if (values.importMode === 'enhanced') {
-        const extractedVideoId = extractYouTubeId(values.playlistUrl);
-        if (extractedVideoId) {
+        if (extractedVideoId && videoMetadata) {
           toast.info(t('playlists.import.info.enhancedModeLimited'));
           
-          // Try to get metadata for the single video
-          const videoMeta = videoMetadata; // Already fetched by useYouTubeMetadata hook
-          
-          if (videoMeta) {
-            const existingVideo = await findVideoByYoutubeId(videoMeta.videoId);
-            let videoToAddToPlaylist;
+          const existingVideo = await findVideoByYoutubeId(videoMetadata.videoId);
+          let videoToAddToPlaylist;
 
-            if (existingVideo) {
-              videoToAddToPlaylist = existingVideo;
-              toast.info(t('playlists.import.info.videoAlreadyExists', { title: videoMeta.title }));
-            } else {
-              // Create video if it doesn't exist
-              videoToAddToPlaylist = await createVideo({
-                youtube_id: videoMeta.videoId,
-                title: videoMeta.title,
-                description: videoMeta.description || null,
-                channel_name: videoMeta.channelName,
-                thumbnail_url: getYouTubeThumbnail(videoMeta.videoId, 'max'),
-                language: 'pt', // Default language
-                submitted_by: user.id,
-              });
-              toast.success(t('playlists.import.success.videoAdded', { title: videoMeta.title }));
-            }
-
-            // Add the video to the new playlist
-            await addVideoMutation.mutateAsync({
-              playlistId: newPlaylist.id,
-              videoId: videoToAddToPlaylist.id,
-            });
-            toast.success(t('playlists.import.success.videoAddedToPlaylist', { title: videoMeta.title, playlistName: newPlaylist.name }));
+          if (existingVideo) {
+            videoToAddToPlaylist = existingVideo;
+            toast.info(t('playlists.import.info.videoAlreadyExists', { title: videoMetadata.title }));
           } else {
-            toast.warn(t('playlists.import.warning.videoMetadataFailed'));
+            // Create video if it doesn't exist
+            videoToAddToPlaylist = await createVideo({
+              youtube_id: videoMetadata.videoId,
+              title: videoMetadata.title,
+              description: videoMetadata.description || null,
+              channel_name: videoMetadata.channelName,
+              thumbnail_url: getYouTubeThumbnail(videoMetadata.videoId, 'max'),
+              language: 'pt', // Default language
+              submitted_by: user.id,
+            });
+            toast.success(t('playlists.import.success.videoAdded', { title: videoMetadata.title }));
           }
+
+          // Add the video to the new playlist
+          await addVideoMutation.mutateAsync({
+            playlistId: newPlaylist.id,
+            videoId: videoToAddToPlaylist.id,
+          });
+          toast.success(t('playlists.import.success.videoAddedToPlaylist', { title: videoToAddToPlaylist.title, playlistName: newPlaylist.name }));
         } else {
-          toast.warn(t('playlists.import.warning.noVideoInUrl'));
+          toast.warn(t('playlists.import.warning.noVideoInUrlForEnhanced'));
+          toast.info(t('playlists.import.info.minimalMode')); // Fallback to minimal mode message
         }
       } else {
         toast.info(t('playlists.import.info.minimalMode'));
@@ -155,6 +157,8 @@ export const PlaylistImportDialog: React.FC<PlaylistImportDialogProps> = ({ chil
       toast.error(t('playlists.import.error.generic'));
     }
   };
+
+  const showVideoMetadataFeedback = importMode === 'enhanced' && playlistUrl.trim() !== '';
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -184,20 +188,20 @@ export const PlaylistImportDialog: React.FC<PlaylistImportDialogProps> = ({ chil
                 className="pl-10"
                 aria-invalid={errors.playlistUrl ? "true" : "false"}
               />
-              {videoMetadataLoading && (
+              {showVideoMetadataFeedback && videoMetadataLoading && (
                 <Loader2 className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 animate-spin text-muted-foreground" />
               )}
-              {videoMetadata && !videoMetadataError && !videoMetadataLoading && (
+              {showVideoMetadataFeedback && videoMetadata && !videoMetadataError && !videoMetadataLoading && (
                 <CheckCircle className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-green-500" />
               )}
-              {(videoMetadataError || errors.playlistUrl) && !videoMetadataLoading && (
+              {showVideoMetadataFeedback && videoMetadataError && !videoMetadataLoading && (
                 <AlertCircle className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-destructive" />
               )}
             </div>
             {errors.playlistUrl && (
               <p role="alert" className="text-sm text-destructive">{t(errors.playlistUrl.message as string)}</p>
             )}
-            {videoMetadataError && !errors.playlistUrl && (
+            {showVideoMetadataFeedback && videoMetadataError && !errors.playlistUrl && (
               <p className="text-sm text-destructive">{videoMetadataError}</p>
             )}
           </div>
@@ -247,9 +251,9 @@ export const PlaylistImportDialog: React.FC<PlaylistImportDialogProps> = ({ chil
             type="submit"
             className="w-full"
             size="lg"
-            disabled={isSubmitting || createPlaylistMutation.isPending || addVideoMutation.isPending || videoMetadataLoading || !!videoMetadataError}
+            disabled={isSubmitting || createPlaylistMutation.isPending || addVideoMutation.isPending || (importMode === 'enhanced' && videoMetadataLoading) || !!errors.playlistUrl}
           >
-            {isSubmitting || createPlaylistMutation.isPending || addVideoMutation.isPending ? (
+            {isSubmitting || createPlaylistMutation.isPending || addVideoMutation.isPending || (importMode === 'enhanced' && videoMetadataLoading) ? (
               <>
                 <Loader2 className="w-4 h-4 mr-2 animate-spin" />
                 {t('playlists.import.form.importingButton')}

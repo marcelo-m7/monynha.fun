@@ -240,6 +240,7 @@
         "urlPlaceholder": "https://www.youtube.com/playlist?list=...",
         "nameLabel": "Nome da Playlist",
         "namePlaceholder": "Nome para sua nova playlist",
+        "defaultPlaylistName": "Playlist Importada do YouTube",
         "modeLabel": "Modo de Importação",
         "minimalMode": "Importação Mínima",
         "minimalModeHint": "Cria uma playlist com a URL e uma descrição padrão. Nenhum vídeo será importado.",
@@ -272,7 +273,8 @@
       },
       "warning": {
         "videoMetadataFailed": "Falha ao buscar metadados para o vídeo. Ele será adicionado com informações básicas.",
-        "noVideoInUrl": "Nenhum ID de vídeo único encontrado na URL fornecida para importação aprimorada."
+        "noVideoInUrl": "Nenhum ID de vídeo único encontrado na URL fornecida para importação aprimorada.",
+        "noVideoInUrlForEnhanced": "Nenhum ID de vídeo único encontrado na URL fornecida para importação aprimorada. Apenas o modo minimalista é possível."
       },
       "apiLimitationInfo": "Devido às restrições da API do YouTube e às políticas de segurança do navegador (CORS), o Monynha Fun não pode buscar de forma confiável uma lista completa de vídeos de uma URL de playlist do YouTube diretamente do seu navegador. Para uma importação completa, um serviço de backend seria necessário."
     }
@@ -429,7 +431,7 @@
         "invalidAvatarUrl": "URL do avatar inválida",
         "bioMaxLength": "Bio não pode exceder 300 caracteres",
         "notLoggedInTitle": "Erro",
-        "notLoggedInDescription": "Você precisa estar logado para editar seu perfil."
+      "notLoggedInDescription": "Você precisa estar logado para editar seu perfil."
       }
     },
     "social": {
