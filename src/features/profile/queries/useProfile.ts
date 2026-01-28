@@ -1,7 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import { useAuth } from '@/features/auth/useAuth';
-import { getContributorCount, getProfileById, getProfileByUsername, updateProfile } from '@/entities/profile/profile.api';
+import { getContributorCount, getProfileById, getProfileByUsername, updateProfile, listProfiles } from '@/entities/profile/profile.api';
 import { profileKeys } from '@/entities/profile/profile.keys';
 import type { Profile } from '@/entities/profile/profile.types';
 
@@ -53,5 +53,12 @@ export function useContributorCount() {
   return useQuery<number, Error>({
     queryKey: profileKeys.contributorCount(),
     queryFn: () => getContributorCount(),
+  });
+}
+
+export function useProfiles() {
+  return useQuery<Profile[], Error>({
+    queryKey: profileKeys.list(),
+    queryFn: () => listProfiles(),
   });
 }

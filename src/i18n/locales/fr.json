@@ -209,7 +209,12 @@
     "title": "Comunidad",
     "description": "Connectez-vous avec d'autres curateurs et passionnés de vidéo.",
     "totalContributors": "Total des Contributeurs",
-    "contributorsCount": "{{count}} usuarios"
+    "contributorsCount": "{{count}} usuarios",
+    "allUsers": "Tous les Utilisateurs",
+    "submissionsCount": "{{count}} soumissions",
+    "loadUsersError": "Échec du chargement des utilisateurs de la communauté. Veuillez réessayer plus tard.",
+    "noUsersFoundTitle": "Aucun utilisateur trouvé.",
+    "noUsersFoundDescription": "Il semble qu'il n'y ait pas encore d'utilisateurs dans la communauté. Soyez le premier à nous rejoindre !"
   },
   "playlists": {
     "title": "Listas de Reproducción",
@@ -529,15 +534,15 @@
       "answer": "Sí. Nos centramos en videos con valor duradero — educativo, artístico o históricamente relevante. Contenido inapropiado o spam será filtrado."
     },
     "q3": {
-      "question": "Esta plataforma é open source?",
+      "question": "Esta plataforma es de código abierto?",
       "answer": "Absolutamente. Puedes acceder al código fuente en GitHub.com/Monynha-Softwares/video-vault."
     },
     "q4": {
       "question": "Posso contribuir?",
-      "answer": "¡Sí! Revisa nuestro repositorio de GitHub, sugiere características o envía pull requests."
+      "answer": "¡Sí! Revisa nuestro repositorio de GitHub, sugiere características o envía solicitudes de extracción."
     },
     "q5": {
-      "question": "¿Quem administra a Monynha Fun?",
+      "question": "¿Quién administra la Monynha Fun?",
       "answer": "Es desarrollada por Monynha Softwares, un estudio de tecnología inclusivo fundado por Marcelo Santos, con el apoyo de la comunidad open-source."
     }
   },

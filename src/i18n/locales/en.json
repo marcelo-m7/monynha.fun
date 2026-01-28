@@ -209,7 +209,12 @@
     "title": "Community",
     "description": "Connect with other curators and video enthusiasts.",
     "totalContributors": "Total Contributors",
-    "contributorsCount": "{{count}} users"
+    "contributorsCount": "{{count}} users",
+    "allUsers": "All Users",
+    "submissionsCount": "{{count}} submissions",
+    "loadUsersError": "Failed to load community users. Please try again later.",
+    "noUsersFoundTitle": "No users found.",
+    "noUsersFoundDescription": "It looks like there are no users in the community yet. Be the first to join!"
   },
   "playlists": {
     "title": "Playlists",

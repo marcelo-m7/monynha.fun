@@ -209,7 +209,12 @@
     "title": "Comunidad",
     "description": "Conéctate con otros curadores y entusiastas de videos.",
     "totalContributors": "Total de Contribuidores",
-    "contributorsCount": "{{count}} usuarios"
+    "contributorsCount": "{{count}} usuarios",
+    "allUsers": "Todos los Usuarios",
+    "submissionsCount": "{{count}} envíos",
+    "loadUsersError": "Error al cargar usuarios de la comunidad. Por favor, inténtalo de nuevo más tarde.",
+    "noUsersFoundTitle": "No se encontraron usuarios.",
+    "noUsersFoundDescription": "Parece que aún no hay usuarios en la comunidad. ¡Sé el primero en unirte!"
   },
   "playlists": {
     "title": "Listas de Reproducción",

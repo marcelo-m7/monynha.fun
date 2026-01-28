@@ -21,12 +21,12 @@ export async function getProfileByUsername(username: string) {
 export async function findProfileByUsername(username: string) {
   const { data, error } = await supabase
     .from('profiles')
-    .select('id, username, avatar_path')
+    .select('id, username, display_name, avatar_url, avatar_path') // Added display_name and avatar_url
     .eq('username', username)
     .maybeSingle();
 
   if (error) throw error;
-  return data as Pick<Profile, 'id' | 'username' | 'avatar_path'> | null;
+  return data as Pick<Profile, 'id' | 'username' | 'display_name' | 'avatar_url' | 'avatar_path'> | null;
 }
 
 export async function updateProfile(userId: string, updates: ProfileUpdate) {
@@ -45,4 +45,15 @@ export async function getContributorCount() {
   const { count, error } = await supabase.from('profiles').select('id', { count: 'exact', head: true });
   if (error) throw error;
   return count || 0;
+}
+
+export async function listProfiles() {
+  const { data, error } = await supabase
+    .from('profiles')
+    .select('id, username, display_name, avatar_url, submissions_count')
+    .order('submissions_count', { ascending: false }) // Order by submissions count
+    .order('username', { ascending: true }); // Then by username
+
+  if (error) throw error;
+  return data as Profile[];
 }
