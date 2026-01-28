@@ -33,7 +33,7 @@ export const CategorySection = () => {
         {categoriesLoading ? (
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-8 xl:grid-cols-9 gap-3"> {/* Denser grid */}
             {Array.from({ length: 9 }).map((_, i) => (
-              <Skeleton key={i} className="h-28 rounded-2xl" /> {/* Smaller skeleton height */}
+              <Skeleton key={i} className="h-28 rounded-2xl" /> /* Smaller skeleton height */
             ))}
           </div>
         ) : (
