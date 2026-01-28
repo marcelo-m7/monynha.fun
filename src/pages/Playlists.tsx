@@ -4,13 +4,14 @@ import { usePlaylists } from '@/features/playlists/queries/usePlaylists';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { Plus, ListVideo, Search, Filter } from 'lucide-react';
+import { Plus, ListVideo, Search, Filter, Youtube } from 'lucide-react'; // Import Youtube icon
 import { Skeleton } from '@/components/ui/skeleton';
 import { Input } from '@/components/ui/input';
 import { useState } from 'react';
-import { PlaylistCard } from '@/components/playlist/PlaylistCard'; // Import the new PlaylistCard
+import { PlaylistCard } from '@/components/playlist/PlaylistCard';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useAuth } from '@/features/auth/useAuth';
+import { PlaylistImportDialog } from '@/components/playlist/PlaylistImportDialog'; // Import PlaylistImportDialog
 
 const Playlists = () => {
   const { t } = useTranslation();
@@ -100,6 +101,12 @@ const Playlists = () => {
                 )}
               </SelectContent>
             </Select>
+            <PlaylistImportDialog>
+              <Button variant="outline" className="gap-2 w-full sm:w-auto">
+                <Youtube className="w-4 h-4" />
+                {t('playlists.import.button')}
+              </Button>
+            </PlaylistImportDialog>
             <Button onClick={() => navigate('/playlists/new')} className="gap-2 w-full sm:w-auto">
               <Plus className="w-4 h-4" />
               {t('playlists.createPlaylist')}

@@ -230,6 +230,51 @@
       "all": "Todas las Listas",
       "myPlaylists": "Mis Listas",
       "collaborating": "Colaborando"
+    },
+    "import": {
+      "button": "Importar de YouTube",
+      "title": "Importar Lista de Reproducción de YouTube",
+      "description": "Pega una URL de una lista de reproducción de YouTube para importarla como una nueva lista de reproducción.",
+      "form": {
+        "urlLabel": "URL de la Lista de Reproducción de YouTube",
+        "urlPlaceholder": "https://www.youtube.com/playlist?list=...",
+        "nameLabel": "Nombre de la Lista de Reproducción",
+        "namePlaceholder": "Nombre para tu nueva lista de reproducción",
+        "modeLabel": "Modo de Importación",
+        "minimalMode": "Importación Mínima",
+        "minimalModeHint": "Crea una lista de reproducción con la URL y una descripción predeterminada. No se importarán videos.",
+        "enhancedMode": "Importación Mejorada (Mejor Esfuerzo)",
+        "enhancedModeHint": "Intenta importar el primer video de la URL de la lista de reproducción si está disponible. ",
+        "enhancedModeWarning": "La enumeración completa de videos de la lista de reproducción no es posible sin la API de datos de YouTube o un servicio de backend debido a restricciones de seguridad del navegador.",
+        "importButton": "Importar Lista de Reproducción",
+        "importingButton": "Importando..."
+      },
+      "error": {
+        "invalidUrl": "Por favor, introduce una URL de lista de reproducción de YouTube válida.",
+        "notYoutubePlaylistUrl": "Solo se aceptan URLs de listas de reproducción de YouTube.",
+        "nameMinLength": "El nombre de la lista de reproducción debe tener al menos 3 caracteres.",
+        "nameMaxLength": "El nombre de la lista de reproducción no puede exceder los 100 caracteres.",
+        "notLoggedIn": "Debes iniciar sesión para importar listas de reproducción.",
+        "noPlaylistId": "No se pudo extraer un ID de lista de reproducción de la URL proporcionada.",
+        "generic": "Ocurrió un error durante la importación de la lista de reproducción. Por favor, inténtalo de nuevo."
+      },
+      "success": {
+        "playlistCreated": "¡Lista de reproducción '{{name}}' creada con éxito!",
+        "videoAdded": "Video '{{title}}' añadido a Monynha Fun.",
+        "videoAddedToPlaylist": "Video '{{title}}' añadido a la lista de reproducción '{{playlistName}}'.",
+        "aiEnrichmentStarted": "Enriquecimiento de IA iniciado para el video importado."
+      },
+      "info": {
+        "minimalMode": "Lista de reproducción creada en modo mínimo. No se importaron videos.",
+        "enhancedModeLimited": "El modo mejorado es limitado. Intentando importar el primer video de la URL.",
+        "videoAlreadyExists": "El video '{{title}}' ya existe en Monynha Fun. Se omite la creación.",
+        "aiEnrichmentStarted": "Enriquecimiento de IA iniciado para el video importado."
+      },
+      "warning": {
+        "videoMetadataFailed": "No se pudieron obtener los metadatos del video. Se añadirá con información básica.",
+        "noVideoInUrl": "No se encontró un ID de video único en la URL proporcionada para la importación mejorada."
+      },
+      "apiLimitationInfo": "Debido a las restricciones de la API de YouTube y las políticas de seguridad del navegador (CORS), Monynha Fun no puede obtener de forma fiable una lista completa de videos de una URL de lista de reproducción de YouTube directamente desde tu navegador. Para una importación completa, se requeriría un servicio de backend."
     }
   },
   "playlistDetails": {

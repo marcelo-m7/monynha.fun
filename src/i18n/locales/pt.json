@@ -230,6 +230,51 @@
       "all": "Todas as Playlists",
       "myPlaylists": "Minhas Playlists",
       "collaborating": "Colaborando"
+    },
+    "import": {
+      "button": "Importar do YouTube",
+      "title": "Importar Playlist do YouTube",
+      "description": "Cole uma URL de uma playlist do YouTube para importá-la como uma nova playlist.",
+      "form": {
+        "urlLabel": "URL da Playlist do YouTube",
+        "urlPlaceholder": "https://www.youtube.com/playlist?list=...",
+        "nameLabel": "Nome da Playlist",
+        "namePlaceholder": "Nome para sua nova playlist",
+        "modeLabel": "Modo de Importação",
+        "minimalMode": "Importação Mínima",
+        "minimalModeHint": "Cria uma playlist com a URL e uma descrição padrão. Nenhum vídeo será importado.",
+        "enhancedMode": "Importação Aprimorada (Melhor Esforço)",
+        "enhancedModeHint": "Tenta importar o primeiro vídeo da URL da playlist, se disponível. ",
+        "enhancedModeWarning": "A enumeração completa de vídeos da playlist não é possível sem a API de Dados do YouTube ou um serviço de backend devido a restrições de segurança do navegador.",
+        "importButton": "Importar Playlist",
+        "importingButton": "Importando..."
+      },
+      "error": {
+        "invalidUrl": "Por favor, insira uma URL de playlist do YouTube válida.",
+        "notYoutubePlaylistUrl": "Apenas URLs de playlists do YouTube são aceitas.",
+        "nameMinLength": "Nome da playlist deve ter pelo menos 3 caracteres.",
+        "nameMaxLength": "Nome da playlist não pode exceder 100 caracteres.",
+        "notLoggedIn": "Você precisa estar logado para importar playlists.",
+        "noPlaylistId": "Não foi possível extrair um ID de playlist da URL fornecida.",
+        "generic": "Ocorreu um erro durante a importação da playlist. Por favor, tente novamente."
+      },
+      "success": {
+        "playlistCreated": "Playlist '{{name}}' criada com sucesso!",
+        "videoAdded": "Vídeo '{{title}}' adicionado ao Monynha Fun.",
+        "videoAddedToPlaylist": "Vídeo '{{title}}' adicionado à playlist '{{playlistName}}'.",
+        "aiEnrichmentStarted": "Enriquecimento de IA iniciado para o vídeo importado."
+      },
+      "info": {
+        "minimalMode": "Playlist criada no modo mínimo. Nenhum vídeo foi importado.",
+        "enhancedModeLimited": "O modo aprimorado é limitado. Tentando importar o primeiro vídeo da URL.",
+        "videoAlreadyExists": "Vídeo '{{title}}' já existe no Monynha Fun. Ignorando criação.",
+        "aiEnrichmentStarted": "Enriquecimento de IA iniciado para o vídeo importado."
+      },
+      "warning": {
+        "videoMetadataFailed": "Falha ao buscar metadados para o vídeo. Ele será adicionado com informações básicas.",
+        "noVideoInUrl": "Nenhum ID de vídeo único encontrado na URL fornecida para importação aprimorada."
+      },
+      "apiLimitationInfo": "Devido às restrições da API do YouTube e às políticas de segurança do navegador (CORS), o Monynha Fun não pode buscar de forma confiável uma lista completa de vídeos de uma URL de playlist do YouTube diretamente do seu navegador. Para uma importação completa, um serviço de backend seria necessário."
     }
   },
   "playlistDetails": {

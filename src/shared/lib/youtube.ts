@@ -15,6 +15,12 @@ export function extractYouTubeId(url: string): string | null {
   return null;
 }
 
+export function extractYouTubePlaylistId(url: string): string | null {
+  const urlObj = new URL(url);
+  const listId = urlObj.searchParams.get('list');
+  return listId;
+}
+
 export function getYouTubeThumbnail(videoId: string, quality: 'default' | 'medium' | 'high' | 'max' = 'max'): string {
   const qualityMap = {
     default: 'default',

@@ -230,6 +230,50 @@
       "all": "All Playlists",
       "myPlaylists": "My Playlists",
       "collaborating": "Collaborating"
+    },
+    "import": {
+      "button": "Import from YouTube",
+      "title": "Import YouTube Playlist",
+      "description": "Paste a YouTube playlist URL to import it as a new playlist.",
+      "form": {
+        "urlLabel": "YouTube Playlist URL",
+        "urlPlaceholder": "https://www.youtube.com/playlist?list=...",
+        "nameLabel": "Playlist Name",
+        "namePlaceholder": "Name for your new playlist",
+        "modeLabel": "Import Mode",
+        "minimalMode": "Minimal Import",
+        "minimalModeHint": "Creates a playlist with the URL and a default description. No videos will be imported.",
+        "enhancedMode": "Enhanced Import (Best-Effort)",
+        "enhancedModeHint": "Attempts to import the first video from the playlist URL if available. ",
+        "enhancedModeWarning": "Full playlist video enumeration is not possible without YouTube Data API or a backend service due to browser security restrictions.",
+        "importButton": "Import Playlist",
+        "importingButton": "Importing..."
+      },
+      "error": {
+        "invalidUrl": "Please enter a valid YouTube playlist URL.",
+        "notYoutubePlaylistUrl": "Only YouTube playlist URLs are accepted.",
+        "nameMinLength": "Playlist name must be at least 3 characters.",
+        "nameMaxLength": "Playlist name cannot exceed 100 characters.",
+        "notLoggedIn": "You need to be logged in to import playlists.",
+        "noPlaylistId": "Could not extract a playlist ID from the provided URL.",
+        "generic": "An error occurred during playlist import. Please try again."
+      },
+      "success": {
+        "playlistCreated": "Playlist '{{name}}' created successfully!",
+        "videoAdded": "Video '{{title}}' added to Monynha Fun.",
+        "videoAddedToPlaylist": "Video '{{title}}' added to playlist '{{playlistName}}'."
+      },
+      "info": {
+        "minimalMode": "Playlist created in minimal mode. No videos were imported.",
+        "enhancedModeLimited": "Enhanced mode is limited. Attempting to import the first video from the URL.",
+        "videoAlreadyExists": "Video '{{title}}' already exists in Monynha Fun. Skipping creation.",
+        "aiEnrichmentStarted": "AI enrichment started for imported video."
+      },
+      "warning": {
+        "videoMetadataFailed": "Failed to fetch metadata for the video. It will be added with basic info.",
+        "noVideoInUrl": "No single video ID found in the provided URL for enhanced import."
+      },
+      "apiLimitationInfo": "Due to YouTube API restrictions and browser security policies (CORS), Monynha Fun cannot reliably fetch a full list of videos from a YouTube playlist URL directly from your browser. For a complete import, a backend service would be required."
     }
   },
   "playlistDetails": {
