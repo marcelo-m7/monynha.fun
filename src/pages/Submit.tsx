@@ -114,21 +114,21 @@ export default function Submit() {
   return (
     <div className="min-h-screen bg-background flex flex-col">
       {/* Header */}
-      <header className="p-4 border-b border-border/50">
-        <div className="container flex items-center gap-4">
+      <header className="p-3 sm:p-4 border-b border-border/50">
+        <div className="container flex items-center gap-3 sm:gap-4">
           <Button 
             variant="ghost" 
             onClick={() => navigate('/')}
-            className="text-muted-foreground hover:text-foreground"
+            className="text-muted-foreground hover:text-foreground h-9 sm:h-10"
           >
             <ArrowLeft className="w-4 h-4 mr-2" />
             {t('common.back')}
           </Button>
-          <div className="flex items-center gap-2">
-            <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
-              <Play className="w-4 h-4 text-primary-foreground fill-current" />
+          <div className="flex items-center gap-1.5 sm:gap-2">
+            <div className="w-7 h-7 sm:w-8 sm:h-8 bg-primary rounded-lg flex items-center justify-center">
+              <Play className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-primary-foreground fill-current" />
             </div>
-            <span className="font-bold text-lg">
+            <span className="font-bold text-base sm:text-lg">
               Monynha<span className="text-primary">Fun</span>
             </span>
           </div>
@@ -136,30 +136,30 @@ export default function Submit() {
       </header>
 
       {/* Main Content */}
-      <main className="flex-1 py-8">
+      <main className="flex-1 py-6 sm:py-8 lg:py-10">
         <div className="container max-w-4xl">
-          <div className="text-center mb-8">
-            <h1 className="text-3xl font-bold">{t('submit.title')}</h1>
-            <p className="text-muted-foreground mt-2">
+          <div className="text-center mb-6 sm:mb-8">
+            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold">{t('submit.title')}</h1>
+            <p className="text-muted-foreground mt-2 text-sm sm:text-base">
               {t('submit.description')}
             </p>
           </div>
 
-          <div className="grid lg:grid-cols-2 gap-8">
+          <div className="grid lg:grid-cols-2 gap-6 sm:gap-8">
             {/* Form */}
-            <div className="bg-card border border-border rounded-2xl p-6 shadow-sm">
-              <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+            <div className="bg-card border border-border rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-sm">
+              <form onSubmit={handleSubmit(onSubmit)} className="space-y-5 sm:space-y-6">
                 {/* YouTube URL */}
-                <div className="space-y-2">
-                  <Label htmlFor="youtube-url">{t('submit.form.youtubeUrlLabel')} *</Label>
+                <div className="space-y-1.5 sm:space-y-2">
+                  <Label htmlFor="youtube-url" className="text-sm sm:text-base">{t('submit.form.youtubeUrlLabel')} *</Label>
                   <div className="relative">
-                    <LinkIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
+                    <LinkIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 sm:w-5 sm:h-5 text-muted-foreground pointer-events-none" />
                     <Input
                       id="youtube-url"
                       type="url"
                       placeholder={t('submit.form.youtubeUrlPlaceholder')}
                       {...register('youtubeUrl')}
-                      className="pl-10"
+                      className="pl-9 sm:pl-10 h-11 sm:h-10 text-base sm:text-sm"
                       aria-invalid={errors.youtubeUrl ? "true" : "false"}
                     />
                     {metadataLoading && (
@@ -173,16 +173,16 @@ export default function Submit() {
                     )}
                   </div>
                   {errors.youtubeUrl && (
-                    <p role="alert" className="text-sm text-destructive">{t(errors.youtubeUrl.message as string)}</p>
+                    <p role="alert" className="text-xs sm:text-sm text-destructive">{t(errors.youtubeUrl.message as string)}</p>
                   )}
                   {metadataError && !errors.youtubeUrl && (
-                    <p className="text-sm text-destructive">{metadataError}</p>
+                    <p className="text-xs sm:text-sm text-destructive">{metadataError}</p>
                   )}
                 </div>
 
                 {/* Description */}
-                <div className="space-y-2">
-                  <Label htmlFor="description">{t('submit.form.descriptionLabel')}</Label>
+                <div className="space-y-1.5 sm:space-y-2">
+                  <Label htmlFor="description" className="text-sm sm:text-base">{t('submit.form.descriptionLabel')}</Label>
                   <Textarea
                     id="description"
                     placeholder={t('submit.form.descriptionPlaceholder')}

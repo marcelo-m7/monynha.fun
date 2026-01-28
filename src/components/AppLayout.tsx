@@ -13,7 +13,7 @@ export const AppLayout = ({ children }: AppLayoutProps) => (
     <AppSidebar />
     <SidebarInset>
       <Header />
-      <div className="flex flex-1 flex-col">{children}</div>
+      <div className="flex flex-1 flex-col w-full overflow-x-hidden">{children}</div>
     </SidebarInset>
   </SidebarProvider>
 );

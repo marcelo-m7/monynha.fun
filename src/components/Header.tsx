@@ -29,23 +29,23 @@ export const Header = () => {
   };
 
   return (
-    <header className="sticky top-0 z-40 w-full border-b border-border/50 bg-background/80 backdrop-blur-xl">
-      <div className="flex h-16 items-center justify-between gap-4 px-4 sm:px-6">
-        <div className="flex items-center gap-3">
-          <SidebarTrigger variant="ghost" size="icon" className="h-9 w-9" />
-          <Link to="/" className="flex items-center gap-2 group">
-            <div className="relative flex h-9 w-9 items-center justify-center rounded-xl bg-primary text-primary-foreground shadow-md transition-transform group-hover:scale-105">
-              <span className="text-lg font-bold">M</span>
+    <header className="sticky top-0 z-40 w-full border-b border-border/50 bg-background/80 backdrop-blur-xl supports-[backdrop-filter]:bg-background/60">
+      <div className="flex h-14 sm:h-16 items-center justify-between gap-2 sm:gap-4 px-3 sm:px-4 lg:px-6">
+        <div className="flex items-center gap-2 sm:gap-3">
+          <SidebarTrigger variant="ghost" size="icon" className="h-10 w-10 sm:h-9 sm:w-9" />
+          <Link to="/" className="flex items-center gap-1.5 sm:gap-2 group">
+            <div className="relative flex h-8 w-8 sm:h-9 sm:w-9 items-center justify-center rounded-lg sm:rounded-xl bg-primary text-primary-foreground shadow-md transition-transform group-hover:scale-105">
+              <span className="text-base sm:text-lg font-bold">M</span>
             </div>
-            <span className="hidden font-bold text-xl tracking-tight sm:inline-block">
+            <span className="hidden font-bold text-lg sm:text-xl tracking-tight sm:inline-block">
               Monynha<span className="text-primary">Fun</span>
             </span>
           </Link>
         </div>
 
-        <Menubar className="border-0 bg-transparent p-0 shadow-none">
+        <Menubar className="border-0 bg-transparent p-0 shadow-none gap-1">
           <MenubarMenu>
-            <MenubarTrigger>{t("header.accountMenu")}</MenubarTrigger>
+            <MenubarTrigger className="text-sm sm:text-base px-2 sm:px-3 h-10">{t("header.accountMenu")}</MenubarTrigger>
             <MenubarContent align="end">
               {user && profile ? (
                 <>
@@ -97,7 +97,7 @@ export const Header = () => {
           </MenubarMenu>
 
           <MenubarMenu>
-            <MenubarTrigger>{t("header.createMenu")}</MenubarTrigger>
+            <MenubarTrigger className="text-sm sm:text-base px-2 sm:px-3 h-10">{t("header.createMenu")}</MenubarTrigger>
             <MenubarContent align="end">
               <MenubarItem onSelect={() => navigate("/submit")}>
                 <Plus className="mr-2 h-4 w-4" />

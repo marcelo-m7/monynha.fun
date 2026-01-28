@@ -24,13 +24,13 @@ export const FeaturedHero = ({ video }: FeaturedHeroProps) => {
   return (
     <article
       onClick={handleClick}
-      className="group cursor-pointer overflow-hidden rounded-3xl shadow-lg border border-border/50 bg-card transition-transform hover:scale-[1.01]"
+      className="group cursor-pointer overflow-hidden rounded-2xl sm:rounded-3xl shadow-lg border border-border/50 bg-card transition-transform hover:scale-[1.01]"
       aria-label={`Featured: ${video.title}`}
     >
       <div className="relative aspect-video">
         {/* Featured badge */}
-        <div className="absolute left-4 top-4 z-20">
-          <Badge variant="secondary" className="uppercase px-2 py-1 text-xs">
+        <div className="absolute left-3 sm:left-4 top-3 sm:top-4 z-20">
+          <Badge variant="secondary" className="uppercase px-1.5 sm:px-2 py-0.5 sm:py-1 text-[10px] sm:text-xs">
             {t('labels.featured')}
           </Badge>
         </div>
@@ -47,26 +47,26 @@ export const FeaturedHero = ({ video }: FeaturedHeroProps) => {
           }}
         />
 
-        <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex items-end p-6">
+        <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex items-end p-4 sm:p-6">
           <div className="w-full text-white">
-            <h3 className="text-2xl md:text-3xl font-bold line-clamp-2">{video.title}</h3>
-            <p className="mt-2 text-sm max-w-2xl line-clamp-2 text-white/90">{video.description}</p>
-            <div className="mt-4 flex items-center gap-4">
+            <h3 className="text-xl sm:text-2xl md:text-3xl font-bold line-clamp-2">{video.title}</h3>
+            <p className="mt-1.5 sm:mt-2 text-xs sm:text-sm max-w-2xl line-clamp-2 text-white/90">{video.description}</p>
+            <div className="mt-3 sm:mt-4 flex flex-wrap items-center gap-3 sm:gap-4">
               {video.duration_seconds && video.duration_seconds > 0 && (
-                <div className="flex items-center gap-2 text-sm text-white/90">
-                  <Play className="w-4 h-4" />
+                <div className="flex items-center gap-1.5 sm:gap-2 text-xs sm:text-sm text-white/90">
+                  <Play className="w-3 h-3 sm:w-4 sm:h-4" />
                   <span>{formatDuration(video.duration_seconds)}</span>
                 </div>
               )}
-              <div className="relative text-sm text-white/90">
+              <div className="relative text-xs sm:text-sm text-white/90">
                 <span className="font-semibold">{formatViewCount(viewCount)}</span>
                 {showPlus && (
-                  <span className="absolute -right-8 -top-1 text-sm text-green-300 font-semibold animate-pop">
+                  <span className="absolute -right-6 sm:-right-8 -top-1 text-xs sm:text-sm text-green-300 font-semibold animate-pop">
                     +1
                   </span>
                 )}
               </div>
-              <Button variant="ghost" className="ml-auto text-white/95 bg-white/5 hover:bg-white/10" onClick={(e) => { e.stopPropagation(); handleClick(); }}>
+              <Button variant="ghost" className="ml-auto text-white/95 bg-white/5 hover:bg-white/10 h-9 sm:h-10 text-sm" onClick={(e) => { e.stopPropagation(); handleClick(); }}>
                 Watch
               </Button>
             </div>

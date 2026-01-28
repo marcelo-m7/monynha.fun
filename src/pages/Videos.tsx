@@ -63,25 +63,25 @@ const Videos = () => {
 
   return (
     <AppLayout>
-      <div className="flex-1 container py-8">
-        <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold">{t('videos.title')}</h1>
-          <p className="text-muted-foreground mt-2">
+      <div className="flex-1 container py-6 sm:py-8 lg:py-10">
+        <div className="text-center mb-6 sm:mb-8">
+          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold">{t('videos.title')}</h1>
+          <p className="text-muted-foreground mt-2 text-sm sm:text-base">
             {t('videos.description')}
           </p>
         </div>
 
         {/* Search and Filter Controls */}
-        <div className="flex flex-col md:flex-row gap-4 mb-8">
+        <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 mb-6 sm:mb-8">
           <div className="relative flex-1">
-            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground pointer-events-none" />
             <Input
               type="search"
               placeholder={t('videos.searchPlaceholder')}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               disabled={isFeatured}
-              className="w-full pl-10 pr-4 h-10 bg-muted/50 border-0 focus-visible:ring-primary/30"
+              className="w-full pl-9 pr-4 h-11 sm:h-10 text-base sm:text-sm bg-muted/50 border-0 focus-visible:ring-primary/30"
             />
           </div>
 
@@ -90,7 +90,7 @@ const Videos = () => {
             onValueChange={(value) => setSelectedCategory(value === "all" ? "" : value)}
             disabled={isFeatured}
           >
-            <SelectTrigger className="w-full md:w-[200px] bg-muted/50 border-0 focus:ring-primary/30">
+            <SelectTrigger className="w-full sm:w-[180px] lg:w-[200px] h-11 sm:h-10 bg-muted/50 border-0 focus:ring-primary/30">
               <SelectValue placeholder={t('videos.allCategories')} />
             </SelectTrigger>
             <SelectContent>
@@ -112,7 +112,7 @@ const Videos = () => {
             onValueChange={(value) => setSelectedLanguage(value === "all" ? "" : value)}
             disabled={isFeatured}
           >
-            <SelectTrigger className="w-full md:w-[150px] bg-muted/50 border-0 focus:ring-primary/30">
+            <SelectTrigger className="w-full sm:w-[140px] lg:w-[160px] h-11 sm:h-10 bg-muted/50 border-0 focus:ring-primary/30">
               <SelectValue placeholder={t('videos.allLanguages')} />
             </SelectTrigger>
             <SelectContent>
@@ -126,7 +126,7 @@ const Videos = () => {
           </Select>
 
           {(searchQuery || selectedCategory || selectedLanguage) && (
-            <Button variant="outline" onClick={handleClearFilters} className="gap-2" disabled={isFeatured}>
+            <Button variant="outline" onClick={handleClearFilters} className="gap-2 h-11 sm:h-10 w-full sm:w-auto" disabled={isFeatured}>
               <X className="w-4 h-4" />
               {t('videos.clearFilters')}
             </Button>
@@ -136,7 +136,7 @@ const Videos = () => {
         {/* Video List */}
         {isFeatured ? (
           featuredLoading ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
               {Array.from({ length: 8 }).map((_, i) => (
                 <div key={i} className="space-y-3">
                   <Skeleton className="aspect-video rounded-2xl" />
@@ -146,7 +146,7 @@ const Videos = () => {
               ))}
             </div>
           ) : featuredVideos && featuredVideos.length > 0 ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
               {featuredVideos.map((video, index) => (
                 <div
                   key={video.id}
@@ -158,22 +158,22 @@ const Videos = () => {
               ))}
             </div>
           ) : (
-            <div className="text-center py-12 text-muted-foreground">
+            <div className="text-center py-8 sm:py-12 text-muted-foreground text-sm sm:text-base">
               {t('index.noFeaturedVideos')}
             </div>
           )
         ) : videosLoading ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
             {Array.from({ length: 8 }).map((_, i) => (
-              <div key={i} className="space-y-3">
-                <Skeleton className="aspect-video rounded-2xl" />
+              <div key={i} className="space-y-2 sm:space-y-3">
+                <Skeleton className="aspect-video rounded-xl sm:rounded-2xl" />
                 <Skeleton className="h-4 w-3/4" />
                 <Skeleton className="h-3 w-1/2" />
               </div>
             ))}
           </div>
         ) : videos && videos.length > 0 ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
             {videos.map((video, index) => (
               <div
                 key={video.id}
@@ -185,7 +185,7 @@ const Videos = () => {
             ))}
           </div>
         ) : (
-          <div className="text-center py-12 text-muted-foreground">
+          <div className="text-center py-8 sm:py-12 text-muted-foreground text-sm sm:text-base">
             {t('videos.noVideosFound')}
           </div>
         )}

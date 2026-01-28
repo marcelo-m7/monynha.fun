@@ -78,26 +78,26 @@ const Profile = () => {
 
   return (
     <AppLayout>
-      <div className="flex-1 container py-8">
+      <div className="flex-1 container py-6 sm:py-8 lg:py-10">
         <Button
           variant="ghost"
           onClick={() => navigate(-1)}
-          className="text-muted-foreground hover:text-foreground mb-6"
+          className="text-muted-foreground hover:text-foreground mb-4 sm:mb-6 h-9 sm:h-10"
         >
           <ArrowLeft className="w-4 h-4 mr-2" />
           {t('common.back')}
         </Button>
 
         {/* Profile Header */}
-        <div className="flex flex-col sm:flex-row items-center sm:items-start gap-6 mb-8 p-6 bg-card border border-border rounded-2xl shadow-sm">
-          <Avatar className="w-24 h-24 border-2 border-primary">
+        <div className="flex flex-col sm:flex-row items-center sm:items-start gap-4 sm:gap-6 mb-6 sm:mb-8 p-4 sm:p-6 bg-card border border-border rounded-xl sm:rounded-2xl shadow-sm">
+          <Avatar className="w-20 h-20 sm:w-24 sm:h-24 border-2 border-primary">
             <AvatarImage src={profile.avatar_url || undefined} alt={profile.display_name || profile.username || 'User'} />
-            <AvatarFallback className="bg-primary/20 text-primary text-3xl font-semibold">
-              {profile.display_name ? profile.display_name[0].toUpperCase() : (profile.username ? profile.username[0].toUpperCase() : <UserIcon className="w-12 h-12" />)}
+            <AvatarFallback className="bg-primary/20 text-primary text-2xl sm:text-3xl font-semibold">
+              {profile.display_name ? profile.display_name[0].toUpperCase() : (profile.username ? profile.username[0].toUpperCase() : <UserIcon className="w-10 h-10 sm:w-12 sm:h-12" />)}
             </AvatarFallback>
           </Avatar>
           <div className="text-center sm:text-left flex-1">
-            <h1 className="text-3xl font-bold">{profile.display_name || profile.username}</h1>
+            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold">{profile.display_name || profile.username}</h1>
             <p className="text-muted-foreground text-lg">@{profile.username}</p>
             <div className="flex items-center justify-center sm:justify-start gap-2 text-sm text-muted-foreground mt-2">
               <CalendarDays className="w-4 h-4" />
