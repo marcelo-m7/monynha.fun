@@ -31,13 +31,13 @@ export const CategorySection = () => {
         </div>
 
         {categoriesLoading ? (
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-7 gap-4">
-            {Array.from({ length: 7 }).map((_, i) => (
-              <Skeleton key={i} className="h-32 rounded-2xl" />
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-8 xl:grid-cols-9 gap-3"> {/* Denser grid */}
+            {Array.from({ length: 9 }).map((_, i) => (
+              <Skeleton key={i} className="h-28 rounded-2xl" /> {/* Smaller skeleton height */}
             ))}
           </div>
         ) : (
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-7 gap-4">
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-8 xl:grid-cols-9 gap-3"> {/* Denser grid */}
             {categories?.map((category, index) => (
               <div
                 key={category.id}
@@ -47,6 +47,7 @@ export const CategorySection = () => {
                 <CategoryCard
                   category={category}
                   onClick={() => navigate(`/videos?category=${category.id}`)}
+                  variant="compact" // Use the compact variant
                 />
               </div>
             ))}
