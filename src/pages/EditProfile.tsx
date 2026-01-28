@@ -7,10 +7,10 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { toast } from 'sonner';
-import { ArrowLeft, User, Loader2, Save } from 'lucide-react';
+import { ArrowLeft, Loader2, Save } from 'lucide-react';
 import { z } from 'zod';
 import { useTranslation } from 'react-i18next';
-import { Header } from '@/components/Header';
+import { AppLayout } from '@/components/AppLayout';
 import { Footer } from '@/components/Footer';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -87,17 +87,18 @@ export default function EditProfile() {
 
   if (authLoading || profileLoading) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <Loader2 className="w-8 h-8 animate-spin text-primary" />
-      </div>
+      <AppLayout>
+        <div className="flex-1 flex items-center justify-center">
+          <Loader2 className="w-8 h-8 animate-spin text-primary" />
+        </div>
+      </AppLayout>
     );
   }
 
   if (profileLoadError || !profile) {
     return (
-      <div className="min-h-screen flex flex-col">
-        <Header />
-        <main className="flex-1 container py-16 text-center">
+      <AppLayout>
+        <div className="flex-1 container py-16 text-center">
           <h1 className="text-3xl font-bold mb-4">{t('profile.edit.loadErrorTitle')}</h1>
           <p className="text-muted-foreground mb-8">
             {t('profile.edit.loadErrorDescription')}
@@ -106,38 +107,15 @@ export default function EditProfile() {
             <ArrowLeft className="w-4 h-4 mr-2" />
             {t('common.backToHome')}
           </Button>
-        </main>
+        </div>
         <Footer />
-      </div>
+      </AppLayout>
     );
   }
 
   return (
-    <div className="min-h-screen bg-background flex flex-col">
-      {/* Header */}
-      <header className="p-4 border-b border-border/50">
-        <div className="container flex items-center gap-4">
-          <Button
-            variant="ghost"
-            onClick={() => navigate(`/profile/${profile.username}`)}
-            className="text-muted-foreground hover:text-foreground"
-          >
-            <ArrowLeft className="w-4 h-4 mr-2" />
-            {t('common.back')}
-          </Button>
-          <div className="flex items-center gap-2">
-            <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
-              <User className="w-4 h-4 text-primary-foreground fill-current" />
-            </div>
-            <span className="font-bold text-lg">
-              Monynha<span className="text-primary">Fun</span>
-            </span>
-          </div>
-        </div>
-      </header>
-
-      {/* Main Content */}
-      <main className="flex-1 py-8">
+    <AppLayout>
+      <div className="flex-1 py-8">
         <div className="container max-w-4xl">
           <div className="text-center mb-8">
             <h1 className="text-3xl font-bold">{t('profile.edit.title')}</h1>
@@ -226,8 +204,8 @@ export default function EditProfile() {
             </form>
           </div>
         </div>
-      </main>
+      </div>
       <Footer />
-    </div>
+    </AppLayout>
   );
 }

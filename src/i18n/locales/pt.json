@@ -28,7 +28,13 @@
     "home": "Início",
     "toggleMenu": "Alternar menu",
     "closeMenu": "Fechar menu",
-    "languageLabel": "Idioma"
+    "languageLabel": "Idioma",
+    "accountMenu": "Conta",
+    "createMenu": "Criar",
+    "languageMenu": "Idioma",
+    "browseSection": "Explorar",
+    "communitySection": "Comunidade",
+    "legalSection": "Legal"
   },
   "footer": {
     "description": "Uma plataforma de curadoria coletiva de vídeos do YouTube. Preservando e descobrindo conteúdos valiosos juntos.",

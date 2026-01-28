@@ -28,7 +28,13 @@
     "home": "Accueil",
     "toggleMenu": "Basculer le menu",
     "closeMenu": "Fermer le menu",
-    "languageLabel": "Langue"
+    "languageLabel": "Langue",
+    "accountMenu": "Compte",
+    "createMenu": "Créer",
+    "languageMenu": "Langue",
+    "browseSection": "Explorer",
+    "communitySection": "Communauté",
+    "legalSection": "Juridique"
   },
   "footer": {
     "description": "Une plateforme de curation collective de vidéos YouTube. Préserver et découvrir du contenu précieux ensemble.",

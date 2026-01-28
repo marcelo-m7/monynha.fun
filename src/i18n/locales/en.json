@@ -28,7 +28,13 @@
     "home": "Home",
     "toggleMenu": "Toggle menu",
     "closeMenu": "Close menu",
-    "languageLabel": "Language"
+    "languageLabel": "Language",
+    "accountMenu": "Account",
+    "createMenu": "Create",
+    "languageMenu": "Language",
+    "browseSection": "Browse",
+    "communitySection": "Community",
+    "legalSection": "Legal"
   },
   "footer": {
     "description": "A collective curation platform for YouTube videos. Preserving and discovering valuable content together.",

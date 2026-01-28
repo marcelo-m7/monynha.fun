@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Header } from '@/components/Header';
+import { AppLayout } from '@/components/AppLayout';
 import { Footer } from '@/components/Footer';
 import { VideoCard } from '@/components/VideoCard';
 import { useAuth } from '@/features/auth/useAuth';
@@ -24,36 +24,33 @@ const Favorites = () => {
 
   if (authLoading || favoritesLoading) {
     return (
-      <div className="min-h-screen flex flex-col">
-        <Header />
-        <main className="flex-1 container py-8 flex items-center justify-center">
+      <AppLayout>
+        <div className="flex-1 container py-8 flex items-center justify-center">
           <Loader2 className="w-8 h-8 animate-spin text-primary" />
-        </main>
+        </div>
         <Footer />
-      </div>
+      </AppLayout>
     );
   }
 
   if (favoritesError) {
     return (
-      <div className="min-h-screen flex flex-col">
-        <Header />
-        <main className="flex-1 container py-16 text-center">
+      <AppLayout>
+        <div className="flex-1 container py-16 text-center">
           <h1 className="text-3xl font-bold mb-4">{t('favorites.loadingErrorTitle')}</h1>
           <p className="text-muted-foreground mb-8">
             {t('favorites.loadingErrorDescription')}
           </p>
           <Button onClick={() => navigate('/')}>{t('videoDetails.backToHome')}</Button>
-        </main>
+        </div>
         <Footer />
-      </div>
+      </AppLayout>
     );
   }
 
   return (
-    <div className="min-h-screen flex flex-col">
-      <Header />
-      <main className="flex-1 container py-8">
+    <AppLayout>
+      <div className="flex-1 container py-8">
         <div className="text-center mb-8">
           <h1 className="text-3xl font-bold">{t('favorites.title')}</h1>
           <p className="text-muted-foreground mt-2">
@@ -83,9 +80,9 @@ const Favorites = () => {
             <Button onClick={() => navigate('/videos')}>{t('favorites.exploreVideos')}</Button>
           </div>
         )}
-      </main>
+      </div>
       <Footer />
-    </div>
+    </AppLayout>
   );
 };
 

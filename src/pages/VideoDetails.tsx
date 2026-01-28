@@ -4,7 +4,7 @@ import { formatDuration, formatViewCount } from '@/shared/lib/format';
 import { useAuth } from '@/features/auth/useAuth';
 import { useIsFavorited, useAddFavorite, useRemoveFavorite } from '@/features/favorites/queries/useFavorites';
 import { getYouTubeEmbedUrl } from '@/shared/lib/youtube';
-import { Header } from '@/components/Header';
+import { AppLayout } from '@/components/AppLayout';
 import { Footer } from '@/components/Footer';
 import { VideoCard } from '@/components/VideoCard';
 import { AspectRatio } from '@/components/ui/aspect-ratio';
@@ -53,9 +53,8 @@ const VideoDetails = () => {
 
   if (isLoading || authLoading) {
     return (
-      <div className="min-h-screen flex flex-col">
-        <Header />
-        <main className="flex-1 container py-8">
+      <AppLayout>
+        <div className="flex-1 container py-8">
           <Skeleton className="h-10 w-48 mb-6" /> {/* Added skeleton for back button */}
           <div className="grid lg:grid-cols-3 gap-8">
             <div className="lg:col-span-2 space-y-6">
@@ -79,17 +78,16 @@ const VideoDetails = () => {
               ))}
             </div>
           </div>
-        </main>
+        </div>
         <Footer />
-      </div>
+      </AppLayout>
     );
   }
 
   if (isError || !video) {
     return (
-      <div className="min-h-screen flex flex-col">
-        <Header />
-        <main className="flex-1 container py-16 text-center">
+      <AppLayout>
+        <div className="flex-1 container py-16 text-center">
           <h1 className="text-3xl font-bold mb-4">{t('videoDetails.videoNotFoundTitle')}</h1>
           <p className="text-muted-foreground mb-8">
             {t('videoDetails.videoNotFoundDescription')}
@@ -98,16 +96,15 @@ const VideoDetails = () => {
             <ArrowLeft className="w-4 h-4 mr-2" />
             {t('common.backToHome')}
           </Button>
-        </main>
+        </div>
         <Footer />
-      </div>
+      </AppLayout>
     );
   }
 
   return (
-    <div className="min-h-screen flex flex-col">
-      <Header />
-      <main className="flex-1 container py-8">
+    <AppLayout>
+      <div className="flex-1 container py-8">
         <Button
           variant="ghost"
           onClick={() => navigate(-1)} // Navigates back to the previous page
@@ -221,9 +218,9 @@ const VideoDetails = () => {
             )}
           </div>
         </div>
-      </main>
+      </div>
       <Footer />
-    </div>
+    </AppLayout>
   );
 };
 

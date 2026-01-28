@@ -1,4 +1,4 @@
-import { Header } from '@/components/Header';
+import { AppLayout } from '@/components/AppLayout';
 import { Footer } from '@/components/Footer';
 import { useTranslation } from 'react-i18next';
 import { ArrowLeft, Users, User as UserIcon, Video } from 'lucide-react';
@@ -15,9 +15,8 @@ const Community = () => {
   const { data: profiles, isLoading: profilesLoading, isError: profilesError } = useProfiles();
 
   return (
-    <div className="min-h-screen flex flex-col">
-      <Header />
-      <main className="flex-1 container py-8">
+    <AppLayout>
+      <div className="flex-1 container py-8">
         <div className="mb-8">
           <Button 
             variant="ghost" 
@@ -107,9 +106,9 @@ const Community = () => {
             <p className="mb-6">{t('community.noUsersFoundDescription')}</p>
           </div>
         )}
-      </main>
+      </div>
       <Footer />
-    </div>
+    </AppLayout>
   );
 };
 

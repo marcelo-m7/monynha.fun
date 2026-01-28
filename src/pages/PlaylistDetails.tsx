@@ -3,7 +3,7 @@ import { usePlaylistById, useDeletePlaylist } from '@/features/playlists/queries
 import { usePlaylistVideos, useAddVideoToPlaylist, useRemoveVideoFromPlaylist } from '@/features/playlists/queries/usePlaylistVideos';
 import { usePlaylistProgress } from '@/features/playlists/queries/usePlaylistProgress';
 import { useCanEditPlaylist, useIsPlaylistAuthor } from '@/features/playlists/usePlaylistUtils';
-import { Header } from '@/components/Header';
+import { AppLayout } from '@/components/AppLayout';
 import { Footer } from '@/components/Footer';
 import { VideoCard } from '@/components/VideoCard';
 import { Button } from '@/components/ui/button';
@@ -70,9 +70,8 @@ const PlaylistDetails = () => {
 
   if (playlistLoading || authLoading || videosLoading || progressLoading) {
     return (
-      <div className="min-h-screen flex flex-col">
-        <Header />
-        <main className="flex-1 container py-8">
+      <AppLayout>
+        <div className="flex-1 container py-8">
           <Skeleton className="h-10 w-48 mb-6" />
           <div className="flex items-center gap-4 mb-4">
             <Skeleton className="w-16 h-16 rounded-2xl" />
@@ -101,17 +100,16 @@ const PlaylistDetails = () => {
               <Skeleton key={i} className="h-24 rounded-xl" />
             ))}
           </div>
-        </main>
+        </div>
         <Footer />
-      </div>
+      </AppLayout>
     );
   }
 
   if (playlistError || !playlist) {
     return (
-      <div className="min-h-screen flex flex-col">
-        <Header />
-        <main className="flex-1 container py-16 text-center">
+      <AppLayout>
+        <div className="flex-1 container py-16 text-center">
           <h1 className="text-3xl font-bold mb-4">{t('playlistDetails.notFoundTitle')}</h1>
           <p className="text-muted-foreground mb-8">
             {t('playlistDetails.notFoundDescription')}
@@ -120,9 +118,9 @@ const PlaylistDetails = () => {
             <ArrowLeft className="w-4 h-4 mr-2" />
             {t('playlistDetails.backToPlaylists')}
           </Button>
-        </main>
+        </div>
         <Footer />
-      </div>
+      </AppLayout>
     );
   }
 
@@ -131,9 +129,8 @@ const PlaylistDetails = () => {
 
   if (!canView) {
     return (
-      <div className="min-h-screen flex flex-col">
-        <Header />
-        <main className="flex-1 container py-16 text-center">
+      <AppLayout>
+        <div className="flex-1 container py-16 text-center">
           <Lock className="w-16 h-16 mb-4 opacity-50 mx-auto" />
           <h1 className="text-3xl font-bold mb-4">{t('playlistDetails.privateTitle')}</h1>
           <p className="text-muted-foreground mb-8">
@@ -143,18 +140,17 @@ const PlaylistDetails = () => {
             <ArrowLeft className="w-4 h-4 mr-2" />
             {t('playlistDetails.backToPlaylists')}
           </Button>
-        </main>
+        </div>
         <Footer />
-      </div>
+      </AppLayout>
     );
   }
 
   const playlistThumbnail = playlist.thumbnail_url || playlistVideos?.[0]?.video?.thumbnail_url || '/placeholder.svg';
 
   return (
-    <div className="min-h-screen flex flex-col">
-      <Header />
-      <main className="flex-1 container py-8">
+    <AppLayout>
+      <div className="flex-1 container py-8">
         <Button
           variant="ghost"
           onClick={() => navigate('/playlists')}
@@ -361,9 +357,9 @@ const PlaylistDetails = () => {
             )}
           </div>
         )}
-      </main>
+      </div>
       <Footer />
-    </div>
+    </AppLayout>
   );
 };
 

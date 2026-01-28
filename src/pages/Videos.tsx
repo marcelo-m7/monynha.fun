@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
-import { Header } from '@/components/Header';
+import { AppLayout } from '@/components/AppLayout';
 import { Footer } from '@/components/Footer';
 import { VideoCard } from '@/components/VideoCard';
 import { useVideos } from '@/features/videos/queries/useVideos';
@@ -56,9 +56,8 @@ const Videos = () => {
   ];
 
   return (
-    <div className="min-h-screen flex flex-col">
-      <Header />
-      <main className="flex-1 container py-8">
+    <AppLayout>
+      <div className="flex-1 container py-8">
         <div className="text-center mb-8">
           <h1 className="text-3xl font-bold">{t('videos.title')}</h1>
           <p className="text-muted-foreground mt-2">
@@ -147,9 +146,9 @@ const Videos = () => {
             {t('videos.noVideosFound')}
           </div>
         )}
-      </main>
+      </div>
       <Footer />
-    </div>
+    </AppLayout>
   );
 };
 

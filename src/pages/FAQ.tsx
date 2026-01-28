@@ -1,4 +1,4 @@
-import { Header } from '@/components/Header';
+import { AppLayout } from '@/components/AppLayout';
 import { Footer } from '@/components/Footer';
 import { useTranslation } from 'react-i18next';
 import { ArrowLeft, HelpCircle } from 'lucide-react';
@@ -34,9 +34,8 @@ const FAQ = () => {
   ];
 
   return (
-    <div className="min-h-screen flex flex-col">
-      <Header />
-      <main className="flex-1 container py-8">
+    <AppLayout>
+      <div className="flex-1 container py-8">
         <div className="mb-8">
           <Button 
             variant="ghost" 
@@ -68,9 +67,9 @@ const FAQ = () => {
             ))}
           </Accordion>
         </section>
-      </main>
+      </div>
       <Footer />
-    </div>
+    </AppLayout>
   );
 };
 

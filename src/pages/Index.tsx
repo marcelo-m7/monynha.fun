@@ -1,4 +1,4 @@
-import { Header } from "@/components/Header";
+import { AppLayout } from "@/components/AppLayout";
 import { HeroSection } from "@/components/HeroSection";
 import { VideoCard } from "@/components/VideoCard";
 import { Footer } from "@/components/Footer";
@@ -22,10 +22,8 @@ const Index = () => {
   const navigate = useNavigate();
 
   return (
-    <div className="min-h-screen flex flex-col">
-      <Header />
-      
-      <main className="flex-1">
+    <AppLayout>
+      <div className="flex-1">
         {/* Hero */}
         <HeroSection />
 
@@ -219,10 +217,9 @@ const Index = () => {
             </div>
           </div>
         </section>
-      </main>
-
+      </div>
       <Footer />
-    </div>
+    </AppLayout>
   );
 };
 

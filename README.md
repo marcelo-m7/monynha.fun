@@ -149,6 +149,9 @@ VITE_SUPABASE_PUBLISHABLE_KEY=your_anon_key_here
 
 The structure is clean and logical – I hate messy codebases:
 
+### Navigation Shell 🧭
+The app now uses the **shadcn/ui Sidebar + Menubar** as its primary navigation pattern. Pages are wrapped with `AppLayout`, which provides the `SidebarProvider`, renders `AppSidebar` alongside the main content, and keeps `Header` focused on menubar actions (account, create, language). This keeps navigation persistent, collapsible, and mobile-friendly by default.
+
 ```
 src/
 ├── components/              # Reusable UI pieces

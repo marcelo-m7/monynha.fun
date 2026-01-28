@@ -1,5 +1,5 @@
 import { useParams, useNavigate, Link } from 'react-router-dom';
-import { Header } from '@/components/Header';
+import { AppLayout } from '@/components/AppLayout';
 import { Footer } from '@/components/Footer';
 import { useProfileByUsername } from '@/features/profile/queries/useProfile';
 import { useVideos } from '@/features/videos/queries/useVideos';
@@ -35,9 +35,8 @@ const Profile = () => {
 
   if (profileLoading || authLoading || socialAccountsLoading) {
     return (
-      <div className="min-h-screen flex flex-col">
-        <Header />
-        <main className="flex-1 container py-8">
+      <AppLayout>
+        <div className="flex-1 container py-8">
           <Skeleton className="h-10 w-48 mb-6" />
           <div className="flex items-center gap-4 mb-8">
             <Skeleton className="w-24 h-24 rounded-full" />
@@ -53,17 +52,16 @@ const Profile = () => {
               <Skeleton key={i} className="h-64 rounded-2xl" />
             ))}
           </div>
-        </main>
+        </div>
         <Footer />
-      </div>
+      </AppLayout>
     );
   }
 
   if (profileError || !profile) {
     return (
-      <div className="min-h-screen flex flex-col">
-        <Header />
-        <main className="flex-1 container py-16 text-center">
+      <AppLayout>
+        <div className="flex-1 container py-16 text-center">
           <h1 className="text-3xl font-bold mb-4">{t('profile.notFoundTitle')}</h1>
           <p className="text-muted-foreground mb-8">
             {t('profile.notFoundDescription')}
@@ -72,16 +70,15 @@ const Profile = () => {
             <ArrowLeft className="w-4 h-4 mr-2" />
             {t('common.backToHome')}
           </Button>
-        </main>
+        </div>
         <Footer />
-      </div>
+      </AppLayout>
     );
   }
 
   return (
-    <div className="min-h-screen flex flex-col">
-      <Header />
-      <main className="flex-1 container py-8">
+    <AppLayout>
+      <div className="flex-1 container py-8">
         <Button
           variant="ghost"
           onClick={() => navigate(-1)}
@@ -206,9 +203,9 @@ const Profile = () => {
             )}
           </div>
         )}
-      </main>
+      </div>
       <Footer />
-    </div>
+    </AppLayout>
   );
 };
 

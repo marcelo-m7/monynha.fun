@@ -1,4 +1,4 @@
-import { Header } from '@/components/Header';
+import { AppLayout } from '@/components/AppLayout';
 import { Footer } from '@/components/Footer';
 import { usePlaylists } from '@/features/playlists/queries/usePlaylists';
 import { useTranslation } from 'react-i18next';
@@ -29,9 +29,8 @@ const Playlists = () => {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen flex flex-col">
-        <Header />
-        <main className="flex-1 container py-8">
+      <AppLayout>
+        <div className="flex-1 container py-8">
           <div className="flex flex-col md:flex-row justify-between items-center mb-8 gap-4">
             <Skeleton className="h-10 w-48" />
             <div className="flex gap-2 w-full md:w-auto">
@@ -44,32 +43,30 @@ const Playlists = () => {
               <Skeleton key={i} className="h-64 rounded-2xl" />
             ))}
           </div>
-        </main>
+        </div>
         <Footer />
-      </div>
+      </AppLayout>
     );
   }
 
   if (isError) {
     return (
-      <div className="min-h-screen flex flex-col">
-        <Header />
-        <main className="flex-1 container py-16 text-center">
+      <AppLayout>
+        <div className="flex-1 container py-16 text-center">
           <h1 className="text-3xl font-bold mb-4">{t('playlists.loadingErrorTitle')}</h1>
           <p className="text-muted-foreground mb-8">
             {t('playlists.loadingErrorDescription')}
           </p>
           <Button onClick={() => navigate('/')}>{t('common.backToHome')}</Button>
-        </main>
+        </div>
         <Footer />
-      </div>
+      </AppLayout>
     );
   }
 
   return (
-    <div className="min-h-screen flex flex-col">
-      <Header />
-      <main className="flex-1 container py-8">
+    <AppLayout>
+      <div className="flex-1 container py-8">
         <div className="flex flex-col md:flex-row justify-between items-center mb-8 gap-4">
           <div>
             <h1 className="text-3xl font-bold">{t('playlists.title')}</h1>
@@ -128,9 +125,9 @@ const Playlists = () => {
             <Button onClick={() => navigate('/playlists/new')}>{t('playlists.createFirstPlaylist')}</Button>
           </div>
         )}
-      </main>
+      </div>
       <Footer />
-    </div>
+    </AppLayout>
   );
 };
 
