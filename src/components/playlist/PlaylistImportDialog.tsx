@@ -123,10 +123,12 @@ export const PlaylistImportDialog: React.FC<PlaylistImportDialogProps> = ({ chil
           name: currentPlaylistName,
           slug: currentSlug,
           description: t('playlists.import.defaultDescription', { url: values.playlistUrl }),
-          thumbnail_url: videoMetadata?.thumbnailUrl || null, // Use video thumbnail as playlist thumbnail if available
-          language: 'pt', // Default language, can be extended later
+          thumbnail_url: videoMetadata?.thumbnailUrl || null,
+          language: 'pt',
           is_public: true,
-          is_ordered: true, // Default to ordered
+          is_ordered: true,
+          course_code: null,
+          unit_code: null,
         });
 
         toast.success(t('playlists.import.success.playlistCreated', { name: newPlaylist.name }));
@@ -163,8 +165,8 @@ export const PlaylistImportDialog: React.FC<PlaylistImportDialogProps> = ({ chil
             });
             toast.success(t('playlists.import.success.videoAddedToPlaylist', { title: videoToAddToPlaylist.title, playlistName: newPlaylist.name }));
           } else {
-            toast.warn(t('playlists.import.warning.noVideoInUrlForEnhanced'));
-            toast.info(t('playlists.import.info.minimalMode')); // Fallback to minimal mode message
+            toast.warning(t('playlists.import.warning.noVideoInUrlForEnhanced'));
+            toast.info(t('playlists.import.info.minimalMode'));
           }
         } else {
           toast.info(t('playlists.import.info.minimalMode'));

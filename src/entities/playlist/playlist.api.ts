@@ -173,17 +173,24 @@ export async function reorderPlaylistVideos(payload: { playlistId: string; order
 export async function listPlaylistCollaborators(playlistId: string) {
   const { data, error } = await supabase
     .from('playlist_collaborators')
-    .select(
-      `
-      *,
-      profile:profiles(id, username, display_name, avatar_url)
-    `,
-    )
+    .select('*')
     .eq('playlist_id', playlistId);
 
   if (error) throw error;
 
-  return data as PlaylistCollaborator[];
+  // Fetch profiles separately to avoid Supabase type issues
+  const userIds = (data || []).map((c) => c.user_id);
+  const { data: profiles } = await supabase
+    .from('profiles')
+    .select('id, username, display_name, avatar_url')
+    .in('id', userIds);
+
+  const profileMap = new Map((profiles || []).map((p) => [p.id, p]));
+
+  return (data || []).map((collab) => ({
+    ...collab,
+    profile: profileMap.get(collab.user_id) || null,
+  })) as PlaylistCollaborator[];
 }
 
 export async function addCollaborator(payload: { playlistId: string; userId: string; role?: 'editor' | 'viewer' }) {

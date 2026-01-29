@@ -18,7 +18,7 @@ const Index = () => {
   const { t } = useTranslation();
   const { data: featuredVideos, isLoading: featuredLoading } = useFeaturedVideos(4);
   const { data: recentVideos, isLoading: recentLoading } = useRecentVideos(4);
-  const { data: recentPlaylists, isLoading: playlistsLoading } = usePlaylists({ isPublic: true, limit: 3 });
+  const { data: recentPlaylists, isLoading: playlistsLoading } = usePlaylists({ isPublic: true });
   const navigate = useNavigate();
 
   return (

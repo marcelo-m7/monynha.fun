@@ -1,16 +1,18 @@
 import { useState, useEffect } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom'; // Import useLocation
+import { useNavigate, useLocation, useSearchParams } from 'react-router-dom';
 import { useAuth } from '@/features/auth/useAuth';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { toast } from 'sonner';
-import { Play, Mail, Lock, User, ArrowLeft, KeyRound } from 'lucide-react';
+import { Play, Mail, Lock, User, ArrowLeft } from 'lucide-react';
 import { z } from 'zod';
 import { useTranslation } from 'react-i18next';
 import { requestPasswordReset } from '@/features/auth/auth.api';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { supabase } from '@/shared/api/supabase/supabaseClient';
+import { ResetPasswordForm } from '@/components/auth/ResetPasswordForm';
 
 // Define Zod schemas for validation
 const loginSchema = z.object({
@@ -32,9 +34,11 @@ export default function Auth() {
   const { t } = useTranslation();
   const [isLogin, setIsLogin] = useState(true);
   const [showForgotPassword, setShowForgotPassword] = useState(false);
+  const [showResetPassword, setShowResetPassword] = useState(false);
   const { signIn, signUp, user, loading } = useAuth();
   const navigate = useNavigate();
-  const location = useLocation(); // Initialize useLocation
+  const location = useLocation();
+  const [searchParams] = useSearchParams();
 
   // Form setup for login/signup
   const { register, handleSubmit, formState: { errors, isSubmitting }, reset, watch } = useForm<z.infer<typeof loginSchema> | z.infer<typeof signupSchema>>({
@@ -54,8 +58,32 @@ export default function Auth() {
     },
   });
 
+  // Check for password reset mode
   useEffect(() => {
-    if (!loading && user) {
+    const isReset = searchParams.get('reset') === 'true';
+    
+    if (isReset) {
+      // Listen for PASSWORD_RECOVERY event
+      const { data: { subscription } } = supabase.auth.onAuthStateChange((event) => {
+        if (event === 'PASSWORD_RECOVERY') {
+          setShowResetPassword(true);
+        }
+      });
+
+      // Also check if we already have a session (user clicked the link)
+      supabase.auth.getSession().then(({ data: { session } }) => {
+        if (session) {
+          setShowResetPassword(true);
+        }
+      });
+
+      return () => subscription.unsubscribe();
+    }
+  }, [searchParams]);
+
+  useEffect(() => {
+    // Only redirect if not in reset password mode
+    if (!loading && user && !showResetPassword) {
       const redirectAfterLogin = localStorage.getItem('redirectAfterLogin');
       const prefillVideoUrl = localStorage.getItem('prefillVideoUrl');
 
@@ -70,7 +98,7 @@ export default function Auth() {
         navigate('/');
       }
     }
-  }, [user, loading, navigate, location]); // Added location to dependencies
+  }, [user, loading, navigate, location, showResetPassword]);
 
   useEffect(() => {
     reset(); // Reset form fields when switching between login/signup
@@ -94,7 +122,6 @@ export default function Auth() {
           toast.success(t('auth.success.welcomeBack'), {
             description: t('auth.success.loginSuccess')
           });
-          // Redirection handled by useEffect
         }
       } else {
         const signupValues = values as z.infer<typeof signupSchema>;
@@ -111,7 +138,6 @@ export default function Auth() {
           toast.success(t('auth.success.accountCreated'), {
             description: t('auth.success.confirmEmail')
           });
-          // Redirection handled by useEffect
         }
       }
     } catch (err) {
@@ -143,6 +169,11 @@ export default function Auth() {
         description: err instanceof Error ? err.message : String(err),
       });
     }
+  };
+
+  const handleResetPasswordSuccess = () => {
+    setShowResetPassword(false);
+    navigate('/auth');
   };
 
   if (loading) {
@@ -180,14 +211,18 @@ export default function Auth() {
             <h1 className="text-3xl font-bold text-foreground">
               Monynha<span className="text-primary">Fun</span>
             </h1>
-            <p className="text-muted-foreground mt-2">
-              {showForgotPassword ? t('auth.forgotPasswordTitle') : (isLogin ? t('auth.loginTitle') : t('auth.signupTitle'))}
-            </p>
+            {!showResetPassword && (
+              <p className="text-muted-foreground mt-2">
+                {showForgotPassword ? t('auth.forgotPasswordTitle') : (isLogin ? t('auth.loginTitle') : t('auth.signupTitle'))}
+              </p>
+            )}
           </div>
 
           {/* Form Card */}
           <div className="bg-card border border-border rounded-2xl p-8 shadow-elegant">
-            {showForgotPassword ? (
+            {showResetPassword ? (
+              <ResetPasswordForm onSuccess={handleResetPasswordSuccess} />
+            ) : showForgotPassword ? (
               <form onSubmit={handleSubmitForgotPassword(onForgotPasswordSubmit)} className="space-y-5">
                 <div className="space-y-2">
                   <Label htmlFor="forgot-email" className="text-foreground">
@@ -224,7 +259,7 @@ export default function Auth() {
                     onClick={() => {
                       setShowForgotPassword(false);
                       resetForgotPassword();
-                      reset({ email: '', password: '' }); // Reset form on back
+                      reset({ email: '', password: '' });
                     }}
                     className="text-sm text-muted-foreground hover:text-primary transition-colors"
                   >
@@ -299,7 +334,7 @@ export default function Auth() {
                       type="button"
                       onClick={() => {
                         setShowForgotPassword(true);
-                        resetForgotPassword({ email: watch('email') }); // Pre-fill email to forgot password form
+                        resetForgotPassword({ email: watch('email') });
                       }}
                       className="text-sm text-muted-foreground hover:text-primary transition-colors"
                     >
@@ -324,20 +359,22 @@ export default function Auth() {
               </form>
             )}
 
-            <div className="mt-6 text-center">
-              {!showForgotPassword && (
-                <button
-                  type="button"
-                  onClick={() => setIsLogin(!isLogin)}
-                  className="text-sm text-muted-foreground hover:text-primary transition-colors"
-                >
-                  {isLogin
-                    ? t('auth.noAccount')
-                    : t('auth.hasAccount')
-                  }
-                </button>
-              )}
-            </div>
+            {!showResetPassword && (
+              <div className="mt-6 text-center">
+                {!showForgotPassword && (
+                  <button
+                    type="button"
+                    onClick={() => setIsLogin(!isLogin)}
+                    className="text-sm text-muted-foreground hover:text-primary transition-colors"
+                  >
+                    {isLogin
+                      ? t('auth.noAccount')
+                      : t('auth.hasAccount')
+                    }
+                  </button>
+                )}
+              </div>
+            )}
           </div>
 
           {/* Tip */}

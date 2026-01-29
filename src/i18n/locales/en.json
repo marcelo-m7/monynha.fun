@@ -25,6 +25,7 @@
     "playlists": "Playlists",
     "myProfile": "My Profile",
     "editProfile": "Edit Profile",
+    "accountSettings": "Account Settings",
     "home": "Home",
     "toggleMenu": "Toggle menu",
     "closeMenu": "Close menu",
@@ -81,6 +82,20 @@
     "forgotPasswordLink": "Forgot password?",
     "sendResetLinkButton": "Send Reset Link",
     "backToLogin": "Back to Login",
+    "resetPassword": {
+      "title": "Set New Password",
+      "description": "Enter your new password below",
+      "newPassword": "New password",
+      "confirmPassword": "Confirm password",
+      "submit": "Reset Password",
+      "success": "Password reset successfully! Redirecting...",
+      "successTitle": "Password Updated",
+      "redirecting": "Redirecting to login...",
+      "error": {
+        "generic": "Failed to reset password",
+        "passwordMismatch": "Passwords do not match"
+      }
+    },
     "error": {
       "validationTitle": "Validation Error",
       "loginGeneric": "Error logging in",
@@ -101,6 +116,44 @@
       "confirmEmail": "Check your email to confirm your registration",
       "passwordResetEmailSent": "Password reset email sent!",
       "checkEmailForReset": "Check your inbox for the password reset link."
+    }
+  },
+  "account": {
+    "settings": {
+      "title": "Account Settings",
+      "description": "Manage your account security and credentials",
+      "securityTitle": "Security & Authentication",
+      "profileLinkDescription": "Looking to update your display name, avatar, or bio?",
+      "emailSection": {
+        "title": "Email Address",
+        "description": "Update your email address. A confirmation will be sent to your new email.",
+        "current": "Current email",
+        "newEmail": "New email address",
+        "confirmChange": "Update Email",
+        "changeInfo": "You will receive a confirmation link at your new email address. The change will take effect after you confirm."
+      },
+      "passwordSection": {
+        "title": "Password",
+        "description": "Change your password to keep your account secure.",
+        "currentPassword": "Current password",
+        "newPassword": "New password",
+        "confirmPassword": "Confirm new password",
+        "update": "Update Password"
+      },
+      "success": {
+        "emailUpdated": "Email update request sent. Check your new email for confirmation.",
+        "passwordUpdated": "Password updated successfully"
+      },
+      "error": {
+        "passwordMismatch": "Passwords do not match",
+        "currentPasswordRequired": "Current password is required",
+        "samePassword": "New password must be different from current",
+        "sameEmail": "New email is the same as your current email",
+        "notLoggedIn": "You must be logged in to access account settings",
+        "wrongCurrentPassword": "Current password is incorrect",
+        "passwordUpdateFailed": "Failed to update password",
+        "emailUpdateFailed": "Failed to update email"
+      }
     }
   },
   "submit": {

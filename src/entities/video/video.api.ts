@@ -74,10 +74,25 @@ export async function listFeaturedVideos(limit = 4, offset = 0) {
   });
 
   if (!error && data) {
-    return data.map((row) => ({
-      ...row,
-      category: row.category ?? null,
-    })) as VideoWithCategory[];
+    return data.map((row) => {
+      // Parse the category JSON if it's a string or object
+      let parsedCategory = null;
+      if (row.category) {
+        if (typeof row.category === 'string') {
+          try {
+            parsedCategory = JSON.parse(row.category);
+          } catch {
+            parsedCategory = null;
+          }
+        } else if (typeof row.category === 'object') {
+          parsedCategory = row.category as { id: string; name: string; slug: string; color: string };
+        }
+      }
+      return {
+        ...row,
+        category: parsedCategory,
+      };
+    }) as unknown as VideoWithCategory[];
   }
 
   const { data: fallbackData, error: fallbackError } = await supabase

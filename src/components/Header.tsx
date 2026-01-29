@@ -1,5 +1,5 @@
 import { Link, useNavigate } from "react-router-dom";
-import { Search, Plus, Menu, X, LogOut, Heart, Globe, ListVideo, User as UserIcon, Settings, Home, Info, BookOpen, Mail, HelpCircle, Users } from "lucide-react";
+import { Search, Plus, Menu, LogOut, Heart, Globe, ListVideo, User as UserIcon, Settings, Home, Info, BookOpen, Mail, HelpCircle, Users, KeyRound } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useState } from "react";
@@ -144,6 +144,10 @@ export const Header = () => {
                     <Settings className="mr-2 h-4 w-4" />
                     <span>{t('header.editProfile')}</span>
                   </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => { navigate('/account/settings'); setIsSheetOpen(false); }}>
+                    <KeyRound className="mr-2 h-4 w-4" />
+                    <span>{t('header.accountSettings')}</span>
+                  </DropdownMenuItem>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem onClick={handleSignOut}>
                     <LogOut className="mr-2 h-4 w-4" />
@@ -269,6 +273,15 @@ export const Header = () => {
                       >
                         <Settings className="h-4 w-4" />
                         <span>{t('header.editProfile')}</span>
+                      </NavLink>
+                      <NavLink
+                        to="/account/settings"
+                        className="flex items-center gap-3 px-4 py-2 text-muted-foreground hover:text-foreground hover:bg-muted rounded-md transition-colors"
+                        activeClassName="bg-muted text-foreground"
+                        onClick={() => setIsSheetOpen(false)}
+                      >
+                        <KeyRound className="h-4 w-4" />
+                        <span>{t('header.accountSettings')}</span>
                       </NavLink>
                       <NavLink
                         to="/playlists"

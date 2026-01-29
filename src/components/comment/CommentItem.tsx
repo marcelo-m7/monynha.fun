@@ -1,21 +1,21 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { formatDistanceToNow } from 'date-fns';
-import { pt, enUS, es, fr } from 'date-fns/locale'; // Import locales
+import { formatDistanceToNow, type Locale } from 'date-fns';
+import { pt, enUS, es, fr } from 'date-fns/locale';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Trash2, User as UserIcon } from 'lucide-react';
-import { Comment } from '@/entities/comment/comment.types';
+import type { Comment } from '@/entities/comment/comment.types';
 import { useAuth } from '@/features/auth/useAuth';
 import { useDeleteComment } from '@/features/comments/queries/useComments';
 import { toast } from 'sonner';
-import i18n from 'i18next'; // Import i18n to get current language
+import i18n from 'i18next';
 
 interface CommentItemProps {
   comment: Comment;
 }
 
-const localeMap: { [key: string]: Locale } = {
+const localeMap: Record<string, Locale> = {
   pt: pt,
   en: enUS,
   es: es,
