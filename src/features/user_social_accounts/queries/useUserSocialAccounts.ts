@@ -25,12 +25,12 @@ export function useCreateUserSocialAccount() {
   const queryClient = useQueryClient();
   const { user } = useAuth();
 
-  return useMutation<UserSocialAccount, Error, Omit<UserSocialAccountInsert, 'user_id'>>({
+  return useMutation<UserSocialAccount, Error, { platform: string; url: string }>({
     mutationFn: async (payload) => {
       if (!user?.id) throw new Error('User not authenticated');
       return createUserSocialAccount({ ...payload, user_id: user.id });
     },
-    onSuccess: (newAccount) => {
+    onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: userSocialAccountKeys.list(user?.id ?? '') });
       toast.success('Social account added successfully!');
     },

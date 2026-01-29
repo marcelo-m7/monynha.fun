@@ -129,11 +129,16 @@ export const SocialAccountsManager: React.FC<SocialAccountsManagerProps> = ({ us
       return;
     }
 
+    // Ensure platform and url are present (already validated by zod)
+    if (!values.platform || !values.url) {
+      return;
+    }
+
     try {
       if (editingAccount) {
         await updateMutation.mutateAsync({ id: editingAccount.id, payload: values });
       } else {
-        await createMutation.mutateAsync(values);
+        await createMutation.mutateAsync({ platform: values.platform, url: values.url });
       }
       setIsDialogOpen(false); // Close dialog on successful submission
     } catch (error) {

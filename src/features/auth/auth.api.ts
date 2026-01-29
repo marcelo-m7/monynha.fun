@@ -33,3 +33,22 @@ export async function requestPasswordReset(email: string, redirectTo?: string) {
 
   return { error: error as Error | null };
 }
+
+export async function updateUserPassword(newPassword: string) {
+  const { error } = await supabase.auth.updateUser({ password: newPassword });
+  return { error: error as Error | null };
+}
+
+export async function updateUserEmail(newEmail: string, redirectTo?: string) {
+  const { error } = await supabase.auth.updateUser(
+    { email: newEmail },
+    { emailRedirectTo: redirectTo ?? `${window.location.origin}/auth` }
+  );
+  return { error: error as Error | null };
+}
+
+export async function reauthenticateUser(email: string, password: string) {
+  // Re-authenticate by signing in with current credentials
+  const { error } = await supabase.auth.signInWithPassword({ email, password });
+  return { error: error as Error | null };
+}

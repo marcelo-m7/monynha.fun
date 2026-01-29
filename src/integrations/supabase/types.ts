@@ -98,6 +98,48 @@ export type Database = {
         }
         Relationships: []
       }
+      comments: {
+        Row: {
+          content: string
+          created_at: string | null
+          id: string
+          updated_at: string | null
+          user_id: string
+          video_id: string
+        }
+        Insert: {
+          content: string
+          created_at?: string | null
+          id?: string
+          updated_at?: string | null
+          user_id: string
+          video_id: string
+        }
+        Update: {
+          content?: string
+          created_at?: string | null
+          id?: string
+          updated_at?: string | null
+          user_id?: string
+          video_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "comments_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "comments_video_id_fkey"
+            columns: ["video_id"]
+            isOneToOne: false
+            referencedRelation: "videos"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       favorites: {
         Row: {
           created_at: string
@@ -326,8 +368,8 @@ export type Database = {
       }
       profiles: {
         Row: {
-          avatar_url: string | null
           avatar_path: string | null
+          avatar_url: string | null
           bio: string | null
           created_at: string
           display_name: string | null
@@ -337,8 +379,8 @@ export type Database = {
           username: string | null
         }
         Insert: {
-          avatar_url?: string | null
           avatar_path?: string | null
+          avatar_url?: string | null
           bio?: string | null
           created_at?: string
           display_name?: string | null
@@ -348,8 +390,8 @@ export type Database = {
           username?: string | null
         }
         Update: {
-          avatar_url?: string | null
           avatar_path?: string | null
+          avatar_url?: string | null
           bio?: string | null
           created_at?: string
           display_name?: string | null
@@ -359,6 +401,68 @@ export type Database = {
           username?: string | null
         }
         Relationships: []
+      }
+      user_social_accounts: {
+        Row: {
+          created_at: string | null
+          id: string
+          platform: string
+          updated_at: string | null
+          url: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          platform: string
+          updated_at?: string | null
+          url: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          platform?: string
+          updated_at?: string | null
+          url?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      video_view_events: {
+        Row: {
+          created_at: string
+          id: string
+          session_id: string | null
+          user_id: string | null
+          video_id: string
+          viewed_on: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          session_id?: string | null
+          user_id?: string | null
+          video_id: string
+          viewed_on?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          session_id?: string | null
+          user_id?: string | null
+          video_id?: string
+          viewed_on?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "video_view_events_video_id_fkey"
+            columns: ["video_id"]
+            isOneToOne: false
+            referencedRelation: "videos"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       videos: {
         Row: {
@@ -437,26 +541,28 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      increment_video_view_count: {
-        Args: { p_video_id: string; p_session_id?: string | null }
-        Returns: number
-      }
+      increment_video_view_count:
+        | { Args: { p_video_id: string }; Returns: number }
+        | {
+            Args: { p_session_id?: string; p_video_id: string }
+            Returns: number
+          }
       list_featured_videos: {
         Args: { p_limit?: number; p_offset?: number }
         Returns: {
-          category: Json | null
-          category_id: string | null
+          category: Json
+          category_id: string
           channel_name: string
           created_at: string
-          description: string | null
-          duration_seconds: number | null
+          description: string
+          duration_seconds: number
           favorites_count: number
           featured_score: number
           id: string
           is_featured: boolean
           language: string
           playlist_add_count: number
-          submitted_by: string | null
+          submitted_by: string
           thumbnail_url: string
           title: string
           updated_at: string

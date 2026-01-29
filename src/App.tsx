@@ -13,8 +13,9 @@ import FAQ from "./pages/FAQ";
 import Playlists from "./pages/Playlists";
 import PlaylistDetails from "./pages/PlaylistDetails";
 import CreateEditPlaylist from "./pages/CreateEditPlaylist";
-import Profile from "./pages/Profile"; // Import new Profile page
-import EditProfile from "./pages/EditProfile"; // Import new EditProfile page
+import Profile from "./pages/Profile";
+import EditProfile from "./pages/EditProfile";
+import AccountSettings from "./pages/AccountSettings";
 import NotFound from "./pages/NotFound";
 import ScrollToTop from "./components/ScrollToTop";
 
@@ -37,9 +38,10 @@ const App = () => (
       <Route path="/playlists/new" element={<CreateEditPlaylist />} />
       <Route path="/playlists/:playlistId" element={<PlaylistDetails />} />
       <Route path="/playlists/:playlistId/edit" element={<CreateEditPlaylist />} />
-      <Route path="/profile/:username" element={<Profile />} /> {/* New public profile route */}
-      <Route path="/profile/edit" element={<EditProfile />} /> {/* New edit profile route */}
-      <Route path="/:username" element={<Profile />} /> {/* Public user profile page (e.g., /marcelo) */}
+      <Route path="/profile/:username" element={<Profile />} />
+      <Route path="/profile/edit" element={<EditProfile />} />
+      <Route path="/account/settings" element={<AccountSettings />} />
+      <Route path="/:username" element={<Profile />} />
       {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
       <Route path="*" element={<NotFound />} />
     </Routes>
