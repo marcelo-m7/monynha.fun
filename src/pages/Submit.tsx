@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom'; // Import useLocation
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/features/auth/useAuth';
 import { useCategories } from '@/features/categories/queries/useCategories';
 import { useYouTubeMetadata } from '@/features/submit/useYouTubeMetadata';
@@ -15,10 +15,11 @@ import { submitVideoSchema, SubmitVideoFormValues } from '@/features/submit/subm
 import { useTranslation } from 'react-i18next';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { Footer } from '@/components/Footer'; // Added missing import
 
 export default function Submit() {
   const { t } = useTranslation();
-  const location = useLocation(); // Initialize useLocation
+  const location = useLocation();
   
   const { user, loading: authLoading } = useAuth();
   const { data: categories } = useCategories();
