@@ -339,6 +339,7 @@
     "backToPlaylists": "Back to Playlists",
     "byAuthor": "By {{author}}",
     "anonymousAuthor": "By anonymous author",
+    "addedBy": "Added by",
     "noDescription": "No description provided for this playlist.",
     "editPlaylist": "Edit Playlist",
     "deletePlaylist": "Delete Playlist",
@@ -590,7 +591,8 @@
   "comments": {
     "title": "Comments",
     "form": {
-      "placeholder": "Add a comment...",
+      "placeholder": "Add a comment... Use @username to mention someone.",
+      "mentionHelper": "Tip: use @username to mention someone.",
       "submitButton": "Comment",
       "submitting": "Submitting...",
       "contentRequired": "Comment cannot be empty.",
