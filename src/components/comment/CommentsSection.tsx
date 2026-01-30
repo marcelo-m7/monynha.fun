@@ -1,6 +1,6 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { MessageSquare, Loader2 } from 'lucide-react';
+import { MessageSquare } from 'lucide-react';
 import { CommentForm } from './CommentForm';
 import { CommentItem } from './CommentItem';
 import { useComments } from '@/features/comments/queries/useComments';
