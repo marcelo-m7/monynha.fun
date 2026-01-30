@@ -101,7 +101,7 @@ const Index = () => {
                 <Button 
                   variant="ghost" 
                   className="gap-2 group"
-                  onClick={() => navigate('/videos?featured=true')}
+                  onClick={() => navigate('/videos')} {/* Changed to navigate to /videos without filter */}
                 >
                   {t('index.viewAll')}
                   <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
