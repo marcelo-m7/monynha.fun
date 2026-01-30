@@ -46,7 +46,7 @@ export const Header = () => {
   const navLinks = [
     { to: "/", label: t('header.home'), icon: Home },
     { to: "/videos", label: t('header.videos'), icon: ListVideo },
-    // { to: "/playlists", label: t('header.playlists'), icon: ListVideo },
+    { to: "/playlists", label: t('header.playlists'), icon: ListVideo },
     { to: "/community", label: t('footer.community'), icon: Users },
     { to: "/about", label: t('footer.about'), icon: Info },
     { to: "/rules", label: t('footer.rules'), icon: BookOpen },
