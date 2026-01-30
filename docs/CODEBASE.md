@@ -1,5 +1,25 @@
 # Monynha Fun Codebase & Database Migrations Exploration
 
+## Recent Changes & Improvements (January 30, 2026)
+
+### Build & CI/CD Fixes
+- ✅ **Fixed import paths**: Corrected 12 incorrect `@hookform/resolvers/dist/zod.mjs` imports to use the proper entry point `@hookform/resolvers/zod`
+- ✅ **CI/CD Pipeline**: Updated GitHub Actions workflow to properly install bun via npm in CI environment
+- ✅ **Build verified**: Production build completes successfully (1.13MB minified)
+- ✅ **All tests pass**: 16 tests passing across 6 test files
+
+### Navigation & UX Improvements
+- ✅ **Header Navigation**: Added explicit "Videos" nav item (`/videos` route) with dedicated translation keys
+- ✅ **Multi-language support**: Added `header.videos` translation key to all 4 locales (English, Portuguese, Spanish, French)
+- ✅ **Consistent labeling**: Replaced generic "Categories" label with "Videos" for clarity
+
+### Code Quality
+- TypeScript type checking: ✓ Pass
+- ESLint: 8 warnings (non-breaking, react-refresh related)
+- Test coverage: All critical paths tested
+
+---
+
 ## Project Overview
 
 **Monynha Fun** is a React + TypeScript + Vite application for cultural video curation, using Supabase as a BaaS platform. The project emphasizes human curation assisted by AI, democratizing access to valuable YouTube content.
@@ -71,19 +91,20 @@ video-vault/
 
 ### Key Routes
 - `/` - Index/Home
-- `/auth` - Login/Signup (Custom forms)
-- `/submit` - Video submission
-- `/videos` - Video listing
-- `/videos/:videoId` - Video details
+- `/auth` - Login/Signup (Custom forms with react-hook-form + Zod)
+- `/submit` - Video submission with YouTube metadata extraction
+- `/videos` - Video listing with search, category, and language filters
+- `/videos/:videoId` - Video details with comments and related videos
 - `/favorites` - User's favorite videos
-- `/community` - Community page
-- `/playlists` - User's playlists
-- `/playlists/:playlistId` - Playlist details
+- `/community` - Community showcase page
+- `/playlists` - User's playlists manager
+- `/playlists/:playlistId` - Playlist details and video management
 - `/playlists/new` - Create new playlist
-- `/playlists/:playlistId/edit` - Edit playlist
-- `/profile/:username` - View user profile
-- `/profile/edit` - Edit own profile
-- `/about`, `/rules`, `/contact`, `/faq` - Info pages
+- `/playlists/:playlistId/edit` - Edit existing playlist
+- `/profile/:username` - View user profile and their curated content
+- `/profile/edit` - Edit own profile with avatar upload
+- `/account/settings` - Account security settings
+- `/about`, `/rules`, `/contact`, `/faq` - Static info pages
 
 ---
 
@@ -529,13 +550,47 @@ FOR UPDATE USING (auth.uid() = id);
 
 ## Next Steps & Future Enhancements
 
-1. **Real AI Integration**: Replace simulated enrichment with actual AI service (OpenAI, Anthropic)
-2. **Video Search**: Full-text search on titles, descriptions, semantic tags
-3. **Recommendations**: Algorithm for suggesting videos based on user history
-4. **Social Features**: Comments, ratings, user follows
-5. **Analytics**: Track user engagement, popular videos, community growth
-6. **Offline Support**: Service workers for offline video playback
-7. **Mobile App**: React Native version of Monynha Fun
+### Development Workflow
+1. **Local development**: `bun run dev` - Starts Vite dev server on http://localhost:5173
+2. **Type safety**: `bun run typecheck` - Validates TypeScript
+3. **Code quality**: `bun run lint` - Checks ESLint rules
+4. **Testing**: `bun run test` - Runs Vitest suite
+5. **Production**: `bun run build` - Creates optimized bundle in `dist/`
+
+### CI/CD Pipeline
+The GitHub Actions workflow (`.github/workflows/ci.yml`) runs on all branches:
+- Installs dependencies via bun
+- Runs linter, type checker, and test suite
+- Builds production bundle
+- Uploads artifacts for deployment
+- Requires environment variables: `VITE_SUPABASE_URL`, `VITE_SUPABASE_PUBLISHABLE_KEY`
+
+### Important: Import Path Conventions
+When using form resolvers or third-party libraries:
+- ✓ **Correct**: `import { zodResolver } from '@hookform/resolvers/zod'`
+- ✗ **Incorrect**: `import { zodResolver } from '@hookform/resolvers/dist/zod.mjs'`
+  
+Always use the package's public entry points (check `package.json` exports). Direct file paths may not resolve in production builds.
+
+### Internationalization (i18n)
+- Configuration: `src/i18n/config.ts`
+- Locale files: `src/i18n/locales/` (en.json, pt.json, es.json, fr.json)
+- Usage: `const { t } = useTranslation()` then `t('header.videos')`
+- Language switching: Available in header via globe icon selector
+- **New in this update**: `header.videos` key added for Videos nav label
+
+### Future Enhancements
+
+1. **Code-splitting**: Reduce main bundle size (currently 1.1MB) using dynamic imports
+2. **Real AI Integration**: Replace simulated enrichment with actual AI service (OpenAI, Anthropic)
+3. **Video Search**: Full-text search on titles, descriptions, semantic tags
+4. **Recommendations**: Algorithm for suggesting videos based on user history
+5. **Social Features**: Comments, ratings, user follows
+6. **Analytics**: Track user engagement, popular videos, community growth
+7. **Offline Support**: Service workers for offline video playback
+8. **Mobile App**: React Native version of Monynha Fun
+9. **Performance**: Implement image optimization and lazy loading
+10. **Accessibility**: WCAG 2.1 AA compliance audit and improvements
 
 ---
 

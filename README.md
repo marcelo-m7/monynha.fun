@@ -1,10 +1,10 @@
 # Monynha Fun – Cultural Video Curation Platform 🎬
 
-![Monynha Fun Hero](./monynha-fun-hero.png)
+![Monynha Fun Hero](./docs/placeholder.png)
 
 > *A passion project by **Marcelo Santos**, crafted with care to bring together the best of cultural video content that gets lost in the algorithmic noise.*
 
-**🌐 Live Platform**: https://monynha.com/fun
+**🌐 Live Platform**: https://monynha.fun
 
 ---
 
@@ -26,12 +26,12 @@ We're creating a space where **human taste matters**. A place where curators (li
 ## 📸 See It In Action
 
 ### Homepage – Where Magic Happens ✨
-![Homepage Screenshot](./monynha-homepage.png)
+![Homepage Screenshot](./docs/homepage.png)
 
 Your first impression matters, né? Clean hero section, easy access to what's hot right now, and categories that actually make sense. No fluff.
 
 ### Discover Videos 🔍
-![Video Discovery](./monynha-videos.png)
+![Video Discovery](./videos.png)
 
 Browse through categories that real people organized. Search, filter, read about *why* someone added a video. Simple as that.
 
@@ -108,11 +108,6 @@ Portuguese, English – we're building for everyone. More languages coming.
 ---
 
 ## 🚀 Getting Started (It's Easy, I Promise)
-
-### What You'll Need
-- **Node.js** – [Install via nvm](https://github.com/nvm-sh/nvm) if you haven't
-- **npm** or **pnpm**
-- **Git**
 
 ### Set It Up Locally
 
@@ -436,5 +431,5 @@ We're constantly improving. On the roadmap:
 
 ---
 
-**Visit us at**: https://monynha.com/fun  
+**Visit us at**: https://monynha.com  
 **Made with** ☕ **and** 💡 **by Marcelo Santos**
