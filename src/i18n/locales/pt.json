@@ -170,6 +170,8 @@
     "viewsLabel": "visualizações",
     "descriptionTitle": "Descrição",
     "noDescription": "Nenhuma descrição fornecida para este vídeo.",
+    "addedBy": "Adicionado por",
+    "anonymousAuthor": "Anônimo",
     "relatedVideosTitle": "Vídeos Relacionados",
     "noRelatedVideos": "Nenhum vídeo relacionado encontrado.",
     "favoriteInfo": "Você precisa estar logado para favoritar vídeos.",

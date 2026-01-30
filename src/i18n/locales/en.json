@@ -222,6 +222,8 @@
     "viewsLabel": "views",
     "descriptionTitle": "Description",
     "noDescription": "No description provided for this video.",
+    "addedBy": "Added by",
+    "anonymousAuthor": "Anonymous",
     "relatedVideosTitle": "Related Videos",
     "noRelatedVideos": "No related videos found.",
     "favoriteInfo": "You need to be logged in to favorite videos.",

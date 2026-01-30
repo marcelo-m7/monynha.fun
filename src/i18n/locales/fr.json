@@ -173,6 +173,8 @@
     "viewsLabel": "vues",
     "descriptionTitle": "Description",
     "noDescription": "Aucune description fournie pour cette vidéo.",
+    "addedBy": "Ajouté par",
+    "anonymousAuthor": "Anonyme",
     "relatedVideosTitle": "Vidéos Similaires",
     "noRelatedVideos": "Aucune vidéo similaire trouvée.",
     "favoriteInfo": "Vous devez être connecté pour ajouter des vidéos aux favoris.",

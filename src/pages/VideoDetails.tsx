@@ -1,8 +1,9 @@
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, Link } from 'react-router-dom';
 import { useVideoById, useRelatedVideos } from '@/features/videos/queries/useVideos';
 import { formatDuration, formatViewCount } from '@/shared/lib/format';
 import { useAuth } from '@/features/auth/useAuth';
 import { useIsFavorited, useAddFavorite, useRemoveFavorite } from '@/features/favorites/queries/useFavorites';
+import { useProfileById } from '@/features/profile/queries/useProfile';
 import { getYouTubeEmbedUrl } from '@/shared/lib/youtube';
 import { Header } from '@/components/Header';
 import { Footer } from '@/components/Footer';
@@ -22,6 +23,7 @@ const VideoDetails = () => {
   const navigate = useNavigate();
   const { user, loading: authLoading } = useAuth();
   const { data: video, isLoading, isError } = useVideoById(videoId);
+  const { data: profile } = useProfileById(video?.submitted_by);
   const { data: relatedVideos, isLoading: relatedLoading } = useRelatedVideos(
     video?.id || '', 
     video?.category_id || null
@@ -150,6 +152,16 @@ const VideoDetails = () => {
                 </Button>
               </div>
               <p className="text-lg text-muted-foreground">{video.channel_name}</p>
+              <p className="text-sm text-muted-foreground">
+                {t('videoDetails.addedBy')}{' '}
+                {profile?.username ? (
+                  <Link to={`/profile/${profile.username}`} className="text-primary hover:underline">
+                    @{profile.username}
+                  </Link>
+                ) : (
+                  t('videoDetails.anonymousAuthor')
+                )}
+              </p>
               <div className="flex flex-wrap items-center gap-4 text-sm text-muted-foreground">
                 <div className="flex items-center gap-1">
                   <Eye className="w-4 h-4" />
