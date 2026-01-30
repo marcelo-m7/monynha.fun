@@ -7,7 +7,6 @@ import { usePlaylists } from "@/features/playlists/queries/usePlaylists";
 import { ArrowRight, TrendingUp, Clock, ListVideo } from "lucide-react";
 import { FeaturedHero } from "@/components/FeaturedHero";
 import { Button } from "@/components/ui/button";
-import { MarkFeaturedButton } from "@/features/admin-dev-tools/markFeatured";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from 'react-i18next';
@@ -107,9 +106,7 @@ const Index = () => {
                   {t('index.viewAll')}
                   <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
                 </Button>
-                {import.meta.env.DEV && (
-                  <MarkFeaturedButton limit={4} />
-                )}
+                {/* Removed MarkFeaturedButton */}
               </div>
             </div>
             {featuredLoading ? (
