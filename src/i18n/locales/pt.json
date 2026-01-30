@@ -545,7 +545,8 @@
   "comments": {
     "title": "Comentários",
     "form": {
-      "placeholder": "Adicione um comentário...",
+      "placeholder": "Adicione um comentário... Use @usuario para mencionar alguém.",
+      "mentionHelper": "Dica: use @usuario para mencionar alguém.",
       "submitButton": "Comentar",
       "submitting": "Enviando...",
       "contentRequired": "O comentário não pode estar vazio.",

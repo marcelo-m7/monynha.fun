@@ -10,6 +10,7 @@ import { useAuth } from '@/features/auth/useAuth';
 import { useDeleteComment } from '@/features/comments/queries/useComments';
 import { toast } from 'sonner';
 import i18n from 'i18next';
+import { Link } from 'react-router-dom';
 
 interface CommentItemProps {
   comment: Comment;
@@ -20,6 +21,28 @@ const localeMap: Record<string, Locale> = {
   en: enUS,
   es: es,
   fr: fr,
+};
+
+const parseContent = (content: string) => {
+  return content.split(/(\s+)/).map((token, index) => {
+    if (token.startsWith('@')) {
+      const match = token.match(/^@([\w.-]+)/);
+      if (match) {
+        const username = match[1];
+        const suffix = token.slice(username.length + 1);
+        return (
+          <React.Fragment key={`${token}-${index}`}>
+            <Link to={`/profile/${username}`} className="text-primary font-semibold hover:underline">
+              @{username}
+            </Link>
+            {suffix}
+          </React.Fragment>
+        );
+      }
+    }
+
+    return <React.Fragment key={`${token}-${index}`}>{token}</React.Fragment>;
+  });
 };
 
 export const CommentItem: React.FC<CommentItemProps> = ({ comment }) => {
@@ -69,7 +92,7 @@ export const CommentItem: React.FC<CommentItemProps> = ({ comment }) => {
             </Button>
           )}
         </div>
-        <p className="text-sm text-foreground mt-1 whitespace-pre-wrap">{comment.content}</p>
+        <p className="text-sm text-foreground mt-1 whitespace-pre-wrap">{parseContent(comment.content)}</p>
       </div>
     </div>
   );

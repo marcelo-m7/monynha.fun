@@ -61,6 +61,9 @@ export const CommentForm: React.FC<CommentFormProps> = ({ videoId }) => {
         maxLength={500}
         disabled={isSubmitting || !user}
       />
+      <p className="text-xs text-muted-foreground">
+        {t('comments.form.mentionHelper')}
+      </p>
       {errors.content && (
         <p className="text-sm text-destructive">{t(errors.content.message as string)}</p>
       )}
