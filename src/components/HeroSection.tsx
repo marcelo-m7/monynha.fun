@@ -157,6 +157,14 @@ export const HeroSection = () => {
             >
               {t('hero.submitVideoButton')}
             </Button>
+            <Button
+              variant="secondary"
+              size="lg"
+              onClick={() => navigate('/videos')}
+            >
+              {t('hero.exploreVideosButton')}
+              <ArrowRight className="w-5 h-5 ml-1" />
+            </Button>
           </div>
         </div>
       </div>

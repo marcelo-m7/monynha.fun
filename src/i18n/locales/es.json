@@ -18,6 +18,7 @@
   },
   "header": {
     "searchPlaceholder": "Buscar videos, canales...",
+    "videos": "Videos",
     "favorites": "Favoritos",
     "submitVideo": "Enviar Video",
     "logout": "Cerrar Sesión",
@@ -56,6 +57,7 @@
     "description": "Una comunidad dedicada a preservar y compartir los mejores videos de YouTube. Tutoriales antiguos, recetas tradicionales, memes icónicos y mucho más.",
     "submitUrlPlaceholder": "Pega una URL de video de YouTube aquí...",
     "submitVideoButton": "Enviar un Video",
+    "exploreVideosButton": "Explorar Videos",
     "error": {
       "invalidUrl": "Formato de URL inválido.",
       "notYoutubeUrl": "Solo se aceptan URLs de videos de YouTube.",

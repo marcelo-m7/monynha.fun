@@ -18,6 +18,7 @@
   },
   "header": {
     "searchPlaceholder": "Search videos, channels...",
+    "videos": "Videos",
     "favorites": "Favorites",
     "submitVideo": "Submit Video",
     "logout": "Logout",
@@ -56,6 +57,7 @@
     "description": "A community dedicated to preserving and sharing the best YouTube videos. Old tutorials, traditional recipes, iconic memes, and more.",
     "submitUrlPlaceholder": "Paste a YouTube video URL here...",
     "submitVideoButton": "Submit a Video",
+    "exploreVideosButton": "Explore Videos",
     "error": {
       "invalidUrl": "Invalid URL format.",
       "notYoutubeUrl": "Only YouTube video URLs are accepted.",
