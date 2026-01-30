@@ -22,6 +22,7 @@ serve(async (req) => {
   }
 
   const token = authHeader.replace('Bearer ', '')
+  // Client for user authentication (uses ANON_KEY and user's JWT)
   const supabase = createClient(
     Deno.env.get('SUPABASE_URL') ?? '',
     Deno.env.get('SUPABASE_ANON_KEY') ?? '',
@@ -42,26 +43,24 @@ serve(async (req) => {
     const { videoId, youtubeUrl } = await req.json()
     console.log(`[enrich-video] Received request for videoId: ${videoId}, youtubeUrl: ${youtubeUrl} by user: ${user.id}`)
 
-    // --- Placeholder for actual AI enrichment logic ---
-    // In a real scenario, you would call an external AI service here
-    // using an API key stored as a Supabase secret.
-    // Example:
-    // const aiApiKey = Deno.env.get('OPENAI_API_KEY');
-    // const aiResponse = await fetch('https://api.openai.com/v1/chat/completions', { ... });
-    // const enrichedData = parseAiResponse(aiResponse);
+    // Create a separate client for service role operations (bypasses RLS)
+    const supabaseServiceRole = createClient(
+      Deno.env.get('SUPABASE_URL') ?? '',
+      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
+    );
 
-    // For now, we'll simulate some enrichment and store it.
+    // --- Placeholder for actual AI enrichment logic ---
     const simulatedEnrichment = {
       optimized_title: `Monynha Fun: ${videoId} - Título Otimizado`,
       summary_description: `Este é um resumo gerado por IA para o vídeo ${videoId} da URL ${youtubeUrl}.`,
       semantic_tags: ['monynha', 'fun', 'ia', 'curadoria'],
-      suggested_category_id: null, // Placeholder, would be determined by AI
-      language: 'pt', // Placeholder, would be determined by AI
+      suggested_category_id: null,
+      language: 'pt',
       cultural_relevance: 'Alta',
       short_summary: 'Um vídeo interessante sobre tecnologia e comunidade.',
     };
 
-    const { data, error } = await supabase
+    const { data, error } = await supabaseServiceRole // Use the service role client here
       .from('ai_enrichments')
       .insert({
         video_id: videoId,
