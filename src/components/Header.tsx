@@ -54,6 +54,14 @@ export const Header = () => {
     { to: "/faq", label: t('footer.faq'), icon: HelpCircle },
   ];
 
+  // Filter navLinks for desktop display
+  const desktopNavLinks = navLinks.filter(link => 
+    link.to !== "/" && // Remove Home
+    link.to !== "/about" && // Remove About
+    link.to !== "/rules" && // Remove Rules
+    link.to !== "/faq" // Remove FAQ
+  );
+
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border/80 bg-background/80 backdrop-blur-xl">
       <div className="container flex h-16 items-center justify-between gap-4">
@@ -69,7 +77,7 @@ export const Header = () => {
 
         {/* New Desktop Nav Links */}
         <nav className="hidden md:flex items-center gap-6 ml-8">
-          {navLinks.map((link) => (
+          {desktopNavLinks.map((link) => (
             <NavLink
               key={link.to}
               to={link.to}
