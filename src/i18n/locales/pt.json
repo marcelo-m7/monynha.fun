@@ -25,6 +25,7 @@
     "playlists": "Playlists",
     "myProfile": "Meu Perfil",
     "editProfile": "Editar Perfil",
+    "accountSettings": "Configurações da Conta",
     "home": "Início",
     "toggleMenu": "Alternar menu",
     "closeMenu": "Fechar menu",
@@ -559,5 +560,59 @@
     "noComments": "Nenhum comentário ainda. Seja o primeiro a comentar!",
     "loadError": "Erro ao carregar comentários.",
     "deleteError": "Falha ao excluir o comentário."
+  },
+  "account": {
+    "settings": {
+      "title": "Configurações da Conta",
+      "description": "Gerencie a segurança e credenciais da sua conta",
+      "securityTitle": "Segurança",
+      "profileLinkDescription": "Deseja editar seu perfil público em vez disso?",
+      "emailSection": {
+        "title": "Endereço de Email",
+        "description": "Gerencie o endereço de email associado à sua conta",
+        "current": "Email atual",
+        "newEmail": "Novo endereço de email",
+        "confirmChange": "Atualizar Email",
+        "changeInfo": "Depois de enviar, você receberá um email de confirmação no novo endereço. Clique no link para confirmar a alteração."
+      },
+      "passwordSection": {
+        "title": "Senha",
+        "description": "Altere a senha da sua conta",
+        "currentPassword": "Senha atual",
+        "newPassword": "Nova senha",
+        "confirmPassword": "Confirmar nova senha",
+        "update": "Atualizar Senha"
+      },
+      "success": {
+        "emailUpdated": "Solicitação de atualização de email enviada. Verifique seu novo email para confirmar.",
+        "passwordUpdated": "Senha atualizada com sucesso"
+      },
+      "error": {
+        "notLoggedIn": "Você precisa estar logado para atualizar as configurações da conta.",
+        "sameEmail": "O novo email deve ser diferente do atual.",
+        "emailUpdateFailed": "Falha ao atualizar o email",
+        "passwordMismatch": "As senhas não coincidem",
+        "currentPasswordRequired": "A senha atual é obrigatória",
+        "samePassword": "A nova senha deve ser diferente da atual",
+        "wrongCurrentPassword": "A senha atual está incorreta",
+        "passwordUpdateFailed": "Falha ao atualizar a senha"
+      }
+    }
+  },
+  "auth": {
+    "resetPassword": {
+      "title": "Definir Nova Senha",
+      "description": "Digite sua nova senha abaixo",
+      "newPassword": "Nova senha",
+      "confirmPassword": "Confirmar senha",
+      "submit": "Redefinir Senha",
+      "success": "Senha redefinida com sucesso!",
+      "successTitle": "Senha Atualizada",
+      "redirecting": "Redirecionando para a página de login...",
+      "error": {
+        "generic": "Falha ao redefinir a senha",
+        "passwordMismatch": "As senhas não coincidem"
+      }
+    }
   }
 }

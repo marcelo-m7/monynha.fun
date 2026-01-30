@@ -25,6 +25,7 @@
     "playlists": "Listas de Reproducción",
     "myProfile": "Mi Perfil",
     "editProfile": "Editar Perfil",
+    "accountSettings": "Configuración de la Cuenta",
     "home": "Inicio",
     "toggleMenu": "Alternar menú",
     "closeMenu": "Cerrar menú",
@@ -565,5 +566,62 @@
     "noComments": "Aún no hay comentarios. ¡Sé el primero en comentar!",
     "loadError": "Error al cargar comentarios.",
     "deleteError": "Error al eliminar el comentario."
+  },
+  "account": {
+    "settings": {
+      "title": "Configuración de la Cuenta",
+      "description": "Gestiona la seguridad y credenciales de tu cuenta",
+      "securityTitle": "Seguridad",
+      "profileLinkDescription": "¿Deseas editar tu perfil público en su lugar?",
+      "emailSection": {
+        "title": "Dirección de Correo Electrónico",
+        "description": "Gestiona la dirección de correo electrónico asociada a tu cuenta",
+        "current": "Correo actual",
+        "newEmail": "Nueva dirección de correo electrónico",
+        "confirmChange": "Actualizar Correo",
+        "changeInfo": "Después de enviar, recibirás un correo de confirmación en la nueva dirección. Haz clic en el enlace para confirmar el cambio."
+      },
+      "passwordSection": {
+        "title": "Contraseña",
+        "description": "Cambia la contraseña de tu cuenta",
+        "currentPassword": "Contraseña actual",
+        "newPassword": "Nueva contraseña",
+        "confirmPassword": "Confirmar nueva contraseña",
+        "update": "Actualizar Contraseña"
+      },
+      "success": {
+        "emailUpdated": "Solicitud de actualización de correo enviada. Revisa tu nuevo correo para confirmar.",
+        "passwordUpdated": "Contraseña actualizada con éxito"
+      },
+      "error": {
+        "notLoggedIn": "Debes iniciar sesión para actualizar la configuración de la cuenta.",
+        "sameEmail": "El nuevo correo debe ser diferente del actual.",
+        "emailUpdateFailed": "Error al actualizar el correo electrónico",
+        "passwordMismatch": "Las contraseñas no coinciden",
+        "currentPasswordRequired": "La contraseña actual es obligatoria",
+        "samePassword": "La nueva contraseña debe ser diferente de la actual",
+        "wrongCurrentPassword": "La contraseña actual es incorrecta",
+        "passwordUpdateFailed": "Error al actualizar la contraseña"
+      }
+    }
+  },
+  "auth": {
+    "resetPassword": {
+      "title": "Establecer Nueva Contraseña",
+      "description": "Introduce tu nueva contraseña a continuación",
+      "newPassword": "Nueva contraseña",
+      "confirmPassword": "Confirmar contraseña",
+      "submit": "Restablecer Contraseña",
+      "success": "¡Contraseña restablecida con éxito!",
+      "successTitle": "Contraseña Actualizada",
+      "redirecting": "Redirigiendo a la página de inicio de sesión...",
+      "error": {
+        "generic": "Error al restablecer la contraseña",
+        "passwordMismatch": "Las contraseñas no coinciden"
+      }
+    }
+  },
+  "header": {
+    "accountSettings": "Configuración de la Cuenta"
   }
 }

@@ -25,6 +25,7 @@
     "playlists": "Playlists",
     "myProfile": "Mon Profil",
     "editProfile": "Modifier le Profil",
+    "accountSettings": "Paramètres du Compte",
     "home": "Accueil",
     "toggleMenu": "Basculer le menu",
     "closeMenu": "Fermer le menu",
@@ -549,19 +550,76 @@
     }
   },
   "comments": {
-    "title": "Comentarios",
+    "title": "Commentaires",
     "form": {
-      "placeholder": "Añade un comentario...",
-      "submitButton": "Comentar",
-      "submitting": "Enviando...",
-      "contentRequired": "El comentario no puede estar vacío.",
-      "contentMaxLength": "El comentario no puede exceder los 500 caracteres."
+      "placeholder": "Ajouter un commentaire...",
+      "submitButton": "Commenter",
+      "submitting": "Envoi en cours...",
+      "contentRequired": "Le commentaire ne peut pas être vide.",
+      "contentMaxLength": "Le commentaire ne peut pas dépasser 500 caractères."
     },
-    "loginToComment": "Debes iniciar sesión para comentar.",
-    "loginToCommentPrompt": "Inicia sesión para añadir tu comentario.",
-    "loginAction": "Iniciar Sesión",
-    "noComments": "Aún no hay comentarios. ¡Sé el primero en comentar!",
-    "loadError": "Error al cargar comentarios.",
-    "deleteError": "Error al eliminar el comentario."
+    "loginToComment": "Vous devez être connecté pour commenter.",
+    "loginToCommentPrompt": "Connectez-vous pour ajouter votre commentaire.",
+    "loginAction": "Connexion",
+    "noComments": "Aucun commentaire pour l'instant. Soyez le premier à commenter !",
+    "loadError": "Erreur lors du chargement des commentaires.",
+    "deleteError": "Échec de la suppression du commentaire."
+  },
+  "account": {
+    "settings": {
+      "title": "Paramètres du Compte",
+      "description": "Gérez la sécurité et les identifiants de votre compte",
+      "securityTitle": "Sécurité",
+      "profileLinkDescription": "Souhaitez-vous modifier votre profil public à la place ?",
+      "emailSection": {
+        "title": "Adresse Email",
+        "description": "Gérez l'adresse email associée à votre compte",
+        "current": "Email actuel",
+        "newEmail": "Nouvelle adresse email",
+        "confirmChange": "Mettre à jour l'Email",
+        "changeInfo": "Après l'envoi, vous recevrez un email de confirmation à la nouvelle adresse. Cliquez sur le lien pour confirmer le changement."
+      },
+      "passwordSection": {
+        "title": "Mot de passe",
+        "description": "Modifiez le mot de passe de votre compte",
+        "currentPassword": "Mot de passe actuel",
+        "newPassword": "Nouveau mot de passe",
+        "confirmPassword": "Confirmer le nouveau mot de passe",
+        "update": "Mettre à jour le Mot de passe"
+      },
+      "success": {
+        "emailUpdated": "Demande de mise à jour de l'email envoyée. Vérifiez votre nouvel email pour confirmer.",
+        "passwordUpdated": "Mot de passe mis à jour avec succès"
+      },
+      "error": {
+        "notLoggedIn": "Vous devez être connecté pour mettre à jour les paramètres du compte.",
+        "sameEmail": "Le nouvel email doit être différent de l'actuel.",
+        "emailUpdateFailed": "Échec de la mise à jour de l'email",
+        "passwordMismatch": "Les mots de passe ne correspondent pas",
+        "currentPasswordRequired": "Le mot de passe actuel est requis",
+        "samePassword": "Le nouveau mot de passe doit être différent de l'actuel",
+        "wrongCurrentPassword": "Le mot de passe actuel est incorrect",
+        "passwordUpdateFailed": "Échec de la mise à jour du mot de passe"
+      }
+    }
+  },
+  "auth": {
+    "resetPassword": {
+      "title": "Définir un Nouveau Mot de passe",
+      "description": "Entrez votre nouveau mot de passe ci-dessous",
+      "newPassword": "Nouveau mot de passe",
+      "confirmPassword": "Confirmer le mot de passe",
+      "submit": "Réinitialiser le Mot de passe",
+      "success": "Mot de passe réinitialisé avec succès !",
+      "successTitle": "Mot de passe Mis à jour",
+      "redirecting": "Redirection vers la page de connexion...",
+      "error": {
+        "generic": "Échec de la réinitialisation du mot de passe",
+        "passwordMismatch": "Les mots de passe ne correspondent pas"
+      }
+    }
+  },
+  "header": {
+    "accountSettings": "Paramètres du Compte"
   }
 }
