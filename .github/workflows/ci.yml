@@ -26,6 +26,9 @@ jobs:
         with:
           node-version: 20
 
+      - name: Prepare bun
+        run: corepack prepare bun@latest --activate
+
       - name: Install dependencies
         run: bun install
 
