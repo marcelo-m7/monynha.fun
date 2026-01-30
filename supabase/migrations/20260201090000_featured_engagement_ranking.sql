@@ -208,18 +208,13 @@ BEGIN
     v.is_featured,
     v.created_at,
     v.updated_at,
-    (
-      (v.view_count * 0.4) +
-      (v.favorites_count * 5) +
-      (v.playlist_add_count * 3)
-    ) * (1 / (1 + (EXTRACT(EPOCH FROM (now() - v.created_at)) / 86400) / 30)) AS featured_score,
+    v.view_count::numeric AS featured_score,
     to_jsonb(c.*) AS category
   FROM public.videos v
   LEFT JOIN public.categories c ON c.id = v.category_id
   ORDER BY
-    featured_score DESC,
-    v.created_at DESC,
-    v.view_count DESC
+    v.view_count DESC,
+    v.created_at DESC
   LIMIT p_limit
   OFFSET p_offset;
 END;

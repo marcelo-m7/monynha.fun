@@ -1,6 +1,6 @@
 # Monynha Fun: Diretrizes de Projeto para Agentes de IA
 
-Este documento descreve as tecnologias centrais e as regras específicas de uso de bibliotecas para o projeto **Monynha Fun**, da **Monynha Softwares**. A adesão a estas diretrizes garante consistência, manutenibilidade e desempenho ideal, alinhando-se à nossa filosofia de democratizar a tecnologia e valorizar a curadoria humana assistida por IA.
+Este documento descreve as tecnologias centrais e as regras específicas de uso de bibliotecas para o projeto **Monynha Fun**, de **Monynha Softwares**. A adesão a estas diretrizes garante consistência, manutenibilidade e desempenho ideal, alinhando-se à nossa filosofia de democratizar a tecnologia e valorizar a curadoria humana assistida por IA.
 
 ## Visão Geral da Pilha Tecnológica
 
