@@ -30,7 +30,7 @@ export const HeroSection = () => {
   const { user, loading: authLoading } = useAuth();
   const [isSubmittingForm, setIsSubmittingForm] = useState(false);
 
-  const { register, handleSubmit, formState: { errors }, setValue } = useForm<HeroSubmitFormValues>({
+  const { register, handleSubmit, formState: { errors } } = useForm<HeroSubmitFormValues>({
     resolver: zodResolver(heroSubmitSchema),
     defaultValues: {
       youtubeUrl: '',
