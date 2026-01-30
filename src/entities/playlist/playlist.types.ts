@@ -15,6 +15,7 @@ export type PlaylistVideo = Database['public']['Tables']['playlist_videos']['Row
     Video,
     'id' | 'title' | 'youtube_id' | 'thumbnail_url' | 'channel_name' | 'duration_seconds'
   > | null;
+  added_by_profile?: Pick<Profile, 'id' | 'username' | 'display_name' | 'avatar_url'> | null;
 };
 
 export type PlaylistCollaborator = Database['public']['Tables']['playlist_collaborators']['Row'] & {

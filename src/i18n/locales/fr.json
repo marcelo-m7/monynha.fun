@@ -289,6 +289,7 @@
     "backToPlaylists": "Volver a Listas de Reproducción",
     "byAuthor": "Por {{author}}",
     "anonymousAuthor": "Por autor anónimo",
+    "addedBy": "Ajouté par",
     "noDescription": "No se proporcionó ninguna descripción para esta lista de reproducción.",
     "editPlaylist": "Editar Lista de Reproducción",
     "deletePlaylist": "Eliminar Lista de Reproducción",

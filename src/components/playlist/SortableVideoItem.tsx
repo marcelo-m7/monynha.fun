@@ -128,6 +128,17 @@ export function SortableVideoItem({
         <p className="text-sm text-muted-foreground line-clamp-1">
           {item.video?.channel_name}
         </p>
+        {item.added_by_profile?.username && (
+          <p className="text-xs text-muted-foreground">
+            {t('playlistDetails.addedBy')}{' '}
+            <Link
+              to={`/profile/${item.added_by_profile.username}`}
+              className="hover:text-foreground transition-colors"
+            >
+              @{item.added_by_profile.username}
+            </Link>
+          </p>
+        )}
       </Link>
 
       {/* Remove button (only for editors) */}
