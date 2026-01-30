@@ -16,10 +16,21 @@ export function extractYouTubeId(url: string): string | null {
 }
 
 export function extractYouTubePlaylistId(url: string): string | null {
-  const urlObj = new URL(url);
-  const listId = urlObj.searchParams.get('list');
-  return listId;
-}
+  try {
+    const urlObj = new URL(url);
+    const hostname = urlObj.hostname || '';
+    // Only treat URLs on YouTube domains as valid playlist URLs
+    if (!hostname.includes('youtube.com') && !hostname.includes('youtu.be') && !hostname.includes('youtube-nocookie.com')) {
+      return null;
+    }
+
+    const listId = urlObj.searchParams.get('list');
+    return listId && listId.trim() !== '' ? listId : null;
+  } catch (e) {
+    // Not a valid absolute URL
+    return null;
+  }
+} 
 
 export function getYouTubeThumbnail(videoId: string, quality: 'default' | 'medium' | 'high' | 'max' = 'max'): string {
   const qualityMap = {

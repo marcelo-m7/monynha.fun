@@ -13,6 +13,8 @@ vi.mock('@/features/playlists/queries/usePlaylists', () => ({
 vi.mock('@/features/playlists', () => ({
   usePlaylistVideos: () => ({ data: [], isLoading: false }),
   usePlaylistProgress: () => ({ data: [], isLoading: false }),
+  useCreatePlaylist: () => ({ mutateAsync: vi.fn(async (payload: any) => ({ id: 'playlist-1', name: payload?.name || 'Playlist' })) }),
+  useAddVideoToPlaylist: () => ({ mutateAsync: vi.fn(async () => ({}) ) }),
 }));
 
 vi.mock('@/features/auth/useAuth', () => ({
