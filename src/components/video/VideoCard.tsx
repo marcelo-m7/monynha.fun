@@ -33,6 +33,7 @@ export const VideoCard = ({ video, onClick, variant = 'default' }: VideoCardProp
       onClick={handleClick}
       className={cn(
         "group cursor-pointer rounded-2xl bg-card overflow-hidden shadow-sm transition-all duration-300 card-hover hover:shadow-lg border border-border/50",
+        variant === 'default' && "flex h-full min-h-[320px] flex-col",
         variant === 'compact' && "flex items-center gap-3 p-2 rounded-xl hover:bg-muted/50 hover:shadow-none border-none"
       )}
     >
@@ -96,8 +97,8 @@ export const VideoCard = ({ video, onClick, variant = 'default' }: VideoCardProp
 
       {/* Content */}
       <div className={cn(
-        "space-y-3",
-        variant === 'default' ? "p-4" : "flex-1 space-y-1"
+        "flex flex-col",
+        variant === 'default' ? "flex-1 space-y-3 p-4" : "flex-1 space-y-1"
       )}>
         <h3 className={cn(
           "font-semibold leading-snug line-clamp-2 group-hover:text-primary transition-colors",
@@ -114,8 +115,9 @@ export const VideoCard = ({ video, onClick, variant = 'default' }: VideoCardProp
         </p>
 
         <div className={cn(
-          "flex items-center justify-between text-xs text-muted-foreground",
-          variant === 'compact' && "hidden"
+          "flex min-h-[24px] items-center justify-between text-xs text-muted-foreground",
+          variant === 'compact' && "hidden",
+          variant === 'default' && "mt-auto"
         )}>
           <div className="flex items-center gap-1 relative">
             <Eye className="w-3.5 h-3.5" />
