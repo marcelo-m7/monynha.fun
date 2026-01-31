@@ -21,7 +21,15 @@ export function renderWithProviders(ui: ReactElement, { route = '/' }: RenderOpt
   return render(
     <I18nextProvider i18n={i18n}>
       <QueryClientProvider client={queryClient}>
-        <MemoryRouter initialEntries={[route]}>{ui}</MemoryRouter>
+        <MemoryRouter 
+          initialEntries={[route]}
+          future={{
+            v7_startTransition: true,
+            v7_relativeSplatPath: true,
+          }}
+        >
+          {ui}
+        </MemoryRouter>
       </QueryClientProvider>
     </I18nextProvider>,
   );
