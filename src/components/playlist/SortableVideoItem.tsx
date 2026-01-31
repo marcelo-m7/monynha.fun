@@ -1,4 +1,6 @@
-import { useSortable } from '@dnd-kit/core';
+import {
+  useSortable,
+} from '@dnd-kit/sortable'; // Corrected import path
 import { CSS } from '@dnd-kit/utilities';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
