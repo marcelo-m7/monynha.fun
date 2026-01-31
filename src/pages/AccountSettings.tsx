@@ -8,7 +8,9 @@ import { useRequireAuth } from '@/shared/hooks/useRequireAuth';
 import { ChangeEmailForm } from '@/components/account/ChangeEmailForm';
 import { ChangePasswordForm } from '@/components/account/ChangePasswordForm';
 import { ResendConfirmationEmail } from '@/components/account/ResendConfirmationEmail';
+import { DeleteAccount } from '@/components/account/DeleteAccount';
 import { Skeleton } from '@/components/ui/skeleton';
+import { Separator } from '@/components/ui/separator';
 
 export default function AccountSettings() {
   const { t } = useTranslation();
@@ -84,6 +86,16 @@ export default function AccountSettings() {
               <Button variant="outline" onClick={() => navigate('/profile/edit')}>
                 {t('header.editProfile')}
               </Button>
+            </div>
+
+            {/* Danger Zone - Account Deletion */}
+            <div className="mt-12">
+              <Separator className="mb-6" />
+              <div className="mb-4">
+                <h2 className="text-lg font-semibold text-destructive">{t('account.settings.dangerZone.title')}</h2>
+                <p className="text-sm text-muted-foreground">{t('account.settings.dangerZone.description')}</p>
+              </div>
+              <DeleteAccount />
             </div>
           </div>
         </div>

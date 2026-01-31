@@ -159,6 +159,42 @@
           "failed": "Falha ao enviar e-mail de confirmação",
           "cooldown": "Por favor, aguarde antes de solicitar outro e-mail"
         }
+      },
+      "dangerZone": {
+        "title": "Zona de Perigo",
+        "description": "Ações irreversíveis que afetam permanentemente sua conta."
+      },
+      "deleteAccount": {
+        "title": "Excluir Conta",
+        "description": "Exclua permanentemente sua conta e todos os dados associados.",
+        "button": "Excluir Minha Conta",
+        "warning": "Esta ação não pode ser desfeita. Todos os seus dados serão permanentemente excluídos.",
+        "consequences": {
+          "title": "O que será excluído:",
+          "data": "Seu perfil e informações da conta",
+          "videos": "Todos os vídeos que você enviou",
+          "playlists": "Todas as suas playlists",
+          "favorites": "Seus favoritos e preferências",
+          "irreversible": "Esta ação é permanente e irreversível"
+        },
+        "dialog": {
+          "title": "Espera! Tem certeza mesmo? 🥺",
+          "playfulMessage": "Ficamos tristes em vê-lo partir! Tem certeza que quer excluir sua conta? Não há volta depois disso... 💔",
+          "reallyConfirm": "Se você tem certeza absoluta, digite DELETE abaixo para confirmar:",
+          "typeToConfirm": "Digite \"{{text}}\" para confirmar",
+          "finalWarning": "Última chance! Isso excluirá tudo permanentemente.",
+          "confirm": "Sim, Excluir Para Sempre",
+          "deleting": "Excluindo...",
+          "cancel": "Não, Manter Minha Conta"
+        },
+        "success": {
+          "deleted": "Conta excluída com sucesso",
+          "goodbye": "Sentimos sua falta. Até logo! 👋"
+        },
+        "error": {
+          "failed": "Falha ao excluir conta",
+          "confirmationMismatch": "Por favor, digite DELETE para confirmar"
+        }
       }
     }
   },

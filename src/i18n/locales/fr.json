@@ -162,6 +162,42 @@
           "failed": "Échec de l'envoi de l'e-mail de confirmation",
           "cooldown": "Veuillez attendre avant de demander un autre e-mail"
         }
+      },
+      "dangerZone": {
+        "title": "Zone Dangereuse",
+        "description": "Actions irréversibles qui affectent définitivement votre compte."
+      },
+      "deleteAccount": {
+        "title": "Supprimer le Compte",
+        "description": "Supprimez définitivement votre compte et toutes les données associées.",
+        "button": "Supprimer Mon Compte",
+        "warning": "Cette action est irréversible. Toutes vos données seront définitivement supprimées.",
+        "consequences": {
+          "title": "Ce qui sera supprimé:",
+          "data": "Votre profil et informations de compte",
+          "videos": "Toutes les vidéos que vous avez soumises",
+          "playlists": "Toutes vos listes de lecture",
+          "favorites": "Vos favoris et préférences",
+          "irreversible": "Cette action est permanente et irréversible"
+        },
+        "dialog": {
+          "title": "Attendez! Êtes-vous vraiment sûr? 🥺",
+          "playfulMessage": "Nous sommes tristes de vous voir partir! Êtes-vous sûr de vouloir supprimer votre compte? Il n'y a pas de retour en arrière... 💔",
+          "reallyConfirm": "Si vous êtes absolument certain, tapez DELETE ci-dessous pour confirmer:",
+          "typeToConfirm": "Tapez \"{{text}}\" pour confirmer",
+          "finalWarning": "Dernière chance! Cela supprimera tout définitivement.",
+          "confirm": "Oui, Supprimer Définitivement",
+          "deleting": "Suppression...",
+          "cancel": "Non, Garder Mon Compte"
+        },
+        "success": {
+          "deleted": "Compte supprimé avec succès",
+          "goodbye": "Nous regrettons de vous voir partir. Au revoir! 👋"
+        },
+        "error": {
+          "failed": "Échec de la suppression du compte",
+          "confirmationMismatch": "Veuillez taper DELETE pour confirmer"
+        }
       }
     }
   },

@@ -176,6 +176,42 @@
           "failed": "Error al enviar correo de confirmación",
           "cooldown": "Por favor, espera antes de solicitar otro correo"
         }
+      },
+      "dangerZone": {
+        "title": "Zona de Peligro",
+        "description": "Acciones irreversibles que afectan permanentemente tu cuenta."
+      },
+      "deleteAccount": {
+        "title": "Eliminar Cuenta",
+        "description": "Elimina permanentemente tu cuenta y todos los datos asociados.",
+        "button": "Eliminar Mi Cuenta",
+        "warning": "Esta acción no se puede deshacer. Todos tus datos serán eliminados permanentemente.",
+        "consequences": {
+          "title": "Lo que se eliminará:",
+          "data": "Tu perfil e información de cuenta",
+          "videos": "Todos los videos que has enviado",
+          "playlists": "Todas tus listas de reproducción",
+          "favorites": "Tus favoritos y preferencias",
+          "irreversible": "Esta acción es permanente e irreversible"
+        },
+        "dialog": {
+          "title": "¡Espera! ¿Estás realmente seguro? 🥺",
+          "playfulMessage": "¡Nos entristece verte partir! ¿Estás seguro de que quieres eliminar tu cuenta? No hay vuelta atrás... 💔",
+          "reallyConfirm": "Si estás absolutamente seguro, escribe DELETE abajo para confirmar:",
+          "typeToConfirm": "Escribe \"{{text}}\" para confirmar",
+          "finalWarning": "¡Última oportunidad! Esto eliminará todo permanentemente.",
+          "confirm": "Sí, Eliminar Para Siempre",
+          "deleting": "Eliminando...",
+          "cancel": "No, Mantener Mi Cuenta"
+        },
+        "success": {
+          "deleted": "Cuenta eliminada exitosamente",
+          "goodbye": "Lamentamos verte partir. ¡Adiós! 👋"
+        },
+        "error": {
+          "failed": "Error al eliminar cuenta",
+          "confirmationMismatch": "Por favor, escribe DELETE para confirmar"
+        }
       }
     }
   },

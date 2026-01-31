@@ -173,6 +173,42 @@
           "failed": "Failed to send confirmation email",
           "cooldown": "Please wait before requesting another email"
         }
+      },
+      "dangerZone": {
+        "title": "Danger Zone",
+        "description": "Irreversible actions that permanently affect your account."
+      },
+      "deleteAccount": {
+        "title": "Delete Account",
+        "description": "Permanently delete your account and all associated data.",
+        "button": "Delete My Account",
+        "warning": "This action cannot be undone. All your data will be permanently deleted.",
+        "consequences": {
+          "title": "What will be deleted:",
+          "data": "Your profile and account information",
+          "videos": "All videos you've submitted",
+          "playlists": "All your playlists",
+          "favorites": "Your favorites and preferences",
+          "irreversible": "This action is permanent and irreversible"
+        },
+        "dialog": {
+          "title": "Wait! Are you really sure? 🥺",
+          "playfulMessage": "We're sad to see you go! Are you sure you want to delete your account? There's no coming back from this... 💔",
+          "reallyConfirm": "If you're absolutely certain, type DELETE below to confirm:",
+          "typeToConfirm": "Type \"{{text}}\" to confirm",
+          "finalWarning": "Last chance! This will permanently delete everything.",
+          "confirm": "Yes, Delete Forever",
+          "deleting": "Deleting...",
+          "cancel": "No, Keep My Account"
+        },
+        "success": {
+          "deleted": "Account deleted successfully",
+          "goodbye": "We're sorry to see you go. Goodbye! 👋"
+        },
+        "error": {
+          "failed": "Failed to delete account",
+          "confirmationMismatch": "Please type DELETE to confirm"
+        }
       }
     }
   },
