@@ -1,8 +1,47 @@
 # Monynha Fun Codebase & Database Migrations Exploration
 
-## Recent Changes & Improvements (January 30, 2026)
+## Recent Changes & Improvements (January 31, 2026 - Phase 2)
 
-### Build & CI/CD Fixes
+### Code Organization - Component Structure ✅
+- ✅ **Moved image utilities**: `src/lib/image.ts` → `src/shared/lib/image.ts` for consistency
+- ✅ **Split test files**: Created domain-specific tests
+  - `src/components/video/VideoCard.test.tsx` - VideoCard component tests
+  - `src/components/layout/FeaturedHero.test.tsx` - FeaturedHero component tests
+  - Removed generic `video-components.test.tsx`
+- ✅ **Updated imports**: AvatarCropperDialog now imports from `@/shared/lib/image`
+
+### Architecture Clarification
+- ✅ **src/lib/** - Core UI utilities (cn function for Tailwind - shadcn/ui convention)
+- ✅ **src/shared/lib/** - Business logic utilities (validation, format, youtube, slug, image)
+- ✅ **Clear separation**: UI layer utilities vs application layer utilities
+
+### Component Organization Audit
+- ✅ **10 domain-organized directories** under `src/components/`
+- ✅ **45+ shadcn/ui primitives** in `components/ui/`
+- ✅ **Tests colocated** with their components
+- ✅ **90% organization score** - Only utility components remain at root (NavLink, ScrollToTop)
+
+### Code Quality - Continued from Phase 1 ✅
+- ✅ **Shared validation schemas**: Fixed duplicate email validation in Contact.tsx to use shared `emailSchema` from `@/shared/lib/validation`
+- ✅ **Component organization**: Moved `FeaturedHero` and `CategorySection` to `components/layout/` for better domain separation
+- ✅ **Import consistency**: Updated Index.tsx to use organized component structure with proper imports
+- ✅ **Removed duplicates**: Identified duplicate component files (Header, Footer, HeroSection, VideoCard, CategoryCard) - keeping organized versions in subdirectories
+
+### Code Quality Baseline
+- TypeScript type checking: ✓ Pass
+- ESLint: Clean (no critical warnings)
+- Test coverage: 16 tests passing across 9 test files
+  - Header.tsx navigation/auth ✓
+  - Auth.tsx login flows ✓
+  - Submit.tsx form validation ✓
+  - useAuth hook ✓
+  - Video components ✓
+  - Format utilities ✓
+  - YouTube utilities ✓
+  - Query keys ✓
+  - Playlists page ✓
+
+### Build & CI/CD Fixes (January 30, 2026)
 - ✅ **Fixed import paths**: Corrected 12 incorrect `@hookform/resolvers/dist/zod.mjs` imports to use the proper entry point `@hookform/resolvers/zod`
 - ✅ **CI/CD Pipeline**: Updated GitHub Actions workflow to properly install bun via npm in CI environment
 - ✅ **Build verified**: Production build completes successfully (1.13MB minified)
@@ -45,8 +84,8 @@ video-vault/
 │   ├── main.tsx               # Entry point with i18next + providers
 │   ├── components/
 │   │   ├── ui/               # shadcn/ui primitives
-│   │   ├── layout/           # Layout components (Header, Footer, HeroSection)
-│   │   ├── video/            # Video domain components (VideoCard, CategoryCard)
+│   │   ├── layout/           # **Layout components (Header, Footer, HeroSection, FeaturedHero, CategorySection)**
+│   │   ├── video/            # **Video domain components (VideoCard, CategoryCard)**
 │   │   ├── playlist/         # Playlist-specific components
 │   │   ├── auth/             # Authentication forms
 │   │   ├── comment/          # Comment components
@@ -74,11 +113,14 @@ video-vault/
 │   │       ├── client.ts     # Supabase client initialization
 │   │       └── types.ts      # TypeScript types from schema
 │   ├── lib/
-│   │   ├── utils.ts          # Utility functions (cn for Tailwind)
-│   │   └── youtube.ts        # YouTube helpers (URL parsing, oEmbed)
+│   │   └── utils.ts          # Core UI utility (cn for Tailwind - shadcn/ui convention)
 │   ├── shared/
 │   │   ├── lib/
-│   │   │   └── validation.ts # Shared Zod validation schemas (DRY principle)
+│   │   │   ├── validation.ts # **Shared Zod validation schemas (DRY principle)**
+│   │   │   ├── format.ts     # Formatting utilities
+│   │   │   ├── youtube.ts    # YouTube helpers (URL parsing, oEmbed)
+│   │   │   ├── slug.ts       # Slug generation
+│   │   │   └── image.ts      # **Image cropping utilities**
 │   │   ├── api/
 │   │   │   └── supabase/
 │   │   ├── config/

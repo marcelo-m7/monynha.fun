@@ -4,8 +4,8 @@ import { useTranslation } from 'react-i18next';
 import { Slider } from '@/components/ui/slider';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
-import { Label } from '@/components/ui/label'; // Import Label
-import { getCroppedImg } from '@/lib/image';
+import { Label } from '@/components/ui/label';
+import { getCroppedImg } from '@/shared/lib/image';
 import { Crop, RotateCcw, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 

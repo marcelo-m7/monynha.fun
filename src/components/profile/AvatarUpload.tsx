@@ -66,7 +66,6 @@ export function AvatarUpload({
       if (currentAvatarPath) {
         const { error: removeError } = await supabase.storage.from('avatars').remove([currentAvatarPath]);
         if (removeError) {
-          console.warn(`[AvatarUpload] Failed to remove old avatar at path ${currentAvatarPath}:`, removeError.message);
           // Don't throw, continue with new upload
         }
       }
@@ -86,10 +85,9 @@ export function AvatarUpload({
         .from('avatars')
         .getPublicUrl(fileName);
 
-      onUploadComplete(publicUrl, fileName); // Pass both URL and path
+      onUploadComplete(publicUrl, fileName);
       toast.success(t('profile.avatar.uploadSuccess'));
     } catch (error) {
-      console.error('Avatar upload error:', error);
       toast.error(t('profile.avatar.uploadError'));
     } finally {
       setIsUploading(false);
@@ -107,10 +105,9 @@ export function AvatarUpload({
         const { error: removeError } = await supabase.storage.from('avatars').remove([currentAvatarPath]);
         if (removeError) throw removeError;
       }
-      onUploadComplete('', ''); // Clear both URL and path in parent component
+      onUploadComplete('', '');
       toast.success(t('profile.avatar.removeSuccess'));
     } catch (error) {
-      console.error('Avatar removal error:', error);
       toast.error(t('profile.avatar.removeError'));
     } finally {
       setIsUploading(false);

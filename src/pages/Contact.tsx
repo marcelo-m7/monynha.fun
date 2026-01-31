@@ -12,11 +12,12 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { toast } from 'sonner';
 import { useState } from 'react';
+import { emailSchema } from '@/shared/lib/validation';
 
 // Define Zod schema for the contact form
 const contactFormSchema = z.object({
   name: z.string().min(1, 'contactPage.form.nameRequired'),
-  email: z.string().email('contactPage.form.emailInvalid'),
+  email: emailSchema.refine(() => true, { message: 'contactPage.form.emailInvalid' }),
   subject: z.string().min(1, 'contactPage.form.subjectRequired'),
   message: z.string().min(1, 'contactPage.form.messageRequired').max(1000, 'contactPage.form.messageMaxLength'),
 });
@@ -41,13 +42,11 @@ const Contact = () => {
   const onSubmit = async (values: ContactFormValues) => {
     setIsSubmitting(true);
     try {
-      // Simulate API call
+      // Simulate API call - TODO: Replace with actual backend endpoint
       await new Promise(resolve => setTimeout(resolve, 1500)); 
-      console.log('Contact form submitted:', values);
       toast.success(t('contactPage.successMessage'));
       reset();
     } catch (error) {
-      console.error('Contact form submission error:', error);
       toast.error(t('contactPage.errorMessage'));
     } finally {
       setIsSubmitting(false);
