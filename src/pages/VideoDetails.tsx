@@ -5,6 +5,7 @@ import { useAuth } from '@/features/auth/useAuth';
 import { useIsFavorited, useAddFavorite, useRemoveFavorite } from '@/features/favorites/queries/useFavorites';
 import { useProfileById } from '@/features/profile/queries/useProfile';
 import { getYouTubeEmbedUrl } from '@/shared/lib/youtube';
+import { useMetaTags } from '@/shared/hooks/useMetaTags';
 import { Header } from '@/components/layout/Header';
 import { Footer } from '@/components/layout/Footer';
 import { VideoCard } from '@/components/video/VideoCard';
@@ -32,6 +33,14 @@ const VideoDetails = () => {
   const { data: isFavorited, isLoading: isFavoritedLoading } = useIsFavorited(video?.id);
   const addFavoriteMutation = useAddFavorite();
   const removeFavoriteMutation = useRemoveFavorite();
+
+  // Set dynamic meta tags for social media sharing
+  useMetaTags({
+    title: video?.title ? `${video.title} | Monynha Fun` : 'Monynha Fun',
+    description: video?.description || 'Curadoria coletiva de vídeos do YouTube.',
+    image: video?.thumbnail_url || 'https://monynha.com/opengraph-image-monynha-fun.png',
+    type: 'video.other',
+  });
 
   const handleFavoriteToggle = async () => {
     if (!user) {

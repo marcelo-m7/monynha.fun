@@ -5,6 +5,7 @@ import { useProfileByUsername } from '@/features/profile/queries/useProfile';
 import { useVideos } from '@/features/videos/queries/useVideos';
 import { usePlaylists } from '@/features/playlists/queries/usePlaylists';
 import { useUserSocialAccounts } from '@/features/user_social_accounts'; // Import the new hook
+import { useMetaTags } from '@/shared/hooks/useMetaTags';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -32,6 +33,12 @@ const Profile = () => {
     enabled: !!profile?.id,
   });
   const { data: socialAccounts, isLoading: socialAccountsLoading } = useUserSocialAccounts(profile?.id); // Fetch social accounts
+
+  // Set dynamic meta tags for social media sharing
+  useMetaTags({
+    title: profile?.display_name ? `${profile.display_name} | Monynha Fun` : 'Monynha Fun',
+    description: profile?.bio || `${profile?.display_name} on Monynha Fun: Curadoria coletiva de vídeos do YouTube.`,
+  });
 
   if (profileLoading || authLoading || socialAccountsLoading) {
     return (

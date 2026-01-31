@@ -3,6 +3,7 @@ import { usePlaylistById, useDeletePlaylist } from '@/features/playlists/queries
 import { usePlaylistVideos, useAddVideoToPlaylist, useRemoveVideoFromPlaylist } from '@/features/playlists/queries/usePlaylistVideos';
 import { usePlaylistProgress } from '@/features/playlists/queries/usePlaylistProgress';
 import { useCanEditPlaylist, useIsPlaylistAuthor } from '@/features/playlists/usePlaylistUtils';
+import { useMetaTags } from '@/shared/hooks/useMetaTags';
 import { Header } from '@/components/layout/Header';
 import { Footer } from '@/components/layout/Footer';
 import { VideoCard } from '@/components/video/VideoCard';
@@ -37,6 +38,13 @@ const PlaylistDetails = () => {
 
   const isAuthor = useIsPlaylistAuthor(playlist);
   const canEdit = useCanEditPlaylist(playlist);
+
+  // Set dynamic meta tags for social media sharing
+  useMetaTags({
+    title: playlist?.name ? `${playlist.name} | Monynha Fun` : 'Monynha Fun',
+    description: playlist?.description || 'Playlist no Monynha Fun: Curadoria coletiva de vídeos do YouTube.',
+    type: 'website',
+  });
 
   const [addVideoSearchQuery, setAddVideoSearchQuery] = useState('');
   const [isAddVideoDialogOpen, setIsAddVideoDialogOpen] = useState(false);
