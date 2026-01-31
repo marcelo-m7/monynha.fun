@@ -13,6 +13,10 @@ export const CategorySection = () => {
   const navigate = useNavigate();
   const { data: categories, isLoading: categoriesLoading, isError: categoriesError } = useCategories();
 
+  const handleCategoryClick = (categoryId: string) => {
+    navigate(`/videos?category=${categoryId}`);
+  };
+
   return (
     <section className="py-16 bg-background">
       <div className="container">
@@ -53,6 +57,7 @@ export const CategorySection = () => {
                   key={category.id}
                   category={category}
                   index={index}
+                  onClick={() => handleCategoryClick(category.id)}
                 />
               ))}
             </div>
