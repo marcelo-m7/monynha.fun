@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { ArrowRight, FolderX } from 'lucide-react';
@@ -6,12 +6,28 @@ import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { CategoryCard } from '@/components/video/CategoryCard';
 import { useCategories } from '@/features/categories/queries/useCategories';
+import { useVideos } from '@/features/videos/queries/useVideos';
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
 
 export const CategorySection = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const { data: categories, isLoading: categoriesLoading, isError: categoriesError } = useCategories();
+  const { data: videos } = useVideos({ enabled: !!categories?.length });
+
+  const categoryVideoCounts = useMemo(() => {
+    const counts: Record<string, number> = {};
+
+    videos?.forEach((video) => {
+      const categoryId = video.category?.id ?? video.category_id;
+
+      if (!categoryId) return;
+
+      counts[categoryId] = (counts[categoryId] ?? 0) + 1;
+    });
+
+    return counts;
+  }, [videos]);
 
   const handleCategoryClick = (categoryId: string) => {
     navigate(`/videos?category=${categoryId}`);
@@ -57,6 +73,7 @@ export const CategorySection = () => {
                   key={category.id}
                   category={category}
                   index={index}
+                  videoCount={categoryVideoCounts[category.id] ?? 0}
                   onClick={() => handleCategoryClick(category.id)}
                 />
               ))}

@@ -42,8 +42,11 @@ describe('VideoCard', () => {
   it('renders video details', () => {
     renderWithProviders(<VideoCard video={sampleVideo} />);
 
+    const article = screen.getByRole('article');
+
     expect(screen.getByText('Learning React')).toBeInTheDocument();
     expect(screen.getByText('Monynha')).toBeInTheDocument();
+    expect(article).toHaveClass('min-h-[320px]');
   });
 
   it('increments view count with session id on click', async () => {
