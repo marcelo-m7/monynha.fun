@@ -82,6 +82,9 @@ export default {
         sm: "var(--shadow-sm)",
         md: "var(--shadow-md)",
         lg: "var(--shadow-lg)",
+        "depth-1": "var(--shadow-depth-1)",
+        "depth-2": "var(--shadow-depth-2)",
+        "depth-3": "var(--shadow-depth-3)",
         glow: "var(--shadow-glow)",
       },
       keyframes: {
