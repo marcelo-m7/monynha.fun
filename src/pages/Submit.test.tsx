@@ -4,6 +4,8 @@ import userEvent from '@testing-library/user-event';
 import Submit from './Submit';
 import { renderWithProviders } from '@/shared/test/renderWithProviders';
 
+const navigateMock = vi.fn();
+
 const useAuthMock = vi.fn();
 const useCategoriesMock = vi.fn();
 const useYouTubeMetadataMock = vi.fn();
@@ -13,6 +15,14 @@ const useSubmitVideoMock = vi.fn();
 vi.mock('@/features/auth/useAuth', () => ({
   useAuth: () => useAuthMock(),
 }));
+
+vi.mock('react-router-dom', async () => {
+  const actual = await vi.importActual<typeof import('react-router-dom')>('react-router-dom');
+  return {
+    ...actual,
+    useNavigate: () => navigateMock,
+  };
+});
 
 vi.mock('@/features/categories/queries/useCategories', () => ({
   useCategories: () => useCategoriesMock(),
@@ -27,6 +37,7 @@ vi.mock('@/features/submit/useSubmitVideo', () => ({
 }));
 
 beforeEach(() => {
+  navigateMock.mockReset();
   useAuthMock.mockReturnValue({ user: { id: 'user-1' }, loading: false });
   useCategoriesMock.mockReturnValue({ data: [], isLoading: false });
   useSubmitVideoMock.mockReturnValue({ mutateAsync: mutateAsyncMock, isPending: false });
@@ -92,5 +103,16 @@ describe('Submit page', () => {
         userId: 'user-1',
       }),
     );
+  });
+
+  it('redirects to auth when user is not authenticated', async () => {
+    useAuthMock.mockReturnValue({ user: null, loading: false });
+    useYouTubeMetadataMock.mockReturnValue({ metadata: null, isLoading: false, error: null });
+
+    renderWithProviders(<Submit />);
+
+    await waitFor(() => {
+      expect(navigateMock).toHaveBeenCalledWith('/auth');
+    });
   });
 });
