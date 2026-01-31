@@ -1,5 +1,5 @@
-import { Header } from '@/components/Header';
-import { Footer } from '@/components/Footer';
+import { Header } from '@/components/layout/Header';
+import { Footer } from '@/components/layout/Footer';
 import { usePlaylists } from '@/features/playlists/queries/usePlaylists';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';

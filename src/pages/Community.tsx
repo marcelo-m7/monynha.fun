@@ -1,5 +1,5 @@
-import { Header } from '@/components/Header';
-import { Footer } from '@/components/Footer';
+import { Header } from '@/components/layout/Header';
+import { Footer } from '@/components/layout/Footer';
 import { useTranslation } from 'react-i18next';
 import { ArrowLeft, Users, User as UserIcon, Video } from 'lucide-react';
 import { Button } from '@/components/ui/button';

@@ -3,9 +3,9 @@ import { usePlaylistById, useDeletePlaylist } from '@/features/playlists/queries
 import { usePlaylistVideos, useAddVideoToPlaylist, useRemoveVideoFromPlaylist } from '@/features/playlists/queries/usePlaylistVideos';
 import { usePlaylistProgress } from '@/features/playlists/queries/usePlaylistProgress';
 import { useCanEditPlaylist, useIsPlaylistAuthor } from '@/features/playlists/usePlaylistUtils';
-import { Header } from '@/components/Header';
-import { Footer } from '@/components/Footer';
-import { VideoCard } from '@/components/VideoCard';
+import { Header } from '@/components/layout/Header';
+import { Footer } from '@/components/layout/Footer';
+import { VideoCard } from '@/components/video/VideoCard';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Badge } from '@/components/ui/badge'; // Import Badge component

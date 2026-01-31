@@ -1,7 +1,7 @@
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { Header } from '@/components/Header';
-import { Footer } from '@/components/Footer';
+import { Header } from '@/components/layout/Header';
+import { Footer } from '@/components/layout/Footer';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft, Settings, Shield } from 'lucide-react';
 import { useRequireAuth } from '@/shared/hooks/useRequireAuth';

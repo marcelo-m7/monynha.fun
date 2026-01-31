@@ -1,8 +1,8 @@
 import { useLocation } from "react-router-dom";
 import { useEffect } from "react";
 import { useTranslation } from 'react-i18next'; // Import useTranslation
-import { Header } from '@/components/Header'; // Added missing import
-import { Footer } from '@/components/Footer'; // Added missing import
+import { Header } from '@/components/layout/Header'; // Added missing import
+import { Footer } from '@/components/layout/Footer'; // Added missing import
 
 const NotFound = () => {
   const { t } = useTranslation(); // Initialize useTranslation

@@ -1,7 +1,7 @@
-import { Header } from "@/components/Header";
-import { HeroSection } from "@/components/HeroSection";
-import { VideoCard } from "@/components/VideoCard";
-import { Footer } from "@/components/Footer";
+import { Header } from "@/components/layout/Header";
+import { HeroSection } from "@/components/layout/HeroSection";
+import { VideoCard } from "@/components/video/VideoCard";
+import { Footer } from "@/components/layout/Footer";
 import { useFeaturedVideos, useRecentVideos } from "@/features/videos/queries/useVideos";
 import { usePlaylists } from "@/features/playlists/queries/usePlaylists";
 import { ArrowRight, TrendingUp, Clock, ListVideo } from "lucide-react";

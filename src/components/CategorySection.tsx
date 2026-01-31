@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { ArrowRight, FolderX } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
-import { CategoryCard } from '@/components/CategoryCard';
+import { CategoryCard } from '@/components/video/CategoryCard';
 import { useCategories } from '@/features/categories/queries/useCategories';
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area'; // Import ScrollArea and ScrollBar
 

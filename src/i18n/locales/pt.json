@@ -106,6 +106,22 @@
       "checkEmailForReset": "Verifique sua caixa de entrada para o link de redefinição de senha."
     }
   },
+  "contact": {
+    "title": "Contato",
+    "description": "Entre em contato conosco. Adoraríamos ouvir você."
+  },
+  "about": {
+    "title": "Sobre",
+    "description": "Saiba mais sobre a Monynha Fun e nossa missão."
+  },
+  "rules": {
+    "title": "Regras",
+    "description": "Diretrizes da comunidade e políticas de conteúdo."
+  },
+  "faq": {
+    "title": "FAQ",
+    "description": "Perguntas frequentes e respostas."
+  },
   "submit": {
     "title": "Enviar Vídeo",
     "description": "Compartilhe um vídeo interessante do YouTube com a comunidade",

@@ -15,8 +15,8 @@ import { submitVideoSchema, SubmitVideoFormValues } from '@/features/submit/subm
 import { useTranslation } from 'react-i18next';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Header } from '@/components/Header'; // Added missing import
-import { Footer } from '@/components/Footer';
+import { Header } from '@/components/layout/Header'; // Added missing import
+import { Footer } from '@/components/layout/Footer';
 
 export default function Submit() {
   const { t } = useTranslation();
