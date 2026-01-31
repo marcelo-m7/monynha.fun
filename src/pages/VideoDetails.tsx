@@ -10,7 +10,7 @@ import { Footer } from '@/components/Footer';
 import { VideoCard } from '@/components/VideoCard';
 import { AspectRatio } from '@/components/ui/aspect-ratio';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Badge } from '@/components/ui/badge';
+import { Badge } from '@/components/ui/badge'; // Import Badge component
 import { Eye, Clock, Folder, ArrowLeft, Heart as HeartIcon, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';

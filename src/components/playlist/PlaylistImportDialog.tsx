@@ -22,6 +22,7 @@ import { useCreatePlaylist, useAddVideoToPlaylist } from '@/features/playlists';
 import { createVideo, findVideoByYoutubeId } from '@/entities/video/video.api';
 import { invokeEdgeFunction } from '@/shared/api/supabase/edgeFunctions';
 import type { VideoInsert } from '@/entities/video/video.types';
+import { generateSlug } from '@/shared/lib/slug'; // Import generateSlug
 
 interface PlaylistImportDialogProps {
   children: React.ReactNode;
@@ -36,19 +37,6 @@ const importSchema = z.object({
 });
 
 type ImportFormValues = z.infer<typeof importSchema>;
-
-// Helper to generate a slug
-const generateSlug = (name: string, suffix: string = '') => {
-  let baseSlug = name.toLowerCase()
-    .replace(/[^a-z0-9-]/g, '-') // Replace non-alphanumeric with hyphens
-    .replace(/-+/g, '-')         // Replace multiple hyphens with a single one
-    .replace(/^-|-$/g, '');      // Trim hyphens from start/end
-
-  if (suffix) {
-    baseSlug = `${baseSlug}-${suffix}`;
-  }
-  return baseSlug;
-};
 
 export const PlaylistImportDialog: React.FC<PlaylistImportDialogProps> = ({ children }) => {
   const { t } = useTranslation();

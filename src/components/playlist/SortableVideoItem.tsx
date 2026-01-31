@@ -1,4 +1,6 @@
-import { useSortable } from '@dnd-kit/sortable';
+import {
+  useSortable,
+} from '@dnd-kit/sortable'; // Corrected import path
 import { CSS } from '@dnd-kit/utilities';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
@@ -43,8 +45,6 @@ export function SortableVideoItem({
     transform: CSS.Transform.toString(transform),
     transition,
   };
-
-  // Removed local formatDuration function, now using the imported one
 
   return (
     <div

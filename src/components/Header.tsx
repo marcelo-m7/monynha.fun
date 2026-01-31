@@ -50,17 +50,15 @@ export const Header = () => {
     { to: "/community", label: t('footer.community'), icon: Users },
     { to: "/about", label: t('footer.about'), icon: Info },
     { to: "/rules", label: t('footer.rules'), icon: BookOpen },
-    // { to: "/contact", label: t('footer.contact'), icon: Mail }, // Removed contact link
+    { to: "/contact", label: t('footer.contact'), icon: Mail },
     { to: "/faq", label: t('footer.faq'), icon: HelpCircle },
   ];
 
   // Filter navLinks for desktop display
   const desktopNavLinks = navLinks.filter(link => 
-    link.to !== "/" && // Remove Home
-    link.to !== "/about" && // Remove About
-    link.to !== "/rules" && // Remove Rules
-    link.to !== "/faq" // &&// Remove FAQ
-    // link.to !== "/playlists" // Remove Playlists
+    link.to === "/videos" || 
+    link.to === "/playlists" || 
+    link.to === "/community"
   );
 
   return (
@@ -173,15 +171,6 @@ export const Header = () => {
             </>
           ) : (
             <>
-              {/* <Button
-                variant="ghost"
-                size="sm"
-                className="hidden sm:flex gap-2 text-muted-foreground hover:text-foreground"
-                onClick={() => navigate('/playlists')}
-              > */}
-                {/* <ListVideo className="h-4 w-4" /> */}
-                {/* <span className="hidden lg:inline">{t('header.playlists')}</span> */}
-              {/* </Button> */}
               <Button
                 variant="hero"
                 size="sm"

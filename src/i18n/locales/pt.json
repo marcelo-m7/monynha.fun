@@ -203,7 +203,8 @@
     "playlistsDescription": "Caminhos de aprendizado e coleções criadas pela comunidade",
     "noPlaylistsTitle": "Nenhuma playlist pública encontrada.",
     "noPlaylistsDescription": "Seja o primeiro a criar uma playlist e organizar o conhecimento!",
-    "createFirstPlaylist": "Criar sua primeira playlist"
+    "createFirstPlaylist": "Criar sua primeira playlist",
+    "noCategoriesFound": "Nenhuma categoria encontrada. Por favor, volte mais tarde!"
   },
   "notFound": {
     "title": "404",

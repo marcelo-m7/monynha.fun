@@ -220,7 +220,8 @@
     "playlistsDescription": "Rutas de aprendizaje y colecciones creadas por la comunidad",
     "noPlaylistsTitle": "No se encontraron listas de reproducción públicas.",
     "noPlaylistsDescription": "¡Sé el primero en crear una lista de reproducción y organizar el conocimiento!",
-    "createFirstPlaylist": "Crear tu primera lista de reproducción"
+    "createFirstPlaylist": "Crear tu primera lista de reproducción",
+    "noCategoriesFound": "No se encontraron categorías. ¡Vuelve a consultar más tarde!"
   },
   "notFound": {
     "title": "404",

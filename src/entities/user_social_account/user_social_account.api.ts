@@ -1,5 +1,9 @@
 import { supabase } from '@/shared/api/supabase/supabaseClient';
-import type { UserSocialAccount, UserSocialAccountInsert, UserSocialAccountUpdate } from './user_social_account.types';
+import type { Database } from '@/integrations/supabase/types';
+
+export type UserSocialAccount = Database['public']['Tables']['user_social_accounts']['Row'];
+export type UserSocialAccountInsert = Database['public']['Tables']['user_social_accounts']['Insert'];
+export type UserSocialAccountUpdate = Database['public']['Tables']['user_social_accounts']['Update'];
 
 export async function listUserSocialAccounts(userId: string) {
   const { data, error } = await supabase

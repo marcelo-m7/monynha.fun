@@ -105,6 +105,7 @@ const Community = () => {
             <UserIcon className="w-16 h-16 mb-4 opacity-50 mx-auto" />
             <p className="text-lg font-medium mb-2">{t('community.noUsersFoundTitle')}</p>
             <p className="mb-6">{t('community.noUsersFoundDescription')}</p>
+            <Button onClick={() => navigate('/playlists/new')}>{t('community.createFirstPlaylist')}</Button>
           </div>
         )}
       </main>

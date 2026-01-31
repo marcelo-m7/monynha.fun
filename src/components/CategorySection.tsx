@@ -1,7 +1,7 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
-import { ArrowRight } from 'lucide-react';
+import { ArrowRight, FolderX } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { CategoryCard } from '@/components/CategoryCard';
@@ -11,7 +11,7 @@ import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area'; // Import S
 export const CategorySection = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const { data: categories, isLoading: categoriesLoading } = useCategories();
+  const { data: categories, isLoading: categoriesLoading, isError: categoriesError } = useCategories();
 
   return (
     <section className="py-16 bg-background">
@@ -37,10 +37,14 @@ export const CategorySection = () => {
               <Skeleton key={i} className="min-w-[140px] h-32 rounded-2xl" />
             ))}
           </div>
-        ) : (
+        ) : categoriesError ? (
+          <div className="text-center py-12 text-destructive">
+            <p>{t('common.loadError')}</p> {/* Assuming a generic load error translation */}
+          </div>
+        ) : categories && categories.length > 0 ? (
           <ScrollArea className="w-full whitespace-nowrap pb-4">
             <div className="flex w-max space-x-4">
-              {categories?.map((category, index) => (
+              {categories.map((category, index) => (
                 <div
                   key={category.id}
                   className="animate-fade-up"
@@ -55,6 +59,11 @@ export const CategorySection = () => {
             </div>
             <ScrollBar orientation="horizontal" />
           </ScrollArea>
+        ) : (
+          <div className="text-center py-12 text-muted-foreground flex flex-col items-center justify-center">
+            <FolderX className="w-16 h-16 mb-4 opacity-50" />
+            <p className="text-lg font-medium mb-2">{t('index.noCategoriesFound')}</p>
+          </div>
         )}
       </div>
     </section>

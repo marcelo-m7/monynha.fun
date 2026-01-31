@@ -1,6 +1,12 @@
 import { supabase } from '@/shared/api/supabase/supabaseClient';
-import type { Comment, CommentInsert } from './comment.types';
+import type { Database } from '@/integrations/supabase/types';
 import type { Profile } from '@/entities/profile/profile.types';
+
+export type Comment = Database['public']['Tables']['comments']['Row'] & {
+  profile?: Pick<Profile, 'id' | 'username' | 'display_name' | 'avatar_url'> | null;
+};
+export type CommentInsert = Database['public']['Tables']['comments']['Insert'];
+export type CommentUpdate = Database['public']['Tables']['comments']['Update'];
 
 export async function createComment(payload: CommentInsert) {
   const { data, error } = await supabase

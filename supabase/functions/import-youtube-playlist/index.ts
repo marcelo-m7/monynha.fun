@@ -57,9 +57,9 @@ serve(async (req) => {
       });
     }
 
-    const YOUTUBE_API_KEY = Deno.env.get('GEMINI_API_KEY'); // Assuming GEMINI_API_KEY can be used for YouTube Data API
+    const YOUTUBE_API_KEY = Deno.env.get('YOUTUBE_API_KEY'); // Changed from GEMINI_API_KEY
     if (!YOUTUBE_API_KEY) {
-      console.error("[import-youtube-playlist] YOUTUBE_API_KEY (GEMINI_API_KEY) is not set.");
+      console.error("[import-youtube-playlist] YOUTUBE_API_KEY is not set.");
       return new Response(JSON.stringify({ error: 'Server configuration error: YouTube API key missing' }), {
         status: 500,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },

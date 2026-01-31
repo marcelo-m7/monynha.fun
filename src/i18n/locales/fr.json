@@ -206,7 +206,8 @@
     "playlistsDescription": "Parcours d'apprentissage et collections créés par la communauté",
     "noPlaylistsTitle": "Aucune playlist publique trouvée.",
     "noPlaylistsDescription": "Soyez le premier à créer une playlist et à organiser les connaissances !",
-    "createFirstPlaylist": "Créer votre première playlist"
+    "createFirstPlaylist": "Créer votre première playlist",
+    "noCategoriesFound": "Aucune catégorie trouvée. Veuillez revenir plus tard !"
   },
   "notFound": {
     "title": "404",
@@ -267,7 +268,8 @@
         "generic": "Ocurrió un error durante la importación de la lista de reproducción. Por favor, inténtalo de nuevo.",
         "maxRetriesReached": "No se pudo crear la lista de reproducción después de varios intentos debido a un conflicto de slug. Por favor, intenta con un nombre de playlist diferente.",
         "youtubeApiFetchFailed": "Error al obtener los detalles de la lista de reproducción de YouTube. Por favor, verifica la URL o inténtalo de nuevo más tarde.",
-        "videoProcessingFailed": "Error al procesar el video '{{title}}': {{error}}"
+        "videoProcessingFailed": "Error al procesar el video '{{title}}': {{error}}",
+        "youtubeApiKeyMissing": "La clave de API de YouTube no está configurada o es inválida en el servidor. Por favor, contacta a soporte."
       },
       "success": {
         "playlistCreated": "¡Lista de reproducción '{{name}}' creada con éxito!",

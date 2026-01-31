@@ -255,7 +255,8 @@
     "playlistsDescription": "Learning paths and collections created by the community",
     "noPlaylistsTitle": "No public playlists found.",
     "noPlaylistsDescription": "Be the first to create a playlist and organize knowledge!",
-    "createFirstPlaylist": "Create your first playlist"
+    "createFirstPlaylist": "Create your first playlist",
+    "noCategoriesFound": "No categories found. Please check back later!"
   },
   "notFound": {
     "title": "404",

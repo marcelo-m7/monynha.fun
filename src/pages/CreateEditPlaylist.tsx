@@ -16,18 +16,19 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Header } from '@/components/Header';
 import { Footer } from '@/components/Footer';
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'; // NEW
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import { generateSlug } from '@/shared/lib/slug'; // Import generateSlug
 
 const playlistSchema = z.object({
   name: z.string().min(3, 'createEditPlaylist.error.nameMinLength').max(100, 'createEditPlaylist.error.nameMaxLength'),
   slug: z.string().min(3, 'createEditPlaylist.error.slugMinLength').max(100, 'createEditPlaylist.error.slugMaxLength').regex(/^[a-z0-9-]+$/, 'createEditPlaylist.error.slugInvalidFormat'),
   description: z.string().max(500, 'createEditPlaylist.error.descriptionMaxLength').optional().or(z.literal('')),
-  thumbnail_url: z.string().url('createEditPlaylist.error.invalidThumbnailUrl').optional().or(z.literal('')), // NEW
+  thumbnail_url: z.string().url('createEditPlaylist.error.invalidThumbnailUrl').optional().or(z.literal('')),
   course_code: z.string().max(50, 'createEditPlaylist.error.courseCodeMaxLength').optional().or(z.literal('')),
   unit_code: z.string().max(50, 'createEditPlaylist.error.unitCodeMaxLength').optional().or(z.literal('')),
   language: z.string().min(2, 'createEditPlaylist.error.languageRequired'),
   is_public: z.boolean(),
-  is_ordered: z.boolean(), // NEW
+  is_ordered: z.boolean(),
 });
 
 type PlaylistFormValues = z.infer<typeof playlistSchema>;
@@ -49,24 +50,24 @@ export default function CreateEditPlaylist() {
       name: '',
       slug: '',
       description: '',
-      thumbnail_url: '', // NEW
+      thumbnail_url: '',
       course_code: '',
       unit_code: '',
       language: 'pt',
       is_public: true,
-      is_ordered: true, // NEW: Default to learning path
+      is_ordered: true,
     },
   });
 
   const name = watch('name');
   const slug = watch('slug');
   const description = watch('description');
-  const thumbnailUrl = watch('thumbnail_url'); // NEW
+  const thumbnailUrl = watch('thumbnail_url');
   const courseCode = watch('course_code');
   const unitCode = watch('unit_code');
   const language = watch('language');
   const isPublic = watch('is_public');
-  const isOrdered = watch('is_ordered'); // NEW
+  const isOrdered = watch('is_ordered');
 
   useEffect(() => {
     if (!authLoading && !user) {
@@ -80,15 +81,22 @@ export default function CreateEditPlaylist() {
         name: existingPlaylist.name,
         slug: existingPlaylist.slug,
         description: existingPlaylist.description || '',
-        thumbnail_url: existingPlaylist.thumbnail_url || '', // NEW
+        thumbnail_url: existingPlaylist.thumbnail_url || '',
         course_code: existingPlaylist.course_code || '',
         unit_code: existingPlaylist.unit_code || '',
         language: existingPlaylist.language,
         is_public: existingPlaylist.is_public,
-        is_ordered: existingPlaylist.is_ordered, // NEW
+        is_ordered: existingPlaylist.is_ordered,
       });
     }
   }, [isEditing, existingPlaylist, reset]);
+
+  // Auto-generate slug from name if creating and slug is empty
+  useEffect(() => {
+    if (!isEditing && name && !slug) {
+      setValue('slug', generateSlug(name));
+    }
+  }, [name, slug, isEditing, setValue]);
 
   const onSubmit = async (values: PlaylistFormValues) => {
     if (!user) {
@@ -103,12 +111,12 @@ export default function CreateEditPlaylist() {
         name: values.name,
         slug: values.slug,
         description: values.description || null,
-        thumbnail_url: values.thumbnail_url || null, // NEW
+        thumbnail_url: values.thumbnail_url || null,
         course_code: values.course_code || null,
         unit_code: values.unit_code || null,
         language: values.language,
         is_public: values.is_public,
-        is_ordered: values.is_ordered, // NEW
+        is_ordered: values.is_ordered,
       };
 
       if (isEditing) {
