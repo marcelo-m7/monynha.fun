@@ -54,7 +54,7 @@ const FAQ = () => {
           <h2 className="text-2xl font-bold mb-6 flex items-center gap-2">
             <HelpCircle className="w-6 h-6 text-primary" />
             {t('faq.title')}
-          </h2>
+          </h2 >
           <Accordion type="single" collapsible className="w-full">
             {faqs.map((faq, index) => (
               <AccordionItem key={index} value={`item-${index}`}>
