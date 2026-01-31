@@ -14,8 +14,8 @@ import { z } from 'zod';
 import { useTranslation } from 'react-i18next';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Header } from '@/components/layout/Header';
-import { Footer } from '@/components/layout/Footer';
+import { Header } from '@/components/Header';
+import { Footer } from '@/components/Footer';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { generateSlug } from '@/shared/lib/slug'; // Import generateSlug
 

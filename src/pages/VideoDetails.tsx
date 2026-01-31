@@ -5,9 +5,9 @@ import { useAuth } from '@/features/auth/useAuth';
 import { useIsFavorited, useAddFavorite, useRemoveFavorite } from '@/features/favorites/queries/useFavorites';
 import { useProfileById } from '@/features/profile/queries/useProfile';
 import { getYouTubeEmbedUrl } from '@/shared/lib/youtube';
-import { Header } from '@/components/layout/Header';
-import { Footer } from '@/components/layout/Footer';
-import { VideoCard } from '@/components/video/VideoCard';
+import { Header } from '@/components/Header';
+import { Footer } from '@/components/Footer';
+import { VideoCard } from '@/components/VideoCard';
 import { AspectRatio } from '@/components/ui/aspect-ratio';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Badge } from '@/components/ui/badge'; // Import Badge component

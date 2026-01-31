@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from 'vitest';
 import { screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { VideoCard } from './video/VideoCard';
+import { VideoCard } from './VideoCard';
 import { FeaturedHero } from './FeaturedHero';
 import { renderWithProviders } from '@/shared/test/renderWithProviders';
 import type { VideoWithCategory } from '@/entities/video/video.types';

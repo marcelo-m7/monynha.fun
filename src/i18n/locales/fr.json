@@ -109,22 +109,6 @@
       "checkEmailForReset": "Vérifiez votre boîte de réception pour le lien de réinitialisation du mot de passe."
     }
   },
-  "contact": {
-    "title": "Contact",
-    "description": "Contactez-nous. Nous serions ravis de vous entendre."
-  },
-  "about": {
-    "title": "À Propos",
-    "description": "En savoir plus sur Monynha Fun et notre mission."
-  },
-  "rules": {
-    "title": "Règles",
-    "description": "Directives communautaires et politiques de contenu."
-  },
-  "faq": {
-    "title": "FAQ",
-    "description": "Questions fréquemment posées et réponses."
-  },
   "submit": {
     "title": "Soumettre une Vidéo",
     "description": "Partagez une vidéo YouTube intéressante avec la communauté",

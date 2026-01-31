@@ -1,8 +1,8 @@
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Header } from '@/components/layout/Header';
-import { Footer } from '@/components/layout/Footer';
-import { VideoCard } from '@/components/video/VideoCard';
+import { Header } from '@/components/Header';
+import { Footer } from '@/components/Footer';
+import { VideoCard } from '@/components/VideoCard';
 import { useAuth } from '@/features/auth/useAuth';
 import { useFavorites } from '@/features/favorites/queries/useFavorites';
 import { Skeleton } from '@/components/ui/skeleton';

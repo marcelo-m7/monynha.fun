@@ -45,13 +45,10 @@ video-vault/
 │   ├── main.tsx               # Entry point with i18next + providers
 │   ├── components/
 │   │   ├── ui/               # shadcn/ui primitives
-│   │   ├── layout/           # Layout components (Header, Footer, HeroSection)
-│   │   ├── video/            # Video domain components (VideoCard, CategoryCard)
 │   │   ├── playlist/         # Playlist-specific components
-│   │   ├── auth/             # Authentication forms
-│   │   ├── comment/          # Comment components
-│   │   ├── profile/          # Profile components
-│   │   └── account/          # Account settings components
+│   │   ├── Header.tsx
+│   │   ├── Footer.tsx
+│   │   └── ...other components
 │   ├── hooks/
 │   │   ├── useAuth.tsx       # Auth context & hooks
 │   │   ├── useVideos.ts      # Videos data fetching (TanStack Query)
@@ -76,13 +73,6 @@ video-vault/
 │   ├── lib/
 │   │   ├── utils.ts          # Utility functions (cn for Tailwind)
 │   │   └── youtube.ts        # YouTube helpers (URL parsing, oEmbed)
-│   ├── shared/
-│   │   ├── lib/
-│   │   │   └── validation.ts # Shared Zod validation schemas (DRY principle)
-│   │   ├── api/
-│   │   │   └── supabase/
-│   │   ├── config/
-│   │   └── hooks/
 │   ├── i18n/
 │   │   ├── config.ts         # i18next configuration
 │   │   └── locales/          # JSON translation files
@@ -115,51 +105,6 @@ video-vault/
 - `/profile/edit` - Edit own profile with avatar upload
 - `/account/settings` - Account security settings
 - `/about`, `/rules`, `/contact`, `/faq` - Static info pages
-
----
-
-## Code Quality & Patterns
-
-### Shared Validation Schemas (DRY Principle)
-
-To eliminate code duplication and ensure consistency, all form validations use **shared Zod schemas** from `src/shared/lib/validation.ts`:
-
-```typescript
-import { emailSchema, passwordSchema, usernameSchema, createPasswordConfirmationSchema } from '@/shared/lib/validation';
-
-// ✅ Correct: Use shared schemas
-const loginSchema = z.object({
-  email: emailSchema,
-  password: passwordSchema,
-});
-
-// ❌ Wrong: Don't duplicate validation logic
-const loginSchema = z.object({
-  email: z.string().email('auth.error.invalidEmail'), // AVOID THIS
-  password: z.string().min(6, 'auth.error.passwordMinLength'), // AVOID THIS
-});
-```
-
-**Available Shared Schemas:**
-- `emailSchema` - Email validation with i18n error message
-- `passwordSchema` - Password validation (min 6 characters)
-- `usernameSchema` - Username validation (min 3 characters)
-- `optionalUsernameSchema` - Optional username (allows empty string)
-- `createPasswordConfirmationSchema(messageKey?)` - Password + confirmation with match validation
-
-**Benefits:**
-- Single source of truth for validation rules
-- Consistent error messages across the app
-- Easy to update validation requirements globally
-- Follows DRY (Don't Repeat Yourself) principle
-- Type-safe with full TypeScript support
-
-**Files Using Shared Schemas:**
-- `src/pages/Auth.tsx` - Login, signup, forgot password
-- `src/components/auth/ResetPasswordForm.tsx` - Password reset
-- `src/components/account/ChangeEmailForm.tsx` - Email change
-- `src/components/account/ChangePasswordForm.tsx` - Password change
-- Any new form that requires email/password validation should use these schemas
 
 ---
 

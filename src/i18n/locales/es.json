@@ -123,22 +123,6 @@
       "checkEmailForReset": "Revisa tu bandeja de entrada para el enlace de restablecimiento de contraseña."
     }
   },
-  "contact": {
-    "title": "Contacto",
-    "description": "Ponte en contacto con nosotros. Nos encantaría saber de ti."
-  },
-  "about": {
-    "title": "Acerca de",
-    "description": "Conoce más sobre Monynha Fun y nuestra misión."
-  },
-  "rules": {
-    "title": "Reglas",
-    "description": "Directrices de la comunidad y políticas de contenido."
-  },
-  "faq": {
-    "title": "Preguntas Frecuentes",
-    "description": "Preguntas frecuentes y respuestas."
-  },
   "submit": {
     "title": "Enviar Video",
     "description": "Comparte un video interesante de YouTube con la comunidad",

@@ -1,5 +1,5 @@
-import { Header } from '@/components/layout/Header';
-import { Footer } from '@/components/layout/Footer';
+import { Header } from '@/components/Header';
+import { Footer } from '@/components/Footer';
 import { useTranslation } from 'react-i18next';
 import { ArrowLeft, Mail, MapPin, Clock, Send, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';

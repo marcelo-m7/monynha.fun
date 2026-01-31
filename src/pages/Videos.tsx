@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
-import { Header } from '@/components/layout/Header';
-import { Footer } from '@/components/layout/Footer';
-import { VideoCard } from '@/components/video/VideoCard';
+import { Header } from '@/components/Header';
+import { Footer } from '@/components/Footer';
+import { VideoCard } from '@/components/VideoCard';
 import { useFeaturedVideos, useVideos } from '@/features/videos/queries/useVideos';
 import { useCategories } from '@/features/categories/queries/useCategories';
 import { Input } from '@/components/ui/input';

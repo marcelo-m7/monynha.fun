@@ -1,6 +1,6 @@
 import { useParams, useNavigate, Link } from 'react-router-dom';
-import { Header } from '@/components/layout/Header';
-import { Footer } from '@/components/layout/Footer';
+import { Header } from '@/components/Header';
+import { Footer } from '@/components/Footer';
 import { useProfileByUsername } from '@/features/profile/queries/useProfile';
 import { useVideos } from '@/features/videos/queries/useVideos';
 import { usePlaylists } from '@/features/playlists/queries/usePlaylists';
@@ -11,7 +11,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { CalendarDays, User as UserIcon, Video as VideoIcon, ListVideo, ArrowLeft, Edit } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '@/features/auth/useAuth';
-import { VideoCard } from '@/components/video/VideoCard';
+import { VideoCard } from '@/components/VideoCard';
 import { SocialAccountsDisplay } from '@/components/profile/SocialAccountsDisplay'; // Import the new component
 
 const Profile = () => {
