@@ -52,3 +52,31 @@ export async function reauthenticateUser(email: string, password: string) {
   const { error } = await supabase.auth.signInWithPassword({ email, password });
   return { error: error as Error | null };
 }
+
+export async function resendConfirmationEmail() {
+  const { error } = await supabase.auth.resend({
+    type: 'signup',
+    email: (await supabase.auth.getUser()).data.user?.email || '',
+    options: {
+      emailRedirectTo: `${window.location.origin}/`,
+    },
+  });
+  return { error: error as Error | null };
+}
+
+export async function deleteUserAccount() {
+  const { data: { user } } = await supabase.auth.getUser();
+  
+  if (!user) {
+    return { error: new Error('No user found') };
+  }
+
+  // Note: Supabase's admin.deleteUser requires admin privileges
+  // For self-service deletion, we use the auth.admin API or a custom edge function
+  // This implementation assumes you have RLS policies that cascade delete user data
+  
+  const { error } = await supabase.rpc('delete_user_account');
+  
+  return { error: error as Error | null };
+}
+

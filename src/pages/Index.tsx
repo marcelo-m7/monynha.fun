@@ -5,13 +5,13 @@ import { Footer } from "@/components/layout/Footer";
 import { useFeaturedVideos, useRecentVideos } from "@/features/videos/queries/useVideos";
 import { usePlaylists } from "@/features/playlists/queries/usePlaylists";
 import { ArrowRight, TrendingUp, Clock, ListVideo } from "lucide-react";
-import { FeaturedHero } from "@/components/FeaturedHero";
+import { FeaturedHero } from "@/components/layout/FeaturedHero";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from 'react-i18next';
 import { PlaylistCard } from "@/components/playlist/PlaylistCard";
-import { CategorySection } from "@/components/CategorySection";
+import { CategorySection } from "@/components/layout/CategorySection";
 
 const Index = () => {
   const { t } = useTranslation();

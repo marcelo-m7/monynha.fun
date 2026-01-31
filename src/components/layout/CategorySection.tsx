@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { CategoryCard } from '@/components/video/CategoryCard';
 import { useCategories } from '@/features/categories/queries/useCategories';
-import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area'; // Import ScrollArea and ScrollBar
+import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
 
 export const CategorySection = () => {
   const { t } = useTranslation();
@@ -32,37 +32,36 @@ export const CategorySection = () => {
         </div>
 
         {categoriesLoading ? (
-          <div className="flex space-x-4 overflow-hidden">
-            {Array.from({ length: 7 }).map((_, i) => (
-              <Skeleton key={i} className="min-w-[140px] h-32 rounded-2xl" />
-            ))}
-          </div>
+          <ScrollArea>
+            <div className="flex gap-4 pb-4">
+              {Array.from({ length: 4 }).map((_, i) => (
+                <Skeleton key={i} className="h-36 w-full min-w-[280px] rounded-2xl" />
+              ))}
+            </div>
+            <ScrollBar orientation="horizontal" />
+          </ScrollArea>
         ) : categoriesError ? (
-          <div className="text-center py-12 text-destructive">
-            <p>{t('common.loadError')}</p> {/* Assuming a generic load error translation */}
+          <div className="flex flex-col items-center justify-center py-12 text-muted-foreground">
+            <FolderX className="w-16 h-16 mb-4 opacity-50" />
+            <p className="text-lg font-medium mb-2">{t('index.categoriesError')}</p>
           </div>
         ) : categories && categories.length > 0 ? (
-          <ScrollArea className="w-full whitespace-nowrap pb-4">
-            <div className="flex w-max space-x-4">
+          <ScrollArea>
+            <div className="flex gap-4 pb-4">
               {categories.map((category, index) => (
-                <div
+                <CategoryCard
                   key={category.id}
-                  className="animate-fade-up"
-                  style={{ animationDelay: `${index * 0.05}s` }}
-                >
-                  <CategoryCard
-                    category={category}
-                    onClick={() => navigate(`/videos?category=${category.id}`)}
-                  />
-                </div>
+                  category={category}
+                  index={index}
+                />
               ))}
             </div>
             <ScrollBar orientation="horizontal" />
           </ScrollArea>
         ) : (
-          <div className="text-center py-12 text-muted-foreground flex flex-col items-center justify-center">
+          <div className="flex flex-col items-center justify-center py-12 text-muted-foreground">
             <FolderX className="w-16 h-16 mb-4 opacity-50" />
-            <p className="text-lg font-medium mb-2">{t('index.noCategoriesFound')}</p>
+            <p className="text-lg font-medium mb-2">{t('index.noCategories')}</p>
           </div>
         )}
       </div>

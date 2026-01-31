@@ -106,6 +106,98 @@
       "checkEmailForReset": "Verifique sua caixa de entrada para o link de redefinição de senha."
     }
   },
+  "account": {
+    "settings": {
+      "title": "Configurações da Conta",
+      "description": "Gerencie a segurança e credenciais da sua conta",
+      "securityTitle": "Segurança e Autenticação",
+      "profileLinkDescription": "Quer atualizar seu nome, avatar ou biografia?",
+      "emailSection": {
+        "title": "Endereço de E-mail",
+        "description": "Atualize seu endereço de e-mail. Uma confirmação será enviada para o seu novo e-mail.",
+        "current": "E-mail atual",
+        "newEmail": "Novo endereço de e-mail",
+        "confirmChange": "Atualizar E-mail",
+        "changeInfo": "Você receberá um link de confirmação no seu novo endereço de e-mail. A alteração terá efeito após a confirmação."
+      },
+      "passwordSection": {
+        "title": "Senha",
+        "description": "Altere sua senha para manter sua conta segura.",
+        "currentPassword": "Senha atual",
+        "newPassword": "Nova senha",
+        "confirmPassword": "Confirmar nova senha",
+        "update": "Atualizar Senha"
+      },
+      "success": {
+        "emailUpdated": "Solicitação de atualização de e-mail enviada. Verifique seu novo e-mail para confirmação.",
+        "passwordUpdated": "Senha atualizada com sucesso"
+      },
+      "error": {
+        "passwordMismatch": "As senhas não correspondem",
+        "currentPasswordRequired": "A senha atual é obrigatória",
+        "samePassword": "A nova senha deve ser diferente da atual",
+        "sameEmail": "O novo e-mail é o mesmo que o atual",
+        "notLoggedIn": "Você precisa estar logado para acessar as configurações",
+        "wrongCurrentPassword": "Senha atual incorreta",
+        "passwordUpdateFailed": "Falha ao atualizar a senha",
+        "emailUpdateFailed": "Falha ao atualizar o e-mail"
+      },
+      "resendEmail": {
+        "title": "Confirmação de E-mail",
+        "description": "Reenviar e-mail de confirmação caso não tenha recebido ou precise de um novo.",
+        "button": "Reenviar Confirmação",
+        "emailLabel": "E-mail",
+        "lastSent": "Último envio",
+        "alreadyConfirmed": "Seu e-mail já está confirmado.",
+        "notConfirmedWarning": "Seu e-mail ainda não está confirmado. Alguns recursos podem estar limitados até você confirmar seu e-mail.",
+        "cooldownMessage": "Por favor, aguarde um minuto antes de solicitar outro e-mail.",
+        "success": {
+          "sent": "E-mail de confirmação enviado!",
+          "checkInbox": "Verifique sua caixa de entrada para o link de confirmação."
+        },
+        "error": {
+          "failed": "Falha ao enviar e-mail de confirmação",
+          "cooldown": "Por favor, aguarde antes de solicitar outro e-mail"
+        }
+      },
+      "dangerZone": {
+        "title": "Zona de Perigo",
+        "description": "Ações irreversíveis que afetam permanentemente sua conta."
+      },
+      "deleteAccount": {
+        "title": "Excluir Conta",
+        "description": "Exclua permanentemente sua conta e todos os dados associados.",
+        "button": "Excluir Minha Conta",
+        "warning": "Esta ação não pode ser desfeita. Todos os seus dados serão permanentemente excluídos.",
+        "consequences": {
+          "title": "O que será excluído:",
+          "data": "Seu perfil e informações da conta",
+          "videos": "Todos os vídeos que você enviou",
+          "playlists": "Todas as suas playlists",
+          "favorites": "Seus favoritos e preferências",
+          "irreversible": "Esta ação é permanente e irreversível"
+        },
+        "dialog": {
+          "title": "Espera! Tem certeza mesmo? 🥺",
+          "playfulMessage": "Ficamos tristes em vê-lo partir! Tem certeza que quer excluir sua conta? Não há volta depois disso... 💔",
+          "reallyConfirm": "Se você tem certeza absoluta, digite DELETE abaixo para confirmar:",
+          "typeToConfirm": "Digite \"{{text}}\" para confirmar",
+          "finalWarning": "Última chance! Isso excluirá tudo permanentemente.",
+          "confirm": "Sim, Excluir Para Sempre",
+          "deleting": "Excluindo...",
+          "cancel": "Não, Manter Minha Conta"
+        },
+        "success": {
+          "deleted": "Conta excluída com sucesso",
+          "goodbye": "Sentimos sua falta. Até logo! 👋"
+        },
+        "error": {
+          "failed": "Falha ao excluir conta",
+          "confirmationMismatch": "Por favor, digite DELETE para confirmar"
+        }
+      }
+    }
+  },
   "contact": {
     "title": "Contato",
     "description": "Entre em contato conosco. Adoraríamos ouvir você."

@@ -121,7 +121,6 @@ export const PlaylistImportDialog: React.FC<PlaylistImportDialogProps> = ({ chil
       }
       setYoutubeFetchError(null);
     } catch (err) {
-      console.error('[PlaylistImportDialog] Error fetching YouTube playlist metadata:', err);
       setYoutubeFetchError(err instanceof Error ? err.message : t('playlists.import.error.youtubeApiFetchFailed'));
     } finally {
       setIsFetchingYoutube(false);
@@ -218,9 +217,7 @@ export const PlaylistImportDialog: React.FC<PlaylistImportDialogProps> = ({ chil
               playlistId: newPlaylist.id,
               videoId: videoToAddToPlaylist.id,
             });
-            // No toast here to avoid spamming, the playlist created toast is enough
           } catch (videoError) {
-            console.error(`[PlaylistImportDialog] Error processing video ${videoData.youtube_id}:`, videoError);
             const errorMessage = videoError instanceof Error ? videoError.message : String(videoError);
             toast.error(t('playlists.import.error.videoProcessingFailed', { title: videoData.title, error: errorMessage }));
           }
@@ -234,9 +231,8 @@ export const PlaylistImportDialog: React.FC<PlaylistImportDialogProps> = ({ chil
           retryCount++;
           const randomSuffix = Math.random().toString(36).substring(2, 8);
           currentSlug = generateSlug(currentPlaylistName, randomSuffix);
-          console.warn(`[PlaylistImportDialog] Duplicate slug detected. Retrying with new slug: ${currentSlug}`);
+          // Retry with new slug to avoid duplicate key conflict
         } else {
-          console.error('Playlist import error:', error);
           toast.error(t('playlists.import.error.generic'), {
             description: error.message,
           });

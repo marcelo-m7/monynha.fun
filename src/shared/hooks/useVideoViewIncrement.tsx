@@ -64,9 +64,8 @@ export function useVideoViewIncrement(initialViewCount: number, animationDuratio
       if (typeof result.data === 'number') {
         setViewCount(result.data);
       }
-    }).catch((e) => {
+    }).catch(() => {
       // Ignore errors - view count is not critical for UX
-      console.debug('increment view failed', e);
     });
   }, [animationDuration, resolveSessionId]);
 

@@ -109,6 +109,98 @@
       "checkEmailForReset": "Vérifiez votre boîte de réception pour le lien de réinitialisation du mot de passe."
     }
   },
+  "account": {
+    "settings": {
+      "title": "Paramètres du Compte",
+      "description": "Gérez la sécurité et les identifiants de votre compte",
+      "securityTitle": "Sécurité et Authentification",
+      "profileLinkDescription": "Vous souhaitez mettre à jour votre nom, avatar ou biographie?",
+      "emailSection": {
+        "title": "Adresse E-mail",
+        "description": "Mettez à jour votre adresse e-mail. Une confirmation sera envoyée à votre nouvelle adresse.",
+        "current": "E-mail actuel",
+        "newEmail": "Nouvelle adresse e-mail",
+        "confirmChange": "Mettre à Jour l'E-mail",
+        "changeInfo": "Vous recevrez un lien de confirmation à votre nouvelle adresse e-mail. Le changement prendra effet après confirmation."
+      },
+      "passwordSection": {
+        "title": "Mot de Passe",
+        "description": "Changez votre mot de passe pour sécuriser votre compte.",
+        "currentPassword": "Mot de passe actuel",
+        "newPassword": "Nouveau mot de passe",
+        "confirmPassword": "Confirmer le nouveau mot de passe",
+        "update": "Mettre à Jour le Mot de Passe"
+      },
+      "success": {
+        "emailUpdated": "Demande de mise à jour de l'e-mail envoyée. Vérifiez votre nouveau e-mail pour confirmation.",
+        "passwordUpdated": "Mot de passe mis à jour avec succès"
+      },
+      "error": {
+        "passwordMismatch": "Les mots de passe ne correspondent pas",
+        "currentPasswordRequired": "Le mot de passe actuel est requis",
+        "samePassword": "Le nouveau mot de passe doit être différent de l'actuel",
+        "sameEmail": "Le nouvel e-mail est identique à l'actuel",
+        "notLoggedIn": "Vous devez être connecté pour accéder aux paramètres",
+        "wrongCurrentPassword": "Mot de passe actuel incorrect",
+        "passwordUpdateFailed": "Échec de la mise à jour du mot de passe",
+        "emailUpdateFailed": "Échec de la mise à jour de l'e-mail"
+      },
+      "resendEmail": {
+        "title": "Confirmation E-mail",
+        "description": "Renvoyer l'e-mail de confirmation si vous ne l'avez pas reçu ou en avez besoin d'un nouveau.",
+        "button": "Renvoyer la Confirmation",
+        "emailLabel": "E-mail",
+        "lastSent": "Dernier envoi",
+        "alreadyConfirmed": "Votre e-mail est déjà confirmé.",
+        "notConfirmedWarning": "Votre e-mail n'est pas encore confirmé. Certaines fonctionnalités peuvent être limitées jusqu'à confirmation.",
+        "cooldownMessage": "Veuillez attendre une minute avant de demander un autre e-mail.",
+        "success": {
+          "sent": "E-mail de confirmation envoyé!",
+          "checkInbox": "Vérifiez votre boîte de réception pour le lien de confirmation."
+        },
+        "error": {
+          "failed": "Échec de l'envoi de l'e-mail de confirmation",
+          "cooldown": "Veuillez attendre avant de demander un autre e-mail"
+        }
+      },
+      "dangerZone": {
+        "title": "Zone Dangereuse",
+        "description": "Actions irréversibles qui affectent définitivement votre compte."
+      },
+      "deleteAccount": {
+        "title": "Supprimer le Compte",
+        "description": "Supprimez définitivement votre compte et toutes les données associées.",
+        "button": "Supprimer Mon Compte",
+        "warning": "Cette action est irréversible. Toutes vos données seront définitivement supprimées.",
+        "consequences": {
+          "title": "Ce qui sera supprimé:",
+          "data": "Votre profil et informations de compte",
+          "videos": "Toutes les vidéos que vous avez soumises",
+          "playlists": "Toutes vos listes de lecture",
+          "favorites": "Vos favoris et préférences",
+          "irreversible": "Cette action est permanente et irréversible"
+        },
+        "dialog": {
+          "title": "Attendez! Êtes-vous vraiment sûr? 🥺",
+          "playfulMessage": "Nous sommes tristes de vous voir partir! Êtes-vous sûr de vouloir supprimer votre compte? Il n'y a pas de retour en arrière... 💔",
+          "reallyConfirm": "Si vous êtes absolument certain, tapez DELETE ci-dessous pour confirmer:",
+          "typeToConfirm": "Tapez \"{{text}}\" pour confirmer",
+          "finalWarning": "Dernière chance! Cela supprimera tout définitivement.",
+          "confirm": "Oui, Supprimer Définitivement",
+          "deleting": "Suppression...",
+          "cancel": "Non, Garder Mon Compte"
+        },
+        "success": {
+          "deleted": "Compte supprimé avec succès",
+          "goodbye": "Nous regrettons de vous voir partir. Au revoir! 👋"
+        },
+        "error": {
+          "failed": "Échec de la suppression du compte",
+          "confirmationMismatch": "Veuillez taper DELETE pour confirmer"
+        }
+      }
+    }
+  },
   "contact": {
     "title": "Contact",
     "description": "Contactez-nous. Nous serions ravis de vous entendre."

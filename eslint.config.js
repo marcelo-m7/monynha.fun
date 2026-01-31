@@ -23,4 +23,20 @@ export default tseslint.config(
       "@typescript-eslint/no-unused-vars": "off",
     },
   },
+  {
+    // Disable react-refresh warnings for shadcn/ui components
+    // These components follow shadcn/ui patterns with hooks exported alongside components
+    files: ["src/components/ui/**/*.{ts,tsx}"],
+    rules: {
+      "react-refresh/only-export-components": "off",
+    },
+  },
+  {
+    // Disable react-refresh warnings for context providers with hooks
+    // Common pattern: AuthProvider component + useAuth hook in same file
+    files: ["src/features/**/use*.tsx", "src/features/**/use*.ts"],
+    rules: {
+      "react-refresh/only-export-components": "off",
+    },
+  },
 );

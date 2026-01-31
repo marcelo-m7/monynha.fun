@@ -1,8 +1,6 @@
 import { describe, expect, it, vi } from 'vitest';
 import { screen } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
-import { VideoCard } from './video/VideoCard';
-import { FeaturedHero } from './layout/FeaturedHero';
+import { FeaturedHero } from './FeaturedHero';
 import { renderWithProviders } from '@/shared/test/renderWithProviders';
 import type { VideoWithCategory } from '@/entities/video/video.types';
 
@@ -39,28 +37,11 @@ const sampleVideo: VideoWithCategory = {
   },
 };
 
-describe('video components', () => {
-  it('renders VideoCard details', () => {
-    renderWithProviders(<VideoCard video={sampleVideo} />);
-
-    expect(screen.getByText('Learning React')).toBeInTheDocument();
-    expect(screen.getByText('Monynha')).toBeInTheDocument();
-  });
-
-  it('renders FeaturedHero headline', () => {
+describe('FeaturedHero', () => {
+  it('renders featured video headline and description', () => {
     renderWithProviders(<FeaturedHero video={sampleVideo} />);
 
     expect(screen.getByText('Learning React')).toBeInTheDocument();
     expect(screen.getByText('React basics')).toBeInTheDocument();
-  });
-
-  it('increments view count with session id on click', async () => {
-    window.localStorage.setItem('video-vault-session-id', 'session-123');
-    const user = userEvent.setup();
-
-    renderWithProviders(<VideoCard video={sampleVideo} />);
-    await user.click(screen.getByRole('article'));
-
-    expect(incrementVideoViewCount).toHaveBeenCalledWith('video-1', 'session-123');
   });
 });
