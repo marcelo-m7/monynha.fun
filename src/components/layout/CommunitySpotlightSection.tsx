@@ -63,24 +63,24 @@ export const CommunitySpotlightSection = () => {
               <Link
                 key={profile.id}
                 to={`/profile/${profile.username}`}
-                className="group flex flex-col items-center text-center gap-4 p-6 bg-card border border-border rounded-2xl shadow-sm transition-all duration-300 hover:scale-[1.02] hover:shadow-lg"
+                className="group flex flex-col items-center text-center gap-3 p-4 bg-card border border-border rounded-xl shadow-sm transition-all duration-300 hover:scale-[1.02] hover:shadow-lg"
                 style={{ animationDelay: `${index * 0.08}s` }}
               >
-                <Avatar className="w-20 h-20 border-2 border-primary/50">
+                <Avatar className="w-16 h-16 border-2 border-primary/50">
                   <AvatarImage src={profile.avatar_url || undefined} alt={profile.display_name || profile.username || 'User'} />
-                  <AvatarFallback className="bg-primary/20 text-primary text-2xl font-semibold">
-                    {profile.display_name ? profile.display_name[0].toUpperCase() : (profile.username ? profile.username[0].toUpperCase() : <UserIcon className="w-8 h-8" />)}
+                  <AvatarFallback className="bg-primary/20 text-primary text-xl font-semibold">
+                    {profile.display_name ? profile.display_name[0].toUpperCase() : (profile.username ? profile.username[0].toUpperCase() : <UserIcon className="w-6 h-6" />)}
                   </AvatarFallback>
                 </Avatar>
                 <div className="flex-1">
-                  <h3 className="font-semibold text-lg group-hover:text-primary transition-colors line-clamp-1">
+                  <h3 className="font-semibold text-base group-hover:text-primary transition-colors line-clamp-1">
                     {profile.display_name || profile.username || t('common.anonymous')}
                   </h3>
                   {profile.username && (
-                    <p className="text-sm text-muted-foreground line-clamp-1">@{profile.username}</p>
+                    <p className="text-xs text-muted-foreground line-clamp-1">@{profile.username}</p>
                   )}
                   {profile.submissions_count > 0 && (
-                    <p className="text-xs text-muted-foreground flex items-center justify-center gap-1 mt-1">
+                    <p className="text-2xs text-muted-foreground flex items-center justify-center gap-1 mt-1">
                       <Video className="w-3 h-3" />
                       {t('community.submissionsCount', { count: profile.submissions_count })}
                     </p>
