@@ -121,7 +121,7 @@
         "current": "E-mail actuel",
         "newEmail": "Nouvelle adresse e-mail",
         "confirmChange": "Mettre à Jour l'E-mail",
-        "changeInfo": "Vous recevrez un lien de confirmation à votre nouvelle adresse e-mail. Le changement prendra effet après confirmation."
+        "changeInfo": "Recibirás un enlace de confirmación en tu nueva dirección de correo. El cambio surtirá efecto después de confirmar."
       },
       "passwordSection": {
         "title": "Mot de Passe",
@@ -315,7 +315,10 @@
     "noPlaylistsTitle": "Aucune playlist publique trouvée.",
     "noPlaylistsDescription": "Soyez le premier à créer une playlist et à organiser les connaissances !",
     "createFirstPlaylist": "Créer votre première playlist",
-    "noCategoriesFound": "Aucune catégorie trouvée. Veuillez revenir plus tard !"
+    "noCategoriesFound": "Aucune catégorie trouvée. Veuillez revenir plus tard !",
+    "communitySpotlightTitle": "Pleins feux sur la communauté",
+    "communitySpotlightDescription": "Rencontrez nos meilleurs curateurs et contributeurs",
+    "noContributorsFound": "Aucun contributeur principal trouvé pour l'instant. Soyez le premier à soumettre une vidéo !"
   },
   "notFound": {
     "title": "404",
@@ -326,7 +329,7 @@
     "title": "Comunidad",
     "description": "Connectez-vous avec d'autres curateurs et passionnés de vidéo.",
     "totalContributors": "Total des Contributeurs",
-    "contributorsCount": "{{count}} usuarios",
+    "contributorsCount": "{{count}} soumissions",
     "allUsers": "Tous les Utilisateurs",
     "submissionsCount": "{{count}} soumissions",
     "loadUsersError": "Échec du chargement des utilisateurs de la communauté. Veuillez réessayer plus tard.",
@@ -584,9 +587,9 @@
     "founderTitle": "Sobre el Fundador",
     "founderName": "Marcelo Santos",
     "founderDescription": "Ingeniero de Software y fundador de Monynha Softwares. Apasionado por el código abierto, la automatización y las experiencias digitales inclusivas.",
-    "founderRole": "Ingénieur Logiciel et Fondateur de Monynha Softwares",
+    "founderRole": "Ingeniero de Software y Fundador de Monynha Softwares",
     "githubLink": "GitHub",
-    "websiteLink": "Site Web",
+    "websiteLink": "Sitio Web",
     "valuesTitle": "Valores",
     "value1": "Orgullo",
     "value2": "Honestidad",

@@ -283,15 +283,6 @@
     "favoriteInfo": "You need to be logged in to favorite videos.",
     "loginAction": "Login"
   },
-  "favorites": {
-    "title": "My Favorites",
-    "description": "All the videos you've saved to watch later.",
-    "loadingErrorTitle": "Error loading favorites",
-    "loadingErrorDescription": "Could not load your favorite videos. Please try again later.",
-    "noFavoritesTitle": "No videos favorited yet.",
-    "noFavoritesDescription": "Start exploring and save your favorite videos!",
-    "exploreVideos": "Explore Videos"
-  },
   "index": {
     "categoriesTitle": "Categories",
     "categoriesDescription": "Explore by theme",
@@ -310,7 +301,10 @@
     "noPlaylistsTitle": "No public playlists found.",
     "noPlaylistsDescription": "Be the first to create a playlist and organize knowledge!",
     "createFirstPlaylist": "Create your first playlist",
-    "noCategoriesFound": "No categories found. Please check back later!"
+    "noCategoriesFound": "No categories found. Please check back later!",
+    "communitySpotlightTitle": "Community Spotlight",
+    "communitySpotlightDescription": "Meet our top curators and contributors",
+    "noContributorsFound": "No top contributors found yet. Be the first to submit a video!"
   },
   "notFound": {
     "title": "404",
@@ -385,7 +379,7 @@
       "warning": {
         "noVideosFoundInPlaylist": "No videos found in the YouTube playlist. An empty playlist will be created."
       },
-      "apiLimitationInfo": "Monynha Fun uses a backend service to fetch YouTube playlist videos, but relies on the YouTube Data API which has quotas and may not always return all videos for very large playlists. For optimal results, ensure the playlist is public."
+      "apiLimitationInfo": "Monynha Fun uses a backend service to fetch YouTube playlist videos, but depends on the YouTube Data API which has quotas and may not always return all videos for very large playlists. For optimal results, ensure the playlist is public."
     }
   },
   "playlistDetails": {
@@ -528,7 +522,7 @@
         "displayNamePlaceholder": "Your name or nickname",
         "avatarUrlLabel": "Avatar URL",
         "avatarUrlPlaceholder": "https://example.com/your-photo.jpg",
-        "avatarUrlHint": "Direct link to your profile image.",
+        "avatarUrlHint": "Direct link to a custom image for your playlist. If empty, the first video's thumbnail will be used.",
         "bioLabel": "Bio",
         "bioPlaceholder": "Tell us a little about yourself...",
         "savingButton": "Saving...",

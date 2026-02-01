@@ -12,6 +12,7 @@ import { useNavigate } from "react-router-dom";
 import { useTranslation } from 'react-i18next';
 import { PlaylistCard } from "@/components/playlist/PlaylistCard";
 import { CategorySection } from "@/components/layout/CategorySection";
+import { CommunitySpotlightSection } from "@/components/layout/CommunitySpotlightSection"; // Import the new component
 
 const Index = () => {
   const { t } = useTranslation();
@@ -101,7 +102,7 @@ const Index = () => {
                 <Button 
                   variant="ghost" 
                   className="gap-2 group"
-                  onClick={() => navigate('/videos')} // Changed to navigate to /videos without filter
+                  onClick={() => navigate('/videos')}
                 >
                   {t('index.viewAll')}
                   <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
@@ -151,6 +152,9 @@ const Index = () => {
             )}
           </div>
         </section>
+
+        {/* Community Spotlight Section */}
+        <CommunitySpotlightSection />
 
         {/* Recent Playlists Section */}
         <section className="py-16 bg-background">

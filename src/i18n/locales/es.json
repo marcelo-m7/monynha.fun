@@ -329,7 +329,10 @@
     "noPlaylistsTitle": "No se encontraron listas de reproducción públicas.",
     "noPlaylistsDescription": "¡Sé el primero en crear una lista de reproducción y organizar el conocimiento!",
     "createFirstPlaylist": "Crear tu primera lista de reproducción",
-    "noCategoriesFound": "No se encontraron categorías. ¡Vuelve a consultar más tarde!"
+    "noCategoriesFound": "No se encontraron categorías. ¡Vuelve a consultar más tarde!",
+    "communitySpotlightTitle": "Destacados de la Comunidad",
+    "communitySpotlightDescription": "Conoce a nuestros principales curadores y contribuidores",
+    "noContributorsFound": "Aún no se encontraron contribuidores destacados. ¡Sé el primero en enviar un video!"
   },
   "notFound": {
     "title": "404",

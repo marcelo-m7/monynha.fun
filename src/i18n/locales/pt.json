@@ -285,15 +285,6 @@
     "favoriteInfo": "Você precisa estar logado para favoritar vídeos.",
     "loginAction": "Entrar"
   },
-  "favorites": {
-    "title": "Meus Favoritos",
-    "description": "Todos os vídeos que você salvou para assistir depois.",
-    "loadingErrorTitle": "Erro ao carregar favoritos",
-    "loadingErrorDescription": "Não foi possível carregar seus vídeos favoritos. Por favor, tente novamente mais tarde.",
-    "noFavoritesTitle": "Nenhum vídeo favoritado ainda.",
-    "noFavoritesDescription": "Comece a explorar e salve seus vídeos preferidos!",
-    "exploreVideos": "Explorar Vídeos"
-  },
   "index": {
     "categoriesTitle": "Categorias",
     "categoriesDescription": "Explore por tema",
@@ -312,7 +303,10 @@
     "noPlaylistsTitle": "Nenhuma playlist pública encontrada.",
     "noPlaylistsDescription": "Seja o primeiro a criar uma playlist e organizar o conhecimento!",
     "createFirstPlaylist": "Criar sua primeira playlist",
-    "noCategoriesFound": "Nenhuma categoria encontrada. Por favor, volte mais tarde!"
+    "noCategoriesFound": "Nenhuma categoria encontrada. Por favor, volte mais tarde!",
+    "communitySpotlightTitle": "Destaque da Comunidade",
+    "communitySpotlightDescription": "Conheça nossos principais curadores e contribuidores",
+    "noContributorsFound": "Nenhum contribuidor em destaque encontrado ainda. Seja o primeiro a enviar um vídeo!"
   },
   "notFound": {
     "title": "404",
