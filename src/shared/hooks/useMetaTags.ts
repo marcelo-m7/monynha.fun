@@ -64,5 +64,5 @@ export const useMetaTags = ({
     updateTwitterTag('twitter:description', description);
     updateTwitterTag('twitter:image', image);
     updateTwitterTag('twitter:card', 'summary_large_image');
-  }, [title, description, image, url, location]);
+  }, [title, description, image, url, type, location]);
 };

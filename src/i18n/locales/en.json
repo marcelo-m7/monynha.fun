@@ -660,6 +660,9 @@
     "form": {
       "placeholder": "Add a comment... Use @username to mention someone.",
       "mentionHelper": "Tip: use @username to mention someone.",
+      "mentionSuggestions": "User suggestions",
+      "searchingUsers": "Searching users...",
+      "keyboardHint": "↑↓ to navigate, Enter to select, Esc to close",
       "submitButton": "Comment",
       "submitting": "Submitting...",
       "contentRequired": "Comment cannot be empty.",
@@ -670,6 +673,7 @@
     "loginAction": "Login",
     "noComments": "No comments yet. Be the first to comment!",
     "loadError": "Error loading comments.",
-    "deleteError": "Failed to delete comment."
+    "deleteError": "Failed to delete comment.",
+    "noUsersFound": "No users found."
   }
 }

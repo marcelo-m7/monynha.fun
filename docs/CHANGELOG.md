@@ -1,6 +1,95 @@
-# Changelog - Monynha Fun
+# Changelog - Monynha Fun 🎬
 
-All notable changes to Monynha Fun are documented in this file.
+*Where we document every bug fix, feature drop, and "oops I broke production" moment*
+
+> **Monynha Softwares Philosophy**: Move fast, break things (but fix them quickly), and always keep it real. No corporate BS here. 🚀
+
+---
+
+## [v0.1.6] - February 1, 2026 🎉
+
+### 🎤 "Ey, You There!" - Mention Autocomplete Feature
+
+**The Problem**: You wanted to tag someone in a comment, but typing `@username` like a caveman? That's so 2010.
+
+**The Solution**: Marcelo built you an autocomplete dropdown that's smoother than Brazilian coffee. ☕
+
+**What's New**:
+- ✨ **Smart Autocomplete**: Type `@` in any comment and boom – user suggestions appear faster than you can say "algoritmo maluco"
+- ⌨️ **Keyboard Navigation**: Arrow keys to browse, Enter to select, Escape to bail. We respect keyboard warriors.
+- 🔍 **Real-time Search**: 300ms debouncing so we don't spam the database like amateurs
+- 🌐 **Fully Internationalized**: Works in PT, EN, ES, FR – porque somos globais, né?
+- 📱 **Mobile-Ready**: Touch-friendly, responsive, no janky behavior
+- ♿ **Accessible**: ARIA labels, proper role attributes – porque inclusão importa
+
+**Technical Goodies**:
+- `searchProfiles` API endpoint in entities layer (proper FSD architecture, baby)
+- `useSearchProfiles` TanStack Query hook with smart caching
+- `MentionAutocomplete` component with hover states and avatar previews
+- Fixed click-outside handler bug (comments stay open when clicking mentions – you're welcome)
+
+**Files Changed**:
+- `src/entities/profile/profile.api.ts` - Added search function
+- `src/features/profile/queries/useProfile.ts` - New hook
+- `src/components/comment/MentionAutocomplete.tsx` - Beautiful dropdown
+- `src/components/comment/CommentForm.tsx` - Integrated autocomplete magic
+- `src/i18n/locales/*.json` - Translations for all languages
+- `src/components/comment/CommentForm.test.tsx` - 10 passing tests because we're professionals
+
+**Tests**: 10/10 passing ✅ (we don't ship broken code)
+
+---
+
+### 💬 "Everyone Can See Your Hot Takes Now" - Public Comments
+
+**The Change**: Comments are now visible to EVERYONE, including anonymous lurkers.
+
+**Why?**: Because good discussions deserve an audience. Plus, SEO juice and community transparency. 🍹
+
+**What Changed**:
+- 🌍 Dropped the auth-only RLS policy on comments
+- 🔓 New policy: `"Anyone can view all comments"` (anon + authenticated users)
+- 🔒 Security intact: Only logged-in users can post/edit/delete (we're not *that* crazy)
+
+**Database Migration**: `make_comments_public`
+```sql
+-- Out with the old
+DROP POLICY "Authenticated users can view all comments" ON public.comments;
+
+-- In with the new
+CREATE POLICY "Anyone can view all comments" ON public.comments
+FOR SELECT TO anon, authenticated USING (true);
+```
+
+**Impact**:
+- ✅ Better content discoverability
+- ✅ Improved SEO (Google loves public content)
+- ✅ Community transparency
+- ✅ Engagement boost (people see conversations happening)
+- 🔒 Write operations still require auth (no spam bots allowed)
+
+---
+
+### 🐛 "Whoops, That Wasn't Supposed to Happen" - Bug Fixes
+
+**DOM Nesting Horror**: Fixed React warning about `<p>` tags containing `<div>` elements
+- **File**: `src/components/comment/CommentItem.tsx`
+- **Fix**: Changed comment content wrapper from `<p>` to `<div>` (HTML semantics matter, who knew?)
+- **Why it happened**: MentionLink's HoverCard has block elements – can't nest those in `<p>` tags
+- **Status**: Console errors gone, W3C validator happy 🎉
+
+**Lint Errors Massacre**: Killed 12 TypeScript `any` types with proper `Mock` typing
+- **File**: `src/components/comment/CommentForm.test.tsx`
+- **Fix**: `(useAuth as unknown as Mock)` instead of lazy `as any`
+- **Bonus**: Added `import type { Mock } from 'vitest'` like grown-ups
+- **Status**: ESLint now purrs like a happy cat 😺
+
+**Missing Dependency**: Added `type` to useMetaTags hook dependency array
+- **File**: `src/shared/hooks/useMetaTags.ts`  
+- **Why**: React was yelling at us in the console
+- **Status**: Hooks exhaustive-deps warning eliminated ✅
+
+---
 
 ## [v0.1.5] - January 30, 2026
 

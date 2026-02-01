@@ -1,7 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import { useAuth } from '@/features/auth/useAuth';
-import { getContributorCount, getProfileById, getProfileByUsername, updateProfile, listProfiles } from '@/entities/profile/profile.api';
+import { getContributorCount, getProfileById, getProfileByUsername, updateProfile, listProfiles, searchProfiles } from '@/entities/profile/profile.api';
 import { profileKeys } from '@/entities/profile/profile.keys';
 import type { Profile } from '@/entities/profile/profile.types';
 
@@ -60,5 +60,14 @@ export function useProfiles() {
   return useQuery<Profile[], Error>({
     queryKey: profileKeys.list(),
     queryFn: () => listProfiles(),
+  });
+}
+
+export function useSearchProfiles(query: string, limit = 10) {
+  return useQuery<Pick<Profile, 'id' | 'username' | 'display_name' | 'avatar_url'>[], Error>({
+    queryKey: [...profileKeys.all, 'search', query, limit] as const,
+    queryFn: () => searchProfiles(query, limit),
+    enabled: query.trim().length > 0,
+    staleTime: 30000, // Cache for 30 seconds
   });
 }

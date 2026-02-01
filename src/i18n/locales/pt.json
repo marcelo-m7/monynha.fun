@@ -14,7 +14,8 @@
     "validationError": "Erro de validação",
     "cancel": "Cancelar",
     "delete": "Excluir",
-    "anonymous": "Anônimo"
+    "anonymous": "Anônimo",
+    "loading": "Carregando..."
   },
   "header": {
     "searchPlaceholder": "Buscar vídeos, canais...",
@@ -645,6 +646,9 @@
     "form": {
       "placeholder": "Adicione um comentário... Use @usuario para mencionar alguém.",
       "mentionHelper": "Dica: use @usuario para mencionar alguém.",
+      "mentionSuggestions": "Sugestões de usuários",
+      "searchingUsers": "Buscando usuários...",
+      "keyboardHint": "↑↓ para navegar, Enter para selecionar, Esc para fechar",
       "submitButton": "Comentar",
       "submitting": "Enviando...",
       "contentRequired": "O comentário não pode estar vazio.",
@@ -655,6 +659,7 @@
     "loginAction": "Entrar",
     "noComments": "Nenhum comentário ainda. Seja o primeiro a comentar!",
     "loadError": "Erro ao carregar comentários.",
-    "deleteError": "Falha ao excluir o comentário."
+    "deleteError": "Falha ao excluir o comentário.",
+    "noUsersFound": "Nenhum usuário encontrado."
   }
 }

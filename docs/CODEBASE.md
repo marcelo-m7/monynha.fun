@@ -1,4 +1,101 @@
-# Monynha Fun Codebase & Database Migrations Exploration
+# Monynha Fun Codebase & Database Migrations Exploration 🚀
+
+*Marcelo's Guide to Not Getting Lost in His Own Code*
+
+> **Pro Tip**: If you're reading this because you broke something, take a deep breath. We've all been there. Check git history, run the tests, and remember: `pnpm run build` is your friend. 🧘
+
+---
+
+## Recent Changes & Improvements (February 1, 2026 - Feature Drop Edition) 🎉
+
+### 🎤 NEW: Mention Autocomplete in Comments
+
+**The Feature Everyone Wanted** (even if they didn't know it yet)
+
+Type `@` in any comment and BAM – autocomplete dropdown appears with user suggestions. Keyboard navigation included. We're not animals.
+
+**Architecture** (because we do things properly):
+```
+entities/profile/
+  ├── profile.api.ts          # searchProfiles() function
+  └── profile.types.ts        # Profile interface
+
+features/profile/queries/
+  └── useProfile.ts           # useSearchProfiles() hook
+
+components/comment/
+  ├── MentionAutocomplete.tsx # Dropdown component (NEW)
+  ├── CommentForm.tsx         # Integration + @ detection
+  ├── CommentForm.test.tsx    # 10 passing tests (NEW)
+  └── CommentItem.tsx         # Display mentions with hover cards
+```
+
+**Technical Highlights**:
+- 300ms debouncing (no database spam)
+- TanStack Query with 30s stale time (smart caching)
+- Keyboard navigation (↑↓ arrows, Enter, Escape)
+- Click-outside handler (but not *too* eager)
+- Mobile-responsive with max-width constraints
+- ARIA labels for accessibility
+- Works in 4 languages (PT, EN, ES, FR)
+
+**Why It's Cool**: Marcelo spent 3 hours debugging the click-outside handler. Worth it. Now you can tag people without copying usernames like it's 2005. 😎
+
+---
+
+### 🌍 NEW: Public Comments (Database Migration)
+
+**Migration**: `make_comments_public` (applied February 1, 2026)
+
+**What Changed**:
+```sql
+-- Before: Only authenticated users could view comments
+CREATE POLICY "Authenticated users can view all comments" 
+  ON public.comments FOR SELECT TO authenticated USING (true);
+
+-- After: Everyone can view comments (anon + authenticated)
+CREATE POLICY "Anyone can view all comments" 
+  ON public.comments FOR SELECT TO anon, authenticated USING (true);
+```
+
+**Security Model** (still locked down where it matters):
+- 🌍 **SELECT**: Public (anyone can read)
+- 🔐 **INSERT**: Authenticated only (auth.uid() = user_id)
+- 🔐 **UPDATE**: Own comments only (auth.uid() = user_id)
+- 🔐 **DELETE**: Own comments only (auth.uid() = user_id)
+
+**Impact**:
+- Better SEO (Google loves public content)
+- Improved discoverability (lurkers can read discussions)
+- Community transparency (no gatekeeping)
+- Anonymous users still need to sign up to comment (fair trade)
+
+**Why We Did This**: Because good discussions deserve an audience. Plus, engagement metrics go brrr. 📈
+
+---
+
+### 🐛 Bug Fixes (The "Oops" Collection)
+
+**DOM Nesting Violation**: 
+- Fixed `<p>` containing `<div>` (HTML semantics matter, apparently)
+- Changed CommentItem content wrapper to `<div>`
+- Console: clean ✅
+
+**TypeScript Lint Errors**:
+- Killed 12 `any` types with `Mock` typing
+- Added proper imports from vitest
+- ESLint: happy ✅
+
+**React Hook Warning**:
+- Added missing `type` dependency in useMetaTags
+- React: satisfied ✅
+
+**Click Handler Bug**:
+- Fixed mention dropdown closing before selection
+- Added autocompleteRef tracking
+- Mentions: working perfectly ✅
+
+---
 
 ## Recent Changes & Improvements (January 31, 2026 - Phase 2)
 

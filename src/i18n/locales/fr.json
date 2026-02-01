@@ -653,20 +653,24 @@
     }
   },
   "comments": {
-    "title": "Comentarios",
+    "title": "Commentaires",
     "form": {
-      "placeholder": "Añade un comentario... Usa @usuario para mencionar a alguien.",
-      "mentionHelper": "Consejo: usa @usuario para mencionar a alguien.",
-      "submitButton": "Comentar",
-      "submitting": "Enviando...",
-      "contentRequired": "El comentario no puede estar vacío.",
-      "contentMaxLength": "El comentario no puede exceder los 500 caracteres."
+      "placeholder": "Ajoutez un commentaire... Utilisez @utilisateur pour mentionner quelqu'un.",
+      "mentionHelper": "Conseil: utilisez @utilisateur pour mentionner quelqu'un.",
+      "mentionSuggestions": "Suggestions d'utilisateurs",
+      "searchingUsers": "Recherche d'utilisateurs...",
+      "keyboardHint": "↑↓ pour naviguer, Entrée pour sélectionner, Échap pour fermer",
+      "submitButton": "Commenter",
+      "submitting": "Envoi en cours...",
+      "contentRequired": "Le commentaire ne peut pas être vide.",
+      "contentMaxLength": "Le commentaire ne peut pas dépasser 500 caractères."
     },
-    "loginToComment": "Debes iniciar sesión para comentar.",
-    "loginToCommentPrompt": "Inicia sesión para añadir tu comentario.",
-    "loginAction": "Iniciar Sesión",
-    "noComments": "Aún no hay comentarios. ¡Sé el primero en comentar!",
-    "loadError": "Error al cargar comentarios.",
-    "deleteError": "Error al eliminar el comentario."
+    "loginToComment": "Vous devez être connecté pour commenter.",
+    "loginToCommentPrompt": "Connectez-vous pour ajouter votre commentaire.",
+    "loginAction": "Se connecter",
+    "noComments": "Pas encore de commentaires. Soyez le premier à commenter!",
+    "loadError": "Erreur lors du chargement des commentaires.",
+    "deleteError": "Échec de la suppression du commentaire.",
+    "noUsersFound": "Aucun utilisateur trouvé."
   }
 }

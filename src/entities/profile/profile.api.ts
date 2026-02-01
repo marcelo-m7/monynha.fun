@@ -57,3 +57,20 @@ export async function listProfiles() {
   if (error) throw error;
   return data as Profile[];
 }
+
+export async function searchProfiles(query: string, limit = 10) {
+  if (!query || query.trim().length === 0) {
+    return [];
+  }
+
+  const searchQuery = query.trim().toLowerCase();
+  
+  const { data, error } = await supabase
+    .from('profiles')
+    .select('id, username, display_name, avatar_url')
+    .or(`username.ilike.%${searchQuery}%,display_name.ilike.%${searchQuery}%`)
+    .limit(limit);
+
+  if (error) throw error;
+  return data as Pick<Profile, 'id' | 'username' | 'display_name' | 'avatar_url'>[];
+}

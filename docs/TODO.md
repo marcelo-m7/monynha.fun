@@ -1,7 +1,122 @@
-# Recent Updates Summary - January 30, 2026
+# Recent Updates Summary - February 1, 2026
 
 ## Overview
-Comprehensive updates to Monynha Fun codebase addressing build issues, navigation improvements, CI/CD pipeline setup, and documentation.
+*Where Marcelo documents his coding adventures and occasional "oh crap" moments* 😅
+
+Comprehensive updates to Monynha Fun codebase: mentions autocomplete (porque copiar usernames é coisa de 2005), public comments (everyone can see your hot takes now), bug fixes (DOM nesting horror resolved), and docs updates (because future-Marcelo will thank past-Marcelo).
+
+---
+
+## 🎉 NEW FEATURES - February 1, 2026
+
+### 1. Mention Autocomplete ✨
+
+**The Vibe**: Type `@` in comments and watch the magic happen. Autocomplete dropdown appears faster than you can say "algoritmo maluco".
+
+**What Works**:
+- ✅ Smart user search with 300ms debouncing (no database spam)
+- ✅ Keyboard navigation (↑↓ arrows, Enter to select, Escape to bail)
+- ✅ Avatar previews and display names (because faces > usernames)
+- ✅ Real-time filtering as you type
+- ✅ Mobile-responsive (no janky behavior on touch screens)
+- ✅ Fully accessible (ARIA labels, proper roles)
+- ✅ Internationalized (PT, EN, ES, FR)
+- ✅ Click outside to close (but not *too* eager – mentions dropdown stays open when clicking suggestions)
+
+**Technical Implementation**:
+```typescript
+// Entity layer - profile.api.ts
+export async function searchProfiles(query: string, limit = 10)
+
+// Feature layer - useProfile.ts  
+export function useSearchProfiles(query: string, limit?: number)
+
+// Component - MentionAutocomplete.tsx
+<MentionAutocomplete users={...} onSelect={insertMention} />
+
+// Integration - CommentForm.tsx
+// @ detection, debouncing, keyboard handlers, cursor positioning
+```
+
+**Files Modified**:
+- `src/entities/profile/profile.api.ts` - Search API
+- `src/features/profile/queries/useProfile.ts` - Query hook
+- `src/components/comment/MentionAutocomplete.tsx` - Dropdown component (NEW)
+- `src/components/comment/CommentForm.tsx` - Integration logic
+- `src/components/comment/CommentForm.test.tsx` - 10 passing tests (NEW)
+- `src/i18n/locales/{en,pt,es,fr}.json` - Translations
+
+**Test Coverage**: 10/10 tests passing ✅
+- Autocomplete display
+- User filtering
+- Loading states
+- Keyboard navigation
+- Mention insertion
+- Accessibility
+- Unauthenticated state
+
+**Why It's Cool**: No more copying usernames like a caveman. Just type, select, done. Plus, it's faster than most autocompletes out there (300ms debounce + smart caching). Marcelo is proud of this one. 😎
+
+---
+
+### 2. Public Comments 🌍
+
+**The Change**: Comments are now visible to EVERYONE – authenticated users AND anonymous lurkers.
+
+**Database Migration**: `make_comments_public` (applied February 1, 2026)
+```sql
+-- Out with the old auth-only policy
+DROP POLICY "Authenticated users can view all comments" ON public.comments;
+
+-- In with the new public policy  
+CREATE POLICY "Anyone can view all comments" ON public.comments
+FOR SELECT TO anon, authenticated USING (true);
+```
+
+**Security Status**: 🔒 Still Locked Down Where It Matters
+- ✅ READ: Public (anon + authenticated)
+- 🔐 CREATE: Authenticated only
+- 🔐 UPDATE: Own comments only
+- 🔐 DELETE: Own comments only
+
+**Why We Did This**:
+1. Better content discoverability (good discussions deserve audiences)
+2. SEO juice (Google loves public content)
+3. Community transparency (no gatekeeping)
+4. Engagement boost (people see convos happening)
+5. Makes the platform feel more alive
+
+**Impact**: Anonymous visitors can now read all the spicy takes and thoughtful discussions. But they still need to sign up to contribute. Fair trade. 🤝
+
+---
+
+### 3. Bug Slaying Session 🐛⚔️
+
+**DOM Nesting Horror** (Fixed)
+- **Error**: `Warning: validateDOMNesting(...): <p> cannot appear as a descendant of <p>`
+- **Root Cause**: Comment content wrapped in `<p>`, but MentionLink's HoverCard has block elements (`<div>`, `<p>`). HTML gods were angry.
+- **Fix**: Changed wrapper from `<p>` to `<div>` in `CommentItem.tsx`
+- **Status**: Console clean, W3C validator happy ✅
+
+**TypeScript Lint Errors** (Massacred)
+- **Errors**: 12x "Unexpected any. Specify a different type" in test files
+- **Fix**: Replaced lazy `as any` with proper `as unknown as Mock` typing
+- **Bonus**: Added `import type { Mock } from 'vitest'`
+- **Status**: ESLint purring like a happy cat 😺
+
+**React Hook Dependency Warning** (Silenced)
+- **Warning**: `useEffect has a missing dependency: 'type'`
+- **Fix**: Added `type` to dependency array in `useMetaTags.ts`
+- **Status**: React happy, console quiet ✅
+
+**Click Outside Handler Bug** (Squashed)
+- **Issue**: Clicking mention suggestion closed dropdown before selection fired
+- **Fix**: Added `autocompleteRef` to track dropdown element, updated click-outside logic
+- **Status**: Mentions now insert properly on click 🎯
+
+---
+
+## PREVIOUS UPDATES - January 30, 2026
 
 ---
 

@@ -671,6 +671,9 @@
     "form": {
       "placeholder": "Añade un comentario... Usa @usuario para mencionar a alguien.",
       "mentionHelper": "Consejo: usa @usuario para mencionar a alguien.",
+      "mentionSuggestions": "Sugerencias de usuarios",
+      "searchingUsers": "Buscando usuarios...",
+      "keyboardHint": "↑↓ para navegar, Enter para seleccionar, Esc para cerrar",
       "submitButton": "Comentar",
       "submitting": "Enviando...",
       "contentRequired": "El comentario no puede estar vacío.",
@@ -681,6 +684,7 @@
     "loginAction": "Iniciar Sesión",
     "noComments": "Aún no hay comentarios. ¡Sé el primero en comentar!",
     "loadError": "Error al cargar comentarios.",
-    "deleteError": "Error al eliminar el comentario."
+    "deleteError": "Error al eliminar el comentario.",
+    "noUsersFound": "No se encontraron usuarios."
   }
 }

@@ -11,6 +11,7 @@ import { useDeleteComment } from '@/features/comments/queries/useComments';
 import { toast } from 'sonner';
 import i18n from 'i18next';
 import { Link } from 'react-router-dom';
+import { MentionLink } from './MentionLink'; // Import the new MentionLink component
 
 interface CommentItemProps {
   comment: Comment;
@@ -23,26 +24,33 @@ const localeMap: Record<string, Locale> = {
   fr: fr,
 };
 
-const parseContent = (content: string) => {
-  return content.split(/(\s+)/).map((token, index) => {
-    if (token.startsWith('@')) {
-      const match = token.match(/^@([\w.-]+)/);
-      if (match) {
-        const username = match[1];
-        const suffix = token.slice(username.length + 1);
-        return (
-          <React.Fragment key={`${token}-${index}`}>
-            <Link to={`/profile/${username}`} className="text-primary font-semibold hover:underline">
-              @{username}
-            </Link>
-            {suffix}
-          </React.Fragment>
-        );
-      }
-    }
+interface ParsedContentPart {
+  type: 'text' | 'mention';
+  value: string; // The actual text or username
+}
 
-    return <React.Fragment key={`${token}-${index}`}>{token}</React.Fragment>;
-  });
+const parseContent = (content: string): ParsedContentPart[] => {
+  const parts: ParsedContentPart[] = [];
+  const regex = /(@[\w.-]+)/g; // Regex to find @username mentions
+  let lastIndex = 0;
+  let match;
+
+  while ((match = regex.exec(content)) !== null) {
+    // Add preceding text
+    if (match.index > lastIndex) {
+      parts.push({ type: 'text', value: content.substring(lastIndex, match.index) });
+    }
+    // Add mention
+    parts.push({ type: 'mention', value: match[1].substring(1) }); // Remove '@' prefix
+    lastIndex = regex.lastIndex;
+  }
+
+  // Add any remaining text
+  if (lastIndex < content.length) {
+    parts.push({ type: 'text', value: content.substring(lastIndex) });
+  }
+
+  return parts;
 };
 
 export const CommentItem: React.FC<CommentItemProps> = ({ comment }) => {
@@ -61,6 +69,7 @@ export const CommentItem: React.FC<CommentItemProps> = ({ comment }) => {
   };
 
   const currentLocale = localeMap[i18n.language] || enUS;
+  const contentParts = parseContent(comment.content);
 
   return (
     <div className="flex items-start space-x-3 p-4 bg-card border border-border rounded-xl">
@@ -92,7 +101,15 @@ export const CommentItem: React.FC<CommentItemProps> = ({ comment }) => {
             </Button>
           )}
         </div>
-        <p className="text-sm text-foreground mt-1 whitespace-pre-wrap">{parseContent(comment.content)}</p>
+        <div className="text-sm text-foreground mt-1 whitespace-pre-wrap">
+          {contentParts.map((part, index) => (
+            part.type === 'text' ? (
+              <React.Fragment key={index}>{part.value}</React.Fragment>
+            ) : (
+              <MentionLink key={index} username={part.value} />
+            )
+          ))}
+        </div>
       </div>
     </div>
   );
