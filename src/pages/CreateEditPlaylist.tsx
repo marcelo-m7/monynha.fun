@@ -44,7 +44,7 @@ export default function CreateEditPlaylist() {
   const createPlaylistMutation = useCreatePlaylist();
   const updatePlaylistMutation = useUpdatePlaylist();
 
-  const { register, handleSubmit, watch, setValue, formState: { errors }, reset } = useForm<PlaylistFormValues>({
+  const { register, handleSubmit, watch, setValue, formState: { errors, dirtyFields }, reset } = useForm<PlaylistFormValues>({
     resolver: zodResolver(playlistSchema),
     defaultValues: {
       name: '',
@@ -60,7 +60,6 @@ export default function CreateEditPlaylist() {
   });
 
   const name = watch('name');
-  const slug = watch('slug');
   const description = watch('description');
   const thumbnailUrl = watch('thumbnail_url');
   const courseCode = watch('course_code');
@@ -91,12 +90,14 @@ export default function CreateEditPlaylist() {
     }
   }, [isEditing, existingPlaylist, reset]);
 
-  // Auto-generate slug from name if creating and slug is empty
+  // Real-time slug generation
   useEffect(() => {
-    if (!isEditing && name && !slug) {
-      setValue('slug', generateSlug(name));
+    // Only auto-generate if the slug field hasn't been manually edited by the user
+    // and if the name field has a value.
+    if (name && !dirtyFields.slug) {
+      setValue('slug', generateSlug(name), { shouldValidate: true });
     }
-  }, [name, slug, isEditing, setValue]);
+  }, [name, dirtyFields.slug, setValue]);
 
   // Clear FACODI fields if playlist type changes to 'Collection'
   useEffect(() => {
