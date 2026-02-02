@@ -462,7 +462,7 @@
       "isPublicHint": "Playlists públicas são visíveis para todos os usuários.",
       "playlistTypeLabel": "Tipo de Playlist",
       "learningPath": "Caminho de Aprendizado",
-      "learningPathHint": "Vídeos são ordenados e devem ser seguidos sequencialmente. Os campos FACODI aparecerão se selecionado.",
+      "learningPathHint": "Vídeos são ordenados e devem ser seguidos sequencialmente. Os campos FACODI aparecerão se selecionado. Para mais informações, visite <a href=\"https://facodi.pt\" target=\"_blank\" rel=\"noopener noreferrer\" class=\"text-primary hover:underline\">FACODI.pt</a>.",
       "collection": "Coleção",
       "collectionHint": "Vídeos são um conjunto curado, a ordem não é estritamente imposta.",
       "facodiFieldsTitle": "Detalhes do Curso FACODI",
