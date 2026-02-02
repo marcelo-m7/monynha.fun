@@ -55,7 +55,7 @@ export default function CreateEditPlaylist() {
       unit_code: '',
       language: 'pt',
       is_public: true,
-      is_ordered: false, // Changed default to false for 'Collection'
+      is_ordered: false, // Set default to false for 'Collection'
     },
   });
 
@@ -302,16 +302,19 @@ export default function CreateEditPlaylist() {
                   onValueChange={(value) => setValue('is_ordered', value === 'ordered')}
                   className="flex flex-col space-y-1"
                 >
-                  <div className="flex items-center space-x-2">
-                    <RadioGroupItem value="ordered" id="ordered" />
-                    <Label htmlFor="ordered">{t('createEditPlaylist.form.learningPath')}</Label>
-                  </div>
-                  <p className="text-xs text-muted-foreground ml-6 -mt-1 mb-2">{t('createEditPlaylist.form.learningPathHint')}</p>
+                  {/* Collection (unordered) as the first option */}
                   <div className="flex items-center space-x-2">
                     <RadioGroupItem value="unordered" id="unordered" />
                     <Label htmlFor="unordered">{t('createEditPlaylist.form.collection')}</Label>
                   </div>
-                  <p className="text-xs text-muted-foreground ml-6 -mt-1">{t('createEditPlaylist.form.collectionHint')}</p>
+                  <p className="text-xs text-muted-foreground ml-6 -mt-1 mb-2">{t('createEditPlaylist.form.collectionHint')}</p>
+                  
+                  {/* Learning Path (ordered) as the second option */}
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="ordered" id="ordered" />
+                    <Label htmlFor="ordered">{t('createEditPlaylist.form.learningPath')}</Label>
+                  </div>
+                  <p className="text-xs text-muted-foreground ml-6 -mt-1">{t('createEditPlaylist.form.learningPathHint')}</p>
                 </RadioGroup>
               </div>
 
