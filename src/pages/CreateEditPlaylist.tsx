@@ -60,7 +60,6 @@ export default function CreateEditPlaylist() {
   });
 
   const name = watch('name');
-  const slug = watch('slug');
   const description = watch('description');
   const thumbnailUrl = watch('thumbnail_url');
   const courseCode = watch('course_code');
@@ -315,7 +314,10 @@ export default function CreateEditPlaylist() {
                     <RadioGroupItem value="ordered" id="ordered" />
                     <Label htmlFor="ordered">{t('createEditPlaylist.form.learningPath')}</Label>
                   </div>
-                  <p className="text-xs text-muted-foreground ml-6 -mt-1">{t('createEditPlaylist.form.learningPathHint')}</p>
+                  <p 
+                    className="text-xs text-muted-foreground ml-6 -mt-1"
+                    dangerouslySetInnerHTML={{ __html: t('createEditPlaylist.form.learningPathHint') }}
+                  />
                 </RadioGroup>
               </div>
 
