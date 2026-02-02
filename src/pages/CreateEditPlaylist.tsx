@@ -55,7 +55,7 @@ export default function CreateEditPlaylist() {
       unit_code: '',
       language: 'pt',
       is_public: true,
-      is_ordered: true,
+      is_ordered: false, // Changed default to false for 'Collection'
     },
   });
 
@@ -226,6 +226,7 @@ export default function CreateEditPlaylist() {
                   type="text"
                   placeholder={t('createEditPlaylist.form.slugPlaceholder')}
                   {...register('slug')}
+                  className="pl-10"
                   aria-invalid={errors.slug ? "true" : "false"}
                 />
                 {errors.slug && (
