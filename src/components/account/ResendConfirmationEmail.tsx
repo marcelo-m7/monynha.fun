@@ -76,8 +76,8 @@ export const ResendConfirmationEmail: React.FC<ResendConfirmationEmailProps> = (
           </AlertDescription>
         </Alert>
 
-        <div className="flex items-center justify-between">
-          <div className="text-sm text-muted-foreground">
+        <div className="flex flex-col items-center space-y-4">
+          <div className="text-center text-sm text-muted-foreground space-y-1">
             {targetEmail && (
               <p>
                 {t('account.settings.resendEmail.emailLabel')}: <span className="font-medium text-foreground">{targetEmail}</span>
@@ -94,6 +94,7 @@ export const ResendConfirmationEmail: React.FC<ResendConfirmationEmailProps> = (
             onClick={handleResend}
             disabled={isSubmitting || !canResend || !targetEmail}
             variant="default"
+            className="w-full sm:w-auto"
           >
             {isSubmitting ? (
               <>
@@ -110,7 +111,7 @@ export const ResendConfirmationEmail: React.FC<ResendConfirmationEmailProps> = (
         </div>
 
         {!canResend && (
-          <p className="text-xs text-muted-foreground">
+          <p className="text-xs text-muted-foreground text-center">
             {t('account.settings.resendEmail.cooldownMessage')}
           </p>
         )}
