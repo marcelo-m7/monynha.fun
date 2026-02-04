@@ -103,7 +103,9 @@
       "title": "Verifique seu E-mail",
       "description": "Enviamos um link de confirmação para o seu e-mail. Por favor, verifique sua caixa de entrada (e spam) para ativar sua conta.",
       "sentTo": "Link enviado para",
-      "goToLogin": "Ir para o Login"
+      "goToLogin": "Ir para o Login",
+      "successConfirmed": "Seu e-mail foi confirmado com sucesso! Você já pode acessar o aplicativo.",
+      "goToApp": "Ir para o Aplicativo"
     },
     "error": {
       "validationTitle": "Erro de validação",
@@ -171,7 +173,7 @@
         "emailLabel": "E-mail",
         "lastSent": "Último envio",
         "alreadyConfirmed": "Seu e-mail já está confirmado.",
-        "notConfirmedWarning": "Seu e-mail ainda não está confirmado. Alguns recursos podem estar limitados até você confirmar seu e-mail.",
+        "notConfirmedWarning": "Seu e-mail ainda não está confirmado. Por favor, verifique sua caixa de entrada e clique no link de confirmação para ativar sua conta.",
         "cooldownMessage": "Por favor, aguarde um minuto antes de solicitar outro e-mail.",
         "success": {
           "sent": "E-mail de confirmação enviado!",
@@ -179,7 +181,8 @@
         },
         "error": {
           "failed": "Falha ao enviar e-mail de confirmação",
-          "cooldown": "Por favor, aguarde antes de solicitar outro e-mail"
+          "cooldown": "Por favor, aguarde antes de solicitar outro e-mail",
+          "noEmail": "E-mail não encontrado para reenviar a confirmação."
         }
       },
       "dangerZone": {
@@ -269,7 +272,7 @@
       "aiEnrichmentFailedTitle": "Erro de Enriquecimento de IA",
       "aiEnrichmentFailedDescription": "Falha ao iniciar o enriquecimento de IA para o vídeo.",
       "invalidUrl": "URL inválida",
-      "notYoutubeUrl": "Apenas URLs do YouTube são aceitas",
+      "notYoutubeUrl": "Apenas URLs de vídeos do YouTube são aceitas",
       "descriptionMaxLength": "Descrição não pode exceder 500 caracteres",
       "languageRequired": "Idioma é obrigatório"
     },

@@ -102,7 +102,9 @@
       "title": "Vérifiez Votre E-mail",
       "description": "Nous avons envoyé un lien de confirmation à votre adresse e-mail. Veuillez vérifier votre boîte de réception (et les spams) pour activer votre compte.",
       "sentTo": "Lien envoyé à",
-      "goToLogin": "Aller à la Connexion"
+      "goToLogin": "Aller à la Connexion",
+      "successConfirmed": "Votre e-mail a été confirmé avec succès ! Vous pouvez maintenant accéder à l'application.",
+      "goToApp": "Aller à l'Application"
     },
     "error": {
       "validationTitle": "Erreur de Validation",
@@ -173,7 +175,7 @@
         "emailLabel": "E-mail",
         "lastSent": "Dernier envoi",
         "alreadyConfirmed": "Votre e-mail est déjà confirmé.",
-        "notConfirmedWarning": "Votre e-mail n'est pas encore confirmé. Certaines fonctionnalités peuvent être limitées jusqu'à confirmation.",
+        "notConfirmedWarning": "Votre e-mail n'est pas encore confirmé. Veuillez vérifier votre boîte de réception et cliquer sur le lien de confirmation pour activer votre compte.",
         "cooldownMessage": "Veuillez attendre une minute avant de demander un autre e-mail.",
         "success": {
           "sent": "E-mail de confirmation envoyé!",
@@ -181,7 +183,8 @@
         },
         "error": {
           "failed": "Échec de l'envoi de l'e-mail de confirmation",
-          "cooldown": "Veuillez attendre avant de demander un autre e-mail"
+          "cooldown": "Veuillez attendre avant de demander un autre e-mail",
+          "noEmail": "E-mail introuvable pour renvoyer la confirmation."
         }
       },
       "dangerZone": {

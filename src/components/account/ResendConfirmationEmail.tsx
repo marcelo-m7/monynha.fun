@@ -2,23 +2,28 @@ import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Mail, Loader2, CheckCircle, AlertCircle } from 'lucide-react';
+import { Mail, Loader2, AlertCircle } from 'lucide-react';
 import { toast } from 'sonner';
 import { resendConfirmationEmail } from '@/features/auth/auth.api';
 import { useAuth } from '@/features/auth/useAuth';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 
-export const ResendConfirmationEmail: React.FC = () => {
+interface ResendConfirmationEmailProps {
+  email?: string | null;
+}
+
+export const ResendConfirmationEmail: React.FC<ResendConfirmationEmailProps> = ({ email }) => {
   const { t } = useTranslation();
   const { user } = useAuth();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [lastSent, setLastSent] = useState<Date | null>(null);
 
   const canResend = !lastSent || Date.now() - lastSent.getTime() > 60000; // 1 minute cooldown
+  const targetEmail = email || user?.email;
 
   const handleResend = async () => {
-    if (!user?.email) {
-      toast.error(t('account.settings.error.notLoggedIn'));
+    if (!targetEmail) {
+      toast.error(t('account.settings.resendEmail.error.noEmail'));
       return;
     }
 
@@ -30,7 +35,7 @@ export const ResendConfirmationEmail: React.FC = () => {
     setIsSubmitting(true);
 
     try {
-      const { error } = await resendConfirmationEmail();
+      const { error } = await resendConfirmationEmail(targetEmail);
 
       if (error) {
         toast.error(t('account.settings.resendEmail.error.failed'), {
@@ -51,33 +56,6 @@ export const ResendConfirmationEmail: React.FC = () => {
       setIsSubmitting(false);
     }
   };
-
-  // Check if email is already confirmed
-  const isEmailConfirmed = user?.email_confirmed_at !== null;
-
-  if (isEmailConfirmed) {
-    return (
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Mail className="w-5 h-5" />
-            {t('account.settings.resendEmail.title')}
-          </CardTitle>
-          <CardDescription>
-            {t('account.settings.resendEmail.description')}
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <Alert>
-            <CheckCircle className="h-4 w-4 text-green-600" />
-            <AlertDescription>
-              {t('account.settings.resendEmail.alreadyConfirmed')}
-            </AlertDescription>
-          </Alert>
-        </CardContent>
-      </Card>
-    );
-  }
 
   return (
     <Card>
@@ -100,9 +78,9 @@ export const ResendConfirmationEmail: React.FC = () => {
 
         <div className="flex items-center justify-between">
           <div className="text-sm text-muted-foreground">
-            {user?.email && (
+            {targetEmail && (
               <p>
-                {t('account.settings.resendEmail.emailLabel')}: <span className="font-medium text-foreground">{user.email}</span>
+                {t('account.settings.resendEmail.emailLabel')}: <span className="font-medium text-foreground">{targetEmail}</span>
               </p>
             )}
             {lastSent && (
@@ -114,7 +92,7 @@ export const ResendConfirmationEmail: React.FC = () => {
           
           <Button
             onClick={handleResend}
-            disabled={isSubmitting || !canResend}
+            disabled={isSubmitting || !canResend || !targetEmail}
             variant="default"
           >
             {isSubmitting ? (

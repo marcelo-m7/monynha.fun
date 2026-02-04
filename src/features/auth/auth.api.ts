@@ -54,10 +54,10 @@ export async function reauthenticateUser(email: string, password: string) {
   return { error: error as Error | null };
 }
 
-export async function resendConfirmationEmail() {
+export async function resendConfirmationEmail(email: string) {
   const { error } = await supabase.auth.resend({
     type: 'signup',
-    email: (await supabase.auth.getUser()).data.user?.email || '',
+    email: email,
     options: {
       emailRedirectTo: `${window.location.origin}/`,
     },

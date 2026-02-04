@@ -102,7 +102,9 @@
       "title": "Verify Your Email",
       "description": "We sent a confirmation link to your email. Please check your inbox (and spam folder) to activate your account.",
       "sentTo": "Link sent to",
-      "goToLogin": "Go to Login"
+      "goToLogin": "Go to Login",
+      "successConfirmed": "Your email has been successfully confirmed! You can now access the app.",
+      "goToApp": "Go to App"
     },
     "error": {
       "validationTitle": "Validation Error",
@@ -170,7 +172,7 @@
         "emailLabel": "Email",
         "lastSent": "Last sent",
         "alreadyConfirmed": "Your email is already confirmed.",
-        "notConfirmedWarning": "Your email is not confirmed yet. Some features may be limited until you confirm your email.",
+        "notConfirmedWarning": "Your email is not confirmed yet. Please check your inbox and click the confirmation link to activate your account.",
         "cooldownMessage": "Please wait a minute before requesting another email.",
         "success": {
           "sent": "Confirmation email sent!",
@@ -178,7 +180,8 @@
         },
         "error": {
           "failed": "Failed to send confirmation email",
-          "cooldown": "Please wait before requesting another email"
+          "cooldown": "Please wait before requesting another email",
+          "noEmail": "Email not found to resend confirmation."
         }
       },
       "dangerZone": {
