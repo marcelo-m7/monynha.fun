@@ -1,5 +1,5 @@
 # Stage 1: Build the React application
-FROM oven/bun:1.1.17-alpine AS builder
+FROM oven/bun:1-alpine AS builder
 
 # Build arguments for Vite environment variables
 ARG VITE_SUPABASE_PROJECT_ID
