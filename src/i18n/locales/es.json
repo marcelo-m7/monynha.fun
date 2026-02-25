@@ -210,6 +210,82 @@
     "title": "Preguntas Frecuentes",
     "description": "Preguntas frecuentes y respuestas."
   },
+  "aboutPage": {
+    "missionTitle": "Nuestra misión",
+    "missionDescription": "Ayudamos a las personas a descubrir y preservar videos valiosos mediante curaduría humana y colaboración comunitaria.",
+    "founderTitle": "Sobre el fundador",
+    "founderName": "Marcelo Santos",
+    "founderRole": "Fundador y curador",
+    "founderDescription": "Marcelo construye productos centrados en la comunidad, enfocados en cultura, aprendizaje y descubrimiento cuidadoso.",
+    "githubLink": "Perfil de GitHub",
+    "websiteLink": "Sitio personal",
+    "valuesTitle": "Nuestros valores",
+    "value1": "Curaduría humana sobre algoritmos",
+    "value2": "Respeto a creadores y comunidades",
+    "value3": "Aprendizaje, curiosidad y oficio",
+    "value4": "Colaboración y responsabilidad compartida",
+    "value5": "Preservación del conocimiento a largo plazo",
+    "philosophyTitle": "Nuestra filosofía",
+    "philosophyDescription": "Creemos que las mejores recomendaciones vienen de personas que cuidan la calidad, el contexto y la cultura."
+  },
+  "rulesPage": {
+    "rule1": "Sé respetuoso y constructivo en todas las interacciones.",
+    "rule2": "No toleramos acoso, discurso de odio ni ataques personales.",
+    "rule3": "Envía solo videos de YouTube que tengas permiso para compartir.",
+    "rule4": "Prioriza contenido de alta calidad, valioso y original.",
+    "rule5": "Sigue las leyes locales y las pautas de la plataforma.",
+    "rule6": "Da crédito correctamente y evita atribuciones incorrectas.",
+    "rule7": "Ayuda a mantener la comunidad segura y acogedora."
+  },
+  "contactPage": {
+    "successMessage": "Mensaje enviado correctamente.",
+    "errorMessage": "Algo salió mal. Inténtalo de nuevo.",
+    "directEmailLabel": "Email directo",
+    "locationLabel": "Ubicación",
+    "locationValue": "Remoto, en todo el mundo",
+    "responseTimeLabel": "Tiempo de respuesta",
+    "responseTimeValue": "Dentro de 48 horas",
+    "feedbackTitle": "Comentarios y sugerencias",
+    "feedbackDescription": "Siempre estamos mejorando. Envía tus comentarios, ideas y preguntas.",
+    "form": {
+      "nameLabel": "Nombre",
+      "namePlaceholder": "Tu nombre",
+      "nameRequired": "Ingresa tu nombre",
+      "emailLabel": "Email",
+      "emailPlaceholder": "tu@ejemplo.com",
+      "emailInvalid": "Ingresa un email válido",
+      "subjectLabel": "Asunto",
+      "subjectPlaceholder": "¿Cómo podemos ayudar?",
+      "subjectRequired": "Ingresa un asunto",
+      "messageLabel": "Mensaje",
+      "messagePlaceholder": "Cuéntanos más sobre tu solicitud...",
+      "messageRequired": "Ingresa un mensaje",
+      "messageMaxLength": "El mensaje no puede superar los 1000 caracteres",
+      "sendButton": "Enviar mensaje"
+    }
+  },
+  "faqPage": {
+    "q1": {
+      "question": "¿Qué es Monynha Fun?",
+      "answer": "Monynha Fun es una plataforma comunitaria para curar contenido valioso de YouTube."
+    },
+    "q2": {
+      "question": "¿Quién puede enviar videos?",
+      "answer": "Cualquier persona con una cuenta puede enviar videos para revisión y curaduría."
+    },
+    "q3": {
+      "question": "¿Cómo se seleccionan los videos destacados?",
+      "answer": "Los videos destacados se seleccionan según la participación de la comunidad y la revisión de curadores."
+    },
+    "q4": {
+      "question": "¿Puedo crear playlists?",
+      "answer": "Sí. Puedes crear playlists para organizar y compartir rutas de aprendizaje."
+    },
+    "q5": {
+      "question": "¿Cómo puedo contactar al equipo?",
+      "answer": "Usa el formulario de contacto o envía un email a hello@monynha.com."
+    }
+  },
   "submit": {
     "title": "Enviar Video",
     "description": "Comparte un video interesante de YouTube con la comunidad",
@@ -327,7 +403,100 @@
     "submissionsCount": "{{count}} envíos",
     "loadUsersError": "Error al cargar usuarios de la comunidad. Por favor, inténtalo de nuevo más tarde.",
     "noUsersFoundTitle": "No se encontraron usuarios.",
-    "noUsersFoundDescription": "Parece que aún no hay usuarios en la comunidad. ¡Sé el primero en unirte!"
+    "noUsersFoundDescription": "Parece que aún no hay usuarios en la comunidad. ¡Sé el primero en unirte!",
+    "createFirstPlaylist": "Crea tu primera playlist"
+  },
+  "contact": {
+    "title": "Contacto",
+    "description": "Ponte en contacto con nosotros. Nos encantaría saber de ti."
+  },
+  "about": {
+    "title": "Acerca de",
+    "description": "Conoce más sobre Monynha Fun y nuestra misión."
+  },
+  "rules": {
+    "title": "Reglas",
+    "description": "Directrices de la comunidad y políticas de contenido."
+  },
+  "faq": {
+    "title": "Preguntas Frecuentes",
+    "description": "Preguntas frecuentes y respuestas."
+  },
+  "aboutPage": {
+    "missionTitle": "Nuestra misión",
+    "missionDescription": "Ayudamos a las personas a descubrir y preservar videos valiosos mediante curaduría humana y colaboración comunitaria.",
+    "founderTitle": "Sobre el fundador",
+    "founderName": "Marcelo Santos",
+    "founderRole": "Fundador y curador",
+    "founderDescription": "Marcelo construye productos centrados en la comunidad, enfocados en cultura, aprendizaje y descubrimiento cuidadoso.",
+    "githubLink": "Perfil de GitHub",
+    "websiteLink": "Sitio personal",
+    "valuesTitle": "Nuestros valores",
+    "value1": "Curaduría humana sobre algoritmos",
+    "value2": "Respeto a creadores y comunidades",
+    "value3": "Aprendizaje, curiosidad y oficio",
+    "value4": "Colaboración y responsabilidad compartida",
+    "value5": "Preservación del conocimiento a largo plazo",
+    "philosophyTitle": "Nuestra filosofía",
+    "philosophyDescription": "Creemos que las mejores recomendaciones vienen de personas que cuidan la calidad, el contexto y la cultura."
+  },
+  "rulesPage": {
+    "rule1": "Sé respetuoso y constructivo en todas las interacciones.",
+    "rule2": "No toleramos acoso, discurso de odio ni ataques personales.",
+    "rule3": "Envía solo videos de YouTube que tengas permiso para compartir.",
+    "rule4": "Prioriza contenido de alta calidad, valioso y original.",
+    "rule5": "Sigue las leyes locales y las pautas de la plataforma.",
+    "rule6": "Da crédito correctamente y evita atribuciones incorrectas.",
+    "rule7": "Ayuda a mantener la comunidad segura y acogedora."
+  },
+  "contactPage": {
+    "successMessage": "Mensaje enviado correctamente.",
+    "errorMessage": "Algo salió mal. Inténtalo de nuevo.",
+    "directEmailLabel": "Email directo",
+    "locationLabel": "Ubicación",
+    "locationValue": "Remoto, en todo el mundo",
+    "responseTimeLabel": "Tiempo de respuesta",
+    "responseTimeValue": "Dentro de 48 horas",
+    "feedbackTitle": "Comentarios y sugerencias",
+    "feedbackDescription": "Siempre estamos mejorando. Envía tus comentarios, ideas y preguntas.",
+    "form": {
+      "nameLabel": "Nombre",
+      "namePlaceholder": "Tu nombre",
+      "nameRequired": "Ingresa tu nombre",
+      "emailLabel": "Email",
+      "emailPlaceholder": "tu@ejemplo.com",
+      "emailInvalid": "Ingresa un email válido",
+      "subjectLabel": "Asunto",
+      "subjectPlaceholder": "¿Cómo podemos ayudar?",
+      "subjectRequired": "Ingresa un asunto",
+      "messageLabel": "Mensaje",
+      "messagePlaceholder": "Cuéntanos más sobre tu solicitud...",
+      "messageRequired": "Ingresa un mensaje",
+      "messageMaxLength": "El mensaje no puede superar los 1000 caracteres",
+      "sendButton": "Enviar mensaje"
+    }
+  },
+  "faqPage": {
+    "q1": {
+      "question": "¿Qué es Monynha Fun?",
+      "answer": "Monynha Fun es una plataforma comunitaria para curar contenido valioso de YouTube."
+    },
+    "q2": {
+      "question": "¿Quién puede enviar videos?",
+      "answer": "Cualquier persona con una cuenta puede enviar videos para revisión y curaduría."
+    },
+    "q3": {
+      "question": "¿Cómo se seleccionan los videos destacados?",
+      "answer": "Los videos destacados se seleccionan según la participación de la comunidad y la revisión de curadores."
+    },
+    "q4": {
+      "question": "¿Puedo crear playlists?",
+      "answer": "Sí. Puedes crear playlists para organizar y compartir rutas de aprendizaje."
+    },
+    "q5": {
+      "question": "¿Cómo puedo contactar al equipo?",
+      "answer": "Usa el formulario de contacto o envía un email a hello@monynha.com."
+    }
   },
   "playlists": {
     "title": "Listas de Reproducción",

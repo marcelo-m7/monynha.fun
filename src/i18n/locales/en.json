@@ -340,7 +340,100 @@
     "submissionsCount": "{{count}} submissions",
     "loadUsersError": "Failed to load community users. Please try again later.",
     "noUsersFoundTitle": "No users found.",
-    "noUsersFoundDescription": "It looks like there are no users in the community yet. Be the first to join!"
+    "noUsersFoundDescription": "It looks like there are no users in the community yet. Be the first to join!",
+    "createFirstPlaylist": "Create your first playlist"
+  },
+  "contact": {
+    "title": "Contact",
+    "description": "Get in touch with us. We'd love to hear from you."
+  },
+  "about": {
+    "title": "About",
+    "description": "Learn more about Monynha Fun and our mission."
+  },
+  "rules": {
+    "title": "Rules",
+    "description": "Community guidelines and content policies."
+  },
+  "faq": {
+    "title": "FAQ",
+    "description": "Frequently asked questions and answers."
+  },
+  "aboutPage": {
+    "missionTitle": "Our Mission",
+    "missionDescription": "We help people discover and preserve valuable videos through human curation and community collaboration.",
+    "founderTitle": "About the Founder",
+    "founderName": "Marcelo Santos",
+    "founderRole": "Founder and Curator",
+    "founderDescription": "Marcelo builds community-first products focused on culture, learning, and thoughtful discovery.",
+    "githubLink": "GitHub Profile",
+    "websiteLink": "Personal Website",
+    "valuesTitle": "Our Values",
+    "value1": "Human curation over algorithms",
+    "value2": "Respect for creators and communities",
+    "value3": "Learning, curiosity, and craft",
+    "value4": "Collaboration and shared stewardship",
+    "value5": "Long-term preservation of knowledge",
+    "philosophyTitle": "Our Philosophy",
+    "philosophyDescription": "We believe the best recommendations come from people who care about quality, context, and culture."
+  },
+  "rulesPage": {
+    "rule1": "Be respectful and constructive in all interactions.",
+    "rule2": "No harassment, hate speech, or personal attacks.",
+    "rule3": "Submit only YouTube videos that you have permission to share.",
+    "rule4": "Prioritize high-quality, valuable, and original content.",
+    "rule5": "Follow local laws and platform guidelines.",
+    "rule6": "Give credit where it is due and avoid misattribution.",
+    "rule7": "Help keep the community safe and welcoming."
+  },
+  "contactPage": {
+    "successMessage": "Message sent successfully!",
+    "errorMessage": "Something went wrong. Please try again.",
+    "directEmailLabel": "Direct Email",
+    "locationLabel": "Location",
+    "locationValue": "Remote, worldwide",
+    "responseTimeLabel": "Response Time",
+    "responseTimeValue": "Within 48 hours",
+    "feedbackTitle": "Feedback and Suggestions",
+    "feedbackDescription": "We are always improving. Send your feedback, ideas, and questions.",
+    "form": {
+      "nameLabel": "Name",
+      "namePlaceholder": "Your name",
+      "nameRequired": "Please enter your name",
+      "emailLabel": "Email",
+      "emailPlaceholder": "you@example.com",
+      "emailInvalid": "Please enter a valid email",
+      "subjectLabel": "Subject",
+      "subjectPlaceholder": "How can we help?",
+      "subjectRequired": "Please enter a subject",
+      "messageLabel": "Message",
+      "messagePlaceholder": "Tell us more about your request...",
+      "messageRequired": "Please enter a message",
+      "messageMaxLength": "Message cannot exceed 1000 characters",
+      "sendButton": "Send Message"
+    }
+  },
+  "faqPage": {
+    "q1": {
+      "question": "What is Monynha Fun?",
+      "answer": "Monynha Fun is a community-driven platform for curating valuable YouTube content."
+    },
+    "q2": {
+      "question": "Who can submit videos?",
+      "answer": "Anyone with an account can submit videos for review and curation."
+    },
+    "q3": {
+      "question": "How are featured videos selected?",
+      "answer": "Featured videos are selected based on community engagement and curator review."
+    },
+    "q4": {
+      "question": "Can I create playlists?",
+      "answer": "Yes. You can create playlists to organize and share learning paths."
+    },
+    "q5": {
+      "question": "How can I contact the team?",
+      "answer": "Use the contact form or email hello@monynha.com."
+    }
   },
   "playlists": {
     "title": "Playlists",

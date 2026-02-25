@@ -210,6 +210,82 @@
     "title": "FAQ",
     "description": "Questions fréquemment posées et réponses."
   },
+  "aboutPage": {
+    "missionTitle": "Notre mission",
+    "missionDescription": "Nous aidons les personnes à découvrir et préserver des vidéos précieuses grâce à la curation humaine et à la collaboration communautaire.",
+    "founderTitle": "À propos du fondateur",
+    "founderName": "Marcelo Santos",
+    "founderRole": "Fondateur et curateur",
+    "founderDescription": "Marcelo construit des produits centrés sur la communauté, axés sur la culture, l'apprentissage et la découverte attentive.",
+    "githubLink": "Profil GitHub",
+    "websiteLink": "Site personnel",
+    "valuesTitle": "Nos valeurs",
+    "value1": "La curation humaine avant les algorithmes",
+    "value2": "Respect des créateurs et des communautés",
+    "value3": "Apprentissage, curiosité et savoir-faire",
+    "value4": "Collaboration et responsabilité partagée",
+    "value5": "Préservation du savoir à long terme",
+    "philosophyTitle": "Notre philosophie",
+    "philosophyDescription": "Nous pensons que les meilleures recommandations viennent de personnes qui valorisent la qualité, le contexte et la culture."
+  },
+  "rulesPage": {
+    "rule1": "Soyez respectueux et constructif dans toutes les interactions.",
+    "rule2": "Aucun harcèlement, discours de haine ni attaques personnelles.",
+    "rule3": "Soumettez uniquement des vidéos YouTube que vous êtes autorisé à partager.",
+    "rule4": "Priorisez les contenus de haute qualité, utiles et originaux.",
+    "rule5": "Respectez les lois locales et les règles de la plateforme.",
+    "rule6": "Attribuez correctement le crédit et évitez les erreurs d'attribution.",
+    "rule7": "Aidez à maintenir la communauté sûre et accueillante."
+  },
+  "contactPage": {
+    "successMessage": "Message envoyé avec succès !",
+    "errorMessage": "Une erreur s'est produite. Veuillez réessayer.",
+    "directEmailLabel": "Email direct",
+    "locationLabel": "Localisation",
+    "locationValue": "À distance, dans le monde entier",
+    "responseTimeLabel": "Délai de réponse",
+    "responseTimeValue": "Sous 48 heures",
+    "feedbackTitle": "Retours et suggestions",
+    "feedbackDescription": "Nous nous améliorons en continu. Envoyez vos retours, idées et questions.",
+    "form": {
+      "nameLabel": "Nom",
+      "namePlaceholder": "Votre nom",
+      "nameRequired": "Veuillez saisir votre nom",
+      "emailLabel": "Email",
+      "emailPlaceholder": "vous@exemple.com",
+      "emailInvalid": "Veuillez saisir un email valide",
+      "subjectLabel": "Sujet",
+      "subjectPlaceholder": "Comment pouvons-nous aider ?",
+      "subjectRequired": "Veuillez saisir un sujet",
+      "messageLabel": "Message",
+      "messagePlaceholder": "Dites-nous en plus sur votre demande...",
+      "messageRequired": "Veuillez saisir un message",
+      "messageMaxLength": "Le message ne peut pas dépasser 1000 caractères",
+      "sendButton": "Envoyer le message"
+    }
+  },
+  "faqPage": {
+    "q1": {
+      "question": "Qu'est-ce que Monynha Fun ?",
+      "answer": "Monynha Fun est une plateforme communautaire de curation de contenus YouTube utiles."
+    },
+    "q2": {
+      "question": "Qui peut soumettre des vidéos ?",
+      "answer": "Toute personne ayant un compte peut soumettre des vidéos pour revue et curation."
+    },
+    "q3": {
+      "question": "Comment les vidéos mises en avant sont-elles sélectionnées ?",
+      "answer": "Les vidéos mises en avant sont choisies selon l'engagement de la communauté et la revue des curateurs."
+    },
+    "q4": {
+      "question": "Puis-je créer des playlists ?",
+      "answer": "Oui. Vous pouvez créer des playlists pour organiser et partager des parcours d'apprentissage."
+    },
+    "q5": {
+      "question": "Comment contacter l'équipe ?",
+      "answer": "Utilisez le formulaire de contact ou écrivez à hello@monynha.com."
+    }
+  },
   "submit": {
     "title": "Soumettre une Vidéo",
     "description": "Partagez une vidéo YouTube intéressante avec la communauté",
@@ -319,19 +395,110 @@
     "returnHome": "Retour à l'accueil"
   },
   "community": {
-    "title": "Comunidad",
-    "description": "Connectez-vous avec d'autres curateurs et passionnés de vidéo.",
+    "title": "Communauté",
+    "description": "Connectez-vous avec d'autres curateurs et passionnés de vidéos.",
     "totalContributors": "Total des Contributeurs",
-    "contributorsCount": "{{count}} soumissions",
+    "contributorsCount": "{{count}} utilisateurs",
     "allUsers": "Tous les Utilisateurs",
     "submissionsCount": "{{count}} soumissions",
     "loadUsersError": "Échec du chargement des utilisateurs de la communauté. Veuillez réessayer plus tard.",
     "noUsersFoundTitle": "Aucun utilisateur trouvé.",
-    "noUsersFoundDescription": "Il semble qu'il n'y ait pas encore d'utilisateurs dans la communauté. Soyez le premier à nous rejoindre !"
+    "noUsersFoundDescription": "Il semble qu'il n'y ait pas encore d'utilisateurs dans la communauté. Soyez le premier à rejoindre!",
+    "createFirstPlaylist": "Créez votre première playlist"
+  },
+  "contact": {
+    "title": "Contact",
+    "description": "Contactez-nous. Nous serions ravis de vous entendre."
+  },
+  "about": {
+    "title": "À Propos",
+    "description": "En savoir plus sur Monynha Fun et notre mission."
+  },
+  "rules": {
+    "title": "Règles",
+    "description": "Directives communautaires et politiques de contenu."
+  },
+  "faq": {
+    "title": "FAQ",
+    "description": "Questions fréquemment posées et réponses."
+  },
+  "aboutPage": {
+    "missionTitle": "Notre mission",
+    "missionDescription": "Nous aidons les personnes à découvrir et préserver des vidéos précieuses grâce à la curation humaine et à la collaboration communautaire.",
+    "founderTitle": "À propos du fondateur",
+    "founderName": "Marcelo Santos",
+    "founderRole": "Fondateur et curateur",
+    "founderDescription": "Marcelo construit des produits centrés sur la communauté, axés sur la culture, l'apprentissage et la découverte attentive.",
+    "githubLink": "Profil GitHub",
+    "websiteLink": "Site personnel",
+    "valuesTitle": "Nos valeurs",
+    "value1": "La curation humaine avant les algorithmes",
+    "value2": "Respect des créateurs et des communautés",
+    "value3": "Apprentissage, curiosité et savoir-faire",
+    "value4": "Collaboration et responsabilité partagée",
+    "value5": "Préservation du savoir à long terme",
+    "philosophyTitle": "Notre philosophie",
+    "philosophyDescription": "Nous pensons que les meilleures recommandations viennent de personnes qui valorisent la qualité, le contexte et la culture."
+  },
+  "rulesPage": {
+    "rule1": "Soyez respectueux et constructif dans toutes les interactions.",
+    "rule2": "Aucun harcèlement, discours de haine ni attaques personnelles.",
+    "rule3": "Soumettez uniquement des vidéos YouTube que vous êtes autorisé à partager.",
+    "rule4": "Priorisez les contenus de haute qualité, utiles et originaux.",
+    "rule5": "Respectez les lois locales et les règles de la plateforme.",
+    "rule6": "Attribuez correctement le crédit et évitez les erreurs d'attribution.",
+    "rule7": "Aidez à maintenir la communauté sûre et accueillante."
+  },
+  "contactPage": {
+    "successMessage": "Message envoyé avec succès !",
+    "errorMessage": "Une erreur s'est produite. Veuillez réessayer.",
+    "directEmailLabel": "Email direct",
+    "locationLabel": "Localisation",
+    "locationValue": "À distance, dans le monde entier",
+    "responseTimeLabel": "Délai de réponse",
+    "responseTimeValue": "Sous 48 heures",
+    "feedbackTitle": "Retours et suggestions",
+    "feedbackDescription": "Nous nous améliorons en continu. Envoyez vos retours, idées et questions.",
+    "form": {
+      "nameLabel": "Nom",
+      "namePlaceholder": "Votre nom",
+      "nameRequired": "Veuillez saisir votre nom",
+      "emailLabel": "Email",
+      "emailPlaceholder": "vous@exemple.com",
+      "emailInvalid": "Veuillez saisir un email valide",
+      "subjectLabel": "Sujet",
+      "subjectPlaceholder": "Comment pouvons-nous aider ?",
+      "subjectRequired": "Veuillez saisir un sujet",
+      "messageLabel": "Message",
+      "messagePlaceholder": "Dites-nous en plus sur votre demande...",
+      "messageRequired": "Veuillez saisir un message",
+      "messageMaxLength": "Le message ne peut pas dépasser 1000 caractères",
+      "sendButton": "Envoyer le message"
+    }
+  },
+  "faqPage": {
+    "q1": {
+      "question": "Qu'est-ce que Monynha Fun ?",
+      "answer": "Monynha Fun est une plateforme communautaire de curation de contenus YouTube utiles."
+    },
+    "q2": {
+      "question": "Qui peut soumettre des vidéos ?",
+      "answer": "Toute personne ayant un compte peut soumettre des vidéos pour revue et curation."
+    },
+    "q3": {
+      "question": "Comment les vidéos mises en avant sont-elles sélectionnées ?",
+      "answer": "Les vidéos mises en avant sont choisies selon l'engagement de la communauté et la revue des curateurs."
+    },
+    "q4": {
+      "question": "Puis-je créer des playlists ?",
+      "answer": "Oui. Vous pouvez créer des playlists pour organiser et partager des parcours d'apprentissage."
+    },
+    "q5": {
+      "question": "Comment contacter l'équipe ?",
+      "answer": "Utilisez le formulaire de contact ou écrivez à hello@monynha.com."
+    }
   },
   "playlists": {
-    "title": "Listas de Reproducción",
-    "description": "Rutas de aprendizaje y colecciones de videos organizados.",
     "searchPlaceholder": "Buscar listas de reproducción...",
     "createPlaylist": "Crear Lista de Reproducción",
     "videoCount": "{{count}} videos",
