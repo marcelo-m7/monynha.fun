@@ -1,5 +1,28 @@
 <svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <rect x="0" y="0" width="64" height="64" rx="12" fill="transparent"/>
-  <rect x="12" y="18" width="40" height="30" rx="8" fill="hsl(4 85% 65%)"/>
-  <rect x="20" y="16" width="32" height="24" rx="6" fill="hsl(175 60% 40%)" opacity="0.8"/>
+  <defs>
+    <filter id="neon-glow" x="-50%" y="-50%" width="200%" height="200%" color-interpolation-filters="sRGB">
+      <feGaussianBlur stdDeviation="3" result="blur" />
+      <feMerge>
+        <feMergeNode in="blur" />
+        <feMergeNode in="SourceGraphic" />
+      </feMerge>
+    </filter>
+  </defs>
+  <rect x="4" y="4" width="56" height="56" rx="12" fill="#070A0F" />
+  <path
+    d="M14 46 L14 18 L26 34 L32 24 L38 34 L50 18 L50 46"
+    stroke="#00F5FF"
+    stroke-width="6"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+    filter="url(#neon-glow)"
+  />
+  <path
+    d="M14 46 L14 18 L26 34 L32 24 L38 34 L50 18 L50 46"
+    stroke="#FF3DBD"
+    stroke-width="2"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+    opacity="0.9"
+  />
 </svg>
