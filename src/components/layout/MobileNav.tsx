@@ -15,10 +15,12 @@ import { Label } from "@/components/ui/label";
 import { NavLink } from "@/components/NavLink";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import i18n from 'i18next';
+import { User } from '@supabase/supabase-js';
+import { Profile } from '@/entities/profile/profile.types';
 
 interface MobileNavProps {
-  user: any;
-  profile: any;
+  user: User | null;
+  profile: Profile | null | undefined;
   onClose: () => void;
   onSignOut: () => void;
   searchQuery: string;
@@ -56,7 +58,6 @@ export const MobileNav: React.FC<MobileNavProps> = ({
 
   return (
     <div className="flex flex-col flex-1 h-full overflow-hidden">
-      {/* 1. Fixed Search Bar (Prevents clipping on focus) */}
       <div className="px-1 pb-6 pt-2">
         <form onSubmit={onSearchSubmit} className="relative group">
           <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground group-focus-within:text-primary transition-colors" />
@@ -72,10 +73,8 @@ export const MobileNav: React.FC<MobileNavProps> = ({
 
       <Separator className="opacity-50" />
 
-      {/* 2. Scrollable Content */}
       <ScrollArea className="flex-1 py-4 px-1">
         <div className="space-y-8">
-          {/* Main Navigation */}
           <nav className="space-y-1">
             <p className="px-4 text-[10px] font-bold text-muted-foreground uppercase tracking-[0.2em] mb-3 opacity-70">
               {t('footer.navigation')}
@@ -98,7 +97,6 @@ export const MobileNav: React.FC<MobileNavProps> = ({
 
           <Separator className="opacity-50 mx-4" />
 
-          {/* User Section / Auth Actions */}
           {user && profile ? (
             <div className="space-y-4">
               <p className="px-4 text-[10px] font-bold text-muted-foreground uppercase tracking-[0.2em] mb-3 opacity-70">
@@ -188,7 +186,6 @@ export const MobileNav: React.FC<MobileNavProps> = ({
 
           <Separator className="opacity-50 mx-4" />
 
-          {/* Language Switcher */}
           <div className="px-4 space-y-4 pb-12">
             <Label htmlFor="mobile-language-switcher" className="text-[10px] font-bold text-muted-foreground uppercase tracking-[0.2em] opacity-70">
               {t('header.languageLabel')}
