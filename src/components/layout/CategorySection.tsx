@@ -1,7 +1,7 @@
 import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
-import { ArrowRight, FolderX } from 'lucide-react';
+import { ArrowRight, FolderX, Sparkles } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { CategoryCard } from '@/components/video/CategoryCard';
@@ -13,19 +13,18 @@ export const CategorySection = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const { data: categories, isLoading: categoriesLoading, isError: categoriesError } = useCategories();
+  
+  // We only enable video fetching if categories are present to avoid unnecessary loads
   const { data: videos } = useVideos({ enabled: !!categories?.length });
 
   const categoryVideoCounts = useMemo(() => {
     const counts: Record<string, number> = {};
-
     videos?.forEach((video) => {
       const categoryId = video.category?.id ?? video.category_id;
-
-      if (!categoryId) return;
-
-      counts[categoryId] = (counts[categoryId] ?? 0) + 1;
+      if (categoryId) {
+        counts[categoryId] = (counts[categoryId] ?? 0) + 1;
+      }
     });
-
     return counts;
   }, [videos]);
 
@@ -34,16 +33,25 @@ export const CategorySection = () => {
   };
 
   return (
-    <section className="py-16 bg-background">
-      <div className="container">
-        <div className="flex items-center justify-between mb-8">
-          <div>
-            <h2 className="text-2xl md:text-3xl font-bold">{t('index.categoriesTitle')}</h2>
-            <p className="text-muted-foreground mt-1">{t('index.categoriesDescription')}</p>
+    <section className="py-20 bg-background relative overflow-hidden">
+      {/* Decorative background element */}
+      <div className="absolute top-0 right-0 -translate-y-1/2 translate-x-1/4 w-96 h-96 bg-primary/5 rounded-full blur-3xl pointer-events-none" />
+
+      <div className="container relative z-10">
+        <div className="flex flex-col md:flex-row md:items-end justify-between mb-10 gap-4">
+          <div className="space-y-2">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 text-primary text-xs font-bold uppercase tracking-wider">
+              <Sparkles className="w-3 h-3" />
+              {t('index.categoriesTitle')}
+            </div>
+            <h2 className="text-3xl md:text-4xl font-extrabold tracking-tight">
+              {t('index.categoriesDescription')}
+            </h2>
           </div>
+          
           <Button
             variant="ghost"
-            className="gap-2 group"
+            className="w-fit gap-2 group text-muted-foreground hover:text-primary transition-colors"
             onClick={() => navigate('/videos')}
           >
             {t('index.viewAll')}
@@ -52,22 +60,19 @@ export const CategorySection = () => {
         </div>
 
         {categoriesLoading ? (
-          <ScrollArea>
-            <div className="flex gap-4 pb-4 items-center">
-              {Array.from({ length: 4 }).map((_, i) => (
-                <Skeleton key={i} className="h-36 w-full min-w-[280px] rounded-2xl" />
-              ))}
-            </div>
-            <ScrollBar orientation="horizontal" />
-          </ScrollArea>
+          <div className="flex gap-4 overflow-hidden">
+            {Array.from({ length: 5 }).map((_, i) => (
+              <Skeleton key={i} className="h-40 min-w-[200px] rounded-2xl" />
+            ))}
+          </div>
         ) : categoriesError ? (
-          <div className="flex flex-col items-center justify-center py-12 text-muted-foreground">
-            <FolderX className="w-16 h-16 mb-4 opacity-50" />
-            <p className="text-lg font-medium mb-2">{t('index.categoriesError')}</p>
+          <div className="flex flex-col items-center justify-center py-16 bg-muted/30 rounded-3xl border border-dashed">
+            <FolderX className="w-12 h-12 mb-4 text-muted-foreground opacity-50" />
+            <p className="text-lg font-semibold text-muted-foreground">{t('index.categoriesError')}</p>
           </div>
         ) : categories && categories.length > 0 ? (
-          <ScrollArea>
-            <div className="flex gap-4 pb-4 items-center">
+          <ScrollArea className="w-full whitespace-nowrap">
+            <div className="flex gap-5 pb-6">
               {categories.map((category, index) => (
                 <CategoryCard
                   key={category.id}
@@ -78,12 +83,12 @@ export const CategorySection = () => {
                 />
               ))}
             </div>
-            <ScrollBar orientation="horizontal" />
+            <ScrollBar orientation="horizontal" className="hidden sm:flex" />
           </ScrollArea>
         ) : (
-          <div className="flex flex-col items-center justify-center py-12 text-muted-foreground">
-            <FolderX className="w-16 h-16 mb-4 opacity-50" />
-            <p className="text-lg font-medium mb-2">{t('index.noCategories')}</p>
+          <div className="flex flex-col items-center justify-center py-16 bg-muted/30 rounded-3xl border border-dashed">
+            <FolderX className="w-12 h-12 mb-4 text-muted-foreground opacity-50" />
+            <p className="text-lg font-semibold text-muted-foreground">{t('index.noCategories')}</p>
           </div>
         )}
       </div>

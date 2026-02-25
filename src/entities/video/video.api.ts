@@ -1,5 +1,6 @@
 import { supabase } from '@/shared/api/supabase/supabaseClient';
 import type { Video, VideoInsert, VideoWithCategory } from './video.types';
+import { extractYouTubeId } from '@/shared/lib/youtube';
 
 export interface ListVideosParams {
   featured?: boolean;
@@ -30,7 +31,13 @@ export async function listVideos(params: ListVideosParams = {}) {
   }
 
   if (params.searchQuery) {
-    query = query.or(`title.ilike.%${params.searchQuery}%,channel_name.ilike.%${params.searchQuery}%`);
+    const youtubeId = extractYouTubeId(params.searchQuery);
+    if (youtubeId) {
+      // If it looks like a YouTube ID or URL, search by ID, title, or channel
+      query = query.or(`youtube_id.eq.${youtubeId},title.ilike.%${params.searchQuery}%,channel_name.ilike.%${params.searchQuery}%`);
+    } else {
+      query = query.or(`title.ilike.%${params.searchQuery}%,channel_name.ilike.%${params.searchQuery}%`);
+    }
   }
 
   if (params.categoryId) {
@@ -52,16 +59,25 @@ export async function listVideos(params: ListVideosParams = {}) {
 }
 
 export async function getVideoById(id: string) {
-  const { data, error } = await supabase
+  // Check if the provided ID is a UUID or a YouTube ID
+  const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id);
+  
+  let query = supabase
     .from('videos')
     .select(
       `
       *,
       category:categories(id, name, slug, color)
     `,
-    )
-    .eq('id', id)
-    .single();
+    );
+
+  if (isUuid) {
+    query = query.eq('id', id);
+  } else {
+    query = query.eq('youtube_id', id);
+  }
+
+  const { data, error } = await query.maybeSingle();
 
   if (error) throw error;
   return data as VideoWithCategory;
