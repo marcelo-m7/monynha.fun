@@ -35,8 +35,8 @@ export const CategoryCard = ({ category, videoCount = 0, onClick, index = 0 }: C
     <button
       onClick={onClick}
       className={cn(
-        "group relative flex flex-col items-center justify-center gap-4 p-6 rounded-2xl border transition-all duration-300",
-        "bg-card border-border/50 elevation-card hover:scale-[1.02] active:scale-[0.98]",
+        "group relative flex flex-col items-center justify-center gap-4 p-6 rounded-md border transition-all duration-300",
+        "bg-card/95 border-primary/20 hover:border-primary/70 hover:shadow-[0_0_15px_var(--glow-primary)] active:scale-[0.98]",
         "min-w-[160px] sm:min-w-[200px] flex-1 animate-fade-up"
       )}
       style={{ 
@@ -44,14 +44,14 @@ export const CategoryCard = ({ category, videoCount = 0, onClick, index = 0 }: C
       }}
     >
       <div 
-        className="w-14 h-14 rounded-2xl flex items-center justify-center transition-all duration-500 group-hover:scale-110 group-hover:rotate-3 shadow-sm"
+        className="w-14 h-14 rounded-md flex items-center justify-center transition-all duration-500 group-hover:scale-110 group-hover:rotate-3 shadow-sm"
         style={{ backgroundColor: `${category.color}15`, color: category.color }}
       >
         <Icon className="w-7 h-7" />
       </div>
       
       <div className="text-center space-y-1">
-        <h3 className="font-bold text-sm sm:text-base text-foreground group-hover:text-primary transition-colors">
+        <h3 className="font-bold text-sm sm:text-base text-foreground group-hover:text-primary transition-colors uppercase tracking-[0.08em]">
           {category.name}
         </h3>
         <p className="text-xs text-muted-foreground font-medium">

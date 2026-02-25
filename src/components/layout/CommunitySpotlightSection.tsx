@@ -16,16 +16,17 @@ export const CommunitySpotlightSection = () => {
   const topContributors = profiles?.slice(0, 4);
 
   return (
-    <section className="py-16 bg-background">
+    <section className="py-20 bg-background border-t border-primary/20">
       <div className="container">
         <div className="flex items-center justify-between mb-8">
           <div className="flex items-center gap-3">
-            <div className="p-2 rounded-xl bg-accent/10">
-              <Users className="w-5 h-5 text-accent" />
-            </div>
             <div>
-              <h2 className="text-2xl md:text-3xl font-bold">{t('index.communitySpotlightTitle')}</h2>
-              <p className="text-muted-foreground mt-1">{t('index.communitySpotlightDescription')}</p>
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-sm border border-accent/40 text-accent text-[0.65rem] font-bold uppercase tracking-[0.25em]">
+                <Users className="w-3 h-3" />
+                {t('index.communitySpotlightTitle')}
+              </div>
+              <h2 className="text-2xl md:text-3xl font-bold uppercase tracking-[0.1em] mt-3 font-mono">{t('index.communitySpotlightTitle')}</h2>
+              <p className="text-muted-foreground mt-2 text-sm uppercase tracking-widest">{t('index.communitySpotlightDescription')}</p>
             </div>
           </div>
           <Button
@@ -63,7 +64,7 @@ export const CommunitySpotlightSection = () => {
               <Link
                 key={profile.id}
                 to={`/profile/${profile.username}`}
-                className="group flex flex-col items-center text-center gap-3 p-4 bg-card border border-border rounded-xl shadow-sm transition-all duration-300 hover:scale-[1.02] hover:shadow-lg"
+                className="group flex flex-col items-center text-center gap-3 p-4 bg-card/95 border border-primary/20 rounded-md shadow-sm transition-all duration-300 hover:scale-[1.02] hover:shadow-[0_0_15px_var(--glow-primary)] hover:border-primary/60"
                 style={{ animationDelay: `${index * 0.08}s` }}
               >
                 <Avatar className="w-16 h-16 border-2 border-primary/50">

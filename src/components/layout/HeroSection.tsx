@@ -96,13 +96,13 @@ export const HeroSection = () => {
       <div className="container relative z-10 flex flex-col items-center text-center space-y-10">
         
         {/* Badge */}
-        <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-sm border border-primary/50 bg-black/60 backdrop-blur-sm text-primary text-xs font-bold tracking-[0.2em] uppercase animate-fade-in shadow-[0_0_10px_rgba(0,245,255,0.2)]">
+        <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-sm border border-primary/50 bg-card/70 backdrop-blur-sm text-primary text-xs font-bold tracking-[0.35em] uppercase animate-fade-in shadow-[0_0_12px_var(--glow-primary)]">
           <Sparkles className="w-3 h-3 text-neon-cyan" />
           <span>{t('hero.badge')}</span>
         </div>
 
         {/* Heading */}
-        <h1 className="text-4xl md:text-6xl lg:text-7xl font-black uppercase tracking-tighter leading-[1.1] animate-fade-up" style={{ animationDelay: '0.1s' }}>
+        <h1 className="text-4xl md:text-6xl lg:text-7xl font-black uppercase tracking-[0.1em] leading-[1.05] animate-fade-up font-mono" style={{ animationDelay: '0.1s' }}>
           <span className="block text-foreground drop-shadow-[0_0_10px_var(--glow-primary)]">
             {t('hero.headingPart1')}
           </span>
@@ -119,7 +119,7 @@ export const HeroSection = () => {
         <div className="w-full max-w-md space-y-4 animate-fade-up" style={{ animationDelay: '0.3s' }}>
           <form onSubmit={handleSubmit(onSubmit)} className="relative group">
             <div className="absolute -inset-0.5 bg-gradient-to-r from-neon-cyan to-neon-pink rounded-lg opacity-30 group-hover:opacity-100 transition duration-500 blur"></div>
-            <div className="relative flex items-center bg-card/90 rounded-lg p-1 border border-border group-hover:border-transparent transition-colors">
+            <div className="relative flex items-center bg-card/95 rounded-lg p-1 border border-border/60 group-hover:border-transparent transition-colors">
               <div className="pl-3 text-muted-foreground">
                 <Youtube className="w-5 h-5 group-focus-within:text-red-500 transition-colors" />
               </div>
@@ -128,7 +128,7 @@ export const HeroSection = () => {
                 id="youtube-url-hero"
                 type="text"
                 placeholder={t('hero.submitUrlPlaceholder')}
-                className="border-0 bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0 placeholder:text-muted-foreground/60 h-10 md:h-12 text-foreground"
+                className="border-0 bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0 placeholder:text-muted-foreground/70 h-10 md:h-12 text-foreground font-mono"
               />
               <Button 
                 type="submit" 

@@ -6,16 +6,16 @@ export const Footer = () => {
   const { t } = useTranslation();
 
   return (
-    <footer className="border-t border-border/50 bg-muted/30">
+    <footer className="border-t border-primary/30 bg-background">
       <div className="container py-12">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           {/* Brand */}
           <div className="md:col-span-2 space-y-4">
             <Link to="/" className="flex items-center gap-2">
-              <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-primary text-primary-foreground shadow-md">
+              <div className="flex h-9 w-9 items-center justify-center rounded-sm bg-primary text-primary-foreground shadow-[0_0_12px_var(--glow-primary)]">
                 <span className="text-lg font-bold">M</span>
               </div>
-              <span className="font-bold text-xl tracking-tight">
+              <span className="font-bold text-xl tracking-[0.2em] uppercase">
                 Monynha<span className="text-primary">Fun</span>
               </span>
             </Link>
@@ -26,8 +26,8 @@ export const Footer = () => {
 
           {/* Links */}
           <div className="space-y-4">
-            <h4 className="font-semibold text-sm">{t('footer.navigation')}</h4>
-            <ul className="space-y-2 text-sm text-muted-foreground">
+            <h4 className="font-semibold text-xs uppercase tracking-widest text-muted-foreground">{t('footer.navigation')}</h4>
+            <ul className="space-y-2 text-xs uppercase tracking-widest text-muted-foreground">
               <li><Link to="/videos" className="hover:text-primary transition-colors">{t('footer.categories')}</Link></li>
               <li><Link to="/videos?recent=true" className="hover:text-primary transition-colors">{t('footer.recent')}</Link></li>
               <li><Link to="/videos?featured=true" className="hover:text-primary transition-colors">{t('footer.featured')}</Link></li>
@@ -37,8 +37,8 @@ export const Footer = () => {
 
           {/* Community */}
           <div className="space-y-4">
-            <h4 className="font-semibold text-sm">{t('footer.community')}</h4>
-            <ul className="space-y-2 text-sm text-muted-foreground">
+            <h4 className="font-semibold text-xs uppercase tracking-widest text-muted-foreground">{t('footer.community')}</h4>
+            <ul className="space-y-2 text-xs uppercase tracking-widest text-muted-foreground">
               <li><Link to="/community" className="hover:text-primary transition-colors">{t('footer.community')}</Link></li>
               <li><Link to="/about" className="hover:text-primary transition-colors">{t('footer.about')}</Link></li>
               <li><Link to="/rules" className="hover:text-primary transition-colors">{t('footer.rules')}</Link></li>
@@ -49,7 +49,7 @@ export const Footer = () => {
         </div>
 
         {/* Bottom */}
-        <div className="flex flex-col md:flex-row items-center justify-between gap-4 pt-8 mt-8 border-t border-border/50">
+        <div className="flex flex-col md:flex-row items-center justify-between gap-4 pt-8 mt-8 border-t border-primary/30">
           <p className="text-sm text-muted-foreground flex items-center gap-1">
             {t('footer.madeWithLove')} <Heart className="w-4 h-4 text-primary fill-primary inline-block" />{" "}
             <a 
