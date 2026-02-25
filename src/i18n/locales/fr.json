@@ -489,5 +489,26 @@
       "notLoggedInTitle": "Erreur",
       "notLoggedInDescription": "Vous devez être connecté pour créer ou modifier des playlists."
     }
+  },
+  "comments": {
+    "title": "Commentaires",
+    "noComments": "Pas encore de commentaires. Soyez le premier à commenter !",
+    "loadError": "Erreur lors du chargement des commentaires",
+    "deleteError": "Erreur lors de la suppression du commentaire",
+    "loginToComment": "Connexion requise",
+    "loginAction": "Connexion",
+    "loginToCommentPrompt": "Connectez-vous pour rejoindre la conversation.",
+    "noUsersFound": "Aucun utilisateur trouvé",
+    "form": {
+      "placeholder": "Écrire un commentaire...",
+      "submitButton": "Poster le Commentaire",
+      "submitting": "Publication...",
+      "mentionHelper": "Tapez @ pour mentionner quelqu'un",
+      "keyboardHint": "Utilisez les flèches pour naviguer et Entrée pour sélectionner",
+      "searchingUsers": "Recherche d'utilisateurs...",
+      "mentionSuggestions": "Suggestions de mention",
+      "contentRequired": "Le commentaire ne peut pas être vide",
+      "contentMaxLength": "Le commentaire doit faire au maximum 500 caractères"
+    }
   }
 }

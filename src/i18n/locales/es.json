@@ -489,5 +489,26 @@
       "notLoggedInTitle": "Error",
       "notLoggedInDescription": "Debes iniciar sesión para crear o editar listas de reproducción."
     }
+  },
+  "comments": {
+    "title": "Comentarios",
+    "noComments": "Aún no hay comentarios. ¡Sé el primero en comentar!",
+    "loadError": "Error al cargar los comentarios",
+    "deleteError": "Error al eliminar el comentario",
+    "loginToComment": "Inicia sesión para comentar",
+    "loginAction": "Iniciar Sesión",
+    "loginToCommentPrompt": "Inicia sesión para unirte a la conversación.",
+    "noUsersFound": "No se encontraron usuarios",
+    "form": {
+      "placeholder": "Escribe un comentario...",
+      "submitButton": "Publicar Comentario",
+      "submitting": "Publicando...",
+      "mentionHelper": "Escribe @ para mencionar a alguien",
+      "keyboardHint": "Usa las flechas para navegar y Enter para seleccionar",
+      "searchingUsers": "Buscando usuarios...",
+      "mentionSuggestions": "Sugerencias de mención",
+      "contentRequired": "El comentario no puede estar vacío",
+      "contentMaxLength": "El comentario debe tener como máximo 500 caracteres"
+    }
   }
 }

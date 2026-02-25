@@ -502,5 +502,26 @@
       "notLoggedInTitle": "Error",
       "notLoggedInDescription": "You need to be logged in to create or edit playlists."
     }
+  },
+  "comments": {
+    "title": "Comments",
+    "noComments": "No comments yet. Be the first to comment!",
+    "loadError": "Error loading comments",
+    "deleteError": "Error deleting comment",
+    "loginToComment": "Login required",
+    "loginAction": "Login",
+    "loginToCommentPrompt": "Log in to join the conversation.",
+    "noUsersFound": "No users found",
+    "form": {
+      "placeholder": "Write a comment...",
+      "submitButton": "Post Comment",
+      "submitting": "Posting...",
+      "mentionHelper": "Type @ to mention someone",
+      "keyboardHint": "Use arrows to navigate and Enter to select",
+      "searchingUsers": "Searching for users...",
+      "mentionSuggestions": "Mention suggestions",
+      "contentRequired": "Comment cannot be empty",
+      "contentMaxLength": "Comment must be at most 500 characters"
+    }
   }
 }

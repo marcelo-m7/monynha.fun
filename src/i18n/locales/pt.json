@@ -455,5 +455,26 @@
       "roleEditor": "Editor",
       "roleViewer": "Visualizador"
     }
+  },
+  "comments": {
+    "title": "Comentários",
+    "noComments": "Nenhum comentário ainda. Seja o primeiro a comentar!",
+    "loadError": "Erro ao carregar comentários",
+    "deleteError": "Erro ao excluir comentário",
+    "loginToComment": "Login necessário",
+    "loginAction": "Entrar",
+    "loginToCommentPrompt": "Faça login para participar da conversa.",
+    "noUsersFound": "Nenhum usuário encontrado",
+    "form": {
+      "placeholder": "Escreva um comentário...",
+      "submitButton": "Postar Comentário",
+      "submitting": "Postando...",
+      "mentionHelper": "Digite @ para mencionar alguém",
+      "keyboardHint": "Use as setas para navegar e Enter para selecionar",
+      "searchingUsers": "Buscando usuários...",
+      "mentionSuggestions": "Sugestões de menção",
+      "contentRequired": "O comentário não pode estar vazio",
+      "contentMaxLength": "O comentário deve ter no máximo 500 caracteres"
+    }
   }
 }
