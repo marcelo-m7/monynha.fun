@@ -37,7 +37,7 @@ export default function Submit() {
       description: '',
       language: 'pt',
       categoryId: '',
-      playlistId: '',
+      playlistId: 'none', // Changed default to 'none' string
     },
   });
 
@@ -102,8 +102,8 @@ export default function Submit() {
 
       const newVideo = result.video;
 
-      // Automatically add to playlist if selected
-      if (values.playlistId) {
+      // Automatically add to playlist if selected and not 'none'
+      if (values.playlistId && values.playlistId !== 'none') {
         try {
           await addVideoToPlaylistMutation.mutateAsync({
             playlistId: values.playlistId,
@@ -278,7 +278,7 @@ export default function Submit() {
 
                 {/* Playlist Selection */}
                 <div className="space-y-2">
-                  <Label htmlFor="playlist">{t('playlists.title')}</Label>
+                  <Label htmlFor="playlist">{t('header.playlists')}</Label>
                   <Select value={playlistId} onValueChange={(value) => setValue('playlistId', value)}>
                     <SelectTrigger>
                       <div className="flex items-center gap-2 overflow-hidden">
@@ -287,7 +287,7 @@ export default function Submit() {
                       </div>
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="">{t('common.allCategories')}</SelectItem>
+                      <SelectItem value="none">{t('common.none')}</SelectItem>
                       {editablePlaylists?.map((pl) => (
                         <SelectItem key={pl.id} value={pl.id}>
                           {pl.name}

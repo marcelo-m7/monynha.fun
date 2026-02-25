@@ -14,7 +14,8 @@
     "validationError": "Validation Error",
     "cancel": "Cancel",
     "delete": "Delete",
-    "anonymous": "Anonymous"
+    "anonymous": "Anonymous",
+    "none": "None"
   },
   "header": {
     "searchPlaceholder": "Search videos, channels...",
@@ -292,6 +293,15 @@
     "noRelatedVideos": "No related videos found.",
     "favoriteInfo": "You need to be logged in to favorite videos.",
     "loginAction": "Login"
+  },
+  "favorites": {
+    "title": "My Favorites",
+    "description": "All the videos you've saved to watch later.",
+    "loadingErrorTitle": "Error loading favorites",
+    "loadingErrorDescription": "Could not load your favorite videos. Please try again later.",
+    "noFavoritesTitle": "No favorite videos yet.",
+    "noFavoritesDescription": "Start exploring and save your favorite videos!",
+    "exploreVideos": "Explore Videos"
   },
   "index": {
     "categoriesTitle": "Categories",

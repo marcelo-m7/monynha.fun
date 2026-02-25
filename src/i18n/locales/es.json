@@ -14,7 +14,8 @@
     "validationError": "Error de Validación",
     "cancel": "Cancelar",
     "delete": "Eliminar",
-    "anonymous": "Anónimo"
+    "anonymous": "Anónimo",
+    "none": "Ninguno"
   },
   "header": {
     "searchPlaceholder": "Buscar videos, canales...",
@@ -34,7 +35,7 @@
   },
   "footer": {
     "description": "Una plataforma de curación colectiva de videos de YouTube. Preservando y descubriendo contenido valioso juntos.",
-    "navigation": "Navegación",
+    "navigation": "Navegação",
     "categories": "Categorías",
     "recent": "Recientes",
     "featured": "Destacados",
@@ -243,7 +244,7 @@
       "aiEnrichmentFailedDescription": "No se pudo iniciar el enriquecimiento de IA para el video.",
       "invalidUrl": "URL inválida",
       "notYoutubeUrl": "Solo se aceptan URLs de YouTube",
-      "descriptionMaxLength": "La descripción no puede exceder los 500 caracteres",
+      "descriptionMaxLength": "La descripción ne puede exceder los 500 caracteres",
       "languageRequired": "El idioma es obligatorio"
     },
     "success": {
@@ -419,7 +420,7 @@
     "collaborators": {
       "manage": "Gestionar Colaboradores",
       "title": "Colaboradores de la Lista de Reproducción",
-      "description": "Gestiona quién puede ver y editar esta lista de reproducción.",
+      "description": "Gestiona quién puede ver e editar esta lista de reproducción.",
       "usernamePlaceholder": "Nombre de usuario del colaborador",
       "userNotFound": "Usuario no encontrado.",
       "alreadyAdded": "El usuario ya es un colaborador.",
