@@ -11,6 +11,9 @@ const useCategoriesMock = vi.fn();
 const useYouTubeMetadataMock = vi.fn();
 const mutateAsyncMock = vi.fn();
 const useSubmitVideoMock = vi.fn();
+const useEditablePlaylistsMock = vi.fn();
+const useAddVideoToPlaylistMock = vi.fn();
+const useProfileByIdMock = vi.fn();
 
 vi.mock('@/features/auth/useAuth', () => ({
   useAuth: () => useAuthMock(),
@@ -36,11 +39,23 @@ vi.mock('@/features/submit/useSubmitVideo', () => ({
   useSubmitVideo: () => useSubmitVideoMock(),
 }));
 
+vi.mock('@/features/profile/queries/useProfile', () => ({
+  useProfileById: (id?: string) => useProfileByIdMock(id),
+}));
+
+vi.mock('@/features/playlists', () => ({
+  useEditablePlaylists: () => useEditablePlaylistsMock(),
+  useAddVideoToPlaylist: () => useAddVideoToPlaylistMock(),
+}));
+
 beforeEach(() => {
   navigateMock.mockReset();
   useAuthMock.mockReturnValue({ user: { id: 'user-1' }, loading: false });
   useCategoriesMock.mockReturnValue({ data: [], isLoading: false });
   useSubmitVideoMock.mockReturnValue({ mutateAsync: mutateAsyncMock, isPending: false });
+  useEditablePlaylistsMock.mockReturnValue({ data: [], isLoading: false });
+  useAddVideoToPlaylistMock.mockReturnValue({ mutateAsync: vi.fn(), isPending: false });
+  useProfileByIdMock.mockReturnValue({ data: null, isLoading: false, isError: false });
   mutateAsyncMock.mockResolvedValue({ status: 'created', video: { id: 'video-1' }, edgeError: null });
 });
 

@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { screen, render, waitFor } from '@testing-library/react';
+import { screen, render, waitFor, renderHook } from '@testing-library/react';
 import { AuthProvider, useAuth } from './useAuth';
 
 const signInWithEmailMock = vi.fn();
@@ -55,12 +55,7 @@ beforeEach(() => {
 describe('useAuth', () => {
   it('throws when used outside AuthProvider', () => {
     const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
-    const Broken = () => {
-      useAuth();
-      return null;
-    };
-
-    expect(() => render(<Broken />)).toThrow('useAuth must be used within an AuthProvider');
+    expect(() => renderHook(() => useAuth())).toThrow('useAuth must be used within an AuthProvider');
     consoleErrorSpy.mockRestore();
   });
 
