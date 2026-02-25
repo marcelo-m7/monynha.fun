@@ -42,7 +42,7 @@ describe('VideoCard', () => {
   it('renders video details', () => {
     renderWithProviders(<VideoCard video={sampleVideo} />);
 
-    const article = screen.getByRole('article');
+    const article = screen.getByRole('link', { name: 'Learning React' });
 
     expect(screen.getByText('Learning React')).toBeInTheDocument();
     expect(screen.getByText('Monynha')).toBeInTheDocument();
@@ -54,7 +54,7 @@ describe('VideoCard', () => {
     const user = userEvent.setup();
 
     renderWithProviders(<VideoCard video={sampleVideo} />);
-    await user.click(screen.getByRole('article'));
+    await user.click(screen.getByRole('link', { name: 'Learning React' }));
 
     expect(incrementVideoViewCount).toHaveBeenCalledWith('video-1', 'session-123');
   });

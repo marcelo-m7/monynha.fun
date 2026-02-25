@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from 'react-i18next';
 import { useVideoViewIncrement } from '@/shared/hooks/useVideoViewIncrement';
+import { KeyboardEvent } from "react";
 
 interface FeaturedHeroProps {
   video: VideoWithCategory;
@@ -21,10 +22,20 @@ export const FeaturedHero = ({ video }: FeaturedHeroProps) => {
     navigate(`/videos/${video.id}`);
   };
 
+  const handleKeyDown = (event: KeyboardEvent<HTMLElement>) => {
+    if (event.key === 'Enter' || event.key === ' ' ) {
+      event.preventDefault();
+      handleClick();
+    }
+  };
+
   return (
     <article
       onClick={handleClick}
-      className="group cursor-pointer overflow-hidden rounded-md shadow-lg border border-primary/30 bg-card/95 transition-transform hover:scale-[1.01] hover:shadow-[0_0_25px_var(--glow-primary)]"
+      onKeyDown={handleKeyDown}
+      tabIndex={0}
+      role="link"
+      className="group cursor-pointer overflow-hidden rounded-md shadow-lg border border-primary/30 bg-card/95 transition-transform hover:scale-[1.01] hover:shadow-[0_0_25px_var(--glow-primary)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/80 focus-visible:ring-offset-2 focus-visible:ring-offset-background"
       aria-label={`Featured: ${video.title}`}
     >
       <div className="relative aspect-video">
@@ -54,7 +65,7 @@ export const FeaturedHero = ({ video }: FeaturedHeroProps) => {
             <div className="mt-4 flex items-center gap-4">
               {video.duration_seconds && video.duration_seconds > 0 && (
                 <div className="flex items-center gap-2 text-sm text-white/90">
-                  <Play className="w-4 h-4" />
+                  <Play className="w-4 h-4" aria-hidden="true" />
                   <span>{formatDuration(video.duration_seconds)}</span>
                 </div>
               )}
