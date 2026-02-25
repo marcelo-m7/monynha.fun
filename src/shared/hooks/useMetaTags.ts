@@ -13,7 +13,7 @@ interface MetaTagsProps {
 export const useMetaTags = ({
   title,
   description,
-  image = 'https://monynha.com/opengraph-image-monynha-fun.png',
+  image = 'https://monynha.fun/placeholder.png',
   url,
   type = 'website',
   imageAlt = 'Pré-visualização do Monynha Fun',
