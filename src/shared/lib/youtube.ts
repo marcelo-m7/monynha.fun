@@ -41,7 +41,7 @@ export function extractYouTubeId(url: string): string | null {
   }
 
   // 3. Fallback to a comprehensive regex for any remaining edge cases
-  const regex = /(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?|shorts|live)\/|.*[?&]v=)|youtu\.be\/)([a-zA-Z0-9_-]{11})/i;
+  const regex = /(?:youtube\.com\/(?:[^/]+\/.+\/|(?:v|e(?:mbed)?|shorts|live)\/|.*[?&]v=)|youtu\.be\/)([a-zA-Z0-9_-]{11})/i;
   const match = trimmedUrl.match(regex);
   
   return match ? match[1] : null;
