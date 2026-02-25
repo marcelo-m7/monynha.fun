@@ -12,7 +12,7 @@ export interface ListPlaylistsParams {
   authorId?: string;
   isPublic?: boolean;
   searchQuery?: string;
-  filter?: 'all' | 'my' | 'collaborating';
+  filter?: 'all' | 'my' | 'collaborating' | 'editable';
   userId?: string;
 }
 
@@ -42,9 +42,6 @@ export async function listPlaylists(params: ListPlaylistsParams = {}) {
   if (params.filter === 'my' && params.userId) {
     query = query.eq('author_id', params.userId);
   } else if (params.filter === 'collaborating' && params.userId) {
-    // For 'collaborating' filter, we need to join with playlist_collaborators
-    // This is a more complex query, so we'll fetch all and filter client-side for simplicity
-    // A more performant solution for large datasets would involve a database function or view.
     const { data: collabData, error: collabError } = await supabase
       .from('playlist_collaborators')
       .select('playlist_id')
@@ -53,6 +50,19 @@ export async function listPlaylists(params: ListPlaylistsParams = {}) {
     if (collabError) throw collabError;
     const collabPlaylistIds = (collabData || []).map((c) => c.playlist_id);
     query = query.in('id', collabPlaylistIds);
+  } else if (params.filter === 'editable' && params.userId) {
+    // Get collaborated playlist IDs where role is editor
+    const { data: collabData, error: collabError } = await supabase
+      .from('playlist_collaborators')
+      .select('playlist_id')
+      .eq('user_id', params.userId)
+      .eq('role', 'editor');
+
+    if (collabError) throw collabError;
+    const collabPlaylistIds = (collabData || []).map((c) => c.playlist_id);
+    
+    // Select where user is author OR user is in collaborated IDs
+    query = query.or(`author_id.eq.${params.userId},id.in.(${collabPlaylistIds.length > 0 ? collabPlaylistIds.join(',') : '00000000-0000-0000-0000-000000000000'})`);
   }
 
   const { data, error } = await query;
@@ -149,11 +159,7 @@ export async function addVideoToPlaylist(payload: { playlistId: string; videoId:
 }
 
 export async function removeVideoFromPlaylist(payload: { playlistId: string; videoId: string }) {
-  const { error } = await supabase
-    .from('playlist_videos')
-    .delete()
-    .eq('playlist_id', payload.playlistId)
-    .eq('video_id', payload.videoId);
+  const { error } = await supabase.from('playlist_videos').delete().eq('id', payload.playlistId).eq('video_id', payload.videoId);
 
   if (error) throw error;
 }

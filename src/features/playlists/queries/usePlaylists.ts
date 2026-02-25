@@ -27,6 +27,16 @@ export function usePlaylists(options: UsePlaylistsOptions = {}) {
   });
 }
 
+export function useEditablePlaylists() {
+  const { user } = useAuth();
+
+  return useQuery<Playlist[], Error>({
+    queryKey: playlistKeys.list({ filter: 'editable', userId: user?.id }),
+    queryFn: () => listPlaylists({ filter: 'editable', userId: user?.id }),
+    enabled: !!user,
+  });
+}
+
 export function usePlaylistById(id: string | undefined) {
   return useQuery<Playlist, Error>({
     queryKey: id ? playlistKeys.detail(id) : playlistKeys.detail(''),

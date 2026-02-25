@@ -8,6 +8,7 @@ export const submitVideoSchema = z.object({
   description: z.string().max(500, 'submit.error.descriptionMaxLength').optional().or(z.literal('')),
   language: z.string().min(2, 'submit.error.languageRequired'),
   categoryId: z.string().optional().or(z.literal('')),
+  playlistId: z.string().optional().or(z.literal('')),
 });
 
 export type SubmitVideoFormValues = z.infer<typeof submitVideoSchema>;

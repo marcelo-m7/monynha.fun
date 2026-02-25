@@ -4,18 +4,19 @@ import { useAuth } from '@/features/auth/useAuth';
 import { useCategories } from '@/features/categories/queries/useCategories';
 import { useYouTubeMetadata } from '@/features/submit/useYouTubeMetadata';
 import { useSubmitVideo } from '@/features/submit/useSubmitVideo';
+import { useEditablePlaylists, useAddVideoToPlaylist } from '@/features/playlists';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { toast } from 'sonner';
-import { ArrowLeft, Link as LinkIcon, Loader2, Play, CheckCircle, AlertCircle } from 'lucide-react';
+import { ArrowLeft, Link as LinkIcon, Loader2, Play, CheckCircle, AlertCircle, ListVideo } from 'lucide-react';
 import { submitVideoSchema, SubmitVideoFormValues } from '@/features/submit/submitVideoSchema';
 import { useTranslation } from 'react-i18next';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Header } from '@/components/layout/Header'; // Added missing import
+import { Header } from '@/components/layout/Header';
 import { Footer } from '@/components/layout/Footer';
 
 export default function Submit() {
@@ -24,7 +25,9 @@ export default function Submit() {
   
   const { user, loading: authLoading } = useAuth();
   const { data: categories } = useCategories();
+  const { data: editablePlaylists } = useEditablePlaylists();
   const submitVideoMutation = useSubmitVideo();
+  const addVideoToPlaylistMutation = useAddVideoToPlaylist();
   const navigate = useNavigate();
 
   const { register, handleSubmit, watch, setValue, formState: { errors } } = useForm<SubmitVideoFormValues>({
@@ -34,6 +37,7 @@ export default function Submit() {
       description: '',
       language: 'pt',
       categoryId: '',
+      playlistId: '',
     },
   });
 
@@ -41,6 +45,7 @@ export default function Submit() {
   const description = watch('description');
   const language = watch('language');
   const categoryId = watch('categoryId');
+  const playlistId = watch('playlistId');
 
   const { metadata, isLoading: metadataLoading, error: metadataError } = useYouTubeMetadata(youtubeUrl);
 
@@ -93,6 +98,22 @@ export default function Submit() {
           description: t('submit.error.videoExistsDescription'),
         });
         return;
+      }
+
+      const newVideo = result.video;
+
+      // Automatically add to playlist if selected
+      if (values.playlistId) {
+        try {
+          await addVideoToPlaylistMutation.mutateAsync({
+            playlistId: values.playlistId,
+            videoId: newVideo.id,
+          });
+          toast.success(t('playlistDetails.videoAdded'));
+        } catch (playlistError) {
+          console.error('Error adding video to playlist:', playlistError);
+          toast.error(t('playlistDetails.addVideoError'));
+        }
       }
 
       toast.success(t('submit.success.videoSubmittedTitle'), {
@@ -253,6 +274,30 @@ export default function Submit() {
                   {errors.categoryId && (
                     <p role="alert" className="text-sm text-destructive">{t(errors.categoryId.message as string)}</p>
                   )}
+                </div>
+
+                {/* Playlist Selection */}
+                <div className="space-y-2">
+                  <Label htmlFor="playlist">{t('playlists.title')}</Label>
+                  <Select value={playlistId} onValueChange={(value) => setValue('playlistId', value)}>
+                    <SelectTrigger>
+                      <div className="flex items-center gap-2 overflow-hidden">
+                        <ListVideo className="w-4 h-4 shrink-0 text-muted-foreground" />
+                        <SelectValue placeholder={t('playlists.searchPlaceholder')} />
+                      </div>
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="">{t('common.allCategories')}</SelectItem>
+                      {editablePlaylists?.map((pl) => (
+                        <SelectItem key={pl.id} value={pl.id}>
+                          {pl.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <p className="text-xs text-muted-foreground">
+                    {t('playlistDetails.addVideoDialogDescription')}
+                  </p>
                 </div>
 
                 {/* Submit Button */}
