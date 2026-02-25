@@ -32,15 +32,15 @@ export const VideoCard = ({ video, onClick, variant = 'default' }: VideoCardProp
     <article
       onClick={handleClick}
       className={cn(
-        "group cursor-pointer rounded-2xl bg-card overflow-hidden shadow-sm transition-all duration-300 card-hover hover:shadow-lg border border-border/50",
+        "group cursor-pointer rounded-md bg-card/95 overflow-hidden shadow-sm transition-all duration-300 border border-primary/15 hover:border-primary/60 hover:shadow-[0_0_15px_var(--glow-primary)]",
         variant === 'default' && "flex h-full min-h-[320px] flex-col",
-        variant === 'compact' && "flex items-center gap-3 p-2 rounded-xl hover:bg-muted/50 hover:shadow-none border-none"
+        variant === 'compact' && "flex items-center gap-3 p-2 rounded-md hover:bg-muted/30 hover:shadow-none border border-border/40"
       )}
     >
       {/* Thumbnail */}
       <div className={cn(
         "relative aspect-video overflow-hidden",
-        variant === 'default' ? "h-auto" : "w-28 h-16 flex-shrink-0 rounded-lg"
+        variant === 'default' ? "h-auto" : "w-28 h-16 flex-shrink-0 rounded-sm"
       )}>
         <img
           src={video.thumbnail_url}
@@ -64,9 +64,9 @@ export const VideoCard = ({ video, onClick, variant = 'default' }: VideoCardProp
         )}
 
         {/* Overlay on hover */}
-        <div className="absolute inset-0 bg-foreground/0 group-hover:bg-foreground/20 transition-colors duration-300 flex items-center justify-center">
+        <div className="absolute inset-0 bg-foreground/0 group-hover:bg-foreground/15 transition-colors duration-300 flex items-center justify-center">
           <div className={cn(
-            "rounded-full bg-primary flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 scale-75 group-hover:scale-100 shadow-lg",
+            "rounded-full bg-primary flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 scale-75 group-hover:scale-100 shadow-[0_0_15px_var(--glow-primary)]",
             variant === 'default' ? "w-14 h-14" : "w-10 h-10"
           )}>
             <Play className={cn(
@@ -78,7 +78,7 @@ export const VideoCard = ({ video, onClick, variant = 'default' }: VideoCardProp
 
         {/* Duration badge */}
         {variant === 'default' && video.duration_seconds && video.duration_seconds > 0 && (
-          <div className="absolute bottom-2 right-2 px-2 py-1 rounded-md bg-foreground/80 text-background text-xs font-medium backdrop-blur-sm">
+          <div className="absolute bottom-2 right-2 px-2 py-1 rounded-sm bg-foreground/80 text-background text-xs font-medium backdrop-blur-sm">
             {formatDuration(video.duration_seconds)}
           </div>
         )}
@@ -87,7 +87,7 @@ export const VideoCard = ({ video, onClick, variant = 'default' }: VideoCardProp
         <Badge
           variant="secondary"
           className={cn(
-            "absolute top-2 left-2 text-xs font-medium bg-background/90 backdrop-blur-sm uppercase",
+            "absolute top-2 left-2 text-[0.65rem] font-bold bg-background/90 backdrop-blur-sm uppercase tracking-widest",
             variant === 'compact' && "hidden"
           )}
         >
@@ -101,7 +101,7 @@ export const VideoCard = ({ video, onClick, variant = 'default' }: VideoCardProp
         variant === 'default' ? "flex-1 space-y-3 p-4" : "flex-1 space-y-1"
       )}>
         <h3 className={cn(
-          "font-semibold leading-snug line-clamp-2 group-hover:text-primary transition-colors",
+          "font-semibold leading-snug line-clamp-2 group-hover:text-primary transition-colors uppercase tracking-[0.05em]",
           variant === 'default' ? "text-sm" : "text-xs"
         )}>
           {video.title}
@@ -129,7 +129,7 @@ export const VideoCard = ({ video, onClick, variant = 'default' }: VideoCardProp
           {video.category && (
             <Badge 
               variant="outline" 
-              className="text-xs px-2 py-0.5"
+              className="text-[0.65rem] px-2 py-0.5 uppercase tracking-widest"
               style={{ borderColor: video.category.color, color: video.category.color }}
             >
               {video.category.name}

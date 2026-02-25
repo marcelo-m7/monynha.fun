@@ -7,6 +7,7 @@ import { I18nextProvider } from 'react-i18next';
 import { HelmetProvider } from 'react-helmet-async';
 import i18n from '@/i18n/config';
 import { getEnv } from '@/shared/config/env';
+import { ThemeProvider } from 'next-themes';
 
 const queryClient = new QueryClient();
 
@@ -17,12 +18,14 @@ export function AppProviders({ children }: { children: ReactNode }) {
     <HelmetProvider>
       <I18nextProvider i18n={i18n}>
         <QueryClientProvider client={queryClient}>
-          <AuthProvider>
-            <TooltipProvider>
-              <Sonner />
-              {children}
-            </TooltipProvider>
-          </AuthProvider>
+          <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+            <AuthProvider>
+              <TooltipProvider>
+                <Sonner />
+                {children}
+              </TooltipProvider>
+            </AuthProvider>
+          </ThemeProvider>
         </QueryClientProvider>
       </I18nextProvider>
     </HelmetProvider>

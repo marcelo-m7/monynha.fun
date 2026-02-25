@@ -13,6 +13,7 @@ import { useProfileById } from "@/features/profile/queries/useProfile";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { NavLink } from "@/components/NavLink";
 import { MobileNav } from "./MobileNav";
+import { ThemeToggle } from "@/components/ui/theme-toggle";
 
 export const Header = () => {
   const { t } = useTranslation();
@@ -42,14 +43,14 @@ export const Header = () => {
   };
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-border/80 bg-background/80 backdrop-blur-xl">
+    <header className="sticky top-0 z-50 w-full border-b border-primary/30 bg-background/90 backdrop-blur-xl">
       <div className="container flex h-16 items-center justify-between gap-4">
         {/* Logo */}
         <Link to="/" className="flex items-center gap-2 group">
-          <div className="relative flex h-9 w-9 items-center justify-center rounded-xl bg-primary text-primary-foreground shadow-md transition-transform group-hover:scale-105">
+          <div className="relative flex h-9 w-9 items-center justify-center rounded-sm bg-primary text-primary-foreground shadow-[0_0_12px_var(--glow-primary)] transition-transform group-hover:scale-105">
             <span className="text-lg font-bold">M</span>
           </div>
-          <span className="hidden font-bold text-xl tracking-tight sm:inline-block">
+          <span className="hidden font-bold text-xl tracking-[0.2em] uppercase sm:inline-block">
             Monynha<span className="text-primary">Fun</span>
           </span>
         </Link>
@@ -58,21 +59,21 @@ export const Header = () => {
         <nav className="hidden md:flex items-center gap-6 ml-8">
           <NavLink
             to="/videos"
-            className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+            className="text-xs font-bold uppercase tracking-widest text-muted-foreground hover:text-foreground transition-colors"
             activeClassName="text-primary"
           >
             {t('header.videos')}
           </NavLink>
           <NavLink
             to="/playlists"
-            className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+            className="text-xs font-bold uppercase tracking-widest text-muted-foreground hover:text-foreground transition-colors"
             activeClassName="text-primary"
           >
             {t('header.playlists')}
           </NavLink>
           <NavLink
             to="/community"
-            className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+            className="text-xs font-bold uppercase tracking-widest text-muted-foreground hover:text-foreground transition-colors"
             activeClassName="text-primary"
           >
             {t('footer.community')}
@@ -88,7 +89,7 @@ export const Header = () => {
               placeholder={t('header.searchPlaceholder')}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-10 pr-4 h-10 bg-muted/50 border-0 focus-visible:ring-primary/30"
+              className="w-full pl-10 pr-4 h-10 bg-card/90 border border-border/50 focus-visible:ring-primary/40"
             />
           </div>
         </form>
@@ -190,6 +191,8 @@ export const Header = () => {
               <SelectItem value="fr">FR</SelectItem>
             </SelectContent>
           </Select>
+
+          <ThemeToggle />
 
           {/* Mobile Menu Trigger */}
           <Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>

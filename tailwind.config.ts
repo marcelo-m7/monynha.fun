@@ -18,6 +18,16 @@ export default {
         sans: ['"Plus Jakarta Sans"', 'system-ui', 'sans-serif'],
       },
       colors: {
+        neon: {
+          cyan: "#00F5FF",
+          pink: "#FF00C8",
+          green: "#00FFA3",
+        },
+        dark: {
+          base: "#000000",
+          surface: "#0B0F14",
+          card: "#111827",
+        },
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
         ring: "hsl(var(--ring))",
@@ -79,6 +89,9 @@ export default {
         "2xl": "calc(var(--radius) + 8px)",
       },
       boxShadow: {
+        neon: "0 0 10px var(--glow-primary), 0 0 20px var(--glow-primary)",
+        "neon-pink": "0 0 10px var(--glow-secondary), 0 0 20px var(--glow-secondary)",
+        "neon-green": "0 0 10px var(--glow-accent), 0 0 20px var(--glow-accent)",
         sm: "var(--shadow-sm)",
         md: "var(--shadow-md)",
         lg: "var(--shadow-lg)",

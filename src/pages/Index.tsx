@@ -26,16 +26,17 @@ const Index = () => {
       <HeroSection />
       <CategorySection />
 
-      <section className="py-16 bg-muted/30">
+      <section className="py-20 bg-background border-t border-primary/20">
         <div className="container">
           <div className="flex items-center justify-between mb-8">
             <div className="flex items-center gap-3">
-              <div className="p-2 rounded-xl bg-primary/10">
-                <Clock className="w-5 h-5 text-primary" />
-              </div>
               <div>
-                <h2 className="text-2xl md:text-3xl font-bold">{t('index.recentTitle')}</h2>
-                <p className="text-muted-foreground mt-1">{t('index.recentDescription')}</p>
+                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-sm border border-primary/40 text-primary text-[0.65rem] font-bold uppercase tracking-[0.25em]">
+                  <Clock className="w-3 h-3" />
+                  {t('index.recentTitle')}
+                </div>
+                <h2 className="text-2xl md:text-3xl font-bold uppercase tracking-[0.1em] mt-3 font-mono">{t('index.recentTitle')}</h2>
+                <p className="text-muted-foreground mt-2 text-sm uppercase tracking-widest">{t('index.recentDescription')}</p>
               </div>
             </div>
             <Button variant="ghost" className="gap-2 group" onClick={() => navigate('/videos?recent=true')}>
@@ -65,16 +66,17 @@ const Index = () => {
         </div>
       </section>
 
-      <section className="py-16 bg-muted/30">
+      <section className="py-20 bg-background border-t border-primary/20">
         <div className="container">
           <div className="flex items-center justify-between mb-8">
             <div className="flex items-center gap-3">
-              <div className="p-2 rounded-xl bg-primary/10">
-                <TrendingUp className="w-5 h-5 text-primary" />
-              </div>
               <div>
-                <h2 className="text-2xl md:text-3xl font-bold">{t('index.featuredTitle')}</h2>
-                <p className="text-muted-foreground mt-1">{t('index.featuredDescription')}</p>
+                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-sm border border-secondary/40 text-secondary text-[0.65rem] font-bold uppercase tracking-[0.25em]">
+                  <TrendingUp className="w-3 h-3" />
+                  {t('index.featuredTitle')}
+                </div>
+                <h2 className="text-2xl md:text-3xl font-bold uppercase tracking-[0.1em] mt-3 font-mono">{t('index.featuredTitle')}</h2>
+                <p className="text-muted-foreground mt-2 text-sm uppercase tracking-widest">{t('index.featuredDescription')}</p>
               </div>
             </div>
             <Button variant="ghost" className="gap-2 group" onClick={() => navigate('/videos')}>
@@ -109,16 +111,17 @@ const Index = () => {
 
       <CommunitySpotlightSection />
 
-      <section className="py-16 bg-background">
+      <section className="py-20 bg-background border-t border-primary/20">
         <div className="container">
           <div className="flex items-center justify-between mb-8">
             <div className="flex items-center gap-3">
-              <div className="p-2 rounded-xl bg-accent/10">
-                <ListVideo className="w-5 h-5 text-accent" />
-              </div>
               <div>
-                <h2 className="text-2xl md:text-3xl font-bold">{t('index.playlistsTitle')}</h2>
-                <p className="text-muted-foreground mt-1">{t('index.playlistsDescription')}</p>
+                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-sm border border-accent/40 text-accent text-[0.65rem] font-bold uppercase tracking-[0.25em]">
+                  <ListVideo className="w-3 h-3" />
+                  {t('index.playlistsTitle')}
+                </div>
+                <h2 className="text-2xl md:text-3xl font-bold uppercase tracking-[0.1em] mt-3 font-mono">{t('index.playlistsTitle')}</h2>
+                <p className="text-muted-foreground mt-2 text-sm uppercase tracking-widest">{t('index.playlistsDescription')}</p>
               </div>
             </div>
             <Button variant="ghost" className="gap-2 group" onClick={() => navigate('/playlists')}>
@@ -145,10 +148,10 @@ const Index = () => {
         </div>
       </section>
 
-      <section className="py-20 bg-gradient-to-br from-primary/10 via-background to-accent/10">
+      <section className="py-24 bg-background border-t border-primary/20">
         <div className="container text-center space-y-6">
-          <h2 className="text-3xl md:text-4xl font-bold">{t('index.ctaTitle')}</h2>
-          <p className="text-lg text-muted-foreground max-w-2xl mx-auto">{t('index.ctaDescription')}</p>
+          <h2 className="text-3xl md:text-4xl font-bold uppercase tracking-[0.12em] font-mono">{t('index.ctaTitle')}</h2>
+          <p className="text-sm uppercase tracking-widest text-muted-foreground max-w-2xl mx-auto">{t('index.ctaDescription')}</p>
           <Button variant="hero" size="xl" className="gap-2" onClick={() => navigate('/submit')}>
             {t('index.ctaButton')}
             <ArrowRight className="w-5 h-5" />

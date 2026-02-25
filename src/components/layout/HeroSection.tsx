@@ -85,54 +85,57 @@ export const HeroSection = () => {
   };
 
   return (
-    <section className="relative overflow-hidden bg-gradient-to-br from-primary/5 via-background to-accent/5 py-16 md:py-24">
-      {/* Background decoration */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute -top-1/2 -right-1/4 w-[600px] h-[600px] rounded-full bg-primary/10 blur-3xl" />
-        <div className="absolute -bottom-1/2 -left-1/4 w-[500px] h-[500px] rounded-full bg-accent/10 blur-3xl" />
-      </div>
+    <section className="relative w-full overflow-hidden py-20 md:py-32 flex flex-col items-center justify-center min-h-[70vh] border-b border-border/40 bg-background">
+      {/* Cyberpunk Grid Background */}
+      <div className="absolute inset-0 z-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-background via-background to-background opacity-80 pointer-events-none" />
+      
+      {/* Glow Orbs */}
+      <div className="absolute top-1/4 left-1/4 w-[500px] h-[500px] bg-primary/10 rounded-full blur-[120px] pointer-events-none animate-pulse" />
+      <div className="absolute bottom-1/4 right-1/4 w-[500px] h-[500px] bg-secondary/10 rounded-full blur-[120px] pointer-events-none animate-pulse delay-700" />
 
-      <div className="container relative z-10">
-        <div className="max-w-3xl mx-auto text-center space-y-8">
-          {/* Badge */}
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary text-sm font-medium animate-fade-up">
-            <Sparkles className="w-4 h-4" />
-            <span>{t('hero.badge')}</span>
-          </div>
+      <div className="container relative z-10 flex flex-col items-center text-center space-y-10">
+        
+        {/* Badge */}
+        <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-sm border border-primary/50 bg-card/70 backdrop-blur-sm text-primary text-xs font-bold tracking-[0.35em] uppercase animate-fade-in shadow-[0_0_12px_var(--glow-primary)]">
+          <Sparkles className="w-3 h-3 text-neon-cyan" />
+          <span>{t('hero.badge')}</span>
+        </div>
 
-          {/* Heading */}
-          <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-tight animate-fade-up" style={{ animationDelay: "0.1s" }}>
-            {t('hero.headingPart1')}{" "}
-            <span className="text-gradient">{t('hero.headingPart2')}</span>
-          </h1>
+        {/* Heading */}
+        <h1 className="text-4xl md:text-6xl lg:text-7xl font-black uppercase tracking-[0.1em] leading-[1.05] animate-fade-up font-mono" style={{ animationDelay: '0.1s' }}>
+          <span className="block text-foreground drop-shadow-[0_0_10px_var(--glow-primary)]">
+            {t('hero.headingPart1')}
+          </span>
+          <span className="bg-clip-text text-transparent bg-gradient-to-r from-primary via-foreground to-secondary drop-shadow-[0_0_15px_var(--glow-primary)] animate-flicker">
+            {t('hero.headingPart2')}
+          </span>
+        </h1>
 
-          {/* Description */}
-          <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto animate-fade-up" style={{ animationDelay: "0.2s" }}>
-            {t('hero.description')}
-          </p>
+        <p className="max-w-2xl text-lg md:text-xl text-muted-foreground/80 md:leading-relaxed animate-fade-up" style={{ animationDelay: '0.2s' }}>
+          {t('hero.description')}
+        </p>
 
-          {/* Video Submission Input */}
-          <form
-            onSubmit={handleSubmit(onSubmit)}
-            className="w-full max-w-xl mx-auto mt-4 animate-fade-up"
-            style={{ animationDelay: "0.3s" }}
-          >
-            <div className="flex gap-2">
-              <div className="relative flex-1">
-                <Youtube className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
-                <Input
-                  id="youtube-url-hero"
-                  type="url"
-                  placeholder={t('hero.submitUrlPlaceholder')}
-                  {...register('youtubeUrl')}
-                  className="h-12 pl-10 pr-4"
-                  aria-invalid={errors.youtubeUrl ? "true" : "false"}
-                />
-                {errors.youtubeUrl && (
-                  <AlertCircle className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-destructive" />
-                )}
+        {/* Action Area */}
+        <div className="w-full max-w-md space-y-4 animate-fade-up" style={{ animationDelay: '0.3s' }}>
+          <form onSubmit={handleSubmit(onSubmit)} className="relative group">
+            <div className="absolute -inset-0.5 bg-gradient-to-r from-neon-cyan to-neon-pink rounded-lg opacity-30 group-hover:opacity-100 transition duration-500 blur"></div>
+            <div className="relative flex items-center bg-card/95 rounded-lg p-1 border border-border/60 group-hover:border-transparent transition-colors">
+              <div className="pl-3 text-muted-foreground">
+                <Youtube className="w-5 h-5 group-focus-within:text-red-500 transition-colors" />
               </div>
-              <Button type="submit" className="px-6" variant="hero" disabled={isSubmittingForm || authLoading}>
+              <Input
+                {...register('youtubeUrl')}
+                id="youtube-url-hero"
+                type="text"
+                placeholder={t('hero.submitUrlPlaceholder')}
+                className="border-0 bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0 placeholder:text-muted-foreground/70 h-10 md:h-12 text-foreground font-mono"
+              />
+              <Button 
+                type="submit" 
+                variant="default"
+                className="h-10 md:h-12 px-6 rounded-md"
+                disabled={isSubmittingForm || authLoading}
+              >
                 {isSubmittingForm || authLoading ? (
                   <Loader2 className="w-4 h-4 animate-spin" />
                 ) : (
@@ -141,29 +144,31 @@ export const HeroSection = () => {
               </Button>
             </div>
             {errors.youtubeUrl && (
-              <p role="alert" className="text-sm text-destructive mt-2 text-left">
+              <p className="absolute -bottom-6 left-0 text-xs text-destructive font-bold uppercase tracking-wider flex items-center gap-1">
+                <AlertCircle className="w-3 h-3" />
                 {t(errors.youtubeUrl.message as string)}
               </p>
             )}
           </form>
 
-          {/* Secondary CTA Button */}
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 animate-fade-up" style={{ animationDelay: "0.4s" }}>
-            <Button
-              variant="outline"
-              size="lg"
-              onClick={handleDirectSubmitClick}
-              disabled={authLoading}
+          <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
+             {/* Secondary Action - Explore */}
+             <Button
+               variant="outline"
+               size="lg"
+               className="w-full sm:w-auto"
+               onClick={() => navigate('/videos')}
+             >
+                {t('hero.exploreVideosButton')}
+             </Button>
+
+            <Button 
+                variant="ghost" 
+                size="lg"
+                className="w-full sm:w-auto text-muted-foreground hover:text-foreground"
+                onClick={handleDirectSubmitClick}
             >
-              {t('hero.submitVideoButton')}
-            </Button>
-            <Button
-              variant="secondary"
-              size="lg"
-              onClick={() => navigate('/videos')}
-            >
-              {t('hero.exploreVideosButton')}
-              <ArrowRight className="w-5 h-5 ml-1" />
+                {t('hero.submitVideoButton')}
             </Button>
           </div>
         </div>

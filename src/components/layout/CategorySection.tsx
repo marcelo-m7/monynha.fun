@@ -33,18 +33,18 @@ export const CategorySection = () => {
   };
 
   return (
-    <section className="py-20 bg-background relative overflow-hidden">
+    <section className="py-20 bg-background relative overflow-hidden border-t border-primary/20">
       {/* Decorative background element */}
       <div className="absolute top-0 right-0 -translate-y-1/2 translate-x-1/4 w-96 h-96 bg-primary/5 rounded-full blur-3xl pointer-events-none" />
 
       <div className="container relative z-10">
         <div className="flex flex-col md:flex-row md:items-end justify-between mb-10 gap-4">
           <div className="space-y-2">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 text-primary text-xs font-bold uppercase tracking-wider">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-sm border border-primary/40 text-primary text-[0.65rem] font-bold uppercase tracking-[0.25em]">
               <Sparkles className="w-3 h-3" />
               {t('index.categoriesTitle')}
             </div>
-            <h2 className="text-3xl md:text-4xl font-extrabold tracking-tight">
+            <h2 className="text-3xl md:text-4xl font-extrabold uppercase tracking-[0.1em] font-mono">
               {t('index.categoriesDescription')}
             </h2>
           </div>

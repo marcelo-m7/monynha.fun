@@ -1,5 +1,5 @@
 import { describe, expect, it, vi, beforeEach } from 'vitest';
-import { screen, waitFor } from '@testing-library/react';
+import { screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import Submit from './Submit';
 import { renderWithProviders } from '@/shared/test/renderWithProviders';
@@ -62,8 +62,12 @@ describe('Submit page', () => {
 
     const user = userEvent.setup();
 
-    await user.type(screen.getByLabelText(/youtube url/i), 'https://example.com');
-    await user.click(screen.getByRole('button', { name: /submit video/i }));
+    const youtubeInput = screen.getByLabelText(/youtube url/i);
+    await user.type(youtubeInput, 'https://example.com');
+
+    const form = youtubeInput.closest('form');
+    if (!form) throw new Error('Submit form not found');
+    await user.click(within(form).getByRole('button', { name: /submit video/i }));
 
     expect(await screen.findByText('Only YouTube URLs are accepted')).toBeInTheDocument();
     expect(mutateAsyncMock).not.toHaveBeenCalled();
@@ -86,12 +90,15 @@ describe('Submit page', () => {
 
     const user = userEvent.setup();
 
+    const youtubeInput = screen.getByLabelText(/youtube url/i);
     await user.type(
-      screen.getByLabelText(/youtube url/i),
+      youtubeInput,
       'https://www.youtube.com/watch?v=abc123DEF45',
     );
 
-    await user.click(screen.getByRole('button', { name: /submit video/i }));
+    const form = youtubeInput.closest('form');
+    if (!form) throw new Error('Submit form not found');
+    await user.click(within(form).getByRole('button', { name: /submit video/i }));
 
     await waitFor(() => {
       expect(mutateAsyncMock).toHaveBeenCalled();
