@@ -10,47 +10,110 @@
 
 @layer base {
   :root {
-    /* Cyberpunk Neon Palette */
-    
-    /* Dark base background (#000000 / #0B0F14) */
-    --background: 0 0% 0%; /* #000000 */
-    --foreground: 0 0% 100%; /* #FFFFFF */
+    /* Light theme - Cyberpunk Neon (premium) */
+    --background: 220 20% 97%; /* #F7F8FA */
+    --foreground: 215 30% 7%; /* #0B0F14 */
 
-    /* Cards - Deep dark background */
-    --card: 222 47% 7%; /* #0B0F14 tailored */
+    --card: 0 0% 100%;
+    --card-foreground: 215 30% 7%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 215 30% 7%;
+
+    /* Neon accents tuned for light surfaces */
+    --primary: 189 100% 46%; /* #00CFEA */
+    --primary-foreground: 0 0% 0%;
+    --primary-hover: 189 100% 52%;
+
+    --secondary: 321 100% 62%; /* #FF3DBD */
+    --secondary-foreground: 0 0% 100%;
+
+    --accent: 157 100% 45%; /* #00E58C */
+    --accent-foreground: 0 0% 0%;
+
+    --muted: 220 16% 92%;
+    --muted-foreground: 215 15% 35%;
+
+    --destructive: 0 80% 55%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 220 15% 85%;
+    --input: 220 15% 85%;
+    --ring: 189 100% 46%;
+
+    --radius: 0.25rem;
+
+    /* Category colors - Neon variants */
+    --category-tutorials: 210 90% 55%;
+    --category-recipes: 30 90% 55%;
+    --category-education: 150 70% 45%;
+    --category-memes: 280 80% 60%;
+    --category-music: 320 80% 55%;
+    --category-culture: 50 90% 55%;
+
+    /* Gradients */
+    --gradient-hero: linear-gradient(135deg, hsl(189 100% 46% / 0.15) 0%, hsl(321 100% 62% / 0.15) 100%);
+    --gradient-card-hover: linear-gradient(180deg, transparent 0%, hsl(189 100% 46% / 0.08) 100%);
+    --gradient-overlay: linear-gradient(180deg, transparent 0%, hsl(215 30% 7% / 0.65) 100%);
+
+    /* Shadows - Soft bloom for light mode */
+    --shadow-sm: 0 1px 2px hsl(215 30% 7% / 0.06);
+    --shadow-md: 0 6px 18px hsl(215 30% 7% / 0.08);
+    --shadow-lg: 0 12px 30px hsl(215 30% 7% / 0.12);
+    --shadow-glow: 0 0 18px hsl(189 100% 46% / 0.35);
+    --shadow-depth-1: 0 0 12px hsl(189 100% 46% / 0.18);
+    --shadow-depth-2: 0 0 20px hsl(321 100% 62% / 0.2);
+    --shadow-depth-3: 0 0 26px hsl(157 100% 45% / 0.2);
+
+    --glow-primary: rgba(0, 207, 234, 0.35);
+    --glow-secondary: rgba(255, 61, 189, 0.35);
+    --glow-accent: rgba(0, 229, 140, 0.35);
+    --grid-line: rgba(0, 207, 234, 0.05);
+
+    /* Sidebar */
+    --sidebar-background: 0 0% 100%;
+    --sidebar-foreground: 215 30% 7%;
+    --sidebar-primary: 189 100% 46%;
+    --sidebar-primary-foreground: 0 0% 0%;
+    --sidebar-accent: 220 16% 94%;
+    --sidebar-accent-foreground: 215 30% 7%;
+    --sidebar-border: 220 15% 85%;
+    --sidebar-ring: 189 100% 46%;
+  }
+
+  .dark {
+    /* Dark base background (#000000 / #0B0F14) */
+    --background: 0 0% 0%;
+    --foreground: 0 0% 100%;
+
+    --card: 222 47% 7%;
     --card-foreground: 0 0% 100%;
 
-    --popover: 222 47% 7%; /* #0B0F14 */
+    --popover: 222 47% 7%;
     --popover-foreground: 0 0% 100%;
 
-    /* Neon Cyan Primary (#00F5FF -> 182 100% 50%) */
     --primary: 182 100% 50%;
     --primary-foreground: 0 0% 0%;
     --primary-hover: 182 100% 60%;
 
-    /* Neon Magenta Secondary (#FF00C8 -> 313 100% 50%) */
     --secondary: 313 100% 50%;
     --secondary-foreground: 0 0% 100%;
 
-    /* Electric Green Accent (#00FFA3 -> 158 100% 50%) */
     --accent: 158 100% 50%;
     --accent-foreground: 0 0% 0%;
 
-    /* Muted tones - Dark Slate */
-    --muted: 217 33% 10%; /* #11151c */
-    --muted-foreground: 215 20% 65%; /* #94a3b8 */
+    --muted: 217 33% 10%;
+    --muted-foreground: 215 20% 65%;
 
-    --destructive: 0 100% 50%; /* Red Neon */
+    --destructive: 0 100% 50%;
     --destructive-foreground: 0 0% 100%;
 
-    /* Borders - Cyan/Blue tint, very subtle for base */
     --border: 217 33% 20%;
     --input: 217 33% 20%;
-    --ring: 182 100% 50%; /* Cyan Ring */
+    --ring: 182 100% 50%;
 
-    --radius: 0.25rem; /* Sharper corners for retro feel */
+    --radius: 0.25rem;
 
-    /* Category colors - Neon variants */
     --category-tutorials: 210 100% 60%;
     --category-recipes: 30 100% 60%;
     --category-education: 150 100% 60%;
@@ -58,12 +121,10 @@
     --category-music: 320 100% 60%;
     --category-culture: 50 100% 60%;
 
-    /* Gradients */
     --gradient-hero: linear-gradient(135deg, hsl(182 100% 50% / 0.2) 0%, hsl(313 100% 50% / 0.2) 100%);
     --gradient-card-hover: linear-gradient(180deg, transparent 0%, hsl(182 100% 50% / 0.1) 100%);
     --gradient-overlay: linear-gradient(180deg, transparent 0%, hsl(0 0% 0% / 0.8) 100%);
 
-    /* Shadows - Neon Glows */
     --shadow-sm: 0 1px 2px hsl(0 0% 0% / 0.5);
     --shadow-md: 0 4px 12px hsl(0 0% 0% / 0.5);
     --shadow-lg: 0 8px 24px hsl(0 0% 0% / 0.5);
@@ -72,7 +133,11 @@
     --shadow-depth-2: 0 0 20px hsl(313 100% 50% / 0.3);
     --shadow-depth-3: 0 0 30px hsl(158 100% 50% / 0.3);
 
-    /* Sidebar */
+    --glow-primary: rgba(0, 245, 255, 0.6);
+    --glow-secondary: rgba(255, 0, 200, 0.6);
+    --glow-accent: rgba(0, 255, 163, 0.6);
+    --grid-line: rgba(0, 245, 255, 0.08);
+
     --sidebar-background: 222 47% 5%;
     --sidebar-foreground: 0 0% 100%;
     --sidebar-primary: 182 100% 50%;
@@ -87,8 +152,8 @@
   .bg-grid-pattern {
     background-size: 40px 40px;
     background-image: 
-      linear-gradient(to right, rgba(0, 245, 255, 0.05) 1px, transparent 1px),
-      linear-gradient(to bottom, rgba(0, 245, 255, 0.05) 1px, transparent 1px);
+      linear-gradient(to right, var(--grid-line) 1px, transparent 1px),
+      linear-gradient(to bottom, var(--grid-line) 1px, transparent 1px);
     mask-image: radial-gradient(ellipse at center, black 40%, transparent 80%);
   }
 }
@@ -113,8 +178,8 @@
     z-index: -1;
     background-size: 40px 40px;
     background-image: 
-      linear-gradient(to right, rgba(0, 245, 255, 0.05) 1px, transparent 1px),
-      linear-gradient(to bottom, rgba(0, 245, 255, 0.05) 1px, transparent 1px);
+      linear-gradient(to right, var(--grid-line) 1px, transparent 1px),
+      linear-gradient(to bottom, var(--grid-line) 1px, transparent 1px);
     pointer-events: none;
   }
 
@@ -128,38 +193,38 @@
     width: 8px;
   }
   ::-webkit-scrollbar-track {
-    background: #000; 
+    background: hsl(var(--background));
   }
   ::-webkit-scrollbar-thumb {
-    background: #1f2937; 
+    background: hsl(var(--muted));
     border-radius: 4px;
   }
   ::-webkit-scrollbar-thumb:hover {
-    background: #00F5FF; 
+    background: hsl(var(--primary));
   }
 }
 
 @layer utilities {
   .text-neon-cyan {
-    color: #00F5FF;
-    text-shadow: 0 0 5px rgba(0, 245, 255, 0.5);
+    color: hsl(var(--primary));
+    text-shadow: 0 0 6px var(--glow-primary);
   }
   .text-neon-pink {
-    color: #FF00C8;
-    text-shadow: 0 0 5px rgba(255, 0, 200, 0.5);
+    color: hsl(var(--secondary));
+    text-shadow: 0 0 6px var(--glow-secondary);
   }
   .text-neon-green {
-    color: #00FFA3;
-    text-shadow: 0 0 5px rgba(0, 255, 163, 0.5);
+    color: hsl(var(--accent));
+    text-shadow: 0 0 6px var(--glow-accent);
   }
   
   .border-neon-cyan {
-    border-color: #00F5FF;
-    box-shadow: 0 0 5px rgba(0, 245, 255, 0.3), inset 0 0 5px rgba(0, 245, 255, 0.1);
+    border-color: hsl(var(--primary));
+    box-shadow: 0 0 5px var(--glow-primary), inset 0 0 5px var(--glow-primary);
   }
   
   .shadow-neon-cyan {
-    box-shadow: 0 0 10px rgba(0, 245, 255, 0.4);
+    box-shadow: 0 0 10px var(--glow-primary);
   }
 
   .glow-text {
@@ -207,36 +272,36 @@
 
   .elevation-card {
     @apply transition-all duration-300;
-    box-shadow: 0 0 10px rgba(0, 245, 255, 0.08);
+    box-shadow: 0 0 10px var(--glow-primary);
   }
 
   .elevation-card:hover,
   .elevation-card:focus {
-    box-shadow: 0 0 20px rgba(0, 245, 255, 0.18);
+    box-shadow: 0 0 20px var(--glow-primary);
   }
 
   .elevation-hover {
     @apply transition-all duration-300;
-    box-shadow: 0 0 8px rgba(0, 245, 255, 0.05);
+    box-shadow: 0 0 8px var(--glow-primary);
   }
 
   .elevation-hover:hover,
   .elevation-hover:focus {
-    box-shadow: 0 0 14px rgba(0, 245, 255, 0.15);
+    box-shadow: 0 0 14px var(--glow-primary);
   }
 
   .elevation-dialog {
-    box-shadow: 0 0 20px rgba(0, 245, 255, 0.2);
+    box-shadow: 0 0 20px var(--glow-primary);
   }
 
   .elevation-fab {
     @apply transition-all duration-300;
-    box-shadow: 0 0 16px rgba(0, 245, 255, 0.25);
+    box-shadow: 0 0 16px var(--glow-primary);
   }
 
   .elevation-fab:hover,
   .elevation-fab:focus {
-    box-shadow: 0 0 26px rgba(0, 245, 255, 0.35);
+    box-shadow: 0 0 26px var(--glow-primary);
   }
 }
 

@@ -89,9 +89,9 @@ export default {
         "2xl": "calc(var(--radius) + 8px)",
       },
       boxShadow: {
-        neon: "0 0 10px #00F5FF, 0 0 20px #00F5FF",
-        "neon-pink": "0 0 10px #FF00C8, 0 0 20px #FF00C8",
-        "neon-green": "0 0 10px #00FFA3, 0 0 20px #00FFA3",
+        neon: "0 0 10px var(--glow-primary), 0 0 20px var(--glow-primary)",
+        "neon-pink": "0 0 10px var(--glow-secondary), 0 0 20px var(--glow-secondary)",
+        "neon-green": "0 0 10px var(--glow-accent), 0 0 20px var(--glow-accent)",
         sm: "var(--shadow-sm)",
         md: "var(--shadow-md)",
         lg: "var(--shadow-lg)",

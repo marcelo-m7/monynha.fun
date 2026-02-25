@@ -85,7 +85,7 @@ export const HeroSection = () => {
   };
 
   return (
-    <section className="relative w-full overflow-hidden py-20 md:py-32 flex flex-col items-center justify-center min-h-[70vh] border-b border-border/40 bg-black">
+    <section className="relative w-full overflow-hidden py-20 md:py-32 flex flex-col items-center justify-center min-h-[70vh] border-b border-border/40 bg-background">
       {/* Cyberpunk Grid Background */}
       <div className="absolute inset-0 z-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-background via-background to-background opacity-80 pointer-events-none" />
       
@@ -103,10 +103,10 @@ export const HeroSection = () => {
 
         {/* Heading */}
         <h1 className="text-4xl md:text-6xl lg:text-7xl font-black uppercase tracking-tighter leading-[1.1] animate-fade-up" style={{ animationDelay: '0.1s' }}>
-          <span className="block text-white drop-shadow-[0_0_10px_rgba(255,255,255,0.3)]">
+          <span className="block text-foreground drop-shadow-[0_0_10px_var(--glow-primary)]">
             {t('hero.headingPart1')}
           </span>
-          <span className="bg-clip-text text-transparent bg-gradient-to-r from-neon-cyan via-white to-neon-pink drop-shadow-[0_0_15px_rgba(0,245,255,0.3)] animate-flicker">
+          <span className="bg-clip-text text-transparent bg-gradient-to-r from-primary via-foreground to-secondary drop-shadow-[0_0_15px_var(--glow-primary)] animate-flicker">
             {t('hero.headingPart2')}
           </span>
         </h1>
@@ -119,7 +119,7 @@ export const HeroSection = () => {
         <div className="w-full max-w-md space-y-4 animate-fade-up" style={{ animationDelay: '0.3s' }}>
           <form onSubmit={handleSubmit(onSubmit)} className="relative group">
             <div className="absolute -inset-0.5 bg-gradient-to-r from-neon-cyan to-neon-pink rounded-lg opacity-30 group-hover:opacity-100 transition duration-500 blur"></div>
-            <div className="relative flex items-center bg-black rounded-lg p-1 border border-border group-hover:border-transparent transition-colors">
+            <div className="relative flex items-center bg-card/90 rounded-lg p-1 border border-border group-hover:border-transparent transition-colors">
               <div className="pl-3 text-muted-foreground">
                 <Youtube className="w-5 h-5 group-focus-within:text-red-500 transition-colors" />
               </div>
@@ -128,7 +128,7 @@ export const HeroSection = () => {
                 id="youtube-url-hero"
                 type="text"
                 placeholder={t('hero.submitUrlPlaceholder')}
-                className="border-0 bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0 placeholder:text-muted-foreground/50 h-10 md:h-12 text-white"
+                className="border-0 bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0 placeholder:text-muted-foreground/60 h-10 md:h-12 text-foreground"
               />
               <Button 
                 type="submit" 
@@ -156,7 +156,7 @@ export const HeroSection = () => {
              <Button
                variant="outline"
                size="lg"
-               className="w-full sm:w-auto border-white/20 hover:border-white/50 hover:bg-white/5 text-white"
+               className="w-full sm:w-auto"
                onClick={() => navigate('/videos')}
              >
                 {t('hero.exploreVideosButton')}
@@ -165,7 +165,7 @@ export const HeroSection = () => {
             <Button 
                 variant="ghost" 
                 size="lg"
-                className="w-full sm:w-auto text-muted-foreground hover:text-white"
+                className="w-full sm:w-auto text-muted-foreground hover:text-foreground"
                 onClick={handleDirectSubmitClick}
             >
                 {t('hero.submitVideoButton')}

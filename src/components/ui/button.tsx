@@ -9,14 +9,14 @@ const buttonVariants = cva(
   {
     variants: {
       variant: {
-        default: "bg-background border border-primary text-primary shadow-[0_0_10px_rgba(0,245,255,0.3)] hover:shadow-[0_0_20px_rgba(0,245,255,0.6)] hover:bg-primary/10 hover:border-primary active:scale-95",
-        destructive: "bg-background border border-destructive text-destructive shadow-[0_0_10px_rgba(255,0,0,0.3)] hover:shadow-[0_0_20px_rgba(255,0,0,0.6)] hover:bg-destructive/10 active:scale-95",
-        outline: "border border-input bg-background hover:bg-accent hover:text-accent-foreground hover:border-accent hover:shadow-[0_0_10px_rgba(0,255,163,0.3)] active:scale-95",
-        secondary: "bg-background border border-secondary text-secondary shadow-[0_0_10px_rgba(255,0,200,0.3)] hover:shadow-[0_0_20px_rgba(255,0,200,0.6)] hover:bg-secondary/10 active:scale-95",
-        ghost: "hover:bg-primary/10 hover:text-primary hover:shadow-[0_0_10px_rgba(0,245,255,0.2)] active:scale-95",
+        default: "bg-background border border-primary text-primary shadow-[0_0_10px_var(--glow-primary)] hover:shadow-[0_0_20px_var(--glow-primary)] hover:bg-primary/10 hover:border-primary active:scale-95",
+        destructive: "bg-background border border-destructive text-destructive shadow-[0_0_10px_rgba(255,0,0,0.25)] hover:shadow-[0_0_20px_rgba(255,0,0,0.45)] hover:bg-destructive/10 active:scale-95",
+        outline: "border border-input bg-background hover:bg-accent/10 hover:text-accent hover:border-accent hover:shadow-[0_0_10px_var(--glow-accent)] active:scale-95",
+        secondary: "bg-background border border-secondary text-secondary shadow-[0_0_10px_var(--glow-secondary)] hover:shadow-[0_0_20px_var(--glow-secondary)] hover:bg-secondary/10 active:scale-95",
+        ghost: "hover:bg-primary/10 hover:text-primary hover:shadow-[0_0_10px_var(--glow-primary)] active:scale-95",
         link: "text-primary underline-offset-4 hover:underline shadow-none hover:shadow-none bg-transparent border-none normal-case tracking-normal",
-        hero: "bg-primary text-black font-extrabold hover:bg-primary/90 shadow-[0_0_20px_rgba(0,245,255,0.5)] hover:shadow-[0_0_30px_rgba(0,245,255,0.8)] active:scale-95 text-base border border-primary",
-        accent: "bg-accent text-black font-bold hover:bg-accent/90 shadow-[0_0_15px_rgba(0,255,163,0.5)] hover:shadow-[0_0_25px_rgba(0,255,163,0.8)] active:scale-95 border border-accent",
+        hero: "bg-primary text-primary-foreground font-extrabold hover:bg-primary/90 shadow-[0_0_20px_var(--glow-primary)] hover:shadow-[0_0_30px_var(--glow-primary)] active:scale-95 text-base border border-primary",
+        accent: "bg-accent text-accent-foreground font-bold hover:bg-accent/90 shadow-[0_0_15px_var(--glow-accent)] hover:shadow-[0_0_25px_var(--glow-accent)] active:scale-95 border border-accent",
       },
       size: {
         default: "h-10 px-5 py-2",

@@ -13,6 +13,7 @@ import { useProfileById } from "@/features/profile/queries/useProfile";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { NavLink } from "@/components/NavLink";
 import { MobileNav } from "./MobileNav";
+import { ThemeToggle } from "@/components/ui/theme-toggle";
 
 export const Header = () => {
   const { t } = useTranslation();
@@ -190,6 +191,8 @@ export const Header = () => {
               <SelectItem value="fr">FR</SelectItem>
             </SelectContent>
           </Select>
+
+          <ThemeToggle />
 
           {/* Mobile Menu Trigger */}
           <Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>
