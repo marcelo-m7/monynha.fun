@@ -1,18 +1,50 @@
 export function extractYouTubeId(url: string): string | null {
-  const patterns = [
-    // New combined pattern to handle various YouTube URL formats
-    /(?:youtube\.com\/(?:watch(?:\?v=|\/)|live\/|embed\/|v\/|shorts\/)|youtu\.be\/)([a-zA-Z0-9_-]{11})/,
-    // Existing pattern for just the ID
-    /^([a-zA-Z0-9_-]{11})$/
-  ];
+  if (!url) return null;
+  const trimmedUrl = url.trim();
 
-  for (const pattern of patterns) {
-    const match = url.match(pattern);
-    if (match) {
-      return match[1];
-    }
+  // 1. Check if it's just a raw 11-character ID
+  if (/^[a-zA-Z0-9_-]{11}$/.test(trimmedUrl)) {
+    return trimmedUrl;
   }
-  return null;
+
+  try {
+    // 2. Try parsing as a URL for structured extraction
+    const parsedUrl = new URL(trimmedUrl.startsWith('http') ? trimmedUrl : `https://${trimmedUrl}`);
+    const hostname = parsedUrl.hostname.replace('www.', '');
+
+    // Handle youtu.be/ID
+    if (hostname === 'youtu.be') {
+      const id = parsedUrl.pathname.slice(1);
+      return id.length >= 11 ? id.substring(0, 11) : null;
+    }
+
+    // Handle youtube.com and youtube-nocookie.com
+    if (hostname === 'youtube.com' || hostname === 'youtube-nocookie.com') {
+      // Standard watch?v=ID
+      const v = parsedUrl.searchParams.get('v');
+      if (v && v.length >= 11) return v.substring(0, 11);
+
+      // Path-based IDs: /shorts/ID, /live/ID, /embed/ID, /v/ID, /watch/ID
+      const pathParts = parsedUrl.pathname.split('/');
+      const specialPaths = ['shorts', 'live', 'embed', 'v', 'watch'];
+      
+      for (const special of specialPaths) {
+        const index = pathParts.indexOf(special);
+        if (index !== -1 && pathParts[index + 1]) {
+          const id = pathParts[index + 1];
+          if (id.length >= 11) return id.substring(0, 11);
+        }
+      }
+    }
+  } catch (e) {
+    // Not a valid URL structure, proceed to regex fallback
+  }
+
+  // 3. Fallback to a comprehensive regex for any remaining edge cases
+  const regex = /(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?|shorts|live)\/|.*[?&]v=)|youtu\.be\/)([a-zA-Z0-9_-]{11})/i;
+  const match = trimmedUrl.match(regex);
+  
+  return match ? match[1] : null;
 }
 
 export function extractYouTubePlaylistId(url: string): string | null {

@@ -3,7 +3,7 @@ import { extractYouTubeId, getYouTubeEmbedUrl, getYouTubeThumbnail, getYouTubeWa
 
 describe('youtube helpers', () => {
   it('extracts YouTube IDs from supported URLs', () => {
-    // Existing formats
+    // Standard and common formats
     expect(extractYouTubeId('https://www.youtube.com/watch?v=abc123DEF45')).toBe('abc123DEF45');
     expect(extractYouTubeId('https://youtu.be/abc123DEF45')).toBe('abc123DEF45');
     expect(extractYouTubeId('https://www.youtube.com/embed/abc123DEF45')).toBe('abc123DEF45');
@@ -11,7 +11,11 @@ describe('youtube helpers', () => {
     expect(extractYouTubeId('https://www.youtube.com/shorts/abc123DEF45')).toBe('abc123DEF45');
     expect(extractYouTubeId('abc123DEF45')).toBe('abc123DEF45');
 
-    // New formats
+    // URLs with tracking parameters (si parameter)
+    expect(extractYouTubeId('https://youtu.be/QK9f08aiM9c?si=qQh7iWQ1BrzjLtSy')).toBe('QK9f08aiM9c');
+    expect(extractYouTubeId('https://www.youtube.com/watch?v=abc123DEF45&si=some-tracker')).toBe('abc123DEF45');
+    
+    // New and edge case formats
     expect(extractYouTubeId('https://www.youtube.com/live/abc123DEF45')).toBe('abc123DEF45');
     expect(extractYouTubeId('https://www.youtube.com/watch/abc123DEF45')).toBe('abc123DEF45');
   });
