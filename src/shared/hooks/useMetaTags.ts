@@ -1,11 +1,11 @@
 import { useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
-import { Helmet } from 'react-helmet-async';
 
 interface MetaTagsProps {
   title: string;
   description: string;
   image?: string;
+  imageAlt?: string;
   url?: string;
   type?: 'website' | 'article' | 'video.other';
 }
@@ -14,6 +14,7 @@ export const useMetaTags = ({
   title,
   description,
   image = 'https://monynha.com/opengraph-image-monynha-fun.png',
+  imageAlt = 'Monynha Fun preview image',
   url,
   type = 'website',
 }: MetaTagsProps) => {
@@ -32,6 +33,20 @@ export const useMetaTags = ({
     }
     descriptionMeta.setAttribute('content', description);
 
+    const canonicalUrl = url || `${window.location.origin}${location.pathname}`;
+
+    const upsertLinkTag = (rel: string, href: string) => {
+      let link = document.querySelector(`link[rel="${rel}"]`);
+      if (!link) {
+        link = document.createElement('link');
+        link.setAttribute('rel', rel);
+        document.head.appendChild(link);
+      }
+      link.setAttribute('href', href);
+    };
+
+    upsertLinkTag('canonical', canonicalUrl);
+
     // Open Graph tags
     const updateOGTag = (property: string, content: string) => {
       let meta = document.querySelector(`meta[property="${property}"]`);
@@ -47,7 +62,8 @@ export const useMetaTags = ({
     updateOGTag('og:description', description);
     updateOGTag('og:type', type);
     updateOGTag('og:image', image);
-    updateOGTag('og:url', url || window.location.href);
+    updateOGTag('og:image:alt', imageAlt);
+    updateOGTag('og:url', canonicalUrl);
 
     // Twitter tags
     const updateTwitterTag = (name: string, content: string) => {
@@ -64,5 +80,5 @@ export const useMetaTags = ({
     updateTwitterTag('twitter:description', description);
     updateTwitterTag('twitter:image', image);
     updateTwitterTag('twitter:card', 'summary_large_image');
-  }, [title, description, image, url, type, location]);
+  }, [title, description, image, imageAlt, url, type, location.pathname]);
 };

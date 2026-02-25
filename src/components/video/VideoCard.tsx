@@ -5,6 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { useTranslation } from 'react-i18next';
+import type { KeyboardEvent } from 'react';
 import { useVideoViewIncrement } from '@/shared/hooks/useVideoViewIncrement';
 
 interface VideoCardProps {
@@ -28,11 +29,22 @@ export const VideoCard = ({ video, onClick, variant = 'default' }: VideoCardProp
     }
   };
 
+  const handleKeyDown = (event: KeyboardEvent<HTMLElement>) => {
+    if (event.key === 'Enter' || event.key === ' ') {
+      event.preventDefault();
+      handleClick();
+    }
+  };
+
   return (
     <article
       onClick={handleClick}
+      onKeyDown={handleKeyDown}
+      tabIndex={0}
+      role="button"
+      aria-label={`Open video ${video.title}`}
       className={cn(
-        "group cursor-pointer rounded-md bg-card/95 overflow-hidden shadow-sm transition-all duration-300 border border-primary/15 hover:border-primary/60 hover:shadow-[0_0_15px_var(--glow-primary)]",
+        "group cursor-pointer rounded-md bg-card/95 overflow-hidden shadow-sm transition-all duration-300 border border-primary/15 hover:border-primary/60 hover:shadow-[0_0_15px_var(--glow-primary)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/80 focus-visible:ring-offset-2 focus-visible:ring-offset-background",
         variant === 'default' && "flex h-full min-h-[320px] flex-col",
         variant === 'compact' && "flex items-center gap-3 p-2 rounded-md hover:bg-muted/30 hover:shadow-none border border-border/40"
       )}
@@ -72,7 +84,7 @@ export const VideoCard = ({ video, onClick, variant = 'default' }: VideoCardProp
             <Play className={cn(
               "text-primary-foreground ml-1",
               variant === 'default' ? "w-6 h-6" : "w-4 h-4"
-            )} fill="currentColor" />
+            )} fill="currentColor" aria-hidden="true" />
           </div>
         </div>
 
@@ -120,7 +132,7 @@ export const VideoCard = ({ video, onClick, variant = 'default' }: VideoCardProp
           variant === 'default' && "mt-auto"
         )}>
           <div className="flex items-center gap-1 relative">
-            <Eye className="w-3.5 h-3.5" />
+            <Eye className="w-3.5 h-3.5" aria-hidden="true" />
             <span>{formatViewCount(viewCount)}</span>
             {showPlus && (
               <span className="absolute -right-6 -top-1 text-xs text-green-400 font-semibold animate-pop">+1</span>

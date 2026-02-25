@@ -42,11 +42,11 @@ describe('VideoCard', () => {
   it('renders video details', () => {
     renderWithProviders(<VideoCard video={sampleVideo} />);
 
-    const article = screen.getByRole('article');
+    const videoTrigger = screen.getByRole('button', { name: /open video learning react/i });
 
     expect(screen.getByText('Learning React')).toBeInTheDocument();
     expect(screen.getByText('Monynha')).toBeInTheDocument();
-    expect(article).toHaveClass('min-h-[320px]');
+    expect(videoTrigger).toHaveClass('min-h-[320px]');
   });
 
   it('increments view count with session id on click', async () => {
@@ -54,7 +54,20 @@ describe('VideoCard', () => {
     const user = userEvent.setup();
 
     renderWithProviders(<VideoCard video={sampleVideo} />);
-    await user.click(screen.getByRole('article'));
+    await user.click(screen.getByRole('button', { name: /open video learning react/i }));
+
+    expect(incrementVideoViewCount).toHaveBeenCalledWith('video-1', 'session-123');
+  });
+
+  it('supports keyboard activation with Enter', async () => {
+    window.localStorage.setItem('video-vault-session-id', 'session-123');
+    const user = userEvent.setup();
+
+    renderWithProviders(<VideoCard video={sampleVideo} />);
+    const videoTrigger = screen.getByRole('button', { name: /open video learning react/i });
+
+    videoTrigger.focus();
+    await user.keyboard('{Enter}');
 
     expect(incrementVideoViewCount).toHaveBeenCalledWith('video-1', 'session-123');
   });
