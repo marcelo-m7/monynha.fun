@@ -18,15 +18,18 @@ import {
 } from '@/features/messages';
 import { useProfileByUsername } from '@/features/profile/queries/useProfile';
 import type { MessageProfile } from '@/entities/direct_message/direct_message.types';
+import { useTranslation } from 'react-i18next';
 
 const formatWhen = (isoDate: string) => {
   const date = new Date(isoDate);
   return date.toLocaleString([], { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
 };
 
-const profileName = (profile: MessageProfile) => profile.display_name || profile.username || 'Unknown user';
+const profileName = (profile: MessageProfile, fallback: string) =>
+  profile.display_name || profile.username || fallback;
 
 const Messages = () => {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const preselectedUsername = searchParams.get('user') || undefined;
@@ -70,6 +73,7 @@ const Messages = () => {
   }, [selectedUsername, conversation, markReadMutation]);
 
   const selectedContact = contacts.find((contact) => contact.username === selectedUsername);
+  const unknownUserLabel = t('messages.unknownUser');
 
   const handleSend = async () => {
     if (!selectedUsername || !draft.trim()) return;
@@ -95,9 +99,9 @@ const Messages = () => {
       <div className="min-h-screen flex flex-col">
         <Header />
         <main className="flex-1 container py-16 text-center">
-          <h1 className="text-3xl font-bold mb-4">Messages</h1>
-          <p className="text-muted-foreground mb-8">You need to sign in to use direct messages.</p>
-          <Button onClick={() => navigate('/auth')}>Sign in</Button>
+          <h1 className="text-3xl font-bold mb-4">{t('messages.title')}</h1>
+          <p className="text-muted-foreground mb-8">{t('messages.signInPrompt')}</p>
+          <Button onClick={() => navigate('/auth')}>{t('header.login')}</Button>
         </main>
         <Footer />
       </div>
@@ -110,24 +114,24 @@ const Messages = () => {
       <main className="flex-1 container py-8 space-y-6">
         <Button variant="ghost" onClick={() => navigate(-1)} className="mb-2">
           <ArrowLeft className="w-4 h-4 mr-2" />
-          Back
+          {t('common.back')}
         </Button>
 
         <div>
-          <h1 className="text-3xl font-bold">Messages</h1>
-          <p className="text-muted-foreground mt-1">Private conversations with curators and community members.</p>
+          <h1 className="text-3xl font-bold">{t('messages.title')}</h1>
+          <p className="text-muted-foreground mt-1">{t('messages.subtitle')}</p>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 h-[640px]">
           <Card className="p-0 overflow-hidden lg:col-span-1">
             <div className="p-4 border-b border-border">
-              <h2 className="font-semibold">Contacts</h2>
+              <h2 className="font-semibold">{t('messages.contactsTitle')}</h2>
             </div>
             <ScrollArea className="h-[580px]">
               <div className="p-2 space-y-1">
                 {contacts.length === 0 ? (
                   <p className="text-sm text-muted-foreground p-3">
-                    No contacts yet. Follow users to start messaging.
+                    {t('messages.noContacts')}
                   </p>
                 ) : (
                   contacts.map((contact) => {
@@ -145,11 +149,11 @@ const Messages = () => {
                       >
                         <div className="flex items-center gap-3">
                           <Avatar className="h-9 w-9">
-                            <AvatarImage src={contact.avatar_url || undefined} alt={profileName(contact)} />
-                            <AvatarFallback>{profileName(contact).charAt(0).toUpperCase()}</AvatarFallback>
+                            <AvatarImage src={contact.avatar_url || undefined} alt={profileName(contact, unknownUserLabel)} />
+                            <AvatarFallback>{profileName(contact, unknownUserLabel).charAt(0).toUpperCase()}</AvatarFallback>
                           </Avatar>
                           <div className="min-w-0 flex-1">
-                            <p className="text-sm font-medium truncate">{profileName(contact)}</p>
+                            <p className="text-sm font-medium truncate">{profileName(contact, unknownUserLabel)}</p>
                             <p className="text-xs text-muted-foreground truncate">@{contact.username}</p>
                           </div>
                           {inboxItem && inboxItem.unreadCount > 0 && (
@@ -171,11 +175,11 @@ const Messages = () => {
               <>
                 <div className="p-4 border-b border-border flex items-center gap-3">
                   <Avatar className="h-9 w-9">
-                    <AvatarImage src={selectedContact.avatar_url || undefined} alt={profileName(selectedContact)} />
-                    <AvatarFallback>{profileName(selectedContact).charAt(0).toUpperCase()}</AvatarFallback>
+                    <AvatarImage src={selectedContact.avatar_url || undefined} alt={profileName(selectedContact, unknownUserLabel)} />
+                    <AvatarFallback>{profileName(selectedContact, unknownUserLabel).charAt(0).toUpperCase()}</AvatarFallback>
                   </Avatar>
                   <div>
-                    <p className="text-sm font-semibold">{profileName(selectedContact)}</p>
+                    <p className="text-sm font-semibold">{profileName(selectedContact, unknownUserLabel)}</p>
                     <p className="text-xs text-muted-foreground">@{selectedContact.username}</p>
                   </div>
                 </div>
@@ -187,7 +191,7 @@ const Messages = () => {
                     ) : !conversation || conversation.length === 0 ? (
                       <div className="text-center py-8 text-muted-foreground">
                         <MessageCircle className="w-8 h-8 mx-auto mb-2" />
-                        <p>No messages yet. Start the conversation.</p>
+                        <p>{t('messages.emptyConversation')}</p>
                       </div>
                     ) : (
                       conversation.map((message) => {
@@ -218,7 +222,7 @@ const Messages = () => {
                   <Input
                     value={draft}
                     onChange={(event) => setDraft(event.target.value)}
-                    placeholder="Type a message..."
+                    placeholder={t('messages.composePlaceholder')}
                     onKeyDown={(event) => {
                       if (event.key === 'Enter' && !event.shiftKey) {
                         event.preventDefault();
@@ -228,15 +232,15 @@ const Messages = () => {
                   />
                   <Button onClick={handleSend} disabled={!draft.trim() || sendMessageMutation.isPending}>
                     <Send className="h-4 w-4 mr-2" />
-                    Send
+                    {t('messages.send')}
                   </Button>
                 </div>
               </>
             ) : (
               <div className="h-full flex flex-col items-center justify-center text-muted-foreground p-8 text-center">
                 <MessageCircle className="w-10 h-10 mb-3" />
-                <p className="font-medium mb-1">Select a contact</p>
-                <p className="text-sm">Choose someone from your contacts to start messaging.</p>
+                <p className="font-medium mb-1">{t('messages.selectContactTitle')}</p>
+                <p className="text-sm">{t('messages.selectContactDescription')}</p>
               </div>
             )}
           </Card>

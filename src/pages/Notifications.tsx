@@ -13,6 +13,7 @@ import {
   useMarkNotificationAsRead,
   useNotifications,
 } from '@/features/notifications';
+import { useTranslation } from 'react-i18next';
 
 const formatWhen = (isoDate: string) => {
   const date = new Date(isoDate);
@@ -41,6 +42,7 @@ const getNotificationIcon = (type: string) => {
 };
 
 const Notifications = () => {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const { user, loading } = useAuth();
   const { data: notifications, isLoading } = useNotifications(100);
@@ -67,9 +69,9 @@ const Notifications = () => {
       <div className="min-h-screen flex flex-col">
         <Header />
         <main className="flex-1 container py-16 text-center">
-          <h1 className="text-3xl font-bold mb-4">Notifications</h1>
-          <p className="text-muted-foreground mb-8">You need to sign in to view notifications.</p>
-          <Button onClick={() => navigate('/auth')}>Sign in</Button>
+          <h1 className="text-3xl font-bold mb-4">{t('notifications.title')}</h1>
+          <p className="text-muted-foreground mb-8">{t('notifications.signInPrompt')}</p>
+          <Button onClick={() => navigate('/auth')}>{t('header.login')}</Button>
         </main>
         <Footer />
       </div>
@@ -84,14 +86,14 @@ const Notifications = () => {
       <main className="flex-1 container py-8 space-y-6">
         <Button variant="ghost" onClick={() => navigate(-1)} className="mb-2">
           <ArrowLeft className="w-4 h-4 mr-2" />
-          Back
+          {t('common.back')}
         </Button>
 
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
-            <h1 className="text-3xl font-bold">Notifications</h1>
+            <h1 className="text-3xl font-bold">{t('notifications.title')}</h1>
             <p className="text-muted-foreground mt-1">
-              {unreadCount} unread {unreadCount === 1 ? 'notification' : 'notifications'}
+              {t('notifications.unreadCount', { count: unreadCount })}
             </p>
           </div>
           <Button
@@ -101,15 +103,15 @@ const Notifications = () => {
             onClick={() => markAllAsRead.mutate()}
           >
             <CheckCheck className="h-4 w-4" />
-            Mark all as read
+            {t('notifications.markAllRead')}
           </Button>
         </div>
 
         {!notifications || notifications.length === 0 ? (
           <Card className="p-10 text-center">
             <Bell className="h-10 w-10 text-muted-foreground mx-auto mb-4" />
-            <h2 className="text-lg font-semibold mb-2">No notifications yet</h2>
-            <p className="text-muted-foreground">When someone follows you or sends a message, it will show up here.</p>
+            <h2 className="text-lg font-semibold mb-2">{t('notifications.emptyTitle')}</h2>
+            <p className="text-muted-foreground">{t('notifications.emptyDescription')}</p>
           </Card>
         ) : (
           <div className="space-y-3">
@@ -129,10 +131,14 @@ const Notifications = () => {
                     <div className="min-w-0">
                       <div className="flex items-center gap-2 mb-1">
                         {getNotificationIcon(notification.type)}
-                        <h3 className="font-semibold text-sm">{notification.title}</h3>
-                        {!notification.is_read && <Badge variant="secondary">New</Badge>}
+                        <h3 className="font-semibold text-sm">
+                          {notification.title || t('notifications.defaultTitle')}
+                        </h3>
+                        {!notification.is_read && <Badge variant="secondary">{t('notifications.newBadge')}</Badge>}
                       </div>
-                      <p className="text-sm text-muted-foreground break-words">{notification.message}</p>
+                      <p className="text-sm text-muted-foreground break-words">
+                        {notification.message || t('notifications.defaultMessage')}
+                      </p>
                       <p className="text-xs text-muted-foreground mt-2">{formatWhen(notification.created_at)}</p>
                     </div>
                   </div>
@@ -143,7 +149,7 @@ const Notifications = () => {
                       size="sm"
                       onClick={() => markOneAsRead.mutate(notification.id)}
                     >
-                      Mark read
+                      {t('notifications.markRead')}
                     </Button>
                   )}
                 </div>

@@ -141,7 +141,7 @@ export const MobileNav: React.FC<MobileNavProps> = ({
                     onClick={onClose}
                   >
                     <Bell className="h-5 w-5" />
-                    <span className="text-sm">Notifications</span>
+                    <span className="text-sm">{t('header.notifications')}</span>
                   </NavLink>
                   <NavLink
                     to="/messages"
@@ -150,7 +150,7 @@ export const MobileNav: React.FC<MobileNavProps> = ({
                     onClick={onClose}
                   >
                     <MessageCircle className="h-5 w-5" />
-                    <span className="text-sm">Messages</span>
+                    <span className="text-sm">{t('header.messages')}</span>
                   </NavLink>
                 <NavLink
                   to="/account/settings"

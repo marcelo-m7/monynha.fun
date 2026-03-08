@@ -181,11 +181,11 @@ export const Header = () => {
                   <DropdownMenuSeparator />
                     <DropdownMenuItem onClick={() => navigate('/notifications')} className="rounded-lg">
                       <Bell className="mr-2 h-4 w-4" />
-                      <span>Notifications</span>
+                      <span>{t('header.notifications')}</span>
                     </DropdownMenuItem>
                     <DropdownMenuItem onClick={() => navigate('/messages')} className="rounded-lg">
                       <MessageCircle className="mr-2 h-4 w-4" />
-                      <span>Messages</span>
+                      <span>{t('header.messages')}</span>
                     </DropdownMenuItem>
                     <DropdownMenuSeparator />
                   <DropdownMenuItem onClick={handleSignOut} className="rounded-lg text-destructive focus:text-destructive focus:bg-destructive/5">
