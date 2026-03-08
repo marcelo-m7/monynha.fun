@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { render, screen, waitFor } from '@testing-library/react';
+import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { LazyImage } from './LazyImage';
 
 describe('LazyImage Component', () => {
@@ -87,7 +87,7 @@ describe('LazyImage Component', () => {
       // Simulate image load by finding and triggering load event
       const img = screen.queryByRole('img');
       if (img) {
-        img.dispatchEvent(new Event('load'));
+        fireEvent.load(img);
         await waitFor(() => {
           expect(onLoadComplete).toHaveBeenCalled();
         });
@@ -107,7 +107,7 @@ describe('LazyImage Component', () => {
       );
 
       if (image) {
-        image.dispatchEvent(new Event('load'));
+        fireEvent.load(image);
         await waitFor(() => {
           expect(image).toHaveClass('opacity-100');
         });
@@ -128,7 +128,7 @@ describe('LazyImage Component', () => {
 
       const img = screen.queryByRole('img');
       if (img) {
-        img.dispatchEvent(new Event('error'));
+        fireEvent.error(img);
         await waitFor(() => {
           expect(onErrorOccurred).toHaveBeenCalled();
         });
@@ -148,7 +148,7 @@ describe('LazyImage Component', () => {
       );
 
       if (img) {
-        img.dispatchEvent(new Event('error'));
+        fireEvent.error(img);
         await waitFor(() => {
           const errorDiv = container.querySelector('.text-muted-foreground');
           if (errorDiv) {
@@ -172,7 +172,7 @@ describe('LazyImage Component', () => {
       );
 
       if (img) {
-        img.dispatchEvent(new Event('error'));
+        fireEvent.error(img);
         // Fallback loading would be triggered
         rerender(
           <LazyImage

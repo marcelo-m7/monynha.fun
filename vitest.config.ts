@@ -1,4 +1,4 @@
-import { defineConfig } from 'vitest/config';
+import { defineConfig, configDefaults } from 'vitest/config';
 import react from '@vitejs/plugin-react-swc';
 import path from 'path';
 
@@ -13,6 +13,6 @@ export default defineConfig({
     environment: 'jsdom',
     globals: true,
     setupFiles: ['src/shared/test/setup.ts'],
-    exclude: ['supabase/functions/**/*.test.ts'],
+    exclude: [...configDefaults.exclude, 'supabase/functions/**/*.test.ts'],
   },
 });

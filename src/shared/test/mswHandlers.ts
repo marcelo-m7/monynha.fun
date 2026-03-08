@@ -10,6 +10,14 @@ export const handlers = [
     return new HttpResponse(null, { status: 404 });
   }),
 
+  http.post(/https:\/\/.*\.supabase\.co\/rest\/v1\/rpc\/get_unread_notifications_count_secure/, () => {
+    return HttpResponse.json(0, { status: 200 });
+  }),
+
+  http.post(/https:\/\/.*\.supabase\.co\/rest\/v1\/rpc\/get_unread_messages_count_secure/, () => {
+    return HttpResponse.json(0, { status: 200 });
+  }),
+
   /**
    * Mock OpenAI API response for testing
    * Used in unit tests for AI enrichment features
