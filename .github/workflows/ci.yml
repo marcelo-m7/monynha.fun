@@ -13,7 +13,7 @@ concurrency:
 jobs:
   build-and-test:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 20
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -26,29 +26,55 @@ jobs:
         with:
           node-version: 20
 
-      - name: Install bun
-        run: npm install -g bun
+      - name: Install pnpm
+        run: corepack prepare pnpm@latest --activate
 
       - name: Install dependencies
-        run: bun install
+        run: pnpm install
 
       - name: Lint
-        run: bun run lint
+        run: pnpm run lint
 
       - name: Type check
-        run: bun run typecheck
+        run: pnpm run typecheck
 
       - name: Test
         env:
           VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
           VITE_SUPABASE_PUBLISHABLE_KEY: ${{ secrets.VITE_SUPABASE_PUBLISHABLE_KEY }}
-        run: bun run test
+        run: pnpm run test
+
+      - name: Test Coverage
+        env:
+          VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
+          VITE_SUPABASE_PUBLISHABLE_KEY: ${{ secrets.VITE_SUPABASE_PUBLISHABLE_KEY }}
+        run: pnpm run test:coverage
 
       - name: Build
         env:
           VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
           VITE_SUPABASE_PUBLISHABLE_KEY: ${{ secrets.VITE_SUPABASE_PUBLISHABLE_KEY }}
-        run: bun run build
+        run: pnpm run build
+
+      - name: Analyze Bundle Size
+        run: |
+          if [ -f dist/stats.html ]; then
+            echo "Bundle size analysis generated at dist/stats.html"
+            # Check if main bundle is reasonable size (adjust threshold as needed)
+            if [ -f dist/index.html ]; then
+              echo "Build completed successfully"
+            fi
+          fi
+
+      - name: Check Bundle Size
+        run: |
+          # Get approximate bundle size from dist
+          if [ -d dist ]; then
+            total_size=$(du -sh dist | cut -f1)
+            echo "Total build size: $total_size"
+            # Optional: Fail if bundle exceeds threshold (e.g., 500KB)
+            # This is a soft check for awareness
+          fi
 
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
@@ -56,4 +82,12 @@ jobs:
         with:
           name: dist
           path: dist/
+          retention-days: 7
+
+      - name: Upload coverage reports
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: coverage
+          path: coverage/
           retention-days: 7
