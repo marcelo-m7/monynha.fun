@@ -4,12 +4,15 @@ import type { VideoWithCategory } from "@/entities/video/video.types";
 import { formatDuration, formatViewCount } from "@/shared/lib/format";
 import { Play, Eye } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { useTranslation } from 'react-i18next';
 import { useVideoViewIncrement } from '@/shared/hooks/useVideoViewIncrement';
 import { KeyboardEvent } from "react";
 import { LazyImage } from "@/shared/components/LazyImage";
+import { SemanticTagBadge } from "./SemanticTagBadge";
+import { EnrichmentIndicator } from "./EnrichmentIndicator";
 
 interface VideoCardProps {
   video: VideoWithCategory;
@@ -72,6 +75,13 @@ export const VideoCard = ({ video, onClick, variant = 'default' }: VideoCardProp
           </div>
         )}
 
+          {/* Enrichment indicator */}
+          {video.enrichment && variant === 'default' && (
+            <div className="absolute right-2 top-2 z-10">
+              <EnrichmentIndicator size="sm" />
+            </div>
+          )}
+
         {/* Overlay on hover */}
         <div className="absolute inset-0 bg-foreground/0 group-hover:bg-foreground/15 transition-colors duration-300 flex items-center justify-center">
           <div className={cn(
@@ -109,12 +119,24 @@ export const VideoCard = ({ video, onClick, variant = 'default' }: VideoCardProp
         "flex flex-col",
         variant === 'default' ? "flex-1 space-y-3 p-4" : "flex-1 space-y-1"
       )}>
-        <h3 className={cn(
-          "font-semibold leading-snug line-clamp-2 group-hover:text-primary transition-colors uppercase tracking-[0.05em]",
-          variant === 'default' ? "text-sm" : "text-xs"
-        )}>
-          {video.title}
-        </h3>
+          <TooltipProvider>
+            <Tooltip delayDuration={300}>
+              <TooltipTrigger asChild>
+                <h3 className={cn(
+                  "font-semibold leading-snug line-clamp-2 group-hover:text-primary transition-colors uppercase tracking-[0.05em]",
+                  variant === 'default' ? "text-sm" : "text-xs"
+                )}>
+                  {video.title}
+                </h3>
+              </TooltipTrigger>
+              {video.enrichment?.optimized_title && video.enrichment.optimized_title !== video.title && (
+                <TooltipContent side="top" className="max-w-xs">
+                  <p className="text-xs font-semibold mb-1">AI-Optimized Title:</p>
+                  <p className="text-sm">{video.enrichment.optimized_title}</p>
+                </TooltipContent>
+              )}
+            </Tooltip>
+          </TooltipProvider>
         
         <p className={cn(
           "text-muted-foreground line-clamp-1",
@@ -122,6 +144,15 @@ export const VideoCard = ({ video, onClick, variant = 'default' }: VideoCardProp
         )}>
           {video.channel_name}
         </p>
+
+          {/* Semantic tags - only show on default variant and mobile hidden */}
+          {variant === 'default' && video.enrichment?.semantic_tags && video.enrichment.semantic_tags.length > 0 && (
+            <div className="flex flex-wrap gap-1.5 hidden sm:flex">
+              {video.enrichment.semantic_tags.slice(0, 3).map((tag, index) => (
+                <SemanticTagBadge key={`${tag}-${index}`} tag={tag} />
+              ))}
+            </div>
+          )}
 
         <div className={cn(
           "flex min-h-[24px] items-center justify-between text-xs text-muted-foreground",
