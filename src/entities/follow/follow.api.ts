@@ -1,72 +1,87 @@
 import { supabase } from '@/shared/api/supabase/supabaseClient';
-import type { Follow, FollowWithProfile, FollowStats } from './follow.types';
+import type { FollowListItem, FollowStats } from './follow.types';
 
-export async function listFollowers(userId: string) {
-  const { data, error } = await supabase
-    .from('user_follows')
-    .select('*, follower:profiles!user_follows_follower_id_fkey(id, username, display_name, avatar_url)')
-    .eq('following_id', userId)
-    .order('created_at', { ascending: false });
+type FollowersRpcRow = {
+  follower_username: string | null;
+  follower_display_name: string | null;
+  follower_avatar_url: string | null;
+  followed_at: string;
+};
+
+type FollowingRpcRow = {
+  following_username: string | null;
+  following_display_name: string | null;
+  following_avatar_url: string | null;
+  followed_at: string;
+};
+
+export async function listFollowers(username: string) {
+  const { data, error } = await supabase.rpc('list_followers_by_username_secure', {
+    p_target_username: username,
+  });
 
   if (error) throw error;
-  return data as FollowWithProfile[];
+
+  return ((data ?? []) as FollowersRpcRow[]).map((row) => ({
+    username: row.follower_username ?? '',
+    display_name: row.follower_display_name,
+    avatar_url: row.follower_avatar_url,
+    followed_at: row.followed_at,
+  })) as FollowListItem[];
 }
 
-export async function listFollowing(userId: string) {
-  const { data, error } = await supabase
-    .from('user_follows')
-    .select('*, following:profiles!user_follows_following_id_fkey(id, username, display_name, avatar_url)')
-    .eq('follower_id', userId)
-    .order('created_at', { ascending: false });
+export async function listFollowing(username: string) {
+  const { data, error } = await supabase.rpc('list_following_by_username_secure', {
+    p_target_username: username,
+  });
 
   if (error) throw error;
-  return data as FollowWithProfile[];
+
+  return ((data ?? []) as FollowingRpcRow[]).map((row) => ({
+    username: row.following_username ?? '',
+    display_name: row.following_display_name,
+    avatar_url: row.following_avatar_url,
+    followed_at: row.followed_at,
+  })) as FollowListItem[];
 }
 
-export async function isFollowing(followerId: string, followingId: string) {
-  const { data, error } = await supabase
-    .from('user_follows')
-    .select('id')
-    .eq('follower_id', followerId)
-    .eq('following_id', followingId)
-    .maybeSingle();
+export async function isFollowing(targetUsername: string) {
+  const { data, error } = await supabase.rpc('is_following_by_username_secure', {
+    p_target_username: targetUsername,
+  });
 
   if (error) throw error;
   return Boolean(data);
 }
 
-export async function followUser(followerId: string, followingId: string) {
-  const { data, error } = await supabase
-    .from('user_follows')
-    .insert({ follower_id: followerId, following_id: followingId })
-    .select()
-    .single();
+export async function followUser(targetUsername: string) {
+  const { data, error } = await supabase.rpc('follow_by_username_secure', {
+    p_target_username: targetUsername,
+  });
 
   if (error) throw error;
-  return data as Follow;
+  return data as string | null;
 }
 
-export async function unfollowUser(followerId: string, followingId: string) {
-  const { error } = await supabase
-    .from('user_follows')
-    .delete()
-    .eq('follower_id', followerId)
-    .eq('following_id', followingId);
+export async function unfollowUser(targetUsername: string) {
+  const { data, error } = await supabase.rpc('unfollow_by_username_secure', {
+    p_target_username: targetUsername,
+  });
 
   if (error) throw error;
+  return data ?? 0;
 }
 
-export async function getFollowStats(userId: string): Promise<FollowStats> {
-  const [followersResult, followingResult] = await Promise.all([
-    supabase.from('user_follows').select('*', { count: 'exact', head: true }).eq('following_id', userId),
-    supabase.from('user_follows').select('*', { count: 'exact', head: true }).eq('follower_id', userId),
-  ]);
+export async function getFollowStats(username: string): Promise<FollowStats> {
+  const { data, error } = await supabase.rpc('get_follow_stats_by_username_secure', {
+    p_target_username: username,
+  });
 
-  if (followersResult.error) throw followersResult.error;
-  if (followingResult.error) throw followingResult.error;
+  if (error) throw error;
 
+  const stats = (data ?? [])[0];
   return {
-    followersCount: followersResult.count || 0,
-    followingCount: followingResult.count || 0,
+    followersCount: stats?.followers_count ?? 0,
+    followingCount: stats?.following_count ?? 0,
   };
 }

@@ -14,10 +14,10 @@ export function useNotifications(limit = 50) {
   const { user } = useAuth();
 
   return useQuery<NotificationWithActor[], Error>({
-    queryKey: user?.id ? notificationKeys.list(user.id, limit) : notificationKeys.list('', limit),
+    queryKey: notificationKeys.list(limit),
     queryFn: async () => {
       if (!user?.id) return [];
-      return listNotifications(user.id, limit);
+      return listNotifications(limit);
     },
     enabled: !!user?.id,
     refetchInterval: 15000,
@@ -28,10 +28,10 @@ export function useUnreadNotificationsCount() {
   const { user } = useAuth();
 
   return useQuery<number, Error>({
-    queryKey: user?.id ? notificationKeys.unreadCount(user.id) : notificationKeys.unreadCount(''),
+    queryKey: notificationKeys.unreadCount(),
     queryFn: async () => {
       if (!user?.id) return 0;
-      return getUnreadNotificationsCount(user.id);
+      return getUnreadNotificationsCount();
     },
     enabled: !!user?.id,
     refetchInterval: 15000,
@@ -46,8 +46,7 @@ export function useMarkNotificationAsRead() {
     mutationFn: (notificationId: string) => markNotificationAsRead(notificationId),
     onSuccess: () => {
       if (!user?.id) return;
-      queryClient.invalidateQueries({ queryKey: notificationKeys.list(user.id) });
-      queryClient.invalidateQueries({ queryKey: notificationKeys.unreadCount(user.id) });
+      queryClient.invalidateQueries({ queryKey: notificationKeys.all });
     },
   });
 }
@@ -59,12 +58,11 @@ export function useMarkAllNotificationsAsRead() {
   return useMutation({
     mutationFn: async () => {
       if (!user?.id) throw new Error('You must be logged in to update notifications.');
-      return markAllNotificationsAsRead(user.id);
+      return markAllNotificationsAsRead();
     },
     onSuccess: () => {
       if (!user?.id) return;
-      queryClient.invalidateQueries({ queryKey: notificationKeys.list(user.id) });
-      queryClient.invalidateQueries({ queryKey: notificationKeys.unreadCount(user.id) });
+      queryClient.invalidateQueries({ queryKey: notificationKeys.all });
       toast.success('All notifications marked as read.');
     },
     onError: (error: Error) => {

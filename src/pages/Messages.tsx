@@ -16,7 +16,7 @@ import {
   useMarkConversationAsRead,
   useSendMessage,
 } from '@/features/messages';
-import { useFollowers, useFollowing } from '@/features/follows';
+import { useProfileByUsername } from '@/features/profile/queries/useProfile';
 import type { MessageProfile } from '@/entities/direct_message/direct_message.types';
 
 const formatWhen = (isoDate: string) => {
@@ -29,16 +29,15 @@ const profileName = (profile: MessageProfile) => profile.display_name || profile
 const Messages = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const preselectedUserId = searchParams.get('user') || undefined;
+  const preselectedUsername = searchParams.get('user') || undefined;
 
   const { user, loading } = useAuth();
-  const [selectedUserId, setSelectedUserId] = useState<string | undefined>(preselectedUserId);
+  const [selectedUsername, setSelectedUsername] = useState<string | undefined>(preselectedUsername);
   const [draft, setDraft] = useState('');
 
   const { data: inbox, isLoading: inboxLoading } = useInboxConversations();
-  const { data: followers } = useFollowers(user?.id);
-  const { data: following } = useFollowing(user?.id);
-  const { data: conversation, isLoading: conversationLoading } = useConversation(selectedUserId);
+  const { data: preselectedProfile } = useProfileByUsername(preselectedUsername);
+  const { data: conversation, isLoading: conversationLoading } = useConversation(selectedUsername);
 
   const sendMessageMutation = useSendMessage();
   const markReadMutation = useMarkConversationAsRead();
@@ -46,33 +45,35 @@ const Messages = () => {
   const contacts = useMemo(() => {
     const map = new Map<string, MessageProfile>();
 
-    inbox?.forEach((item) => map.set(item.partner.id, item.partner));
-    followers?.forEach((item) => {
-      if (item.follower) map.set(item.follower.id, item.follower);
-    });
-    following?.forEach((item) => {
-      if (item.following) map.set(item.following.id, item.following);
-    });
+    inbox?.forEach((item) => map.set(item.partner.username, item.partner));
+
+    if (preselectedProfile?.username) {
+      map.set(preselectedProfile.username, {
+        username: preselectedProfile.username,
+        display_name: preselectedProfile.display_name,
+        avatar_url: preselectedProfile.avatar_url,
+      });
+    }
 
     return [...map.values()];
-  }, [inbox, followers, following]);
+  }, [inbox, preselectedProfile]);
 
   useEffect(() => {
-    if (!selectedUserId && contacts.length > 0) {
-      setSelectedUserId(contacts[0].id);
+    if (!selectedUsername && contacts.length > 0) {
+      setSelectedUsername(contacts[0].username);
     }
-  }, [contacts, selectedUserId]);
+  }, [contacts, selectedUsername]);
 
   useEffect(() => {
-    if (!selectedUserId || !conversation || conversation.length === 0) return;
-    markReadMutation.mutate({ otherUserId: selectedUserId });
-  }, [selectedUserId, conversation, markReadMutation]);
+    if (!selectedUsername || !conversation || conversation.length === 0) return;
+    markReadMutation.mutate({ otherUsername: selectedUsername });
+  }, [selectedUsername, conversation, markReadMutation]);
 
-  const selectedContact = contacts.find((contact) => contact.id === selectedUserId);
+  const selectedContact = contacts.find((contact) => contact.username === selectedUsername);
 
   const handleSend = async () => {
-    if (!selectedUserId || !draft.trim()) return;
-    await sendMessageMutation.mutateAsync({ receiverId: selectedUserId, content: draft });
+    if (!selectedUsername || !draft.trim()) return;
+    await sendMessageMutation.mutateAsync({ receiverUsername: selectedUsername, content: draft });
     setDraft('');
   };
 
@@ -130,14 +131,14 @@ const Messages = () => {
                   </p>
                 ) : (
                   contacts.map((contact) => {
-                    const inboxItem = inbox?.find((item) => item.partner.id === contact.id);
-                    const isActive = selectedUserId === contact.id;
+                    const inboxItem = inbox?.find((item) => item.partner.username === contact.username);
+                    const isActive = selectedUsername === contact.username;
 
                     return (
                       <button
-                        key={contact.id}
+                        key={contact.username}
                         type="button"
-                        onClick={() => setSelectedUserId(contact.id)}
+                        onClick={() => setSelectedUsername(contact.username)}
                         className={`w-full text-left p-3 rounded-lg transition-colors ${
                           isActive ? 'bg-primary/10 border border-primary/30' : 'hover:bg-muted/50 border border-transparent'
                         }`}
@@ -190,7 +191,7 @@ const Messages = () => {
                       </div>
                     ) : (
                       conversation.map((message) => {
-                        const isMine = message.sender_id === user.id;
+                        const isMine = message.is_mine;
 
                         return (
                           <div key={message.id} className={`flex ${isMine ? 'justify-end' : 'justify-start'}`}>

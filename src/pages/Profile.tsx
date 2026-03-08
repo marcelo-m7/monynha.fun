@@ -25,8 +25,8 @@ const Profile = () => {
 
   const { data: profile, isLoading: profileLoading, isError: profileError } = useProfileByUsername(username);
   const isCurrentUser = authUser && profile && authUser.id === profile.id;
-  const { data: followStats } = useFollowStats(profile?.id);
-  const { data: isFollowing = false } = useFollowStatus(profile?.id);
+  const { data: followStats } = useFollowStats(profile?.username);
+  const { data: isFollowing = false } = useFollowStatus(profile?.username);
   const followMutation = useFollowUser();
   const unfollowMutation = useUnfollowUser();
   const { data: userVideos, isLoading: videosLoading } = useVideos({
@@ -41,7 +41,7 @@ const Profile = () => {
   const { data: socialAccounts, isLoading: socialAccountsLoading } = useUserSocialAccounts(profile?.id); // Fetch social accounts
 
   const handleFollowToggle = async () => {
-    if (!profile?.id) return;
+    if (!profile?.username) return;
 
     if (!authUser) {
       navigate('/auth');
@@ -49,11 +49,11 @@ const Profile = () => {
     }
 
     if (isFollowing) {
-      await unfollowMutation.mutateAsync(profile.id);
+      await unfollowMutation.mutateAsync(profile.username);
       return;
     }
 
-    await followMutation.mutateAsync(profile.id);
+    await followMutation.mutateAsync(profile.username);
   };
 
   // Set dynamic meta tags for social media sharing
@@ -171,7 +171,7 @@ const Profile = () => {
                   {isFollowing ? 'Following' : 'Follow'}
                 </Button>
                 <Button
-                  onClick={() => navigate(`/messages?user=${profile.id}`)}
+                  onClick={() => navigate(`/messages?user=${profile.username}`)}
                   variant="secondary"
                   className="gap-2"
                 >

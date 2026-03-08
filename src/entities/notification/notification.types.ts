@@ -1,12 +1,18 @@
-import type { Database } from '@/integrations/supabase/types';
-import type { Profile } from '@/entities/profile/profile.types';
+export interface NotificationActor {
+  username: string | null;
+  display_name: string | null;
+  avatar_url: string | null;
+}
 
-export type Notification = Database['public']['Tables']['notifications']['Row'];
-export type NotificationInsert = Database['public']['Tables']['notifications']['Insert'];
-export type NotificationUpdate = Database['public']['Tables']['notifications']['Update'];
-
-export type NotificationActor = Pick<Profile, 'id' | 'username' | 'display_name' | 'avatar_url'>;
-
-export interface NotificationWithActor extends Notification {
+export interface NotificationWithActor {
+  id: string;
+  type: string;
+  title: string | null;
+  message: string | null;
+  entity_type: string | null;
+  entity_id: string | null;
+  is_read: boolean;
+  created_at: string;
+  read_at: string | null;
   actor?: NotificationActor | null;
 }

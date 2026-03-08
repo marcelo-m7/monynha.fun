@@ -1,8 +1,7 @@
 export const followKeys = {
   all: ['follows'] as const,
-  followers: (userId: string) => [...followKeys.all, 'followers', userId] as const,
-  following: (userId: string) => [...followKeys.all, 'following', userId] as const,
-  status: (followerId: string, followingId: string) =>
-    [...followKeys.all, 'status', followerId, followingId] as const,
-  stats: (userId: string) => [...followKeys.all, 'stats', userId] as const,
+  followers: (username: string) => [...followKeys.all, 'followers', username] as const,
+  following: (username: string) => [...followKeys.all, 'following', username] as const,
+  status: (targetUsername: string) => [...followKeys.all, 'status', targetUsername] as const,
+  stats: (username: string) => [...followKeys.all, 'stats', username] as const,
 };

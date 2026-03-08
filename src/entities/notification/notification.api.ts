@@ -1,47 +1,67 @@
 import { supabase } from '@/shared/api/supabase/supabaseClient';
-import type { Notification, NotificationWithActor } from './notification.types';
+import type { NotificationWithActor } from './notification.types';
 
-export async function listNotifications(userId: string, limit = 50) {
-  const { data, error } = await supabase
-    .from('notifications')
-    .select('*, actor:profiles!notifications_actor_id_fkey(id, username, display_name, avatar_url)')
-    .eq('user_id', userId)
-    .order('created_at', { ascending: false })
-    .limit(limit);
+type NotificationRpcRow = {
+  id: string;
+  type: string;
+  title: string | null;
+  message: string | null;
+  entity_type: string | null;
+  entity_id: string | null;
+  is_read: boolean;
+  created_at: string;
+  read_at: string | null;
+  actor_username: string | null;
+  actor_display_name: string | null;
+  actor_avatar_url: string | null;
+};
+
+export async function listNotifications(limit = 50) {
+  const { data, error } = await supabase.rpc('list_notifications_secure', {
+    p_limit: limit,
+  });
 
   if (error) throw error;
-  return data as NotificationWithActor[];
+
+  return ((data ?? []) as NotificationRpcRow[]).map((row) => ({
+    id: row.id,
+    type: row.type,
+    title: row.title,
+    message: row.message,
+    entity_type: row.entity_type,
+    entity_id: row.entity_id,
+    is_read: row.is_read,
+    created_at: row.created_at,
+    read_at: row.read_at,
+    actor: row.actor_username || row.actor_display_name || row.actor_avatar_url
+      ? {
+          username: row.actor_username,
+          display_name: row.actor_display_name,
+          avatar_url: row.actor_avatar_url,
+        }
+      : null,
+  })) as NotificationWithActor[];
 }
 
-export async function getUnreadNotificationsCount(userId: string) {
-  const { count, error } = await supabase
-    .from('notifications')
-    .select('*', { count: 'exact', head: true })
-    .eq('user_id', userId)
-    .eq('is_read', false);
+export async function getUnreadNotificationsCount() {
+  const { data, error } = await supabase.rpc('get_unread_notifications_count_secure');
 
   if (error) throw error;
-  return count || 0;
+  return data ?? 0;
 }
 
 export async function markNotificationAsRead(notificationId: string) {
-  const { data, error } = await supabase
-    .from('notifications')
-    .update({ is_read: true, read_at: new Date().toISOString() })
-    .eq('id', notificationId)
-    .select()
-    .single();
+  const { data, error } = await supabase.rpc('mark_notification_as_read_secure', {
+    p_notification_id: notificationId,
+  });
 
   if (error) throw error;
-  return data as Notification;
+  return Boolean(data);
 }
 
-export async function markAllNotificationsAsRead(userId: string) {
-  const { error } = await supabase
-    .from('notifications')
-    .update({ is_read: true, read_at: new Date().toISOString() })
-    .eq('user_id', userId)
-    .eq('is_read', false);
+export async function markAllNotificationsAsRead() {
+  const { data, error } = await supabase.rpc('mark_all_notifications_as_read_secure');
 
   if (error) throw error;
+  return data ?? 0;
 }

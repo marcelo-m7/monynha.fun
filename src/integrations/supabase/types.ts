@@ -679,12 +679,100 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+        follow_by_username_secure: {
+          Args: { p_target_username: string }
+          Returns: string
+        }
+        get_follow_stats_by_username_secure: {
+          Args: { p_target_username: string }
+          Returns: {
+            followers_count: number
+            following_count: number
+          }[]
+        }
+        get_conversation_by_username_secure: {
+          Args: { p_other_username: string }
+          Returns: {
+            content: string
+            created_at: string
+            id: string
+            is_mine: boolean
+            is_read: boolean
+            receiver_avatar_url: string | null
+            receiver_display_name: string | null
+            receiver_username: string | null
+            sender_avatar_url: string | null
+            sender_display_name: string | null
+            sender_username: string | null
+          }[]
+        }
+        get_unread_notifications_count_secure: {
+          Args: Record<PropertyKey, never>
+          Returns: number
+        }
+        get_unread_messages_count_secure: {
+          Args: Record<PropertyKey, never>
+          Returns: number
+        }
+        is_following_by_username_secure: {
+          Args: { p_target_username: string }
+          Returns: boolean
+        }
       increment_video_view_count:
         | { Args: { p_video_id: string }; Returns: number }
         | {
             Args: { p_session_id?: string; p_video_id: string }
             Returns: number
           }
+        list_followers_by_username_secure: {
+          Args: { p_target_username: string }
+          Returns: {
+            follower_avatar_url: string | null
+            follower_display_name: string | null
+            follower_username: string | null
+            followed_at: string
+          }[]
+        }
+        list_following_by_username_secure: {
+          Args: { p_target_username: string }
+          Returns: {
+            followed_at: string
+            following_avatar_url: string | null
+            following_display_name: string | null
+            following_username: string | null
+          }[]
+        }
+        list_inbox_conversations_secure: {
+          Args: Record<PropertyKey, never>
+          Returns: {
+            last_message_content: string
+            last_message_created_at: string
+            last_message_id: string
+            last_message_is_read: boolean
+            last_message_sender_username: string | null
+            partner_avatar_url: string | null
+            partner_display_name: string | null
+            partner_username: string | null
+            unread_count: number
+          }[]
+        }
+        list_notifications_secure: {
+          Args: { p_limit?: number }
+          Returns: {
+            actor_avatar_url: string | null
+            actor_display_name: string | null
+            actor_username: string | null
+            created_at: string
+            entity_id: string | null
+            entity_type: string | null
+            id: string
+            is_read: boolean
+            message: string | null
+            read_at: string | null
+            title: string | null
+            type: string
+          }[]
+        }
       list_featured_videos: {
         Args: { p_limit?: number; p_offset?: number }
         Returns: {
@@ -712,12 +800,40 @@ export type Database = {
         Args: { p_limit?: number }
         Returns: number
       }
+      mark_all_notifications_as_read_secure: {
+        Args: Record<PropertyKey, never>
+        Returns: number
+      }
+      mark_conversation_as_read_by_username_secure: {
+        Args: { p_other_username: string }
+        Returns: number
+      }
+      mark_notification_as_read_secure: {
+        Args: { p_notification_id: string }
+        Returns: boolean
+      }
       playlist_accessible_to_user:
         | { Args: { p_playlist_id: string }; Returns: boolean }
         | {
             Args: { p_playlist_id: string; p_user_id: string }
             Returns: boolean
           }
+      send_direct_message_by_username_secure: {
+        Args: { p_content: string; p_receiver_username: string }
+        Returns: {
+          content: string
+          created_at: string
+          id: string
+          is_mine: boolean
+          is_read: boolean
+          receiver_username: string | null
+          sender_username: string | null
+        }[]
+      }
+      unfollow_by_username_secure: {
+        Args: { p_target_username: string }
+        Returns: number
+      }
       update_playlist_derived_fields: {
         Args: { p_playlist_id: string }
         Returns: undefined

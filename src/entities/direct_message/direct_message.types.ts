@@ -1,19 +1,41 @@
-import type { Database } from '@/integrations/supabase/types';
-import type { Profile } from '@/entities/profile/profile.types';
+export interface MessageProfile {
+  username: string;
+  display_name: string | null;
+  avatar_url: string | null;
+}
 
-export type DirectMessage = Database['public']['Tables']['direct_messages']['Row'];
-export type DirectMessageInsert = Database['public']['Tables']['direct_messages']['Insert'];
-export type DirectMessageUpdate = Database['public']['Tables']['direct_messages']['Update'];
+export interface ConversationMessage {
+  id: string;
+  content: string;
+  is_read: boolean;
+  created_at: string;
+  sender_username: string | null;
+  sender_display_name: string | null;
+  sender_avatar_url: string | null;
+  receiver_username: string | null;
+  receiver_display_name: string | null;
+  receiver_avatar_url: string | null;
+  is_mine: boolean;
+}
 
-export type MessageProfile = Pick<Profile, 'id' | 'username' | 'display_name' | 'avatar_url'>;
-
-export interface DirectMessageWithProfiles extends DirectMessage {
-  sender_profile?: MessageProfile | null;
-  receiver_profile?: MessageProfile | null;
+export interface SentMessage {
+  id: string;
+  content: string;
+  is_read: boolean;
+  created_at: string;
+  sender_username: string | null;
+  receiver_username: string | null;
+  is_mine: boolean;
 }
 
 export interface ConversationSummary {
   partner: MessageProfile;
-  lastMessage: DirectMessage;
+  lastMessage: {
+    id: string;
+    content: string;
+    created_at: string;
+    is_read: boolean;
+    sender_username: string | null;
+  };
   unreadCount: number;
 }

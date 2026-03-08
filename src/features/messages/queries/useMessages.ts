@@ -10,9 +10,9 @@ import {
   sendDirectMessage,
 } from '@/entities/direct_message/direct_message.api';
 import type {
+  ConversationMessage,
   ConversationSummary,
-  DirectMessage,
-  DirectMessageWithProfiles,
+  SentMessage,
 } from '@/entities/direct_message/direct_message.types';
 
 export function useInboxConversations() {
@@ -22,26 +22,26 @@ export function useInboxConversations() {
     queryKey: user?.id ? directMessageKeys.inbox(user.id) : directMessageKeys.inbox(''),
     queryFn: async () => {
       if (!user?.id) return [];
-      return listInboxConversations(user.id);
+      return listInboxConversations();
     },
     enabled: !!user?.id,
     refetchInterval: 15000,
   });
 }
 
-export function useConversation(otherUserId: string | undefined) {
+export function useConversation(otherUsername: string | undefined) {
   const { user } = useAuth();
 
-  return useQuery<DirectMessageWithProfiles[], Error>({
+  return useQuery<ConversationMessage[], Error>({
     queryKey:
-      user?.id && otherUserId
-        ? directMessageKeys.conversation(user.id, otherUserId)
+      user?.id && otherUsername
+        ? directMessageKeys.conversation(user.id, otherUsername)
         : directMessageKeys.conversation('', ''),
     queryFn: async () => {
-      if (!user?.id || !otherUserId) return [];
-      return listConversation(user.id, otherUserId);
+      if (!user?.id || !otherUsername) return [];
+      return listConversation(otherUsername);
     },
-    enabled: !!user?.id && !!otherUserId,
+    enabled: !!user?.id && !!otherUsername,
     refetchInterval: 10000,
   });
 }
@@ -53,7 +53,7 @@ export function useUnreadMessagesCount() {
     queryKey: user?.id ? directMessageKeys.unreadCount(user.id) : directMessageKeys.unreadCount(''),
     queryFn: async () => {
       if (!user?.id) return 0;
-      return getUnreadMessagesCount(user.id);
+      return getUnreadMessagesCount();
     },
     enabled: !!user?.id,
     refetchInterval: 15000,
@@ -64,14 +64,14 @@ export function useSendMessage() {
   const { user } = useAuth();
   const queryClient = useQueryClient();
 
-  return useMutation<DirectMessage, Error, { receiverId: string; content: string }>({
-    mutationFn: async ({ receiverId, content }) => {
+  return useMutation<SentMessage, Error, { receiverUsername: string; content: string }>({
+    mutationFn: async ({ receiverUsername, content }) => {
       if (!user?.id) throw new Error('You must be logged in to send a message.');
-      return sendDirectMessage(user.id, receiverId, content);
+      return sendDirectMessage(receiverUsername, content);
     },
     onSuccess: (_, variables) => {
       if (!user?.id) return;
-      queryClient.invalidateQueries({ queryKey: directMessageKeys.conversation(user.id, variables.receiverId) });
+      queryClient.invalidateQueries({ queryKey: directMessageKeys.conversation(user.id, variables.receiverUsername) });
       queryClient.invalidateQueries({ queryKey: directMessageKeys.inbox(user.id) });
       toast.success('Message sent.');
     },
@@ -85,14 +85,14 @@ export function useMarkConversationAsRead() {
   const { user } = useAuth();
   const queryClient = useQueryClient();
 
-  return useMutation<void, Error, { otherUserId: string }>({
-    mutationFn: async ({ otherUserId }) => {
+  return useMutation<void, Error, { otherUsername: string }>({
+    mutationFn: async ({ otherUsername }) => {
       if (!user?.id) throw new Error('You must be logged in to update messages.');
-      return markConversationAsRead(user.id, otherUserId);
+      return markConversationAsRead(otherUsername);
     },
-    onSuccess: (_, { otherUserId }) => {
+    onSuccess: (_, { otherUsername }) => {
       if (!user?.id) return;
-      queryClient.invalidateQueries({ queryKey: directMessageKeys.conversation(user.id, otherUserId) });
+      queryClient.invalidateQueries({ queryKey: directMessageKeys.conversation(user.id, otherUsername) });
       queryClient.invalidateQueries({ queryKey: directMessageKeys.inbox(user.id) });
       queryClient.invalidateQueries({ queryKey: directMessageKeys.unreadCount(user.id) });
     },
