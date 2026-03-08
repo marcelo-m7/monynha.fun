@@ -14,6 +14,8 @@ import { useTranslation } from 'react-i18next';
 import { useAuth } from '@/features/auth/useAuth';
 import { VideoCard } from '@/components/video/VideoCard';
 import { SocialAccountsDisplay } from '@/components/profile/SocialAccountsDisplay'; // Import the new component
+import { useFollowStats, useFollowStatus, useFollowUser, useUnfollowUser } from '@/features/follows';
+import { MessageCircle, UserPlus, UserCheck } from 'lucide-react';
 
 const Profile = () => {
   const { t } = useTranslation();
@@ -23,6 +25,10 @@ const Profile = () => {
 
   const { data: profile, isLoading: profileLoading, isError: profileError } = useProfileByUsername(username);
   const isCurrentUser = authUser && profile && authUser.id === profile.id;
+  const { data: followStats } = useFollowStats(profile?.id);
+  const { data: isFollowing = false } = useFollowStatus(profile?.id);
+  const followMutation = useFollowUser();
+  const unfollowMutation = useUnfollowUser();
   const { data: userVideos, isLoading: videosLoading } = useVideos({
     submittedBy: profile?.id,
     enabled: !!profile?.id,
@@ -33,6 +39,22 @@ const Profile = () => {
     enabled: !!profile?.id,
   });
   const { data: socialAccounts, isLoading: socialAccountsLoading } = useUserSocialAccounts(profile?.id); // Fetch social accounts
+
+  const handleFollowToggle = async () => {
+    if (!profile?.id) return;
+
+    if (!authUser) {
+      navigate('/auth');
+      return;
+    }
+
+    if (isFollowing) {
+      await unfollowMutation.mutateAsync(profile.id);
+      return;
+    }
+
+    await followMutation.mutateAsync(profile.id);
+  };
 
   // Set dynamic meta tags for social media sharing
   useMetaTags({
@@ -113,6 +135,14 @@ const Profile = () => {
               <CalendarDays className="w-4 h-4" />
               <span>{t('profile.joinedOn', { date: new Date(profile.created_at).toLocaleDateString() })}</span>
             </div>
+            <div className="flex items-center justify-center sm:justify-start gap-4 text-sm text-muted-foreground mt-3">
+              <span>
+                <strong className="text-foreground">{followStats?.followersCount ?? 0}</strong> followers
+              </span>
+              <span>
+                <strong className="text-foreground">{followStats?.followingCount ?? 0}</strong> following
+              </span>
+            </div>
             {profile.bio && (
               <p className="text-muted-foreground mt-4 max-w-xl whitespace-pre-wrap">
                 {profile.bio}
@@ -128,6 +158,27 @@ const Profile = () => {
                 <Edit className="w-4 h-4" />
                 {t('profile.editProfile')}
               </Button>
+            )}
+            {!isCurrentUser && (
+              <div className="mt-4 flex flex-wrap gap-2 justify-center sm:justify-start">
+                <Button
+                  onClick={handleFollowToggle}
+                  variant={isFollowing ? 'outline' : 'default'}
+                  className="gap-2"
+                  disabled={followMutation.isPending || unfollowMutation.isPending}
+                >
+                  {isFollowing ? <UserCheck className="w-4 h-4" /> : <UserPlus className="w-4 h-4" />}
+                  {isFollowing ? 'Following' : 'Follow'}
+                </Button>
+                <Button
+                  onClick={() => navigate(`/messages?user=${profile.id}`)}
+                  variant="secondary"
+                  className="gap-2"
+                >
+                  <MessageCircle className="w-4 h-4" />
+                  Message
+                </Button>
+              </div>
             )}
           </div>
         </div>

@@ -402,6 +402,144 @@ export type Database = {
         }
         Relationships: []
       }
+        user_follows: {
+          Row: {
+            created_at: string
+            follower_id: string
+            following_id: string
+            id: string
+          }
+          Insert: {
+            created_at?: string
+            follower_id: string
+            following_id: string
+            id?: string
+          }
+          Update: {
+            created_at?: string
+            follower_id?: string
+            following_id?: string
+            id?: string
+          }
+          Relationships: [
+            {
+              foreignKeyName: "user_follows_follower_id_fkey"
+              columns: ["follower_id"]
+              isOneToOne: false
+              referencedRelation: "profiles"
+              referencedColumns: ["id"]
+            },
+            {
+              foreignKeyName: "user_follows_following_id_fkey"
+              columns: ["following_id"]
+              isOneToOne: false
+              referencedRelation: "profiles"
+              referencedColumns: ["id"]
+            },
+          ]
+        }
+        direct_messages: {
+          Row: {
+            content: string
+            created_at: string
+            id: string
+            is_read: boolean
+            read_at: string | null
+            receiver_id: string
+            sender_id: string
+          }
+          Insert: {
+            content: string
+            created_at?: string
+            id?: string
+            is_read?: boolean
+            read_at?: string | null
+            receiver_id: string
+            sender_id: string
+          }
+          Update: {
+            content?: string
+            created_at?: string
+            id?: string
+            is_read?: boolean
+            read_at?: string | null
+            receiver_id?: string
+            sender_id?: string
+          }
+          Relationships: [
+            {
+              foreignKeyName: "direct_messages_receiver_id_fkey"
+              columns: ["receiver_id"]
+              isOneToOne: false
+              referencedRelation: "profiles"
+              referencedColumns: ["id"]
+            },
+            {
+              foreignKeyName: "direct_messages_sender_id_fkey"
+              columns: ["sender_id"]
+              isOneToOne: false
+              referencedRelation: "profiles"
+              referencedColumns: ["id"]
+            },
+          ]
+        }
+        notifications: {
+          Row: {
+            actor_id: string | null
+            created_at: string
+            entity_id: string | null
+            entity_type: string | null
+            id: string
+            is_read: boolean
+            message: string
+            read_at: string | null
+            title: string
+            type: string
+            user_id: string
+          }
+          Insert: {
+            actor_id?: string | null
+            created_at?: string
+            entity_id?: string | null
+            entity_type?: string | null
+            id?: string
+            is_read?: boolean
+            message: string
+            read_at?: string | null
+            title: string
+            type: string
+            user_id: string
+          }
+          Update: {
+            actor_id?: string | null
+            created_at?: string
+            entity_id?: string | null
+            entity_type?: string | null
+            id?: string
+            is_read?: boolean
+            message?: string
+            read_at?: string | null
+            title?: string
+            type?: string
+            user_id?: string
+          }
+          Relationships: [
+            {
+              foreignKeyName: "notifications_actor_id_fkey"
+              columns: ["actor_id"]
+              isOneToOne: false
+              referencedRelation: "profiles"
+              referencedColumns: ["id"]
+            },
+            {
+              foreignKeyName: "notifications_user_id_fkey"
+              columns: ["user_id"]
+              isOneToOne: false
+              referencedRelation: "profiles"
+              referencedColumns: ["id"]
+            },
+          ]
+        }
       user_social_accounts: {
         Row: {
           created_at: string | null

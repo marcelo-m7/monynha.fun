@@ -3,11 +3,23 @@ import type { Video, VideoInsert, VideoWithCategory } from './video.types';
 import type { AiEnrichment } from '@/entities/ai_enrichment/ai_enrichment.types';
 import { extractYouTubeId } from '@/shared/lib/youtube';
 
+type VideoWithEnrichmentRows = VideoWithCategory & {
+  ai_enrichments?: AiEnrichment[] | null;
+};
+
 // Helper to extract the latest enrichment from an array
 function getLatestEnrichment(enrichments: AiEnrichment[] | null | undefined): AiEnrichment | null {
   if (!enrichments || enrichments.length === 0) return null;
   // Enrichments should already be sorted by created_at DESC
   return enrichments[0];
+}
+
+function mapWithLatestEnrichment(video: VideoWithEnrichmentRows): VideoWithCategory {
+  const { ai_enrichments, ...rest } = video;
+  return {
+    ...rest,
+    enrichment: getLatestEnrichment(ai_enrichments),
+  };
 }
 
 export interface ListVideosParams {
@@ -22,7 +34,7 @@ export interface ListVideosParams {
 
 export async function listVideos(params: ListVideosParams = {}) {
   const includeEnrichment = params.includeEnrichment !== false; // Default true
-  
+
   let query = supabase
     .from('videos')
     .select(
@@ -77,33 +89,29 @@ export async function listVideos(params: ListVideosParams = {}) {
   const { data, error } = await query;
 
   if (error) throw error;
-  
+
   // Process enrichments - extract only the latest one
   if (includeEnrichment && data) {
-    return data.map((video: any) => ({
-      ...video,
-      enrichment: getLatestEnrichment(video.ai_enrichments),
-      ai_enrichments: undefined, // Remove the array
-    })) as VideoWithCategory[];
+    return (data as VideoWithEnrichmentRows[]).map(mapWithLatestEnrichment);
   }
-  
+
   return data as VideoWithCategory[];
 }
 
 export async function getVideoById(id: string) {
   // Check if the provided ID is a UUID or a YouTube ID
   const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id);
-  
+
   let query = supabase
     .from('videos')
     .select(
       `
       *,
-        category:categories(id, name, slug, color),
-        ai_enrichments!video_id(*)
+      category:categories(id, name, slug, color),
+      ai_enrichments!video_id(*)
     `,
-      )
-      .order('created_at', { foreignTable: 'ai_enrichments', ascending: false });
+    )
+    .order('created_at', { foreignTable: 'ai_enrichments', ascending: false });
 
   if (isUuid) {
     query = query.eq('id', id);
@@ -114,18 +122,13 @@ export async function getVideoById(id: string) {
   const { data, error } = await query.maybeSingle();
 
   if (error) throw error;
-  
-    // Process enrichment - extract only the latest one
-    if (data) {
-      const video = data as any;
-      return {
-        ...video,
-        enrichment: getLatestEnrichment(video.ai_enrichments),
-        ai_enrichments: undefined,
-      } as VideoWithCategory;
-    }
-  
-    return data as VideoWithCategory;
+
+  // Process enrichment - extract only the latest one
+  if (data) {
+    return mapWithLatestEnrichment(data as VideoWithEnrichmentRows);
+  }
+
+  return data as VideoWithCategory;
 }
 
 export async function listFeaturedVideos(limit = 4, offset = 0) {
@@ -152,7 +155,7 @@ export async function listFeaturedVideos(limit = 4, offset = 0) {
       return {
         ...row,
         category: parsedCategory,
-          enrichment: null, // RPC doesn't include enrichments yet
+        enrichment: null, // RPC doesn't include enrichments yet
       };
     }) as unknown as VideoWithCategory[];
   }
@@ -162,26 +165,22 @@ export async function listFeaturedVideos(limit = 4, offset = 0) {
     .select(
       `
       *,
-        category:categories(id, name, slug, color),
-        ai_enrichments!video_id(*)
+      category:categories(id, name, slug, color),
+      ai_enrichments!video_id(*)
     `,
     )
-      .order('created_at', { foreignTable: 'ai_enrichments', ascending: false })
+    .order('created_at', { foreignTable: 'ai_enrichments', ascending: false })
     .order('view_count', { ascending: false })
     .limit(limit);
 
   if (fallbackError) throw fallbackError;
-  
-    // Process enrichments
-    if (fallbackData) {
-      return fallbackData.map((video: any) => ({
-        ...video,
-        enrichment: getLatestEnrichment(video.ai_enrichments),
-        ai_enrichments: undefined,
-      })) as VideoWithCategory[];
-    }
-  
-    return fallbackData as VideoWithCategory[];
+
+  // Process enrichments
+  if (fallbackData) {
+    return (fallbackData as VideoWithEnrichmentRows[]).map(mapWithLatestEnrichment);
+  }
+
+  return fallbackData as VideoWithCategory[];
 }
 
 export async function listRecentVideos(limit = 4) {
@@ -190,27 +189,23 @@ export async function listRecentVideos(limit = 4) {
     .select(
       `
       *,
-        category:categories(id, name, slug, color),
-        ai_enrichments!video_id(*)
+      category:categories(id, name, slug, color),
+      ai_enrichments!video_id(*)
     `,
     )
-      .order('created_at', { foreignTable: 'ai_enrichments', ascending: false })
+    .order('created_at', { foreignTable: 'ai_enrichments', ascending: false })
     .eq('is_featured', false)
     .order('created_at', { ascending: false })
     .limit(limit);
 
   if (error) throw error;
-  
-    // Process enrichments
-    if (data) {
-      return data.map((video: any) => ({
-        ...video,
-        enrichment: getLatestEnrichment(video.ai_enrichments),
-        ai_enrichments: undefined,
-      })) as VideoWithCategory[];
-    }
-  
-    return data as VideoWithCategory[];
+
+  // Process enrichments
+  if (data) {
+    return (data as VideoWithEnrichmentRows[]).map(mapWithLatestEnrichment);
+  }
+
+  return data as VideoWithCategory[];
 }
 
 export async function listRelatedVideos(currentVideoId: string, categoryId: string | null, limit = 4) {
@@ -220,28 +215,24 @@ export async function listRelatedVideos(currentVideoId: string, categoryId: stri
     .select(
       `
       *,
-        category:categories(id, name, slug, color),
-        ai_enrichments!video_id(*)
+      category:categories(id, name, slug, color),
+      ai_enrichments!video_id(*)
     `,
     )
-      .order('created_at', { foreignTable: 'ai_enrichments', ascending: false })
+    .order('created_at', { foreignTable: 'ai_enrichments', ascending: false })
     .eq('category_id', categoryId)
     .neq('id', currentVideoId)
     .order('created_at', { ascending: false })
     .limit(limit);
 
   if (error) throw error;
-  
-    // Process enrichments
-    if (data) {
-      return data.map((video: any) => ({
-        ...video,
-        enrichment: getLatestEnrichment(video.ai_enrichments),
-        ai_enrichments: undefined,
-      })) as VideoWithCategory[];
-    }
-  
-    return data as VideoWithCategory[];
+
+  // Process enrichments
+  if (data) {
+    return (data as VideoWithEnrichmentRows[]).map(mapWithLatestEnrichment);
+  }
+
+  return data as VideoWithCategory[];
 }
 
 export async function incrementVideoViewCount(videoId: string, sessionId?: string | null) {
