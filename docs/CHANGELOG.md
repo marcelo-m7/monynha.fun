@@ -109,7 +109,7 @@ OPENAI_MODEL=gpt-4o-mini              # Documented in .env.example
 
 **The Problem**: How do we ensure WCAG 2.1 AA compliance doesn't regress? Manual testing sucks.
 
-**The Solution**: Built comprehensive a11y testing utilities using axe-core/react.
+**The Solution**: Built comprehensive a11y testing utilities using axe-core.
 
 **What's New**:
 - 🔍 **A11y Test Utilities** (`a11y-setup.ts`):
@@ -122,7 +122,7 @@ OPENAI_MODEL=gpt-4o-mini              # Documented in .env.example
     - `checkFocusIndicators()` — Verify focus visibility
 - 📋 **Test Template** (`a11y-test-template.ts`): Boilerplate for WCAG 2.1 Level AA compliance across 9 categories
 - 🧪 **jsdom Mocks**: Added IntersectionObserver polyfill for jsdom testing environment
-- 📦 **Dependency**: `@axe-core/react` installed
+- 📦 **Dependency**: `axe-core` installed
 
 **Files Created**:
 - `src/shared/test/a11y-setup.ts`
@@ -439,8 +439,8 @@ FOR SELECT TO anon, authenticated USING (true);
 
 ## Version Support
 
-| Version | Status | Node | Bun | Supabase |
-|---------|--------|------|-----|----------|
+| Version | Status | Node | pnpm | Supabase |
+|---------|--------|------|------|----------|
 | 0.1.5   | Current | 20.x | Latest | Latest |
 | 0.1.0   | Stable | 20.x | Latest | Latest |
 
@@ -451,8 +451,8 @@ FOR SELECT TO anon, authenticated USING (true);
 ### From v0.1.0 to v0.1.5
 No breaking changes. Simply pull latest changes and run:
 ```bash
-bun install
-bun run build
+pnpm install
+pnpm build
 ```
 
 All existing data and migrations remain compatible.
@@ -472,4 +472,4 @@ When making changes, please:
 ## Resources
 - [Main README](../README.md)
 - [CODEBASE Documentation](./CODEBASE.md)
-- [GitHub Repository](https://github.com/Monynha-Softwares/video-vault)
+- [GitHub Repository](https://github.com/marcelo-m7/monynha.fun)

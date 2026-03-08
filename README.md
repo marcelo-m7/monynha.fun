@@ -36,7 +36,7 @@ Your first impression matters, né? Clean hero section, easy access to what's ho
 Browse through categories that real people organized. Search, filter, read about *why* someone added a video. Simple as that.
 
 ### Create Playlists Like You Own The Place 📋
-![Playlists](./monynha-playlists.png)
+![Playlists](./docs/placeholder.png)
 
 Build learning paths. Curate collections. Share with friends or the whole community. Your taste, your rules. You can even invite collaborators to help build something together.
 
@@ -52,7 +52,7 @@ Every video deserves thoughtful discussion. Leave comments, reply to curators, s
 No algorithms deciding what's visible – comments stay honest and community-driven. Tag people with `@username` and actually see their face pop up. Because UX matters, viu?
 
 ### Your Profile 👤
-![User Profile](./monynha-profile.png)
+![User Profile](./docs/placeholder.png)
 
 Show the world what you're passionate about. Add a bio, customize your presence. People will see the videos *you* curated. Be proud of that.
 
@@ -81,7 +81,7 @@ I chose a stack that's modern, scalable, and – honestly – a joy to work with
 
 ### UX Polish 🎨
 - **Lucide React** – Clean icons
-- **Sonner** – Toast notifications that don-t annoy
+- **Sonner** – Toast notifications that don't annoy
 - **date-fns** – Dates done right
 - **i18next** – Portuguese, English, and more
 
@@ -127,21 +127,21 @@ Tag users in comments with autocomplete that actually works. Type `@` and boom �
 
 ```bash
 # Clone the repo
-git clone https://github.com/Monynha-Softwares/video-vault
+git clone https://github.com/marcelo-m7/monynha.fun
 
 # Go into the folder
-cd monynha-fun
+cd monynha.fun
 
 # Install dependencies
-npm i
-# or if you're pnpm gang:
 pnpm install
+# or if you prefer npm:
+npm install
 
 # Fire it up!
-npm run dev
+pnpm dev
 ```
 
-Open **http://localhost:5173** and boom – you're in.
+Open **http://localhost:8080** and boom – you're in.
 
 ### Environment Setup
 
@@ -149,7 +149,7 @@ Create a `.env.local` file (ask Marcelo for the keys, or set up your own Supabas
 
 ```env
 VITE_SUPABASE_URL=your_supabase_url_here
-VITE_SUPABASE_PUBLISHABLE_KEY=your_anon_key_here
+VITE_SUPABASE_PUBLISHABLE_KEY=your_publishable_key_here
 ```
 
 ---
@@ -235,23 +235,38 @@ Every folder has a purpose. No random files lying around.
 
 ---
 
-## � Available Commands
+## 📜 Available Commands
 
 ```bash
 # Development server with hot reload (what you'll use most)
-npm run dev
+pnpm dev
 
 # Build for production (minified, optimized)
-npm run build
+pnpm build
 
 # Build with dev settings (if debugging production)
-npm run build:dev
+pnpm build:dev
 
 # Preview the production build locally
-npm run preview
+pnpm preview
 
 # Run the linter (keep code clean)
-npm run lint
+pnpm lint
+
+# Type-check the project
+pnpm typecheck
+
+# Run tests (one-off)
+pnpm test
+
+# Run tests in watch mode
+pnpm test:watch
+
+# Run tests with coverage
+pnpm test:coverage
+
+# Generate bundle analysis report
+pnpm build:analyze
 ```
 
 ---
@@ -285,7 +300,7 @@ You need two things from Supabase:
 
 ```env
 VITE_SUPABASE_URL=https://your-project.supabase.co
-VITE_SUPABASE_ANON_KEY=your_anon_key_here
+VITE_SUPABASE_PUBLISHABLE_KEY=your_publishable_key_here
 ```
 
 These are public (it's fine, Supabase uses RLS to protect data). Create a `.env.local` file in the root and paste them in.
@@ -343,10 +358,10 @@ Great! You can work locally or directly on GitHub. Here's how:
 
 ### Option 1: Local Development (The Pro Way)
 ```bash
-git clone https://github.com/Monynha-Softwares/video-vault
-cd monynha-fun
-npm i
-npm run dev
+git clone https://github.com/marcelo-m7/monynha.fun
+cd monynha.fun
+pnpm install
+pnpm dev
 ```
 Make changes, test locally, push to your branch.
 
@@ -392,7 +407,7 @@ Nothing creepy. No ads. No surveillance.
 
 ### Port Already In Use?
 ```bash
-npm run dev -- --port 3000
+pnpm dev -- --port 3000
 ```
 
 ### Dependencies Missing?
@@ -406,7 +421,7 @@ pnpm install
 ```bash
 # Clear the cache
 rm -rf dist
-npm run build
+pnpm build
 ```
 
 ### Something Else?
@@ -419,14 +434,14 @@ Check the [Supabase docs](https://supabase.com/docs) or [Vite docs](https://vite
 **Built by**: Marcelo Santos  
 **Organization**: Monynha Softwares  
 **License**: Check the LICENSE file  
-**Version**: 0.0.0 (and growing!)
+**Version**: 0.1.5 (and growing!)
 
 ---
 
 ## 🌟 What's Next?
 
 We're constantly improving. On the roadmap:
-- Real AI integration (actual enrichment, not simulated)
+- Batch AI enrichment for existing videos
 - Video search with full-text indexing
 - Smart recommendations
 - Community comments & ratings

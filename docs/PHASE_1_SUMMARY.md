@@ -53,7 +53,7 @@ pnpm build:analyze
   - `checkFocusIndicators()` — Verify focus states
 
 **Dependencies Added:**
-- `@axe-core/react` — Core accessibility testing library
+- `axe-core` — Core accessibility testing library
 - `idb@8.0.3` — IndexedDB wrapper (for Phase 7 offline support)
 
 **Test Coverage:** Template includes 9 test categories covering WCAG 2.1 AA compliance
@@ -243,7 +243,7 @@ VITE_ENABLE_PWA=true
 ```json
 {
   "devDependencies": {
-    "@axe-core/react": "^latest",
+    "axe-core": "^4.11.0",
     "rollup-plugin-visualizer": "^7.0.1",
     "vite-plugin-pwa": "^1.2.0"
   },
