@@ -1,3 +1,5 @@
+"use client";
+
 import type { VideoWithCategory } from "@/entities/video/video.types";
 import { formatDuration, formatViewCount } from "@/shared/lib/format";
 import { Play } from "lucide-react";
@@ -7,6 +9,7 @@ import { useNavigate } from "react-router-dom";
 import { useTranslation } from 'react-i18next';
 import { useVideoViewIncrement } from '@/shared/hooks/useVideoViewIncrement';
 import { KeyboardEvent } from "react";
+import { LazyImage } from "@/shared/components/LazyImage";
 
 interface FeaturedHeroProps {
   video: VideoWithCategory;
@@ -46,16 +49,10 @@ export const FeaturedHero = ({ video }: FeaturedHeroProps) => {
           </Badge>
         </div>
 
-        <img
+        <LazyImage
           src={video.thumbnail_url}
           alt={video.title}
-          loading="lazy"
           className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-          onError={(e) => {
-            const target = e.target as HTMLImageElement;
-            target.src = '/placeholder.svg';
-            target.onerror = null;
-          }}
         />
 
         <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent flex items-end p-6">

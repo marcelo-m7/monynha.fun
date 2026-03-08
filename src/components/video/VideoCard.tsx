@@ -1,3 +1,5 @@
+"use client";
+
 import type { VideoWithCategory } from "@/entities/video/video.types";
 import { formatDuration, formatViewCount } from "@/shared/lib/format";
 import { Play, Eye } from "lucide-react";
@@ -7,6 +9,7 @@ import { cn } from "@/lib/utils";
 import { useTranslation } from 'react-i18next';
 import { useVideoViewIncrement } from '@/shared/hooks/useVideoViewIncrement';
 import { KeyboardEvent } from "react";
+import { LazyImage } from "@/shared/components/LazyImage";
 
 interface VideoCardProps {
   video: VideoWithCategory;
@@ -54,16 +57,10 @@ export const VideoCard = ({ video, onClick, variant = 'default' }: VideoCardProp
         "relative aspect-video overflow-hidden",
         variant === 'default' ? "h-auto" : "w-28 h-16 flex-shrink-0 rounded-sm"
       )}>
-        <img
+        <LazyImage
           src={video.thumbnail_url}
           alt={video.title}
-          loading="lazy"
           className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-          onError={(e) => {
-            const target = e.target as HTMLImageElement;
-            target.src = '/placeholder.svg';
-            target.onerror = null;
-          }}
         />
 
         {/* Featured badge */}
