@@ -15,6 +15,7 @@
     "cancel": "Cancel",
     "delete": "Delete",
     "anonymous": "Anonymous",
+    "loading": "Loading...",
     "none": "None"
   },
   "header": {
@@ -29,6 +30,8 @@
     "editProfile": "Edit Profile",
     "accountSettings": "Account Settings",
     "home": "Home",
+    "messages": "Messages",
+    "notifications": "Notifications",
     "toggleMenu": "Toggle menu",
     "closeMenu": "Close menu",
     "languageLabel": "Language"
@@ -616,5 +619,31 @@
       "contentRequired": "Comment cannot be empty",
       "contentMaxLength": "Comment must be at most 500 characters"
     }
+  },
+  "messages": {
+    "title": "Messages",
+    "description": "Your direct conversations with other curators.",
+    "inbox": "Inbox",
+    "emptyInbox": "No conversations yet.",
+    "selectConversation": "Select a conversation to start chatting.",
+    "emptyConversation": "No messages yet. Say hello!",
+    "inputPlaceholder": "Write a message...",
+    "tipPrefix": "Tip:",
+    "tipLink": "visit community profiles"
+  },
+  "notifications": {
+    "title": "Notifications",
+    "description": "Follow updates, new messages, and account activity.",
+    "inbox": "Recent notifications",
+    "empty": "You have no notifications yet.",
+    "markAsRead": "Mark read",
+    "markAllAsRead": "Mark all as read"
+  },
+  "socialProfile": {
+    "followers": "followers",
+    "following": "following",
+    "follow": "Follow",
+    "unfollow": "Unfollow",
+    "sendMessage": "Message"
   }
 }

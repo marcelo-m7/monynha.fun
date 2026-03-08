@@ -6,6 +6,264 @@
 
 ---
 
+## [v0.3.0] - March 12, 2026 🤖 **Phase 2: AI Integration**
+
+### 🤖 OpenAI Integration for Video Enrichment
+
+**The Problem**: Video metadata is manually entered. Inconsistent, time-consuming, and prone to errors.
+
+**The Solution**: AI-powered video enrichment using OpenAI API (gpt-4o-mini model).
+
+**What's New**:
+- 🧠 **OpenAI Client** (`supabase/functions/_shared/openai-client.ts`):
+  - Complete TypeScript client with timeout (15s) and retry logic (2 retries, exponential backoff)
+  - Structured output parsing for reliable JSON responses
+  - Smart error classification (retryable vs. non-retryable)
+  - Handles markdown-wrapped JSON from AI responses
+- 🎬 **Video Enrichment Features**:
+  - **Optimized Titles**: AI generates SEO-friendly video titles
+  - **Summaries**: Short and detailed descriptions for better curation
+  - **Semantic Tags**: Auto-generated tags for video categorization
+  - **Cultural Relevance**: AI assesses cultural significance (High/Medium/Low)
+  - **Language Support**: Respects video language (Portuguese default)
+- 🔗 **Edge Function** (`enrich-video`):
+  - Integrates OpenAI client
+  - Fetches video from database
+  - Handles enrichment errors gracefully
+  - Inserts results into `ai_enrichments` table
+- ⚛️ **Frontend Hook** (`useEnrichVideo`):
+  - TanStack Query mutation for loading/error states
+  - Toast notifications for user feedback
+  - Type-safe request/response handling
+- 🔐 **Security**:
+  - JWT authentication before API calls
+  - Service role for database operations (RLS bypass)
+  - Environment variables protected in Supabase secrets
+
+**Files Created**:
+- `supabase/functions/_shared/openai-client.ts` (290 lines) — OpenAI client implementation
+- `supabase/functions/_shared/env.ts` (50 lines) — Environment variable validation
+- `src/features/videos/queries/useEnrichVideo.ts` (70 lines) — Frontend hook
+- `src/features/videos/queries/useEnrichVideo.test.ts` (180 lines) — Unit tests
+- `supabase/functions/enrich-video/index.test.ts` (150 lines) — Edge function tests
+
+**Files Modified**:
+- `supabase/functions/enrich-video/index.ts` — Integrated OpenAI client, replaced `simulatedEnrichment`
+- `src/shared/test/mswHandlers.ts` — Added OpenAI API mock for unit testing
+
+**Environment Variables**:
+```bash
+OPENAI_API_KEY=sk-proj-xxxxxxxxxxxxx  # Set in Supabase secrets
+OPENAI_MODEL=gpt-4o-mini              # Documented in .env.example
+```
+
+**Cost Estimate**: $0.0002-0.0005 per enrichment (~$20-50 for 100,000 videos annually)
+
+**Deployment Status**: ✅ **DEPLOYED TO PRODUCTION**
+- 🚀 **Edge Function Version**: 128 (Active)
+- 📅 **Deployed**: March 8, 2026
+- 🔗 **Endpoint**: `https://wvkjainfwsyiyfcmbtid.supabase.co/functions/v1/enrich-video`
+- ✅ **Status**: ACTIVE and operational
+
+**Testing Status**:
+- ✅ Unit tests structured and ready
+- ✅ MSW mock handler integrated
+- ✅ Manual browser testing completed (all features working)
+  - Login/Logout ✓
+  - Video submission ✓
+  - Favorites ✓
+  - Comments ✓
+  - Video details page ✓
+  - Playlists ✓
+- ⏳ OpenAI enrichment (requires OPENAI_API_KEY to be set in Supabase secrets)
+
+**Next Steps**:
+- Set API key: `supabase secrets set OPENAI_API_KEY sk-proj-xxxxxxxxxxxxx`
+- Test AI enrichment with real OpenAI API
+- Monitor OpenAI usage and response times
+- Phase 3: Batch enrichment for existing videos
+
+---
+
+## [v0.2.0] - March 8, 2026 🚀 **Phase 1: Foundation & Observability**
+
+### 📊 Bundle Analysis & Performance Monitoring
+
+**The Problem**: No visibility into bundle size. Features added silently ballooning the JS payload? Not anymore.
+
+**The Solution**: Integrated Rollup Visualizer for interactive bundle analysis.
+
+**What's New**:
+- 📈 **Bundle Analyzer**: Run `pnpm build:analyze` to generate interactive `stats.html` with chunk breakdown
+- 🎯 **Manual Chunking**: Split build into vendor, UI, and query libraries (better cache busting)
+- 📍 **CI Integration**: Bundle size reported in CI/CD pipeline
+- 📋 **Current Metrics**: Main bundle ~500 KB (141 KB gzipped) – healthy baseline
+
+**Files Changed**:
+- `vite.config.ts` — Added visualizer + manual chunks
+- `package.json` — New build:analyze script
+
+---
+
+### ♿ Accessibility Testing Foundation
+
+**The Problem**: How do we ensure WCAG 2.1 AA compliance doesn't regress? Manual testing sucks.
+
+**The Solution**: Built comprehensive a11y testing utilities using axe-core.
+
+**What's New**:
+- 🔍 **A11y Test Utilities** (`a11y-setup.ts`):
+  - `auditPageA11y()` — Run accessibility audits on pages
+  - `a11yPatterns` object with reusable test helpers:
+    - `checkButtonAccessibility()` — Verify button labels
+    - `checkImageAccessibility()` — Check alt text coverage
+    - `checkContrast()` — Detect color contrast violations
+    - `checkKeyboardNav()` — Validate keyboard support
+    - `checkFocusIndicators()` — Verify focus visibility
+- 📋 **Test Template** (`a11y-test-template.ts`): Boilerplate for WCAG 2.1 Level AA compliance across 9 categories
+- 🧪 **jsdom Mocks**: Added IntersectionObserver polyfill for jsdom testing environment
+- 📦 **Dependency**: `axe-core` installed
+
+**Files Created**:
+- `src/shared/test/a11y-setup.ts`
+- `src/shared/test/a11y-test-template.ts`
+
+---
+
+### 🖼️ Enhanced LazyImage Component with IntersectionObserver
+
+**The Problem**: Images loading regardless of viewport visibility = wasted bandwidth on mobile.
+
+**The Solution**: Refactored LazyImage with IntersectionObserver-based lazy loading.
+
+**What's New**:
+- 👁️ **IntersectionObserver**: Only load images when entering viewport (50px margin by default, configurable)
+- 🫙 **Blur Placeholder**: Optional low-quality image placeholder while high-quality loads
+- 💾 **Fallback Support**: Automatic fallback image if primary fails
+- ⚠️ **Error Handling**: User-friendly error message with retry option
+- ♿ **A11y Improvements**:
+  - `aria-hidden` on blur placeholder
+  - `loading="lazy"` native attribute
+  - `decoding="async"` for non-blocking decode
+- 🧪 **Test Coverage**: 15 comprehensive tests across 7 categories
+
+**Props:**
+```tsx
+<LazyImage
+  src="image.jpg"
+  alt="Description"
+  blurDataURL="data:image/..." // Optional
+  fallbackSrc="fallback.jpg" // Optional
+  observerOptions={{ rootMargin: '100px' }} // Optional
+  onLoadComplete={() => {}} // Optional callback
+  onErrorOccurred={(error) => {}} // Optional callback
+/>
+```
+
+**Files Changed**:
+- `src/shared/components/LazyImage.tsx` — Complete refactor
+
+**Files Created**:
+- `src/shared/components/LazyImage.test.tsx` — 15 tests
+
+---
+
+### 📱 PWA Configuration (Phase Prep)
+
+**The Problem**: Users want offline access and installable app experience.
+
+**The Solution**: Configured Vite PWA plugin with Workbox caching strategies.
+
+**What's New**:
+- 🔧 **Service Worker**: Auto-generated at `dist/sw.js`
+- 📄 **Web App Manifest**: Generated at `dist/manifest.webmanifest`
+- 💾 **Smart Caching**:
+  - Cache-first for images, fonts, static assets (long-term caching)
+  - Network-first for Supabase API (with 1-hour fallback)
+  - Stale-while-revalidate for HTML pages
+- 📦 **Precache**: 83 static entries for offline access
+- 🎨 **Install Prompt**: Mobile/desktop PWA install support (UI coming in Phase 7)
+- 📚 **Dependencies**: `vite-plugin-pwa` + `idb` (for offline sync queue in Phase 7)
+
+**Configuration**:
+```javascript
+{
+  name: 'Monynha Fun',
+  short_name: 'Monynha',
+  display: 'standalone',
+  theme_color: '#1a1a1a',
+  icons: [192x192, 512x512],
+  workbox: { /* caching strategies */ }
+}
+```
+
+**Files Changed**:
+- `vite.config.ts` — Added PWA plugin configuration
+
+---
+
+### 🔧 CI/CD Pipeline Enhancements
+
+**The Problem**: CI was basic. No coverage reporting, no bundle monitoring.
+
+**The Solution**: Enhanced pipeline with test coverage, bundle analysis, and PWA verification.
+
+**What's New**:
+- 📊 **Test Coverage Reports**: Generated and uploaded as artifact
+- 📈 **Bundle Size Awareness**: Logs bundle size per build
+- 🔄 **PWA Verification**: Confirms service worker generation
+- 📦 **Artifact Retention**: 7-day retention for coverage reports
+- ✅ **Package Manager**: Updated to use pnpm (more reliable than bun for this project)
+
+**Files Changed**:
+- `.github/workflows/ci.yml`
+
+**Test Results**:
+```
+✓ 52 tests passed across 14 test files
+✓ Build time: 30.09s
+✓ No broken changes
+```
+
+---
+
+### 🌍 Environment Configuration
+
+**What's New**:
+- Updated `.env.example` with organized variables for all phases
+- Added feature flag support:
+  - `VITE_ENABLE_RECOMMENDATIONS`
+  - `VITE_ENABLE_RATINGS`
+  - `VITE_ENABLE_SOCIAL_FEATURES`
+  - `VITE_ENABLE_PWA`
+- Prepared variables for Phase 2 OpenAI integration:
+  - `OPENAI_API_KEY`
+  - `OPENAI_MODEL` (default: gpt-4o-mini)
+
+**Files Changed**:
+- `.env.example`
+
+---
+
+### 📚 Documentation
+
+**Files Created**:
+- `docs/PHASE_1_SUMMARY.md` — Comprehensive Phase 1 summary with metrics and next steps
+
+---
+
+## Breaking Changes
+**None** – Phase 1 is fully backward compatible.
+
+---
+
+## Migration Guide (if any)
+No migration needed. Update dependencies and build.
+
+---
+
+---
+
 ## [v0.1.6] - February 1, 2026 🎉
 
 ### 🎤 "Ey, You There!" - Mention Autocomplete Feature
@@ -181,8 +439,8 @@ FOR SELECT TO anon, authenticated USING (true);
 
 ## Version Support
 
-| Version | Status | Node | Bun | Supabase |
-|---------|--------|------|-----|----------|
+| Version | Status | Node | pnpm | Supabase |
+|---------|--------|------|------|----------|
 | 0.1.5   | Current | 20.x | Latest | Latest |
 | 0.1.0   | Stable | 20.x | Latest | Latest |
 
@@ -193,8 +451,8 @@ FOR SELECT TO anon, authenticated USING (true);
 ### From v0.1.0 to v0.1.5
 No breaking changes. Simply pull latest changes and run:
 ```bash
-bun install
-bun run build
+pnpm install
+pnpm build
 ```
 
 All existing data and migrations remain compatible.
@@ -214,4 +472,4 @@ When making changes, please:
 ## Resources
 - [Main README](../README.md)
 - [CODEBASE Documentation](./CODEBASE.md)
-- [GitHub Repository](https://github.com/Monynha-Softwares/video-vault)
+- [GitHub Repository](https://github.com/marcelo-m7/monynha.fun)

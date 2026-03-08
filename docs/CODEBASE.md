@@ -623,16 +623,16 @@ export const Header = () => {
 ### Setup Local Development
 ```bash
 # Clone & install
-git clone https://github.com/Monynha-Softwares/video-vault
-cd video-vault
-npm install  # or pnpm install
+git clone https://github.com/marcelo-m7/monynha.fun
+cd monynha.fun
+pnpm install
 
 # Environment variables (.env.local)
 VITE_SUPABASE_URL=https://your-project.supabase.co
-VITE_SUPABASE_PUBLISHABLE_KEY=your-anon-key
+VITE_SUPABASE_PUBLISHABLE_KEY=your-publishable-key
 
-# Run dev server (http://localhost:5173)
-npm run dev
+# Run dev server (http://localhost:8080)
+pnpm dev
 ```
 
 ### Database Development
@@ -677,7 +677,7 @@ supabase db push
 ### Deployed Functions
 
 #### 1. **enrich-video** (Active - v30)
-- **Purpose**: AI enrichment of video metadata (currently simulated)
+- **Purpose**: AI enrichment of video metadata (OpenAI-powered)
 - **Authentication**: Manual Bearer token validation (verify_jwt disabled)
 - **Input**: `{ videoId: uuid, youtubeUrl: string }`
 - **Output**: Saves to `ai_enrichments` table
@@ -688,7 +688,7 @@ supabase db push
 ```typescript
 // Receives request with video metadata
 // Validates user auth via Bearer token
-// Simulates AI enrichment (placeholder for real AI service)
+// Calls OpenAI enrichment client
 // Writes enriched data to ai_enrichments table
 ```
 
@@ -745,15 +745,15 @@ FOR UPDATE USING (auth.uid() = id);
 ## Next Steps & Future Enhancements
 
 ### Development Workflow
-1. **Local development**: `bun run dev` - Starts Vite dev server on http://localhost:5173
-2. **Type safety**: `bun run typecheck` - Validates TypeScript
-3. **Code quality**: `bun run lint` - Checks ESLint rules
-4. **Testing**: `bun run test` - Runs Vitest suite
-5. **Production**: `bun run build` - Creates optimized bundle in `dist/`
+1. **Local development**: `pnpm dev` - Starts Vite dev server on http://localhost:8080
+2. **Type safety**: `pnpm typecheck` - Validates TypeScript
+3. **Code quality**: `pnpm lint` - Checks ESLint rules
+4. **Testing**: `pnpm test` - Runs Vitest suite
+5. **Production**: `pnpm build` - Creates optimized bundle in `dist/`
 
 ### CI/CD Pipeline
 The GitHub Actions workflow (`.github/workflows/ci.yml`) runs on all branches:
-- Installs dependencies via bun
+- Installs dependencies via pnpm
 - Runs linter, type checker, and test suite
 - Builds production bundle
 - Uploads artifacts for deployment
@@ -776,7 +776,7 @@ Always use the package's public entry points (check `package.json` exports). Dir
 ### Future Enhancements
 
 1. **Code-splitting**: Reduce main bundle size (currently 1.1MB) using dynamic imports
-2. **Real AI Integration**: Replace simulated enrichment with actual AI service (OpenAI, Anthropic)
+2. **Batch AI Enrichment**: Enrich existing videos in bulk with OpenAI
 3. **Video Search**: Full-text search on titles, descriptions, semantic tags
 4. **Recommendations**: Algorithm for suggesting videos based on user history
 5. **Social Features**: Comments, ratings, user follows

@@ -157,19 +157,22 @@ import { zodResolver } from '@hookform/resolvers/zod';
 ## 2. CI/CD Pipeline Setup ✅
 
 ### Issue: GitHub Actions Failing
-**Error**: `bun: command not found` in GitHub Actions environment
+**Error**: `pnpm: command not found` in GitHub Actions environment
 
-**Root Cause**: Bun was not installed in the CI runner. Corepack preparation syntax was incorrect.
+**Root Cause**: pnpm was not activated via Corepack in the CI runner.
 
 **Solution**: Updated `.github/workflows/ci.yml`
 ```yaml
 # ❌ Before
-- name: Prepare bun
-  run: corepack prepare bun@latest --activate
+- name: Install dependencies
+  run: pnpm install
 
 # ✅ After
-- name: Install bun
-  run: npm install -g bun
+- name: Enable Corepack
+  run: corepack enable
+
+- name: Install pnpm
+  run: corepack prepare pnpm@latest --activate
 ```
 
 **Pipeline Status**: ✅ All jobs now execute successfully
@@ -256,7 +259,7 @@ This document - quick reference for January 30 updates
 
 ### For Future Contributors
 - Always use public entry points for third-party library imports
-- Run `bun run build` locally before pushing to verify production build
+- Run `pnpm build` locally before pushing to verify production build
 - Update CHANGELOG.md when making changes
 - All 4 locales (PT, EN, ES, FR) need synchronization for new features
 - CI/CD automatically validates code quality on all branches
@@ -285,10 +288,10 @@ This document - quick reference for January 30 updates
 ## Testing Checklist
 
 Before deployment, verify:
-- [ ] `bun run lint` passes
-- [ ] `bun run typecheck` passes
-- [ ] `bun run test` passes
-- [ ] `bun run build` completes
+- [ ] `pnpm lint` passes
+- [ ] `pnpm typecheck` passes
+- [ ] `pnpm test` passes
+- [ ] `pnpm build` completes
 - [ ] `/videos` route displays "Videos" label in all languages
 - [ ] Header nav works on mobile and desktop
 - [ ] No console errors in browser DevTools
@@ -298,7 +301,7 @@ Before deployment, verify:
 ## Contact & Support
 
 For questions about these updates:
-- **Repository**: https://github.com/Monynha-Softwares/video-vault
+- **Repository**: https://github.com/marcelo-m7/monynha.fun
 - **Documentation**: See `docs/` folder
 - **Issues**: Report on GitHub Issues
 

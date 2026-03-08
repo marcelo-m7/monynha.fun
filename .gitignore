@@ -25,3 +25,4 @@ dist-ssr
 *.sw?
 .github/copilot-instructions.md
 .env
+/.playwright-mcp

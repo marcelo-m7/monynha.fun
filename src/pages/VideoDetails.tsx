@@ -12,6 +12,10 @@ import { VideoCard } from '@/components/video/VideoCard';
 import { AspectRatio } from '@/components/ui/aspect-ratio';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Badge } from '@/components/ui/badge'; // Import Badge component
+import { Card } from '@/components/ui/card';
+import { Sparkles } from 'lucide-react';
+import { CulturalRelevanceBadge } from '@/components/video/CulturalRelevanceBadge';
+import { SemanticTagBadge } from '@/components/video/SemanticTagBadge';
 import { Eye, Clock, Folder, ArrowLeft, Heart as HeartIcon, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
@@ -203,10 +207,52 @@ const VideoDetails = () => {
               </p>
             </div>
 
+              {/* AI-Generated Summary */}
+              {video.enrichment && (
+                <Card className="p-6 bg-gradient-to-br from-purple-50/50 to-pink-50/50 dark:from-purple-950/20 dark:to-pink-950/20 border-purple-200/50 dark:border-purple-800/50">
+                  <div className="flex items-start gap-3">
+                    <div className="rounded-full bg-gradient-to-r from-purple-500 to-pink-500 p-2 flex-shrink-0">
+                      <Sparkles className="w-5 h-5 text-white" />
+                    </div>
+                    <div className="flex-1 space-y-3">
+                      <div className="flex items-center justify-between">
+                        <h3 className="text-lg font-semibold">AI-Generated Summary</h3>
+                        <CulturalRelevanceBadge relevance={video.enrichment.cultural_relevance} />
+                      </div>
+                    
+                      {video.enrichment.short_summary && (
+                        <p className="text-sm text-muted-foreground leading-relaxed">
+                          {video.enrichment.short_summary}
+                        </p>
+                      )}
+                    
+                      {video.enrichment.summary_description && video.enrichment.summary_description !== video.enrichment.short_summary && (
+                        <details className="group">
+                          <summary className="text-sm text-primary cursor-pointer hover:underline">
+                            Read full summary
+                          </summary>
+                          <p className="text-sm text-muted-foreground mt-2 leading-relaxed">
+                            {video.enrichment.summary_description}
+                          </p>
+                        </details>
+                      )}
+                    
+                      {video.enrichment.semantic_tags && video.enrichment.semantic_tags.length > 0 && (
+                        <div className="flex flex-wrap gap-1.5 pt-2">
+                          {video.enrichment.semantic_tags.map((tag, index) => (
+                            <SemanticTagBadge key={`${tag}-${index}`} tag={tag} />
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </Card>
+              )}
+
             {/* Comments Section */}
-            {videoId && (
+            {video.id && (
               <div className="border-t border-border/50 pt-6 mt-6">
-                <CommentsSection videoId={videoId} />
+                <CommentsSection videoId={video.id} />
               </div>
             )}
           </div>

@@ -1,5 +1,5 @@
 import { Link, useNavigate } from "react-router-dom";
-import { Search, Plus, Menu, Heart, Globe, User as UserIcon, Settings, ListVideo, KeyRound, LogOut } from "lucide-react";
+import { Search, Plus, Menu, Heart, Globe, User as UserIcon, Settings, KeyRound, LogOut, Bell, MessageCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useState } from "react";
@@ -14,6 +14,8 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/co
 import { NavLink } from "@/components/NavLink";
 import { MobileNav } from "./MobileNav";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
+import { useUnreadMessagesCount } from "@/features/messages";
+import { useUnreadNotificationsCount } from "@/features/notifications";
 
 export const Header = () => {
   const { t } = useTranslation();
@@ -21,6 +23,8 @@ export const Header = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const { user, signOut } = useAuth();
   const { data: profile } = useProfileById(user?.id);
+  const { data: unreadMessagesCount = 0 } = useUnreadMessagesCount();
+  const { data: unreadNotificationsCount = 0 } = useUnreadNotificationsCount();
   const navigate = useNavigate();
 
   const handleSignOut = async () => {
@@ -106,6 +110,34 @@ export const Header = () => {
               >
                 <Heart className="h-4 w-4" />
                 <span className="hidden lg:inline">{t('header.favorites')}</span>
+              </Button>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="hidden sm:inline-flex relative text-muted-foreground hover:text-foreground"
+                onClick={() => navigate('/messages')}
+                aria-label={t('header.messages')}
+              >
+                <MessageCircle className="h-4 w-4" />
+                {unreadMessagesCount > 0 && (
+                  <span className="absolute -top-1 -right-1 h-5 min-w-5 px-1 rounded-full bg-primary text-primary-foreground text-[10px] font-bold flex items-center justify-center">
+                    {unreadMessagesCount > 99 ? '99+' : unreadMessagesCount}
+                  </span>
+                )}
+              </Button>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="hidden sm:inline-flex relative text-muted-foreground hover:text-foreground"
+                onClick={() => navigate('/notifications')}
+                aria-label={t('header.notifications')}
+              >
+                <Bell className="h-4 w-4" />
+                {unreadNotificationsCount > 0 && (
+                  <span className="absolute -top-1 -right-1 h-5 min-w-5 px-1 rounded-full bg-primary text-primary-foreground text-[10px] font-bold flex items-center justify-center">
+                    {unreadNotificationsCount > 99 ? '99+' : unreadNotificationsCount}
+                  </span>
+                )}
               </Button>
               <Button
                 variant="hero"
@@ -223,6 +255,8 @@ export const Header = () => {
               <MobileNav
                 user={user}
                 profile={profile}
+                unreadMessagesCount={unreadMessagesCount}
+                unreadNotificationsCount={unreadNotificationsCount}
                 onClose={() => setIsSheetOpen(false)}
                 onSignOut={handleSignOut}
                 searchQuery={searchQuery}
