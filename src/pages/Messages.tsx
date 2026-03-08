@@ -68,6 +68,13 @@ const Messages = () => {
   }, [contacts, selectedUsername]);
 
   useEffect(() => {
+    if (!preselectedUsername) return;
+    if (preselectedUsername !== selectedUsername) {
+      setSelectedUsername(preselectedUsername);
+    }
+  }, [preselectedUsername, selectedUsername]);
+
+  useEffect(() => {
     if (!selectedUsername || !conversation || conversation.length === 0) return;
     markReadMutation.mutate({ otherUsername: selectedUsername });
   }, [selectedUsername, conversation, markReadMutation]);

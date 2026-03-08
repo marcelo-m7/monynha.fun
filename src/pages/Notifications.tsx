@@ -49,6 +49,26 @@ const Notifications = () => {
   const markOneAsRead = useMarkNotificationAsRead();
   const markAllAsRead = useMarkAllNotificationsAsRead();
 
+  const handleNotificationOpen = async (notificationId: string, type: string, actorUsername?: string | null) => {
+    if (!notificationId) return;
+
+    if (!actorUsername) {
+      await markOneAsRead.mutateAsync(notificationId);
+      return;
+    }
+
+    await markOneAsRead.mutateAsync(notificationId);
+
+    if (type === 'new_message') {
+      navigate(`/messages?user=${encodeURIComponent(actorUsername)}`);
+      return;
+    }
+
+    if (type === 'new_follower') {
+      navigate(`/profile/${actorUsername}`);
+    }
+  };
+
   if (loading || isLoading) {
     return (
       <div className="min-h-screen flex flex-col">
@@ -121,7 +141,17 @@ const Notifications = () => {
                 className={`p-4 transition-colors ${notification.is_read ? 'bg-card' : 'bg-primary/5 border-primary/30'}`}
               >
                 <div className="flex items-start justify-between gap-4">
-                  <div className="flex items-start gap-3 min-w-0">
+                  <button
+                    type="button"
+                    className="flex items-start gap-3 min-w-0 text-left w-full"
+                    onClick={() =>
+                      handleNotificationOpen(
+                        notification.id,
+                        notification.type,
+                        notification.actor?.username,
+                      )
+                    }
+                  >
                     <Avatar className="h-10 w-10">
                       <AvatarImage src={notification.actor?.avatar_url || undefined} alt={notification.actor?.username || 'actor'} />
                       <AvatarFallback>
@@ -141,13 +171,16 @@ const Notifications = () => {
                       </p>
                       <p className="text-xs text-muted-foreground mt-2">{formatWhen(notification.created_at)}</p>
                     </div>
-                  </div>
+                  </button>
 
                   {!notification.is_read && (
                     <Button
                       variant="ghost"
                       size="sm"
-                      onClick={() => markOneAsRead.mutate(notification.id)}
+                      onClick={(event) => {
+                        event.stopPropagation();
+                        markOneAsRead.mutate(notification.id);
+                      }}
                     >
                       {t('notifications.markRead')}
                     </Button>

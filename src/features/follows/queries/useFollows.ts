@@ -1,7 +1,9 @@
+import { useEffect } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import { useAuth } from '@/features/auth/useAuth';
 import { followKeys } from '@/entities/follow/follow.keys';
+import { supabase } from '@/shared/api/supabase/supabaseClient';
 import {
   followUser,
   getFollowStats,
@@ -36,6 +38,32 @@ export function useFollowing(username: string | undefined) {
 
 export function useFollowStatus(targetUsername: string | undefined) {
   const { user } = useAuth();
+  const queryClient = useQueryClient();
+
+  useEffect(() => {
+    if (!user?.id || !targetUsername) return;
+
+    const channel = supabase
+      .channel(`follow-status-${user.id}-${targetUsername}`)
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'user_follows',
+          filter: `follower_id=eq.${user.id}`,
+        },
+        () => {
+          queryClient.invalidateQueries({ queryKey: followKeys.status(targetUsername) });
+          queryClient.invalidateQueries({ queryKey: followKeys.stats(targetUsername) });
+        },
+      )
+      .subscribe();
+
+    return () => {
+      void supabase.removeChannel(channel);
+    };
+  }, [queryClient, targetUsername, user?.id]);
 
   return useQuery<boolean, Error>({
     queryKey: targetUsername ? followKeys.status(targetUsername) : followKeys.status(''),
@@ -48,6 +76,31 @@ export function useFollowStatus(targetUsername: string | undefined) {
 }
 
 export function useFollowStats(username: string | undefined) {
+  const queryClient = useQueryClient();
+
+  useEffect(() => {
+    if (!username) return;
+
+    const channel = supabase
+      .channel(`follow-stats-${username}`)
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'user_follows',
+        },
+        () => {
+          queryClient.invalidateQueries({ queryKey: followKeys.stats(username) });
+        },
+      )
+      .subscribe();
+
+    return () => {
+      void supabase.removeChannel(channel);
+    };
+  }, [queryClient, username]);
+
   return useQuery<FollowStats, Error>({
     queryKey: username ? followKeys.stats(username) : followKeys.stats(''),
     queryFn: async () => {
