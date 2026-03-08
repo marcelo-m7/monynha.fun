@@ -59,16 +59,27 @@ OPENAI_MODEL=gpt-4o-mini              # Documented in .env.example
 
 **Cost Estimate**: $0.0002-0.0005 per enrichment (~$20-50 for 100,000 videos annually)
 
+**Deployment Status**: ✅ **DEPLOYED TO PRODUCTION**
+- 🚀 **Edge Function Version**: 128 (Active)
+- 📅 **Deployed**: March 8, 2026
+- 🔗 **Endpoint**: `https://wvkjainfwsyiyfcmbtid.supabase.co/functions/v1/enrich-video`
+- ✅ **Status**: ACTIVE and operational
+
 **Testing Status**:
 - ✅ Unit tests structured and ready
 - ✅ MSW mock handler integrated
-- ⏳ Manual testing with real OpenAI (pending API key verification)
-- ⏳ Integration testing (pending deployment)
+- ✅ Manual browser testing completed (all features working)
+  - Login/Logout ✓
+  - Video submission ✓
+  - Favorites ✓
+  - Comments ✓
+  - Video details page ✓
+  - Playlists ✓
+- ⏳ OpenAI enrichment (requires OPENAI_API_KEY to be set in Supabase secrets)
 
 **Next Steps**:
-- Deploy Edge Function: `supabase functions deploy enrich-video`
 - Set API key: `supabase secrets set OPENAI_API_KEY sk-proj-xxxxxxxxxxxxx`
-- Test with cURL against live API
+- Test AI enrichment with real OpenAI API
 - Monitor OpenAI usage and response times
 - Phase 3: Batch enrichment for existing videos
 
