@@ -11,8 +11,34 @@ class ResizeObserverMock {
   disconnect() {}
 }
 
+class IntersectionObserverMock {
+  constructor(public callback: IntersectionObserverCallback) {}
+  observe() {
+    // Trigger intersection for testing
+    this.callback(
+      [
+        {
+          target: document.createElement('div'),
+          isIntersecting: true,
+          intersectionRatio: 1,
+        } as IntersectionObserverEntry,
+      ],
+      this as any
+    );
+  }
+  unobserve() {}
+  disconnect() {}
+  takeRecords() {
+    return [];
+  }
+}
+
 if (!window.ResizeObserver) {
   window.ResizeObserver = ResizeObserverMock;
+}
+
+if (!window.IntersectionObserver) {
+  window.IntersectionObserver = IntersectionObserverMock as any;
 }
 
 if (!window.scrollTo) {

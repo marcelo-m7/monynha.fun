@@ -1,5 +1,6 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts"
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.45.0'
+import { createOpenAIClient, type VideoEnrichmentParams } from '../_shared/openai-client.ts'
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -49,22 +50,45 @@ serve(async (req) => {
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     );
 
-    // --- Placeholder for actual AI enrichment logic ---
-    const simulatedEnrichment = {
-      optimized_title: `Monynha Fun: ${videoId} - Título Otimizado`,
-      summary_description: `Este é um resumo gerado por IA para o vídeo ${videoId} da URL ${youtubeUrl}.`,
-      semantic_tags: ['monynha', 'fun', 'ia', 'curadoria'],
-      suggested_category_id: null,
-      language: 'pt',
-      cultural_relevance: 'Alta',
-      short_summary: 'Um vídeo interessante sobre tecnologia e comunidade.',
-    };
+    // Fetch the video data from database
+    const { data: video, error: videoError } = await supabaseServiceRole
+      .from('videos')
+      .select('title, description, language')
+      .eq('id', videoId)
+      .single();
 
-    const { data, error } = await supabaseServiceRole // Use the service role client here
+    if (videoError || !video) {
+      console.error("[enrich-video] Video not found:", videoError?.message);
+      throw new Error(`Video not found: ${videoError?.message || 'Unknown error'}`);
+    }
+
+    // Call OpenAI for enrichment
+    let enrichment;
+    try {
+      const openaiClient = createOpenAIClient();
+      const enrichmentParams: VideoEnrichmentParams = {
+        title: video.title || '',
+        description: video.description || '',
+        language: video.language || 'pt',
+      };
+      enrichment = await openaiClient.enrichVideo(enrichmentParams);
+      console.log(`[enrich-video] Successfully enriched video ${videoId} with OpenAI`);
+    } catch (openaiError) {
+      const errorMsg = openaiError instanceof Error ? openaiError.message : 'Unknown OpenAI error';
+      console.error("[enrich-video] OpenAI enrichment failed:", errorMsg);
+      
+      // If OpenAI fails, we can either:
+      // 1. Return error (fail the request)
+      // 2. Create a fallback enrichment with null/default values
+      // For now, we'll fail to ensure data quality
+      throw new Error(`AI enrichment failed: ${errorMsg}`);
+    }
+
+    const { data, error } = await supabaseServiceRole
       .from('ai_enrichments')
       .insert({
         video_id: videoId,
-        ...simulatedEnrichment
+        ...enrichment
       })
       .select()
       .single();
