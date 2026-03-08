@@ -63,13 +63,15 @@ export const LazyImage: React.FC<LazyImageProps> = ({
       });
     }, observerOptions);
 
-    if (containerRef.current && isObserving) {
-      observer.observe(containerRef.current);
+    const currentContainer = containerRef.current;
+
+    if (currentContainer && isObserving) {
+      observer.observe(currentContainer);
     }
 
     return () => {
-      if (containerRef.current) {
-        observer.unobserve(containerRef.current);
+      if (currentContainer) {
+        observer.unobserve(currentContainer);
       }
       observer.disconnect();
     };

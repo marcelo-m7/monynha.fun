@@ -23,7 +23,7 @@ class IntersectionObserverMock {
           intersectionRatio: 1,
         } as IntersectionObserverEntry,
       ],
-      this as any
+      this as unknown as IntersectionObserver
     );
   }
   unobserve() {}
@@ -38,7 +38,7 @@ if (!window.ResizeObserver) {
 }
 
 if (!window.IntersectionObserver) {
-  window.IntersectionObserver = IntersectionObserverMock as any;
+  window.IntersectionObserver = IntersectionObserverMock as unknown as typeof IntersectionObserver;
 }
 
 if (!window.scrollTo) {

@@ -1,13 +1,34 @@
 import { supabase } from '@/shared/api/supabase/supabaseClient';
-import type { Video, VideoInsert, VideoWithCategory } from './video.types';
+import type { Video, VideoCategory, VideoInsert, VideoWithCategory } from './video.types';
 import type { AiEnrichment } from '@/entities/ai_enrichment/ai_enrichment.types';
 import { extractYouTubeId } from '@/shared/lib/youtube';
+import type { Json } from '@/integrations/supabase/types';
 
 // Helper to extract the latest enrichment from an array
 function getLatestEnrichment(enrichments: AiEnrichment[] | null | undefined): AiEnrichment | null {
   if (!enrichments || enrichments.length === 0) return null;
   // Enrichments should already be sorted by created_at DESC
   return enrichments[0];
+}
+
+type VideoWithRelations = Video & {
+  category?: VideoCategory | null;
+  ai_enrichments?: AiEnrichment[] | null;
+};
+
+type FeaturedVideoRpcRow = Video & {
+  category?: Json | null;
+};
+
+function isVideoCategory(value: unknown): value is VideoCategory {
+  if (!value || typeof value !== 'object') return false;
+  const candidate = value as Record<string, unknown>;
+  return (
+    typeof candidate.id === 'string' &&
+    typeof candidate.name === 'string' &&
+    typeof candidate.slug === 'string' &&
+    typeof candidate.color === 'string'
+  );
 }
 
 export interface ListVideosParams {
@@ -80,7 +101,8 @@ export async function listVideos(params: ListVideosParams = {}) {
   
   // Process enrichments - extract only the latest one
   if (includeEnrichment && data) {
-    return data.map((video: any) => ({
+    const videos = data as VideoWithRelations[];
+    return videos.map((video) => ({
       ...video,
       enrichment: getLatestEnrichment(video.ai_enrichments),
       ai_enrichments: undefined, // Remove the array
@@ -117,7 +139,7 @@ export async function getVideoById(id: string) {
   
     // Process enrichment - extract only the latest one
     if (data) {
-      const video = data as any;
+      const video = data as VideoWithRelations;
       return {
         ...video,
         enrichment: getLatestEnrichment(video.ai_enrichments),
@@ -135,18 +157,24 @@ export async function listFeaturedVideos(limit = 4, offset = 0) {
   });
 
   if (!error && data) {
-    return data.map((row) => {
+    const rows = data as FeaturedVideoRpcRow[];
+    return rows.map((row) => {
       // Parse the category JSON if it's a string or object
-      let parsedCategory = null;
+      let parsedCategory: VideoCategory | null = null;
       if (row.category) {
         if (typeof row.category === 'string') {
           try {
-            parsedCategory = JSON.parse(row.category);
+            const parsed = JSON.parse(row.category) as unknown;
+            if (isVideoCategory(parsed)) {
+              parsedCategory = parsed;
+            }
           } catch {
             parsedCategory = null;
           }
         } else if (typeof row.category === 'object') {
-          parsedCategory = row.category as { id: string; name: string; slug: string; color: string };
+          if (isVideoCategory(row.category)) {
+            parsedCategory = row.category;
+          }
         }
       }
       return {
@@ -174,7 +202,8 @@ export async function listFeaturedVideos(limit = 4, offset = 0) {
   
     // Process enrichments
     if (fallbackData) {
-      return fallbackData.map((video: any) => ({
+        const videos = fallbackData as VideoWithRelations[];
+        return videos.map((video) => ({
         ...video,
         enrichment: getLatestEnrichment(video.ai_enrichments),
         ai_enrichments: undefined,
@@ -203,7 +232,8 @@ export async function listRecentVideos(limit = 4) {
   
     // Process enrichments
     if (data) {
-      return data.map((video: any) => ({
+        const videos = data as VideoWithRelations[];
+        return videos.map((video) => ({
         ...video,
         enrichment: getLatestEnrichment(video.ai_enrichments),
         ai_enrichments: undefined,
@@ -234,7 +264,8 @@ export async function listRelatedVideos(currentVideoId: string, categoryId: stri
   
     // Process enrichments
     if (data) {
-      return data.map((video: any) => ({
+        const videos = data as VideoWithRelations[];
+        return videos.map((video) => ({
         ...video,
         enrichment: getLatestEnrichment(video.ai_enrichments),
         ai_enrichments: undefined,
