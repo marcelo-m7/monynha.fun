@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { 
   Search, Plus, LogOut, Heart, Globe, ListVideo, 
   User as UserIcon, Settings, KeyRound, Home, 
-  Info, BookOpen, Mail, HelpCircle, Users 
+  Info, BookOpen, Mail, HelpCircle, Users, Bell, MessageCircle
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -21,6 +21,8 @@ import { Profile } from '@/entities/profile/profile.types';
 interface MobileNavProps {
   user: User | null;
   profile: Profile | null | undefined;
+  unreadMessagesCount: number;
+  unreadNotificationsCount: number;
   onClose: () => void;
   onSignOut: () => void;
   searchQuery: string;
@@ -31,6 +33,8 @@ interface MobileNavProps {
 export const MobileNav: React.FC<MobileNavProps> = ({
   user,
   profile,
+  unreadMessagesCount,
+  unreadNotificationsCount,
   onClose,
   onSignOut,
   searchQuery,
@@ -133,6 +137,34 @@ export const MobileNav: React.FC<MobileNavProps> = ({
                 >
                   <Heart className="h-5 w-5" />
                   <span className="text-sm">{t('header.favorites')}</span>
+                </NavLink>
+                <NavLink
+                  to="/messages"
+                  className="flex items-center gap-3 px-4 py-3 text-muted-foreground hover:text-foreground hover:bg-muted/50 rounded-2xl transition-all"
+                  activeClassName="bg-primary/5 text-primary font-medium"
+                  onClick={onClose}
+                >
+                  <MessageCircle className="h-5 w-5" />
+                  <span className="text-sm flex-1">{t('header.messages')}</span>
+                  {unreadMessagesCount > 0 && (
+                    <span className="text-xs font-bold rounded-full min-w-5 h-5 px-1 bg-primary text-primary-foreground inline-flex items-center justify-center">
+                      {unreadMessagesCount > 99 ? '99+' : unreadMessagesCount}
+                    </span>
+                  )}
+                </NavLink>
+                <NavLink
+                  to="/notifications"
+                  className="flex items-center gap-3 px-4 py-3 text-muted-foreground hover:text-foreground hover:bg-muted/50 rounded-2xl transition-all"
+                  activeClassName="bg-primary/5 text-primary font-medium"
+                  onClick={onClose}
+                >
+                  <Bell className="h-5 w-5" />
+                  <span className="text-sm flex-1">{t('header.notifications')}</span>
+                  {unreadNotificationsCount > 0 && (
+                    <span className="text-xs font-bold rounded-full min-w-5 h-5 px-1 bg-primary text-primary-foreground inline-flex items-center justify-center">
+                      {unreadNotificationsCount > 99 ? '99+' : unreadNotificationsCount}
+                    </span>
+                  )}
                 </NavLink>
                 <NavLink
                   to="/account/settings"

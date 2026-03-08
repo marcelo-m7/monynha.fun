@@ -37,6 +37,8 @@ const CreateEditPlaylist = lazy(() => import("./pages/CreateEditPlaylist"));
 const Profile = lazy(() => import("./pages/Profile"));
 const EditProfile = lazy(() => import("./pages/EditProfile"));
 const AccountSettings = lazy(() => import("./pages/AccountSettings"));
+const Messages = lazy(() => import("./pages/Messages"));
+const Notifications = lazy(() => import("./pages/Notifications"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 
 const App = () => (
@@ -68,6 +70,8 @@ const App = () => (
         <Route path="/profile/:username" element={<Profile />} />
         <Route path="/profile/edit" element={<EditProfile />} />
         <Route path="/account/settings" element={<AccountSettings />} />
+        <Route path="/messages" element={<Messages />} />
+        <Route path="/notifications" element={<Notifications />} />
         <Route path="/:username" element={<Profile />} />
         <Route path="*" element={<NotFound />} />
       </Routes>

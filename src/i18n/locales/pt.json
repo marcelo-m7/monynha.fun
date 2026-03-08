@@ -30,6 +30,8 @@
     "editProfile": "Editar Perfil",
     "accountSettings": "Configurações da Conta",
     "home": "Início",
+    "messages": "Mensagens",
+    "notifications": "Notificações",
     "toggleMenu": "Alternar menu",
     "closeMenu": "Fechar menu",
     "languageLabel": "Idioma"
@@ -553,5 +555,31 @@
       "contentRequired": "O comentário não pode estar vazio",
       "contentMaxLength": "O comentário deve ter no máximo 500 caracteres"
     }
+  },
+  "messages": {
+    "title": "Mensagens",
+    "description": "Suas conversas diretas com outros curadores.",
+    "inbox": "Caixa de entrada",
+    "emptyInbox": "Ainda não há conversas.",
+    "selectConversation": "Selecione uma conversa para começar.",
+    "emptyConversation": "Sem mensagens ainda. Envie a primeira!",
+    "inputPlaceholder": "Escreva uma mensagem...",
+    "tipPrefix": "Dica:",
+    "tipLink": "visite perfis na comunidade"
+  },
+  "notifications": {
+    "title": "Notificações",
+    "description": "Acompanhe novos seguidores, mensagens e atividades da conta.",
+    "inbox": "Notificações recentes",
+    "empty": "Você ainda não tem notificações.",
+    "markAsRead": "Marcar como lida",
+    "markAllAsRead": "Marcar tudo como lido"
+  },
+  "socialProfile": {
+    "followers": "seguidores",
+    "following": "seguindo",
+    "follow": "Seguir",
+    "unfollow": "Deixar de seguir",
+    "sendMessage": "Mensagem"
   }
 }
