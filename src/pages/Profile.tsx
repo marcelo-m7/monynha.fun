@@ -25,10 +25,6 @@ const Profile = () => {
 
   const { data: profile, isLoading: profileLoading, isError: profileError } = useProfileByUsername(username);
   const isCurrentUser = authUser && profile && authUser.id === profile.id;
-  const { data: followStats } = useFollowStats(profile?.username);
-  const { data: isFollowing = false } = useFollowStatus(profile?.username);
-  const followMutation = useFollowUser();
-  const unfollowMutation = useUnfollowUser();
   const { data: userVideos, isLoading: videosLoading } = useVideos({
     submittedBy: profile?.id,
     enabled: !!profile?.id,
@@ -43,22 +39,6 @@ const Profile = () => {
   const { data: isFollowing = false } = useIsFollowing(profile?.username || undefined);
   const followMutation = useFollowByUsername();
   const unfollowMutation = useUnfollowByUsername();
-
-  const handleFollowToggle = async () => {
-    if (!profile?.username) return;
-
-    if (!authUser) {
-      navigate('/auth');
-      return;
-    }
-
-    if (isFollowing) {
-      await unfollowMutation.mutateAsync(profile.username);
-      return;
-    }
-
-    await followMutation.mutateAsync(profile.username);
-  };
 
   // Set dynamic meta tags for social media sharing
   useMetaTags({
