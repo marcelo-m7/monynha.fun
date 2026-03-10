@@ -1,5 +1,5 @@
 import { describe, expect, it, vi, beforeEach } from 'vitest';
-import { screen, waitFor, within } from '@testing-library/react';
+import { fireEvent, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import Submit from './Submit';
 import { renderWithProviders } from '@/shared/test/renderWithProviders';
@@ -106,10 +106,11 @@ describe('Submit page', () => {
     const user = userEvent.setup();
 
     const youtubeInput = screen.getByLabelText(/youtube url/i);
-    await user.type(
-      youtubeInput,
-      'https://www.youtube.com/watch?v=abc123DEF45',
-    );
+    fireEvent.change(youtubeInput, {
+      target: { value: 'https://www.youtube.com/watch?v=abc123DEF45' },
+    });
+
+    expect(youtubeInput).toHaveValue('https://www.youtube.com/watch?v=abc123DEF45');
 
     const form = youtubeInput.closest('form');
     if (!form) throw new Error('Submit form not found');
