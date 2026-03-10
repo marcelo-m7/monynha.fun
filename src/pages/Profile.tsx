@@ -1,7 +1,7 @@
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { Header } from '@/components/layout/Header';
 import { Footer } from '@/components/layout/Footer';
-import { useProfileByUsername } from '@/features/profile/queries/useProfile';
+import { useProfileById, useProfileByUsername } from '@/features/profile/queries/useProfile';
 import { useVideos } from '@/features/videos/queries/useVideos';
 import { usePlaylists } from '@/features/playlists/queries/usePlaylists';
 import { useUserSocialAccounts } from '@/features/user_social_accounts'; // Import the new hook
@@ -9,26 +9,22 @@ import { useMetaTags } from '@/shared/hooks/useMetaTags';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { CalendarDays, User as UserIcon, Video as VideoIcon, ListVideo, ArrowLeft, Edit } from 'lucide-react';
+import { CalendarDays, User as UserIcon, Video as VideoIcon, ListVideo, ArrowLeft, Edit, MessageCircle } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '@/features/auth/useAuth';
 import { VideoCard } from '@/components/video/VideoCard';
 import { SocialAccountsDisplay } from '@/components/profile/SocialAccountsDisplay'; // Import the new component
-import { useFollowStats, useFollowStatus, useFollowUser, useUnfollowUser } from '@/features/follows';
-import { MessageCircle, UserPlus, UserCheck } from 'lucide-react';
+import { useFollowByUsername, useFollowStats, useIsFollowing, useUnfollowByUsername } from '@/features/follows';
 
 const Profile = () => {
   const { t } = useTranslation();
   const { username } = useParams<{ username: string }>();
   const navigate = useNavigate();
   const { user: authUser, loading: authLoading } = useAuth();
+  const { data: currentUserProfile } = useProfileById(authUser?.id);
 
   const { data: profile, isLoading: profileLoading, isError: profileError } = useProfileByUsername(username);
   const isCurrentUser = authUser && profile && authUser.id === profile.id;
-  const { data: followStats } = useFollowStats(profile?.username);
-  const { data: isFollowing = false } = useFollowStatus(profile?.username);
-  const followMutation = useFollowUser();
-  const unfollowMutation = useUnfollowUser();
   const { data: userVideos, isLoading: videosLoading } = useVideos({
     submittedBy: profile?.id,
     enabled: !!profile?.id,
@@ -39,22 +35,10 @@ const Profile = () => {
     enabled: !!profile?.id,
   });
   const { data: socialAccounts, isLoading: socialAccountsLoading } = useUserSocialAccounts(profile?.id); // Fetch social accounts
-
-  const handleFollowToggle = async () => {
-    if (!profile?.username) return;
-
-    if (!authUser) {
-      navigate('/auth');
-      return;
-    }
-
-    if (isFollowing) {
-      await unfollowMutation.mutateAsync(profile.username);
-      return;
-    }
-
-    await followMutation.mutateAsync(profile.username);
-  };
+  const { data: followStats } = useFollowStats(profile?.username || undefined);
+  const { data: isFollowing = false } = useIsFollowing(profile?.username || undefined);
+  const followMutation = useFollowByUsername();
+  const unfollowMutation = useUnfollowByUsername();
 
   // Set dynamic meta tags for social media sharing
   useMetaTags({
@@ -135,13 +119,15 @@ const Profile = () => {
               <CalendarDays className="w-4 h-4" />
               <span>{t('profile.joinedOn', { date: new Date(profile.created_at).toLocaleDateString() })}</span>
             </div>
-            <div className="flex items-center justify-center sm:justify-start gap-4 text-sm text-muted-foreground mt-3">
-              <span>
-                <strong className="text-foreground">{followStats?.followersCount ?? 0}</strong> followers
-              </span>
-              <span>
-                <strong className="text-foreground">{followStats?.followingCount ?? 0}</strong> following
-              </span>
+            <div className="flex items-center justify-center sm:justify-start gap-6 mt-4 text-sm">
+              <div>
+                <span className="font-semibold">{followStats?.followersCount || 0}</span>{' '}
+                <span className="text-muted-foreground">{t('socialProfile.followers')}</span>
+              </div>
+              <div>
+                <span className="font-semibold">{followStats?.followingCount || 0}</span>{' '}
+                <span className="text-muted-foreground">{t('socialProfile.following')}</span>
+              </div>
             </div>
             {profile.bio && (
               <p className="text-muted-foreground mt-4 max-w-xl whitespace-pre-wrap">
@@ -159,24 +145,31 @@ const Profile = () => {
                 {t('profile.editProfile')}
               </Button>
             )}
-            {!isCurrentUser && (
-              <div className="mt-4 flex flex-wrap gap-2 justify-center sm:justify-start">
+            {!isCurrentUser && authUser && profile.username && (
+              <div className="mt-4 flex flex-wrap gap-3 justify-center sm:justify-start">
                 <Button
-                  onClick={handleFollowToggle}
                   variant={isFollowing ? 'outline' : 'default'}
-                  className="gap-2"
+                  onClick={() => {
+                    if (isFollowing) {
+                      unfollowMutation.mutate({
+                        targetUsername: profile.username as string,
+                        currentUsername: currentUserProfile?.username || undefined,
+                      });
+                      return;
+                    }
+
+                    followMutation.mutate({
+                      targetUsername: profile.username as string,
+                      currentUsername: currentUserProfile?.username || undefined,
+                    });
+                  }}
                   disabled={followMutation.isPending || unfollowMutation.isPending}
                 >
-                  {isFollowing ? <UserCheck className="w-4 h-4" /> : <UserPlus className="w-4 h-4" />}
-                  {isFollowing ? 'Following' : 'Follow'}
+                  {isFollowing ? t('socialProfile.unfollow') : t('socialProfile.follow')}
                 </Button>
-                <Button
-                  onClick={() => navigate(`/messages?user=${profile.username}`)}
-                  variant="secondary"
-                  className="gap-2"
-                >
-                  <MessageCircle className="w-4 h-4" />
-                  Message
+                <Button variant="outline" onClick={() => navigate(`/messages?with=${profile.username}`)}>
+                  <MessageCircle className="w-4 h-4 mr-2" />
+                  {t('socialProfile.sendMessage')}
                 </Button>
               </div>
             )}

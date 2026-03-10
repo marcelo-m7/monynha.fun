@@ -1,124 +1,62 @@
-import { useEffect } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
-import { useAuth } from '@/features/auth/useAuth';
-import { notificationKeys } from '@/entities/notification/notification.keys';
-import { supabase } from '@/shared/api/supabase/supabaseClient';
 import {
   getUnreadNotificationsCount,
   listNotifications,
   markAllNotificationsAsRead,
   markNotificationAsRead,
 } from '@/entities/notification/notification.api';
-import type { NotificationWithActor } from '@/entities/notification/notification.types';
+import { notificationKeys } from '@/entities/notification/notification.keys';
+import type { NotificationItem } from '@/entities/notification/notification.types';
+import { useAuth } from '@/features/auth/useAuth';
 
 export function useNotifications(limit = 50) {
-  const { user } = useAuth();
-  const queryClient = useQueryClient();
-
-  useEffect(() => {
-    if (!user?.id) return;
-
-    const channel = supabase
-      .channel(`notifications-list-${user.id}`)
-      .on(
-        'postgres_changes',
-        {
-          event: '*',
-          schema: 'public',
-          table: 'notifications',
-          filter: `user_id=eq.${user.id}`,
-        },
-        () => {
-          queryClient.invalidateQueries({ queryKey: notificationKeys.all });
-        },
-      )
-      .subscribe();
-
-    return () => {
-      void supabase.removeChannel(channel);
-    };
-  }, [queryClient, user?.id]);
-
-  return useQuery<NotificationWithActor[], Error>({
+  return useQuery<NotificationItem[], Error>({
     queryKey: notificationKeys.list(limit),
-    queryFn: async () => {
-      if (!user?.id) return [];
-      return listNotifications(limit);
-    },
-    enabled: !!user?.id,
-    refetchInterval: 15000,
+    queryFn: () => listNotifications(limit),
   });
 }
 
 export function useUnreadNotificationsCount() {
   const { user } = useAuth();
-  const queryClient = useQueryClient();
-
-  useEffect(() => {
-    if (!user?.id) return;
-
-    const channel = supabase
-      .channel(`notifications-unread-${user.id}`)
-      .on(
-        'postgres_changes',
-        {
-          event: '*',
-          schema: 'public',
-          table: 'notifications',
-          filter: `user_id=eq.${user.id}`,
-        },
-        () => {
-          queryClient.invalidateQueries({ queryKey: notificationKeys.unreadCount() });
-        },
-      )
-      .subscribe();
-
-    return () => {
-      void supabase.removeChannel(channel);
-    };
-  }, [queryClient, user?.id]);
 
   return useQuery<number, Error>({
     queryKey: notificationKeys.unreadCount(),
     queryFn: async () => {
-      if (!user?.id) return 0;
+      if (!user) return 0;
       return getUnreadNotificationsCount();
     },
-    enabled: !!user?.id,
-    refetchInterval: 15000,
+    enabled: !!user,
+    staleTime: 15000,
   });
 }
 
 export function useMarkNotificationAsRead() {
-  const { user } = useAuth();
   const queryClient = useQueryClient();
 
-  return useMutation({
-    mutationFn: (notificationId: string) => markNotificationAsRead(notificationId),
-    onSuccess: () => {
-      if (!user?.id) return;
-      queryClient.invalidateQueries({ queryKey: notificationKeys.all });
+  return useMutation<boolean, Error, { notificationId: string; limit?: number }>({
+    mutationFn: ({ notificationId }) => markNotificationAsRead(notificationId),
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({ queryKey: notificationKeys.unreadCount() });
+      queryClient.invalidateQueries({ queryKey: notificationKeys.list(variables.limit || 50) });
+    },
+    onError: (error) => {
+      toast.error('Nao foi possivel atualizar a notificacao.', { description: error.message });
     },
   });
 }
 
 export function useMarkAllNotificationsAsRead() {
-  const { user } = useAuth();
   const queryClient = useQueryClient();
 
-  return useMutation({
-    mutationFn: async () => {
-      if (!user?.id) throw new Error('You must be logged in to update notifications.');
-      return markAllNotificationsAsRead();
+  return useMutation<number, Error, { limit?: number } | undefined>({
+    mutationFn: () => markAllNotificationsAsRead(),
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({ queryKey: notificationKeys.unreadCount() });
+      queryClient.invalidateQueries({ queryKey: notificationKeys.list(variables?.limit || 50) });
     },
-    onSuccess: () => {
-      if (!user?.id) return;
-      queryClient.invalidateQueries({ queryKey: notificationKeys.all });
-      toast.success('All notifications marked as read.');
-    },
-    onError: (error: Error) => {
-      toast.error(error.message || 'Could not update notifications.');
+    onError: (error) => {
+      toast.error('Nao foi possivel marcar as notificacoes como lidas.', { description: error.message });
     },
   });
 }

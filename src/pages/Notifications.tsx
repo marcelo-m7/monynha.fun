@@ -1,12 +1,12 @@
+import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { Bell, Check, CheckCheck, Loader2 } from 'lucide-react';
 import { Header } from '@/components/layout/Header';
 import { Footer } from '@/components/layout/Footer';
-import { Button } from '@/components/ui/button';
-import { Card } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Skeleton } from '@/components/ui/skeleton';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Bell, CheckCheck, ArrowLeft, MessageCircle, UserPlus } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Separator } from '@/components/ui/separator';
 import { useAuth } from '@/features/auth/useAuth';
 import {
   useMarkAllNotificationsAsRead,
@@ -15,181 +15,106 @@ import {
 } from '@/features/notifications';
 import { useTranslation } from 'react-i18next';
 
-const formatWhen = (isoDate: string) => {
-  const date = new Date(isoDate);
-  const now = Date.now();
-  const diffMs = now - date.getTime();
-  const diffMin = Math.floor(diffMs / 60000);
-  const diffHours = Math.floor(diffMin / 60);
-  const diffDays = Math.floor(diffHours / 24);
-
-  if (diffMin < 1) return 'just now';
-  if (diffMin < 60) return `${diffMin}m ago`;
-  if (diffHours < 24) return `${diffHours}h ago`;
-  if (diffDays < 7) return `${diffDays}d ago`;
-  return date.toLocaleDateString();
-};
-
-const getNotificationIcon = (type: string) => {
-  switch (type) {
-    case 'new_message':
-      return <MessageCircle className="h-4 w-4 text-primary" />;
-    case 'new_follower':
-      return <UserPlus className="h-4 w-4 text-primary" />;
-    default:
-      return <Bell className="h-4 w-4 text-primary" />;
-  }
-};
+const PAGE_LIMIT = 100;
 
 const Notifications = () => {
   const { t } = useTranslation();
+  const { user, loading: authLoading } = useAuth();
   const navigate = useNavigate();
-  const { user, loading } = useAuth();
-  const { data: notifications, isLoading } = useNotifications(100);
-  const markOneAsRead = useMarkNotificationAsRead();
+
+  const { data: notifications = [], isLoading } = useNotifications(PAGE_LIMIT);
+  const markNotificationAsRead = useMarkNotificationAsRead();
   const markAllAsRead = useMarkAllNotificationsAsRead();
 
-  const handleNotificationOpen = async (notificationId: string, type: string, actorUsername?: string | null) => {
-    if (!notificationId) return;
-
-    if (!actorUsername) {
-      await markOneAsRead.mutateAsync(notificationId);
-      return;
+  useEffect(() => {
+    if (!authLoading && !user) {
+      navigate('/auth');
     }
+  }, [authLoading, navigate, user]);
 
-    await markOneAsRead.mutateAsync(notificationId);
-
-    if (type === 'new_message') {
-      navigate(`/messages?user=${encodeURIComponent(actorUsername)}`);
-      return;
-    }
-
-    if (type === 'new_follower') {
-      navigate(`/profile/${actorUsername}`);
-    }
-  };
-
-  if (loading || isLoading) {
+  if (authLoading || isLoading) {
     return (
       <div className="min-h-screen flex flex-col">
         <Header />
-        <main className="flex-1 container py-8 space-y-4">
-          <Skeleton className="h-10 w-56" />
-          {Array.from({ length: 6 }).map((_, i) => (
-            <Skeleton key={i} className="h-24 w-full rounded-xl" />
-          ))}
+        <main className="flex-1 container py-8 flex items-center justify-center">
+          <Loader2 className="w-8 h-8 animate-spin text-primary" />
         </main>
         <Footer />
       </div>
     );
   }
 
-  if (!user) {
-    return (
-      <div className="min-h-screen flex flex-col">
-        <Header />
-        <main className="flex-1 container py-16 text-center">
-          <h1 className="text-3xl font-bold mb-4">{t('notifications.title')}</h1>
-          <p className="text-muted-foreground mb-8">{t('notifications.signInPrompt')}</p>
-          <Button onClick={() => navigate('/auth')}>{t('header.login')}</Button>
-        </main>
-        <Footer />
-      </div>
-    );
-  }
-
-  const unreadCount = notifications?.filter((item) => !item.is_read).length ?? 0;
+  const unreadCount = notifications.filter((item) => !item.isRead).length;
 
   return (
     <div className="min-h-screen flex flex-col">
       <Header />
       <main className="flex-1 container py-8 space-y-6">
-        <Button variant="ghost" onClick={() => navigate(-1)} className="mb-2">
-          <ArrowLeft className="w-4 h-4 mr-2" />
-          {t('common.back')}
-        </Button>
-
-        <div className="flex flex-wrap items-center justify-between gap-3">
+        <div className="flex flex-wrap gap-3 items-start justify-between">
           <div>
             <h1 className="text-3xl font-bold">{t('notifications.title')}</h1>
-            <p className="text-muted-foreground mt-1">
-              {t('notifications.unreadCount', { count: unreadCount })}
-            </p>
+            <p className="text-muted-foreground mt-2">{t('notifications.description')}</p>
           </div>
           <Button
             variant="outline"
-            className="gap-2"
+            onClick={() => markAllAsRead.mutate({ limit: PAGE_LIMIT })}
             disabled={unreadCount === 0 || markAllAsRead.isPending}
-            onClick={() => markAllAsRead.mutate()}
           >
-            <CheckCheck className="h-4 w-4" />
-            {t('notifications.markAllRead')}
+            {markAllAsRead.isPending ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : <CheckCheck className="w-4 h-4 mr-2" />}
+            {t('notifications.markAllAsRead')}
           </Button>
         </div>
 
-        {!notifications || notifications.length === 0 ? (
-          <Card className="p-10 text-center">
-            <Bell className="h-10 w-10 text-muted-foreground mx-auto mb-4" />
-            <h2 className="text-lg font-semibold mb-2">{t('notifications.emptyTitle')}</h2>
-            <p className="text-muted-foreground">{t('notifications.emptyDescription')}</p>
-          </Card>
-        ) : (
-          <div className="space-y-3">
-            {notifications.map((notification) => (
-              <Card
-                key={notification.id}
-                className={`p-4 transition-colors ${notification.is_read ? 'bg-card' : 'bg-primary/5 border-primary/30'}`}
-              >
-                <div className="flex items-start justify-between gap-4">
-                  <button
-                    type="button"
-                    className="flex items-start gap-3 min-w-0 text-left w-full"
-                    onClick={() =>
-                      handleNotificationOpen(
-                        notification.id,
-                        notification.type,
-                        notification.actor?.username,
-                      )
-                    }
-                  >
-                    <Avatar className="h-10 w-10">
-                      <AvatarImage src={notification.actor?.avatar_url || undefined} alt={notification.actor?.username || 'actor'} />
-                      <AvatarFallback>
-                        {notification.actor?.display_name?.charAt(0)?.toUpperCase() || notification.actor?.username?.charAt(0)?.toUpperCase() || '?'}
-                      </AvatarFallback>
-                    </Avatar>
-                    <div className="min-w-0">
-                      <div className="flex items-center gap-2 mb-1">
-                        {getNotificationIcon(notification.type)}
-                        <h3 className="font-semibold text-sm">
-                          {notification.title || t('notifications.defaultTitle')}
-                        </h3>
-                        {!notification.is_read && <Badge variant="secondary">{t('notifications.newBadge')}</Badge>}
+        <Card>
+          <CardHeader>
+            <CardTitle>{t('notifications.inbox')}</CardTitle>
+          </CardHeader>
+          <Separator />
+          <CardContent className="p-0">
+            {notifications.length === 0 ? (
+              <div className="py-16 px-6 text-center text-muted-foreground">
+                <Bell className="w-14 h-14 mx-auto mb-3 opacity-60" />
+                <p>{t('notifications.empty')}</p>
+              </div>
+            ) : (
+              <div className="divide-y divide-border">
+                {notifications.map((notification) => (
+                  <div key={notification.id} className={`p-4 md:p-5 ${notification.isRead ? 'bg-background' : 'bg-primary/5'}`}>
+                    <div className="flex gap-3 items-start">
+                      <Avatar className="h-10 w-10">
+                        <AvatarImage src={notification.actorAvatarUrl || undefined} alt={notification.actorDisplayName || notification.actorUsername || 'User'} />
+                        <AvatarFallback>
+                          {(notification.actorDisplayName || notification.actorUsername || '?').slice(0, 1).toUpperCase()}
+                        </AvatarFallback>
+                      </Avatar>
+                      <div className="min-w-0 flex-1">
+                        <p className="font-medium">{notification.title}</p>
+                        {notification.message && <p className="text-sm text-muted-foreground mt-1">{notification.message}</p>}
+                        {notification.actorUsername && (
+                          <p className="text-xs text-muted-foreground mt-1">
+                            @{notification.actorUsername}
+                          </p>
+                        )}
                       </div>
-                      <p className="text-sm text-muted-foreground break-words">
-                        {notification.message || t('notifications.defaultMessage')}
-                      </p>
-                      <p className="text-xs text-muted-foreground mt-2">{formatWhen(notification.created_at)}</p>
+                      {!notification.isRead && (
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="shrink-0"
+                          onClick={() => markNotificationAsRead.mutate({ notificationId: notification.id, limit: PAGE_LIMIT })}
+                          disabled={markNotificationAsRead.isPending}
+                        >
+                          <Check className="w-4 h-4 mr-2" />
+                          {t('notifications.markAsRead')}
+                        </Button>
+                      )}
                     </div>
-                  </button>
-
-                  {!notification.is_read && (
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={(event) => {
-                        event.stopPropagation();
-                        markOneAsRead.mutate(notification.id);
-                      }}
-                    >
-                      {t('notifications.markRead')}
-                    </Button>
-                  )}
-                </div>
-              </Card>
-            ))}
-          </div>
-        )}
+                  </div>
+                ))}
+              </div>
+            )}
+          </CardContent>
+        </Card>
       </main>
       <Footer />
     </div>

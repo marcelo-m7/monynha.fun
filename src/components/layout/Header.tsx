@@ -1,5 +1,5 @@
 import { Link, useNavigate } from "react-router-dom";
-import { Search, Plus, Menu, Heart, Globe, User as UserIcon, Settings, ListVideo, KeyRound, LogOut, Bell, MessageCircle } from "lucide-react";
+import { Search, Plus, Menu, Heart, Globe, User as UserIcon, Settings, KeyRound, LogOut, Bell, MessageCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useState } from "react";
@@ -10,12 +10,12 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useProfileById } from "@/features/profile/queries/useProfile";
-import { useUnreadMessagesCount } from '@/features/messages';
-import { useUnreadNotificationsCount } from '@/features/notifications';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { NavLink } from "@/components/NavLink";
 import { MobileNav } from "./MobileNav";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
+import { useUnreadMessagesCount } from "@/features/messages";
+import { useUnreadNotificationsCount } from "@/features/notifications";
 
 export const Header = () => {
   const { t } = useTranslation();
@@ -23,8 +23,8 @@ export const Header = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const { user, signOut } = useAuth();
   const { data: profile } = useProfileById(user?.id);
-    const { data: unreadMessages = 0 } = useUnreadMessagesCount();
-    const { data: unreadNotifications = 0 } = useUnreadNotificationsCount();
+  const { data: unreadMessagesCount = 0 } = useUnreadMessagesCount();
+  const { data: unreadNotificationsCount = 0 } = useUnreadNotificationsCount();
   const navigate = useNavigate();
 
   const handleSignOut = async () => {
@@ -102,32 +102,6 @@ export const Header = () => {
         <div className="flex items-center gap-2">
           {user && profile ? (
             <>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="hidden sm:flex relative text-muted-foreground hover:text-foreground"
-                  onClick={() => navigate('/notifications')}
-                >
-                  <Bell className="h-4 w-4" />
-                  {unreadNotifications > 0 && (
-                    <span className="absolute -top-1 -right-1 min-w-[18px] h-[18px] px-1 rounded-full bg-primary text-primary-foreground text-[10px] leading-[18px] font-bold">
-                      {unreadNotifications > 99 ? '99+' : unreadNotifications}
-                    </span>
-                  )}
-                </Button>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="hidden sm:flex relative text-muted-foreground hover:text-foreground"
-                  onClick={() => navigate('/messages')}
-                >
-                  <MessageCircle className="h-4 w-4" />
-                  {unreadMessages > 0 && (
-                    <span className="absolute -top-1 -right-1 min-w-[18px] h-[18px] px-1 rounded-full bg-primary text-primary-foreground text-[10px] leading-[18px] font-bold">
-                      {unreadMessages > 99 ? '99+' : unreadMessages}
-                    </span>
-                  )}
-                </Button>
               <Button
                 variant="ghost"
                 size="sm"
@@ -136,6 +110,34 @@ export const Header = () => {
               >
                 <Heart className="h-4 w-4" />
                 <span className="hidden lg:inline">{t('header.favorites')}</span>
+              </Button>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="hidden sm:inline-flex relative text-muted-foreground hover:text-foreground"
+                onClick={() => navigate('/messages')}
+                aria-label={t('header.messages')}
+              >
+                <MessageCircle className="h-4 w-4" />
+                {unreadMessagesCount > 0 && (
+                  <span className="absolute -top-1 -right-1 h-5 min-w-5 px-1 rounded-full bg-primary text-primary-foreground text-[10px] font-bold flex items-center justify-center">
+                    {unreadMessagesCount > 99 ? '99+' : unreadMessagesCount}
+                  </span>
+                )}
+              </Button>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="hidden sm:inline-flex relative text-muted-foreground hover:text-foreground"
+                onClick={() => navigate('/notifications')}
+                aria-label={t('header.notifications')}
+              >
+                <Bell className="h-4 w-4" />
+                {unreadNotificationsCount > 0 && (
+                  <span className="absolute -top-1 -right-1 h-5 min-w-5 px-1 rounded-full bg-primary text-primary-foreground text-[10px] font-bold flex items-center justify-center">
+                    {unreadNotificationsCount > 99 ? '99+' : unreadNotificationsCount}
+                  </span>
+                )}
               </Button>
               <Button
                 variant="hero"
@@ -179,15 +181,6 @@ export const Header = () => {
                     <span>{t('header.accountSettings')}</span>
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
-                    <DropdownMenuItem onClick={() => navigate('/notifications')} className="rounded-lg">
-                      <Bell className="mr-2 h-4 w-4" />
-                      <span>{t('header.notifications')}</span>
-                    </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => navigate('/messages')} className="rounded-lg">
-                      <MessageCircle className="mr-2 h-4 w-4" />
-                      <span>{t('header.messages')}</span>
-                    </DropdownMenuItem>
-                    <DropdownMenuSeparator />
                   <DropdownMenuItem onClick={handleSignOut} className="rounded-lg text-destructive focus:text-destructive focus:bg-destructive/5">
                     <LogOut className="mr-2 h-4 w-4" />
                     <span>{t('header.logout')}</span>
@@ -262,6 +255,8 @@ export const Header = () => {
               <MobileNav
                 user={user}
                 profile={profile}
+                unreadMessagesCount={unreadMessagesCount}
+                unreadNotificationsCount={unreadNotificationsCount}
                 onClose={() => setIsSheetOpen(false)}
                 onSignOut={handleSignOut}
                 searchQuery={searchQuery}

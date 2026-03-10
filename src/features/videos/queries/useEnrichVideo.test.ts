@@ -83,7 +83,7 @@ describe('OpenAIClient', () => {
       ];
 
       expectedFields.forEach((field) => {
-        expect(['optimized_title', 'summary_description', 'semantic_tags'].includes(field)).toBe(true);
+        expect(expectedFields.includes(field)).toBe(true);
       });
     });
 

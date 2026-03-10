@@ -31,35 +31,7 @@
     "home": "Accueil",
     "toggleMenu": "Basculer le menu",
     "closeMenu": "Fermer le menu",
-    "languageLabel": "Langue",
-    "notifications": "Notifications",
-    "messages": "Messages"
-  },
-  "messages": {
-    "title": "Messages",
-    "subtitle": "Conversations privees avec des curateurs et des membres de la communaute.",
-    "contactsTitle": "Contacts",
-    "noContacts": "Pas encore de contacts. Suivez des utilisateurs pour commencer a discuter.",
-    "emptyConversation": "Pas encore de messages. Lancez la conversation.",
-    "composePlaceholder": "Ecrivez un message...",
-    "send": "Envoyer",
-    "selectContactTitle": "Selectionnez un contact",
-    "selectContactDescription": "Choisissez quelqu'un parmi vos contacts pour commencer a discuter.",
-    "signInPrompt": "Vous devez vous connecter pour utiliser les messages directs.",
-    "unknownUser": "Utilisateur inconnu"
-  },
-  "notifications": {
-    "title": "Notifications",
-    "signInPrompt": "Vous devez vous connecter pour voir les notifications.",
-    "unreadCount_one": "{{count}} notification non lue",
-    "unreadCount_other": "{{count}} notifications non lues",
-    "markAllRead": "Tout marquer comme lu",
-    "markRead": "Marquer comme lu",
-    "emptyTitle": "Aucune notification pour le moment",
-    "emptyDescription": "Lorsqu'une personne vous suit ou vous envoie un message, cela apparaitra ici.",
-    "newBadge": "Nouveau",
-    "defaultTitle": "Notification",
-    "defaultMessage": "Vous avez une nouvelle notification."
+    "languageLabel": "Langue"
   },
   "footer": {
     "description": "Une plateforme de curation collective de vidéos YouTube. Préserver et découvrir du contenu précieux ensemble.",

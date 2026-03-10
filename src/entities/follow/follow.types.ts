@@ -3,9 +3,9 @@ export interface FollowStats {
   followingCount: number;
 }
 
-export interface FollowListItem {
+export interface FollowUser {
   username: string;
-  display_name: string | null;
-  avatar_url: string | null;
-  followed_at: string;
+  displayName: string | null;
+  avatarUrl: string | null;
+  followedAt: string;
 }

@@ -1,18 +1,14 @@
-export interface NotificationActor {
-  username: string | null;
-  display_name: string | null;
-  avatar_url: string | null;
-}
-
-export interface NotificationWithActor {
+export interface NotificationItem {
   id: string;
   type: string;
-  title: string | null;
+  title: string;
   message: string | null;
-  entity_type: string | null;
-  entity_id: string | null;
-  is_read: boolean;
-  created_at: string;
-  read_at: string | null;
-  actor?: NotificationActor | null;
+  entityType: string | null;
+  entityId: string | null;
+  isRead: boolean;
+  createdAt: string;
+  readAt: string | null;
+  actorUsername: string | null;
+  actorDisplayName: string | null;
+  actorAvatarUrl: string | null;
 }

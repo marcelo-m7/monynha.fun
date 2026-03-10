@@ -140,6 +140,51 @@ export type Database = {
           },
         ]
       }
+      direct_messages: {
+        Row: {
+          content: string
+          created_at: string | null
+          id: string
+          is_read: boolean | null
+          read_at: string | null
+          receiver_id: string
+          sender_id: string
+        }
+        Insert: {
+          content: string
+          created_at?: string | null
+          id?: string
+          is_read?: boolean | null
+          read_at?: string | null
+          receiver_id: string
+          sender_id: string
+        }
+        Update: {
+          content?: string
+          created_at?: string | null
+          id?: string
+          is_read?: boolean | null
+          read_at?: string | null
+          receiver_id?: string
+          sender_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "direct_messages_receiver_id_fkey"
+            columns: ["receiver_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "direct_messages_sender_id_fkey"
+            columns: ["sender_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       favorites: {
         Row: {
           created_at: string
@@ -366,6 +411,63 @@ export type Database = {
           },
         ]
       }
+      notifications: {
+        Row: {
+          actor_id: string | null
+          created_at: string | null
+          entity_id: string | null
+          entity_type: string | null
+          id: string
+          is_read: boolean | null
+          message: string | null
+          read_at: string | null
+          title: string
+          type: string
+          user_id: string
+        }
+        Insert: {
+          actor_id?: string | null
+          created_at?: string | null
+          entity_id?: string | null
+          entity_type?: string | null
+          id?: string
+          is_read?: boolean | null
+          message?: string | null
+          read_at?: string | null
+          title: string
+          type: string
+          user_id: string
+        }
+        Update: {
+          actor_id?: string | null
+          created_at?: string | null
+          entity_id?: string | null
+          entity_type?: string | null
+          id?: string
+          is_read?: boolean | null
+          message?: string | null
+          read_at?: string | null
+          title?: string
+          type?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "notifications_actor_id_fkey"
+            columns: ["actor_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "notifications_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           avatar_path: string | null
@@ -402,144 +504,42 @@ export type Database = {
         }
         Relationships: []
       }
-        user_follows: {
-          Row: {
-            created_at: string
-            follower_id: string
-            following_id: string
-            id: string
-          }
-          Insert: {
-            created_at?: string
-            follower_id: string
-            following_id: string
-            id?: string
-          }
-          Update: {
-            created_at?: string
-            follower_id?: string
-            following_id?: string
-            id?: string
-          }
-          Relationships: [
-            {
-              foreignKeyName: "user_follows_follower_id_fkey"
-              columns: ["follower_id"]
-              isOneToOne: false
-              referencedRelation: "profiles"
-              referencedColumns: ["id"]
-            },
-            {
-              foreignKeyName: "user_follows_following_id_fkey"
-              columns: ["following_id"]
-              isOneToOne: false
-              referencedRelation: "profiles"
-              referencedColumns: ["id"]
-            },
-          ]
+      user_follows: {
+        Row: {
+          created_at: string | null
+          follower_id: string
+          following_id: string
+          id: string
         }
-        direct_messages: {
-          Row: {
-            content: string
-            created_at: string
-            id: string
-            is_read: boolean
-            read_at: string | null
-            receiver_id: string
-            sender_id: string
-          }
-          Insert: {
-            content: string
-            created_at?: string
-            id?: string
-            is_read?: boolean
-            read_at?: string | null
-            receiver_id: string
-            sender_id: string
-          }
-          Update: {
-            content?: string
-            created_at?: string
-            id?: string
-            is_read?: boolean
-            read_at?: string | null
-            receiver_id?: string
-            sender_id?: string
-          }
-          Relationships: [
-            {
-              foreignKeyName: "direct_messages_receiver_id_fkey"
-              columns: ["receiver_id"]
-              isOneToOne: false
-              referencedRelation: "profiles"
-              referencedColumns: ["id"]
-            },
-            {
-              foreignKeyName: "direct_messages_sender_id_fkey"
-              columns: ["sender_id"]
-              isOneToOne: false
-              referencedRelation: "profiles"
-              referencedColumns: ["id"]
-            },
-          ]
+        Insert: {
+          created_at?: string | null
+          follower_id: string
+          following_id: string
+          id?: string
         }
-        notifications: {
-          Row: {
-            actor_id: string | null
-            created_at: string
-            entity_id: string | null
-            entity_type: string | null
-            id: string
-            is_read: boolean
-            message: string
-            read_at: string | null
-            title: string
-            type: string
-            user_id: string
-          }
-          Insert: {
-            actor_id?: string | null
-            created_at?: string
-            entity_id?: string | null
-            entity_type?: string | null
-            id?: string
-            is_read?: boolean
-            message: string
-            read_at?: string | null
-            title: string
-            type: string
-            user_id: string
-          }
-          Update: {
-            actor_id?: string | null
-            created_at?: string
-            entity_id?: string | null
-            entity_type?: string | null
-            id?: string
-            is_read?: boolean
-            message?: string
-            read_at?: string | null
-            title?: string
-            type?: string
-            user_id?: string
-          }
-          Relationships: [
-            {
-              foreignKeyName: "notifications_actor_id_fkey"
-              columns: ["actor_id"]
-              isOneToOne: false
-              referencedRelation: "profiles"
-              referencedColumns: ["id"]
-            },
-            {
-              foreignKeyName: "notifications_user_id_fkey"
-              columns: ["user_id"]
-              isOneToOne: false
-              referencedRelation: "profiles"
-              referencedColumns: ["id"]
-            },
-          ]
+        Update: {
+          created_at?: string | null
+          follower_id?: string
+          following_id?: string
+          id?: string
         }
+        Relationships: [
+          {
+            foreignKeyName: "user_follows_follower_id_fkey"
+            columns: ["follower_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "user_follows_following_id_fkey"
+            columns: ["following_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       user_social_accounts: {
         Row: {
           created_at: string | null
@@ -679,100 +679,47 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-        follow_by_username_secure: {
-          Args: { p_target_username: string }
-          Returns: string
-        }
-        get_follow_stats_by_username_secure: {
-          Args: { p_target_username: string }
-          Returns: {
-            followers_count: number
-            following_count: number
-          }[]
-        }
-        get_conversation_by_username_secure: {
-          Args: { p_other_username: string }
-          Returns: {
-            content: string
-            created_at: string
-            id: string
-            is_mine: boolean
-            is_read: boolean
-            receiver_avatar_url: string | null
-            receiver_display_name: string | null
-            receiver_username: string | null
-            sender_avatar_url: string | null
-            sender_display_name: string | null
-            sender_username: string | null
-          }[]
-        }
-        get_unread_notifications_count_secure: {
-          Args: Record<PropertyKey, never>
-          Returns: number
-        }
-        get_unread_messages_count_secure: {
-          Args: Record<PropertyKey, never>
-          Returns: number
-        }
-        is_following_by_username_secure: {
-          Args: { p_target_username: string }
-          Returns: boolean
-        }
+      follow_by_username_secure: {
+        Args: { p_target_username: string }
+        Returns: string
+      }
+      get_conversation_by_username_secure: {
+        Args: { p_other_username: string }
+        Returns: {
+          content: string
+          created_at: string
+          id: string
+          is_mine: boolean
+          is_read: boolean
+          receiver_avatar_url: string | null
+          receiver_display_name: string | null
+          receiver_username: string | null
+          sender_avatar_url: string | null
+          sender_display_name: string | null
+          sender_username: string | null
+        }[]
+      }
+      get_follow_stats_by_username_secure: {
+        Args: { p_target_username: string }
+        Returns: {
+          followers_count: number
+          following_count: number
+        }[]
+      }
+      get_unread_messages_count_secure: {
+        Args: Record<PropertyKey, never>
+        Returns: number
+      }
+      get_unread_notifications_count_secure: {
+        Args: Record<PropertyKey, never>
+        Returns: number
+      }
       increment_video_view_count:
         | { Args: { p_video_id: string }; Returns: number }
         | {
             Args: { p_session_id?: string; p_video_id: string }
             Returns: number
           }
-        list_followers_by_username_secure: {
-          Args: { p_target_username: string }
-          Returns: {
-            follower_avatar_url: string | null
-            follower_display_name: string | null
-            follower_username: string | null
-            followed_at: string
-          }[]
-        }
-        list_following_by_username_secure: {
-          Args: { p_target_username: string }
-          Returns: {
-            followed_at: string
-            following_avatar_url: string | null
-            following_display_name: string | null
-            following_username: string | null
-          }[]
-        }
-        list_inbox_conversations_secure: {
-          Args: Record<PropertyKey, never>
-          Returns: {
-            last_message_content: string
-            last_message_created_at: string
-            last_message_id: string
-            last_message_is_read: boolean
-            last_message_sender_username: string | null
-            partner_avatar_url: string | null
-            partner_display_name: string | null
-            partner_username: string | null
-            unread_count: number
-          }[]
-        }
-        list_notifications_secure: {
-          Args: { p_limit?: number }
-          Returns: {
-            actor_avatar_url: string | null
-            actor_display_name: string | null
-            actor_username: string | null
-            created_at: string
-            entity_id: string | null
-            entity_type: string | null
-            id: string
-            is_read: boolean
-            message: string | null
-            read_at: string | null
-            title: string | null
-            type: string
-          }[]
-        }
       list_featured_videos: {
         Args: { p_limit?: number; p_offset?: number }
         Returns: {
@@ -794,6 +741,55 @@ export type Database = {
           updated_at: string
           view_count: number
           youtube_id: string
+        }[]
+      }
+      list_followers_by_username_secure: {
+        Args: { p_target_username: string }
+        Returns: {
+          followed_at: string
+          follower_avatar_url: string | null
+          follower_display_name: string | null
+          follower_username: string | null
+        }[]
+      }
+      list_following_by_username_secure: {
+        Args: { p_target_username: string }
+        Returns: {
+          followed_at: string
+          following_avatar_url: string | null
+          following_display_name: string | null
+          following_username: string | null
+        }[]
+      }
+      list_inbox_conversations_secure: {
+        Args: Record<PropertyKey, never>
+        Returns: {
+          last_message_content: string
+          last_message_created_at: string
+          last_message_id: string
+          last_message_is_read: boolean
+          last_message_sender_username: string | null
+          partner_avatar_url: string | null
+          partner_display_name: string | null
+          partner_username: string | null
+          unread_count: number
+        }[]
+      }
+      list_notifications_secure: {
+        Args: { p_limit?: number }
+        Returns: {
+          actor_avatar_url: string | null
+          actor_display_name: string | null
+          actor_username: string | null
+          created_at: string
+          entity_id: string | null
+          entity_type: string | null
+          id: string
+          is_read: boolean
+          message: string | null
+          read_at: string | null
+          title: string
+          type: string
         }[]
       }
       mark_top_videos_as_featured: {
@@ -833,6 +829,10 @@ export type Database = {
       unfollow_by_username_secure: {
         Args: { p_target_username: string }
         Returns: number
+      }
+      is_following_by_username_secure: {
+        Args: { p_target_username: string }
+        Returns: boolean
       }
       update_playlist_derived_fields: {
         Args: { p_playlist_id: string }

@@ -1,8 +1,21 @@
 import { http, HttpResponse } from 'msw';
 
+type ChatCompletionRequest = {
+  model?: string;
+  messages?: Array<{ role: string; content?: string }>;
+};
+
 export const handlers = [
   http.get('https://www.youtube.com/oembed', () => {
     return new HttpResponse(null, { status: 404 });
+  }),
+
+  http.post(/https:\/\/.*\.supabase\.co\/rest\/v1\/rpc\/get_unread_notifications_count_secure/, () => {
+    return HttpResponse.json(0, { status: 200 });
+  }),
+
+  http.post(/https:\/\/.*\.supabase\.co\/rest\/v1\/rpc\/get_unread_messages_count_secure/, () => {
+    return HttpResponse.json(0, { status: 200 });
   }),
 
   /**
@@ -10,10 +23,10 @@ export const handlers = [
    * Used in unit tests for AI enrichment features
    */
   http.post('https://api.openai.com/v1/chat/completions', async ({ request }) => {
-    const body = await request.json() as Record<string, any>;
+    const body = (await request.json()) as ChatCompletionRequest;
 
     // Simulate different responses based on request content
-    const userMessage = body.messages?.find((m: any) => m.role === 'user')?.content || '';
+    const userMessage = body.messages?.find((message) => message.role === 'user')?.content || '';
 
     // Mock successful enrichment response
     const mockResponse = {

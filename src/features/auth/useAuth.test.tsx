@@ -55,7 +55,15 @@ beforeEach(() => {
 describe('useAuth', () => {
   it('throws when used outside AuthProvider', () => {
     const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+    const suppressExpectedWindowError = (event: ErrorEvent) => {
+      if (event.error instanceof Error && event.error.message.includes('useAuth must be used within an AuthProvider')) {
+        event.preventDefault();
+      }
+    };
+
+    window.addEventListener('error', suppressExpectedWindowError);
     expect(() => renderHook(() => useAuth())).toThrow('useAuth must be used within an AuthProvider');
+    window.removeEventListener('error', suppressExpectedWindowError);
     consoleErrorSpy.mockRestore();
   });
 

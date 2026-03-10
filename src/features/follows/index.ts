@@ -1,8 +1,8 @@
 export {
+  useFollowByUsername,
   useFollowers,
-  useFollowing,
-  useFollowStatus,
   useFollowStats,
-  useFollowUser,
-  useUnfollowUser,
+  useFollowing,
+  useIsFollowing,
+  useUnfollowByUsername,
 } from './queries/useFollows';

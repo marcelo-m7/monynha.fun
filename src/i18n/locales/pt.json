@@ -30,37 +30,11 @@
     "editProfile": "Editar Perfil",
     "accountSettings": "Configurações da Conta",
     "home": "Início",
+    "messages": "Mensagens",
+    "notifications": "Notificações",
     "toggleMenu": "Alternar menu",
     "closeMenu": "Fechar menu",
-    "languageLabel": "Idioma",
-    "notifications": "Notificações",
-    "messages": "Mensagens"
-  },
-  "messages": {
-    "title": "Mensagens",
-    "subtitle": "Conversas privadas com curadores e membros da comunidade.",
-    "contactsTitle": "Contatos",
-    "noContacts": "Nenhum contato ainda. Siga usuários para começar a conversar.",
-    "emptyConversation": "Nenhuma mensagem ainda. Inicie a conversa.",
-    "composePlaceholder": "Digite uma mensagem...",
-    "send": "Enviar",
-    "selectContactTitle": "Selecione um contato",
-    "selectContactDescription": "Escolha alguém dos seus contatos para iniciar uma conversa.",
-    "signInPrompt": "Você precisa entrar para usar mensagens diretas.",
-    "unknownUser": "Usuário desconhecido"
-  },
-  "notifications": {
-    "title": "Notificações",
-    "signInPrompt": "Você precisa entrar para ver notificações.",
-    "unreadCount_one": "{{count}} notificação não lida",
-    "unreadCount_other": "{{count}} notificações não lidas",
-    "markAllRead": "Marcar todas como lidas",
-    "markRead": "Marcar como lida",
-    "emptyTitle": "Ainda não há notificações",
-    "emptyDescription": "Quando alguém seguir você ou enviar uma mensagem, aparecerá aqui.",
-    "newBadge": "Nova",
-    "defaultTitle": "Notificação",
-    "defaultMessage": "Você tem uma nova notificação."
+    "languageLabel": "Idioma"
   },
   "footer": {
     "description": "Uma plataforma de curadoria coletiva de vídeos do YouTube. Preservando e descobrindo conteúdos valiosos juntos.",
@@ -581,5 +555,31 @@
       "contentRequired": "O comentário não pode estar vazio",
       "contentMaxLength": "O comentário deve ter no máximo 500 caracteres"
     }
+  },
+  "messages": {
+    "title": "Mensagens",
+    "description": "Suas conversas diretas com outros curadores.",
+    "inbox": "Caixa de entrada",
+    "emptyInbox": "Ainda não há conversas.",
+    "selectConversation": "Selecione uma conversa para começar.",
+    "emptyConversation": "Sem mensagens ainda. Envie a primeira!",
+    "inputPlaceholder": "Escreva uma mensagem...",
+    "tipPrefix": "Dica:",
+    "tipLink": "visite perfis na comunidade"
+  },
+  "notifications": {
+    "title": "Notificações",
+    "description": "Acompanhe novos seguidores, mensagens e atividades da conta.",
+    "inbox": "Notificações recentes",
+    "empty": "Você ainda não tem notificações.",
+    "markAsRead": "Marcar como lida",
+    "markAllAsRead": "Marcar tudo como lido"
+  },
+  "socialProfile": {
+    "followers": "seguidores",
+    "following": "seguindo",
+    "follow": "Seguir",
+    "unfollow": "Deixar de seguir",
+    "sendMessage": "Mensagem"
   }
 }

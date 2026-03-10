@@ -1,41 +1,25 @@
-export interface MessageProfile {
-  username: string;
-  display_name: string | null;
-  avatar_url: string | null;
-}
-
-export interface ConversationMessage {
+export interface DirectMessage {
   id: string;
   content: string;
-  is_read: boolean;
-  created_at: string;
-  sender_username: string | null;
-  sender_display_name: string | null;
-  sender_avatar_url: string | null;
-  receiver_username: string | null;
-  receiver_display_name: string | null;
-  receiver_avatar_url: string | null;
-  is_mine: boolean;
-}
-
-export interface SentMessage {
-  id: string;
-  content: string;
-  is_read: boolean;
-  created_at: string;
-  sender_username: string | null;
-  receiver_username: string | null;
-  is_mine: boolean;
+  isRead: boolean;
+  createdAt: string;
+  senderUsername: string | null;
+  senderDisplayName: string | null;
+  senderAvatarUrl: string | null;
+  receiverUsername: string | null;
+  receiverDisplayName: string | null;
+  receiverAvatarUrl: string | null;
+  isMine: boolean;
 }
 
 export interface ConversationSummary {
-  partner: MessageProfile;
-  lastMessage: {
-    id: string;
-    content: string;
-    created_at: string;
-    is_read: boolean;
-    sender_username: string | null;
-  };
+  partnerUsername: string;
+  partnerDisplayName: string | null;
+  partnerAvatarUrl: string | null;
+  lastMessageId: string;
+  lastMessageContent: string;
+  lastMessageCreatedAt: string;
+  lastMessageIsRead: boolean;
+  lastMessageSenderUsername: string | null;
   unreadCount: number;
 }

@@ -2,6 +2,6 @@ export {
   useConversation,
   useInboxConversations,
   useMarkConversationAsRead,
-  useSendMessage,
+  useSendDirectMessage,
   useUnreadMessagesCount,
 } from './queries/useMessages';

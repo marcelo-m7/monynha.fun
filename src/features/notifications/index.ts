@@ -1,6 +1,6 @@
 export {
+  useMarkAllNotificationsAsRead,
+  useMarkNotificationAsRead,
   useNotifications,
   useUnreadNotificationsCount,
-  useMarkNotificationAsRead,
-  useMarkAllNotificationsAsRead,
 } from './queries/useNotifications';
