@@ -34,7 +34,35 @@
     "notifications": "Notifications",
     "toggleMenu": "Toggle menu",
     "closeMenu": "Close menu",
-    "languageLabel": "Language"
+    "languageLabel": "Language",
+    "notifications": "Notifications",
+    "messages": "Messages"
+  },
+  "messages": {
+    "title": "Messages",
+    "subtitle": "Private conversations with curators and community members.",
+    "contactsTitle": "Contacts",
+    "noContacts": "No contacts yet. Follow users to start messaging.",
+    "emptyConversation": "No messages yet. Start the conversation.",
+    "composePlaceholder": "Type a message...",
+    "send": "Send",
+    "selectContactTitle": "Select a contact",
+    "selectContactDescription": "Choose someone from your contacts to start messaging.",
+    "signInPrompt": "You need to sign in to use direct messages.",
+    "unknownUser": "Unknown user"
+  },
+  "notifications": {
+    "title": "Notifications",
+    "signInPrompt": "You need to sign in to view notifications.",
+    "unreadCount_one": "{{count}} unread notification",
+    "unreadCount_other": "{{count}} unread notifications",
+    "markAllRead": "Mark all as read",
+    "markRead": "Mark read",
+    "emptyTitle": "No notifications yet",
+    "emptyDescription": "When someone follows you or sends a message, it will show up here.",
+    "newBadge": "New",
+    "defaultTitle": "Notification",
+    "defaultMessage": "You have a new notification."
   },
   "footer": {
     "description": "A collective curation platform for YouTube videos. Preserving and discovering valuable content together.",

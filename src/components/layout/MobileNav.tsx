@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { 
   Search, Plus, LogOut, Heart, Globe, ListVideo, 
   User as UserIcon, Settings, KeyRound, Home, 
-  Info, BookOpen, Mail, HelpCircle, Users, Bell, MessageCircle
+  Info, BookOpen, Mail, HelpCircle, Users, Bell, MessageCircle 
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -138,6 +138,24 @@ export const MobileNav: React.FC<MobileNavProps> = ({
                   <Heart className="h-5 w-5" />
                   <span className="text-sm">{t('header.favorites')}</span>
                 </NavLink>
+                  <NavLink
+                    to="/notifications"
+                    className="flex items-center gap-3 px-4 py-3 text-muted-foreground hover:text-foreground hover:bg-muted/50 rounded-2xl transition-all"
+                    activeClassName="bg-primary/5 text-primary font-medium"
+                    onClick={onClose}
+                  >
+                    <Bell className="h-5 w-5" />
+                    <span className="text-sm">{t('header.notifications')}</span>
+                  </NavLink>
+                  <NavLink
+                    to="/messages"
+                    className="flex items-center gap-3 px-4 py-3 text-muted-foreground hover:text-foreground hover:bg-muted/50 rounded-2xl transition-all"
+                    activeClassName="bg-primary/5 text-primary font-medium"
+                    onClick={onClose}
+                  >
+                    <MessageCircle className="h-5 w-5" />
+                    <span className="text-sm">{t('header.messages')}</span>
+                  </NavLink>
                 <NavLink
                   to="/messages"
                   className="flex items-center gap-3 px-4 py-3 text-muted-foreground hover:text-foreground hover:bg-muted/50 rounded-2xl transition-all"

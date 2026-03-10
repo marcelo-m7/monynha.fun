@@ -720,6 +720,55 @@ export type Database = {
             Args: { p_session_id?: string; p_video_id: string }
             Returns: number
           }
+        list_followers_by_username_secure: {
+          Args: { p_target_username: string }
+          Returns: {
+            follower_avatar_url: string | null
+            follower_display_name: string | null
+            follower_username: string | null
+            followed_at: string
+          }[]
+        }
+        list_following_by_username_secure: {
+          Args: { p_target_username: string }
+          Returns: {
+            followed_at: string
+            following_avatar_url: string | null
+            following_display_name: string | null
+            following_username: string | null
+          }[]
+        }
+        list_inbox_conversations_secure: {
+          Args: Record<PropertyKey, never>
+          Returns: {
+            last_message_content: string
+            last_message_created_at: string
+            last_message_id: string
+            last_message_is_read: boolean
+            last_message_sender_username: string | null
+            partner_avatar_url: string | null
+            partner_display_name: string | null
+            partner_username: string | null
+            unread_count: number
+          }[]
+        }
+        list_notifications_secure: {
+          Args: { p_limit?: number }
+          Returns: {
+            actor_avatar_url: string | null
+            actor_display_name: string | null
+            actor_username: string | null
+            created_at: string
+            entity_id: string | null
+            entity_type: string | null
+            id: string
+            is_read: boolean
+            message: string | null
+            read_at: string | null
+            title: string | null
+            type: string
+          }[]
+        }
       list_featured_videos: {
         Args: { p_limit?: number; p_offset?: number }
         Returns: {

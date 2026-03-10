@@ -4,6 +4,10 @@ import type { AiEnrichment } from '@/entities/ai_enrichment/ai_enrichment.types'
 import { extractYouTubeId } from '@/shared/lib/youtube';
 import type { Json } from '@/integrations/supabase/types';
 
+type VideoWithEnrichmentRows = VideoWithCategory & {
+  ai_enrichments?: AiEnrichment[] | null;
+};
+
 // Helper to extract the latest enrichment from an array
 function getLatestEnrichment(enrichments: AiEnrichment[] | null | undefined): AiEnrichment | null {
   if (!enrichments || enrichments.length === 0) return null;
@@ -43,7 +47,7 @@ export interface ListVideosParams {
 
 export async function listVideos(params: ListVideosParams = {}) {
   const includeEnrichment = params.includeEnrichment !== false; // Default true
-  
+
   let query = supabase
     .from('videos')
     .select(
@@ -98,7 +102,7 @@ export async function listVideos(params: ListVideosParams = {}) {
   const { data, error } = await query;
 
   if (error) throw error;
-  
+
   // Process enrichments - extract only the latest one
   if (includeEnrichment && data) {
     const videos = data as VideoWithRelations[];
@@ -108,24 +112,24 @@ export async function listVideos(params: ListVideosParams = {}) {
       ai_enrichments: undefined, // Remove the array
     })) as VideoWithCategory[];
   }
-  
+
   return data as VideoWithCategory[];
 }
 
 export async function getVideoById(id: string) {
   // Check if the provided ID is a UUID or a YouTube ID
   const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id);
-  
+
   let query = supabase
     .from('videos')
     .select(
       `
       *,
-        category:categories(id, name, slug, color),
-        ai_enrichments!video_id(*)
+      category:categories(id, name, slug, color),
+      ai_enrichments!video_id(*)
     `,
-      )
-      .order('created_at', { foreignTable: 'ai_enrichments', ascending: false });
+    )
+    .order('created_at', { foreignTable: 'ai_enrichments', ascending: false });
 
   if (isUuid) {
     query = query.eq('id', id);
@@ -180,7 +184,7 @@ export async function listFeaturedVideos(limit = 4, offset = 0) {
       return {
         ...row,
         category: parsedCategory,
-          enrichment: null, // RPC doesn't include enrichments yet
+        enrichment: null, // RPC doesn't include enrichments yet
       };
     }) as unknown as VideoWithCategory[];
   }
@@ -190,11 +194,11 @@ export async function listFeaturedVideos(limit = 4, offset = 0) {
     .select(
       `
       *,
-        category:categories(id, name, slug, color),
-        ai_enrichments!video_id(*)
+      category:categories(id, name, slug, color),
+      ai_enrichments!video_id(*)
     `,
     )
-      .order('created_at', { foreignTable: 'ai_enrichments', ascending: false })
+    .order('created_at', { foreignTable: 'ai_enrichments', ascending: false })
     .order('view_count', { ascending: false })
     .limit(limit);
 
@@ -219,11 +223,11 @@ export async function listRecentVideos(limit = 4) {
     .select(
       `
       *,
-        category:categories(id, name, slug, color),
-        ai_enrichments!video_id(*)
+      category:categories(id, name, slug, color),
+      ai_enrichments!video_id(*)
     `,
     )
-      .order('created_at', { foreignTable: 'ai_enrichments', ascending: false })
+    .order('created_at', { foreignTable: 'ai_enrichments', ascending: false })
     .eq('is_featured', false)
     .order('created_at', { ascending: false })
     .limit(limit);
@@ -250,11 +254,11 @@ export async function listRelatedVideos(currentVideoId: string, categoryId: stri
     .select(
       `
       *,
-        category:categories(id, name, slug, color),
-        ai_enrichments!video_id(*)
+      category:categories(id, name, slug, color),
+      ai_enrichments!video_id(*)
     `,
     )
-      .order('created_at', { foreignTable: 'ai_enrichments', ascending: false })
+    .order('created_at', { foreignTable: 'ai_enrichments', ascending: false })
     .eq('category_id', categoryId)
     .neq('id', currentVideoId)
     .order('created_at', { ascending: false })

@@ -31,7 +31,35 @@
     "home": "Inicio",
     "toggleMenu": "Alternar menú",
     "closeMenu": "Cerrar menú",
-    "languageLabel": "Idioma"
+    "languageLabel": "Idioma",
+    "notifications": "Notificaciones",
+    "messages": "Mensajes"
+  },
+  "messages": {
+    "title": "Mensajes",
+    "subtitle": "Conversaciones privadas con curadores y miembros de la comunidad.",
+    "contactsTitle": "Contactos",
+    "noContacts": "Aun no hay contactos. Sigue a usuarios para empezar a conversar.",
+    "emptyConversation": "Aun no hay mensajes. Inicia la conversacion.",
+    "composePlaceholder": "Escribe un mensaje...",
+    "send": "Enviar",
+    "selectContactTitle": "Selecciona un contacto",
+    "selectContactDescription": "Elige a alguien de tus contactos para iniciar una conversacion.",
+    "signInPrompt": "Debes iniciar sesion para usar mensajes directos.",
+    "unknownUser": "Usuario desconocido"
+  },
+  "notifications": {
+    "title": "Notificaciones",
+    "signInPrompt": "Debes iniciar sesion para ver notificaciones.",
+    "unreadCount_one": "{{count}} notificacion sin leer",
+    "unreadCount_other": "{{count}} notificaciones sin leer",
+    "markAllRead": "Marcar todo como leido",
+    "markRead": "Marcar como leido",
+    "emptyTitle": "Aun no hay notificaciones",
+    "emptyDescription": "Cuando alguien te siga o te envie un mensaje, aparecera aqui.",
+    "newBadge": "Nuevo",
+    "defaultTitle": "Notificacion",
+    "defaultMessage": "Tienes una nueva notificacion."
   },
   "footer": {
     "description": "Una plataforma de curación colectiva de videos de YouTube. Preservando y descubriendo contenido valioso juntos.",
