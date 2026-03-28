@@ -26,3 +26,4 @@ dist-ssr
 .github/copilot-instructions.md
 .env
 /.playwright-mcp
+.dyad/
