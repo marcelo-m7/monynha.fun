@@ -46,6 +46,11 @@ export const HeroSection = () => {
       return;
     }
 
+    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (prefersReducedMotion || document.visibilityState !== 'visible') {
+      return;
+    }
+
     const activeElement = document.activeElement;
     if (window.location.hash || (activeElement && activeElement !== document.body)) {
       return;
@@ -126,6 +131,10 @@ export const HeroSection = () => {
     }
   };
 
+  const handleHowItWorksClick = () => {
+    document.getElementById('how-it-works')?.scrollIntoView({ behavior: 'smooth' });
+  };
+
   return (
     <section className="relative w-full overflow-hidden py-20 md:py-32 flex flex-col items-center justify-center min-h-[70vh] border-b border-border/40 bg-background">
       {/* Cyberpunk Grid Background */}
@@ -200,6 +209,15 @@ export const HeroSection = () => {
           </form>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
+            <Button
+              variant="secondary"
+              size="lg"
+              className="w-full sm:w-auto"
+              onClick={handleHowItWorksClick}
+            >
+              {t('home.howItWorks.title')}
+            </Button>
+
              {/* Secondary Action - Explore */}
              <Button
                variant="outline"
