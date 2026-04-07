@@ -8,10 +8,24 @@
  * - Error handling and logging
  */
 
+export interface CategoryContext {
+  id: string;
+  name: string;
+  slug: string;
+}
+
+export interface PlaylistContext {
+  id: string;
+  name: string;
+  description: string | null;
+}
+
 export interface VideoEnrichmentParams {
   title: string;
   description: string;
   language?: string;
+  categories?: CategoryContext[];
+  playlists?: PlaylistContext[];
 }
 
 export interface VideoEnrichmentResult {
@@ -20,6 +34,7 @@ export interface VideoEnrichmentResult {
   semantic_tags: string[];
   suggested_category_id: string | null;
   suggested_category: string | null;
+  suggested_playlist_id: string | null;
   suggested_playlist_query: string | null;
   classification_confidence: number;
   language: string;
@@ -98,8 +113,8 @@ export class OpenAIClient {
               content: prompt,
             },
           ],
-          temperature: 0.7,
-          max_tokens: 500,
+          temperature: 0.3,
+          max_tokens: 800,
         }),
         signal: controller.signal,
       });
@@ -108,9 +123,10 @@ export class OpenAIClient {
 
       if (!response.ok) {
         const error = await response.json().catch(() => ({}));
-        const openaiError: OpenAIError = new Error(
+        const baseError = new Error(
           error.error?.message || `OpenAI API error: ${response.status}`
         );
+        const openaiError = baseError as OpenAIError;
         openaiError.code = error.error?.code || 'API_ERROR';
         openaiError.status = response.status;
         
@@ -181,31 +197,43 @@ export class OpenAIClient {
    * Build enrichment prompt for OpenAI
    */
   private buildEnrichmentPrompt(params: VideoEnrichmentParams): string {
-    return `
-Enrich the following video metadata:
+    const categoryBlock =
+      params.categories && params.categories.length > 0
+        ? `\nAvailable categories (return the EXACT id of the best match, or null if none fit):\n${params.categories
+            .map((c) => `  {"id": "${c.id}", "name": "${c.name}", "slug": "${c.slug}"}`)
+            .join('\n')}\n`
+        : '';
+
+    const playlistBlock =
+      params.playlists && params.playlists.length > 0
+        ? `\nAvailable playlists (return the EXACT id of the best match, or null if none is clearly relevant):\n${params.playlists
+            .map((p) => `  {"id": "${p.id}", "name": "${p.name}"${p.description ? `, "description": "${p.description.substring(0, 80)}"` : ''}}`)
+            .join('\n')}\n`
+        : '';
+
+    return `Enrich the following video metadata and classify it.
 
 Title: "${params.title}"
 Description: "${params.description}"
 Preferred Language: ${params.language || 'Portuguese'}
-
-Please respond with JSON (no markdown, just raw JSON) with these fields:
+${categoryBlock}${playlistBlock}
+Respond ONLY with valid JSON (no markdown, no explanation):
 {
   "optimized_title": "A catchy, SEO-friendly title (max 100 chars)",
   "summary_description": "A 2-3 sentence summary (max 250 chars)",
   "semantic_tags": ["tag1", "tag2", "tag3", "tag4", "tag5"],
-  "suggested_category": "A category label or slug that best matches the content",
-  "suggested_playlist_query": "Short phrase to find a matching playlist (2-6 words)",
+  "suggested_category_id": "exact-uuid-from-list-or-null",
+  "suggested_playlist_id": "exact-uuid-from-list-or-null",
   "classification_confidence": 0.0,
   "cultural_relevance": "High, Medium, or Low",
   "short_summary": "A single sentence summary for UI display"
 }
 
 Rules:
-- Return classification_confidence as a number between 0 and 1.
-- Keep semantic_tags specific and concise.
-- If uncertain, set suggested_playlist_query to null and classification_confidence below 0.6.
-
-Only return valid JSON, no explanations.
+- suggested_category_id MUST be one of the exact UUIDs from the categories list above, or null.
+- suggested_playlist_id MUST be one of the exact UUIDs from the playlists list above, or null.
+- classification_confidence: number 0-1 reflecting how confident you are in the category choice.
+- If uncertain about category or playlist, return null for that field and set confidence < 0.5.
 `;
   }
 
@@ -231,11 +259,12 @@ Only return valid JSON, no explanations.
         semantic_tags: Array.isArray(parsed.semantic_tags)
           ? parsed.semantic_tags.slice(0, 5)
           : [],
-        suggested_category_id: null, // Mapping done at database level
+        suggested_category_id: this.parseUuid(parsed.suggested_category_id),
         suggested_category:
           typeof parsed.suggested_category === 'string'
             ? parsed.suggested_category.trim() || null
             : null,
+        suggested_playlist_id: this.parseUuid(parsed.suggested_playlist_id),
         suggested_playlist_query:
           typeof parsed.suggested_playlist_query === 'string'
             ? parsed.suggested_playlist_query.trim() || null
@@ -266,6 +295,16 @@ Only return valid JSON, no explanations.
     if (normalized?.includes('medium')) return 'Medium';
     if (normalized?.includes('low')) return 'Low';
     return 'Medium'; // Default
+  }
+
+  /**
+   * Parse and validate a UUID string; returns null if invalid.
+   */
+  private parseUuid(value: unknown): string | null {
+    if (typeof value !== 'string') return null;
+    const trimmed = value.trim();
+    const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+    return UUID_RE.test(trimmed) ? trimmed : null;
   }
 
   /**

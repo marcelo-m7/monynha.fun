@@ -1,4 +1,4 @@
-import { serve } from "https://deno.land/std@0.190.0/http/server.ts"
+﻿import { serve } from "https://deno.land/std@0.190.0/http/server.ts"
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.45.0'
 import { createOpenAIClient, type VideoEnrichmentParams } from '../_shared/openai-client.ts'
 
@@ -27,6 +27,7 @@ type EnrichmentPayload = {
   semantic_tags: string[];
   suggested_category_id: string | null;
   suggested_category: string | null;
+  suggested_playlist_id: string | null;
   suggested_playlist_query: string | null;
   classification_confidence: number;
   language: string;
@@ -198,6 +199,8 @@ async function assignVideoToPlaylist(
 async function runEnhancedAssignments(params: {
   supabaseServiceRole: ReturnType<typeof createClient>;
   enrichment: EnrichmentPayload;
+  categoryRows: CategoryRow[];
+  playlistRows: PlaylistRow[];
   videoId: string;
   currentVideoCategoryId: string | null;
   videoLanguage: string;
@@ -206,29 +209,37 @@ async function runEnhancedAssignments(params: {
   const {
     supabaseServiceRole,
     enrichment,
+    categoryRows,
+    playlistRows,
     videoId,
     currentVideoCategoryId,
     videoLanguage,
     userId,
   } = params;
 
-  const { data: categories, error: categoryError } = await supabaseServiceRole
-    .from('categories')
-    .select('id, name, slug');
+  const categoryConfidence = enrichment.classification_confidence;
 
-  if (categoryError) {
-    throw new Error(`Failed to load categories: ${categoryError.message}`);
+  // Primary path: AI returned a valid UUID from the provided categories list
+  let resolvedCategoryId: string | null =
+    enrichment.suggested_category_id &&
+    categoryRows.some((c) => c.id === enrichment.suggested_category_id)
+      ? enrichment.suggested_category_id
+      : null;
+
+  // Fallback: token-overlap scoring (handles cases where AI skipped returning a UUID)
+  if (!resolvedCategoryId) {
+    const scored = resolveSuggestedCategoryId(categoryRows, enrichment);
+    if (scored.score >= 4) {
+      resolvedCategoryId = scored.categoryId;
+    }
   }
 
-  const categoryRows = (categories ?? []) as CategoryRow[];
-  const suggested = resolveSuggestedCategoryId(categoryRows, enrichment);
-  const categoryConfidence = enrichment.classification_confidence;
-  const hasReliableCategory = suggested.score >= 4 && categoryConfidence >= 0.45;
+  const hasReliableCategory = !!resolvedCategoryId && categoryConfidence >= 0.40;
 
   let assignedCategoryId: string | null = null;
-  if (hasReliableCategory && suggested.categoryId) {
+  if (hasReliableCategory && resolvedCategoryId) {
     const unclassifiedCategoryId =
-      categoryRows.find((category) => normalizeText(category.slug) === 'nao-classificados')?.id ?? null;
+      categoryRows.find((c) => normalizeText(c.slug) === 'nao-classificados')?.id ?? null;
 
     const shouldUpdateCategory =
       currentVideoCategoryId === null || currentVideoCategoryId === unclassifiedCategoryId;
@@ -236,7 +247,7 @@ async function runEnhancedAssignments(params: {
     if (shouldUpdateCategory) {
       const { error: updateCategoryError } = await supabaseServiceRole
         .from('videos')
-        .update({ category_id: suggested.categoryId })
+        .update({ category_id: resolvedCategoryId })
         .eq('id', videoId);
 
       if (updateCategoryError) {
@@ -244,69 +255,49 @@ async function runEnhancedAssignments(params: {
       }
     }
 
-    assignedCategoryId = suggested.categoryId;
+    assignedCategoryId = resolvedCategoryId;
   }
 
-  const effectiveLanguage = videoLanguage || enrichment.language || 'pt';
-  let playlistsQuery = supabaseServiceRole
-    .from('playlists')
-    .select('id, name, description, language, is_public')
-    .eq('is_public', true)
-    .limit(60);
+  // Primary path: AI returned a valid UUID from the provided playlists list
+  let resolvedPlaylistId: string | null =
+    enrichment.suggested_playlist_id &&
+    playlistRows.some((p) => p.id === enrichment.suggested_playlist_id)
+      ? enrichment.suggested_playlist_id
+      : null;
 
-  if (effectiveLanguage) {
-    playlistsQuery = playlistsQuery.eq('language', effectiveLanguage);
-  }
-
-  const { data: playlistsByLanguage, error: playlistError } = await playlistsQuery;
-  if (playlistError) {
-    throw new Error(`Failed to load playlists: ${playlistError.message}`);
-  }
-
-  let playlistRows = (playlistsByLanguage ?? []) as PlaylistRow[];
-  if (playlistRows.length === 0) {
-    const { data: fallbackPlaylists, error: fallbackPlaylistError } = await supabaseServiceRole
-      .from('playlists')
-      .select('id, name, description, language, is_public')
-      .eq('is_public', true)
-      .limit(60);
-
-    if (fallbackPlaylistError) {
-      throw new Error(`Failed to load fallback playlists: ${fallbackPlaylistError.message}`);
+  // Fallback: token-overlap scoring for playlists
+  if (!resolvedPlaylistId) {
+    const categoryRow = categoryRows.find((c) => c.id === assignedCategoryId) ?? null;
+    const effectiveLanguage = videoLanguage || enrichment.language || 'pt';
+    const playlistCandidate = pickPlaylistCandidate(
+      playlistRows,
+      enrichment,
+      categoryRow,
+      effectiveLanguage,
+    );
+    if (playlistCandidate.score >= 5 && categoryConfidence >= 0.55) {
+      resolvedPlaylistId = playlistCandidate.playlistId;
     }
-
-    playlistRows = (fallbackPlaylists ?? []) as PlaylistRow[];
   }
-
-  const categoryRow = categoryRows.find((category) => category.id === assignedCategoryId) ?? null;
-  const playlistCandidate = pickPlaylistCandidate(
-    playlistRows,
-    enrichment,
-    categoryRow,
-    effectiveLanguage,
-  );
-
-  const hasReliablePlaylist =
-    playlistCandidate.score >= 5 && enrichment.classification_confidence >= 0.55;
 
   let assignedPlaylistId: string | null = null;
-  if (hasReliablePlaylist && playlistCandidate.playlistId) {
+  if (resolvedPlaylistId) {
     await assignVideoToPlaylist(
       supabaseServiceRole,
-      playlistCandidate.playlistId,
+      resolvedPlaylistId,
       videoId,
       userId,
     );
-    assignedPlaylistId = playlistCandidate.playlistId;
+    assignedPlaylistId = resolvedPlaylistId;
   }
 
-  const reliable = hasReliableCategory || hasReliablePlaylist;
+  const reliable = hasReliableCategory || !!assignedPlaylistId;
   const reason = reliable
     ? 'Enhanced assignment applied'
     : 'Enhanced suggestions below reliability threshold';
 
   return {
-    suggestedCategoryId: suggested.categoryId,
+    suggestedCategoryId: resolvedCategoryId,
     assignedCategoryId,
     assignedPlaylistId,
     reliability: reliable ? 'high' : 'low',
@@ -319,7 +310,6 @@ serve(async (req) => {
     return new Response(null, { headers: corsHeaders })
   }
 
-  // Manual authentication handling (since verify_jwt is false)
   const authHeader = req.headers.get('Authorization')
   if (!authHeader) {
     console.error("[enrich-video] Unauthorized: No Authorization header provided.")
@@ -330,7 +320,6 @@ serve(async (req) => {
   }
 
   const token = authHeader.replace('Bearer ', '')
-  // Client for user authentication (uses ANON_KEY and user's JWT)
   const supabase = createClient(
     Deno.env.get('SUPABASE_URL') ?? '',
     Deno.env.get('SUPABASE_ANON_KEY') ?? '',
@@ -358,13 +347,11 @@ serve(async (req) => {
 
     console.log(`[enrich-video] Received request for videoId: ${videoId}, youtubeUrl: ${youtubeUrl} by user: ${user.id}`)
 
-    // Create a separate client for service role operations (bypasses RLS)
     const supabaseServiceRole = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     );
 
-    // Fetch the video data from database
     const { data: video, error: videoError } = await supabaseServiceRole
       .from('videos')
       .select('title, description, language, category_id')
@@ -376,31 +363,61 @@ serve(async (req) => {
       throw new Error(`Video not found: ${videoError?.message || 'Unknown error'}`);
     }
 
-    // Call OpenAI for enrichment
+    // Fetch categories and playlists BEFORE calling OpenAI so they can be
+    // embedded in the prompt, enabling the AI to return exact DB UUIDs.
+    const { data: categoriesData, error: categoryFetchError } = await supabaseServiceRole
+      .from('categories')
+      .select('id, name, slug');
+    if (categoryFetchError) {
+      throw new Error(`Failed to load categories: ${categoryFetchError.message}`);
+    }
+    const categoryRows = (categoriesData ?? []) as CategoryRow[];
+
+    const effectiveLanguage = video.language || 'pt';
+    let { data: playlistsData, error: playlistFetchError } = await supabaseServiceRole
+      .from('playlists')
+      .select('id, name, description, language, is_public')
+      .eq('is_public', true)
+      .eq('language', effectiveLanguage)
+      .limit(30);
+    if (playlistFetchError) {
+      throw new Error(`Failed to load playlists: ${playlistFetchError.message}`);
+    }
+    if (!playlistsData || playlistsData.length === 0) {
+      const { data: fallbackData, error: fallbackError } = await supabaseServiceRole
+        .from('playlists')
+        .select('id, name, description, language, is_public')
+        .eq('is_public', true)
+        .limit(30);
+      if (fallbackError) {
+        throw new Error(`Failed to load fallback playlists: ${fallbackError.message}`);
+      }
+      playlistsData = fallbackData;
+    }
+    const playlistRows = (playlistsData ?? []) as PlaylistRow[];
+
+    // Call OpenAI for enrichment -- categories and playlists embedded in prompt
     let enrichment: EnrichmentPayload;
     try {
       const openaiClient = createOpenAIClient();
       const enrichmentParams: VideoEnrichmentParams = {
         title: video.title || '',
         description: video.description || '',
-        language: video.language || 'pt',
+        language: effectiveLanguage,
+        categories: categoryRows,
+        playlists: playlistRows,
       };
       enrichment = await openaiClient.enrichVideo(enrichmentParams) as EnrichmentPayload;
-      console.log(`[enrich-video] Successfully enriched video ${videoId} with OpenAI`);
+      console.log(`[enrich-video] Enriched video ${videoId}: category_id=${enrichment.suggested_category_id}, playlist_id=${enrichment.suggested_playlist_id}`);
     } catch (openaiError) {
       const errorMsg = openaiError instanceof Error ? openaiError.message : 'Unknown OpenAI error';
       console.error("[enrich-video] OpenAI enrichment failed:", errorMsg);
-      
-      // If OpenAI fails, we can either:
-      // 1. Return error (fail the request)
-      // 2. Create a fallback enrichment with null/default values
-      // For now, we'll fail to ensure data quality
       throw new Error(`AI enrichment failed: ${errorMsg}`);
     }
 
     let enhancedAssignment = {
       fallbackUsed: false,
-      reliability: 'low',
+      reliability: 'low' as 'low' | 'high',
       reason: 'Enhanced assignment not evaluated',
       suggestedCategoryId: null as string | null,
       assignedCategoryId: null as string | null,
@@ -411,9 +428,11 @@ serve(async (req) => {
       const assignment = await runEnhancedAssignments({
         supabaseServiceRole,
         enrichment,
+        categoryRows,
+        playlistRows,
         videoId,
         currentVideoCategoryId: video.category_id ?? null,
-        videoLanguage: video.language || 'pt',
+        videoLanguage: effectiveLanguage,
         userId: user.id,
       });
 
