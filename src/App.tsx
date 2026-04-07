@@ -41,6 +41,7 @@ const Messages = lazy(() => import("./pages/Messages"));
 const Notifications = lazy(() => import("./pages/Notifications"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 const YouTubeRouteBridge = lazy(() => import("./pages/YouTubeRouteBridge"));
+const SmartSlugRoute = lazy(() => import("./pages/SmartSlugRoute"));
 
 const App = () => (
   <BrowserRouter
@@ -78,7 +79,7 @@ const App = () => (
         <Route path="/account/settings" element={<AccountSettings />} />
         <Route path="/messages" element={<Messages />} />
         <Route path="/notifications" element={<Notifications />} />
-        <Route path="/:username" element={<Profile />} />
+        <Route path="/:username" element={<SmartSlugRoute />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
     </Suspense>
