@@ -21,6 +21,13 @@ export interface EnrichVideoResponse {
     short_summary: string;
     created_at: string;
   };
+  assignment?: {
+    fallback_used: boolean;
+    reliability: 'high' | 'low';
+    reason: string;
+    assigned_category_id: string | null;
+    assigned_playlist_id: string | null;
+  };
 }
 
 /**
