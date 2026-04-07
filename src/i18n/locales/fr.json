@@ -65,6 +65,82 @@
       "emptyUrl": "Veuillez coller une URL de vidéo YouTube."
     }
   },
+  "home": {
+    "onboarding": {
+      "title": "Commencez en moins d'une minute",
+      "subtitle": "Collez un lien, vérifiez les infos, puis publiez pour la communauté."
+    },
+    "howItWorks": {
+      "title": "Comment ça marche",
+      "steps": {
+        "step1": {
+          "title": "Collez l'URL",
+          "description": "Ajoutez un lien YouTube pour démarrer."
+        },
+        "step2": {
+          "title": "Vérifiez les métadonnées",
+          "description": "Confirmez le titre, la langue et la catégorie suggérée."
+        },
+        "step3": {
+          "title": "Publiez avec contexte",
+          "description": "Ajoutez une note courte pour aider les autres curateurs."
+        },
+        "step4": {
+          "title": "Explorez avec des humains",
+          "description": "Parcourez des collections humaines, pas des flux algorithmiques."
+        }
+      }
+    },
+    "features": {
+      "title": "Fonctionnalités clés",
+      "cards": {
+        "card1": {
+          "title": "Curation humaine",
+          "description": "Des sélections faites par des personnes avec contexte culturel."
+        },
+        "card2": {
+          "title": "Playlists vivantes",
+          "description": "Des collections qui évoluent avec les contributions."
+        },
+        "card3": {
+          "title": "Classification intelligente",
+          "description": "Suggestions IA avec validation communautaire."
+        },
+        "card4": {
+          "title": "Recherche sans bruit",
+          "description": "Trouvez l'essentiel sans surcharge de clickbait."
+        },
+        "card5": {
+          "title": "Préservation d'abord",
+          "description": "Sauvegardez les vidéos utiles avant qu'elles disparaissent."
+        },
+        "card6": {
+          "title": "Multilingue",
+          "description": "Partagez et découvrez des contenus en plusieurs langues."
+        }
+      }
+    },
+    "useCases": {
+      "title": "Pour qui",
+      "items": {
+        "case1": {
+          "title": "Étudiants",
+          "description": "Créez des parcours fiables pour apprendre plus vite."
+        },
+        "case2": {
+          "title": "Créateurs",
+          "description": "Référencez des sources de qualité pour votre audience."
+        },
+        "case3": {
+          "title": "Communautés",
+          "description": "Préservez la mémoire culturelle en collections partagées."
+        }
+      }
+    },
+    "ctaSecondary": {
+      "label": "Voir des exemples"
+    }
+  },
   "auth": {
     "loginTitle": "Connectez-vous à votre compte",
     "signupTitle": "Créez votre compte",

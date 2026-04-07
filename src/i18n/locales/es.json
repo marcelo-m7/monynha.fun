@@ -65,6 +65,82 @@
       "emptyUrl": "Por favor, pega una URL de video de YouTube."
     }
   },
+  "home": {
+    "onboarding": {
+      "title": "Empieza en menos de un minuto",
+      "subtitle": "Pega un enlace, revisa los datos y publícalo para la comunidad."
+    },
+    "howItWorks": {
+      "title": "Cómo funciona",
+      "steps": {
+        "step1": {
+          "title": "Pega la URL",
+          "description": "Añade un enlace de YouTube para comenzar."
+        },
+        "step2": {
+          "title": "Revisa los metadatos",
+          "description": "Verifica título, idioma y categoría sugerida."
+        },
+        "step3": {
+          "title": "Publica con contexto",
+          "description": "Agrega una nota breve para ayudar a otros curadores."
+        },
+        "step4": {
+          "title": "Descubre con personas",
+          "description": "Explora colecciones humanas, no feeds algorítmicos."
+        }
+      }
+    },
+    "features": {
+      "title": "Funciones clave",
+      "cards": {
+        "card1": {
+          "title": "Curaduría humana",
+          "description": "Selecciones hechas por personas con contexto cultural."
+        },
+        "card2": {
+          "title": "Playlists vivas",
+          "description": "Colecciones que evolucionan con nuevos aportes."
+        },
+        "card3": {
+          "title": "Clasificación inteligente",
+          "description": "Sugerencias de IA con revisión comunitaria."
+        },
+        "card4": {
+          "title": "Búsqueda sin ruido",
+          "description": "Encuentra videos útiles sin exceso de clickbait."
+        },
+        "card5": {
+          "title": "Preservación primero",
+          "description": "Rescata videos valiosos antes de que se pierdan."
+        },
+        "card6": {
+          "title": "Multilingüe",
+          "description": "Comparte y descubre contenido en varios idiomas."
+        }
+      }
+    },
+    "useCases": {
+      "title": "Para quién es",
+      "items": {
+        "case1": {
+          "title": "Estudiantes",
+          "description": "Crea rutas de aprendizaje confiables más rápido."
+        },
+        "case2": {
+          "title": "Creadores",
+          "description": "Comparte fuentes de alta calidad con tu audiencia."
+        },
+        "case3": {
+          "title": "Comunidades",
+          "description": "Preserven memoria cultural en colecciones compartidas."
+        }
+      }
+    },
+    "ctaSecondary": {
+      "label": "Ver ejemplos"
+    }
+  },
   "auth": {
     "loginTitle": "Inicia sesión en tu cuenta",
     "signupTitle": "Crea tu cuenta",

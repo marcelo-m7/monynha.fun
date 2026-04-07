@@ -12,6 +12,9 @@ import { useTranslation } from 'react-i18next';
 import { PlaylistCard } from "@/components/playlist/PlaylistCard";
 import { CategorySection } from "@/components/layout/CategorySection";
 import { CommunitySpotlightSection } from "@/components/layout/CommunitySpotlightSection";
+import { HowItWorksSection } from "@/components/layout/HowItWorksSection";
+import { FeaturesSection } from "@/components/layout/FeaturesSection";
+import { UseCasesSection } from "@/components/layout/UseCasesSection";
 
 const Index = () => {
   const { t } = useTranslation();
@@ -24,6 +27,9 @@ const Index = () => {
   return (
     <MainLayout>
       <HeroSection />
+      <HowItWorksSection />
+      <FeaturesSection />
+      <UseCasesSection />
       <CategorySection />
 
       <section className="py-20 bg-background border-t border-primary/20">

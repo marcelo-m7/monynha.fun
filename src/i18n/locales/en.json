@@ -68,6 +68,82 @@
       "emptyUrl": "Please paste a YouTube video URL."
     }
   },
+  "home": {
+    "onboarding": {
+      "title": "Start in under a minute",
+      "subtitle": "Paste a link, review details, and publish for the community."
+    },
+    "howItWorks": {
+      "title": "How it works",
+      "steps": {
+        "step1": {
+          "title": "Paste the URL",
+          "description": "Drop a YouTube link to begin."
+        },
+        "step2": {
+          "title": "Review metadata",
+          "description": "Check title, language, and suggested category."
+        },
+        "step3": {
+          "title": "Publish with context",
+          "description": "Add a short note so other curators understand why it matters."
+        },
+        "step4": {
+          "title": "Explore with people",
+          "description": "Browse human collections instead of algorithmic feeds."
+        }
+      }
+    },
+    "features": {
+      "title": "Key features",
+      "cards": {
+        "card1": {
+          "title": "Human curation",
+          "description": "Selections made by people with cultural context."
+        },
+        "card2": {
+          "title": "Living playlists",
+          "description": "Collections that evolve as the community contributes."
+        },
+        "card3": {
+          "title": "Smart classification",
+          "description": "AI suggestions with community oversight."
+        },
+        "card4": {
+          "title": "Low-noise search",
+          "description": "Find useful videos without clickbait clutter."
+        },
+        "card5": {
+          "title": "Preservation first",
+          "description": "Save valuable videos that might disappear over time."
+        },
+        "card6": {
+          "title": "Multilingual",
+          "description": "Share and discover content across languages."
+        }
+      }
+    },
+    "useCases": {
+      "title": "Who it helps",
+      "items": {
+        "case1": {
+          "title": "Students",
+          "description": "Build trusted learning paths faster."
+        },
+        "case2": {
+          "title": "Creators",
+          "description": "Reference high-quality sources for your audience."
+        },
+        "case3": {
+          "title": "Communities",
+          "description": "Preserve cultural memory in shared collections."
+        }
+      }
+    },
+    "ctaSecondary": {
+      "label": "See examples"
+    }
+  },
   "auth": {
     "loginTitle": "Log in to your account",
     "signupTitle": "Create your account",
