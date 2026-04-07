@@ -35,9 +35,10 @@ WORKDIR /app
 ENV NODE_ENV=production
 ENV PORT=80
 
-# Install runtime dependencies required by server/server.ts
-COPY package.json bun.lock ./
-RUN bun install --production --frozen-lockfile || bun install --production
+# Reuse dependencies from builder stage to avoid lockfile resolution at runtime
+COPY --from=builder /app/node_modules ./node_modules
+COPY --from=builder /app/package.json ./package.json
+COPY --from=builder /app/bun.lock ./bun.lock
 
 # Copy built client and server entrypoint
 COPY --from=builder /app/dist ./dist
