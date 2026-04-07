@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from "react-router-dom";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -29,13 +29,55 @@ export const HeroSection = () => {
   const navigate = useNavigate();
   const { user, loading: authLoading } = useAuth();
   const [isSubmittingForm, setIsSubmittingForm] = useState(false);
+  const videoUrlInputRef = useRef<HTMLInputElement | null>(null);
 
-  const { register, handleSubmit, formState: { errors }, setValue } = useForm<HeroSubmitFormValues>({
+  const { register, handleSubmit, formState: { errors } } = useForm<HeroSubmitFormValues>({
     resolver: zodResolver(heroSubmitSchema),
     defaultValues: {
       youtubeUrl: '',
     },
   });
+
+  const { ref: youtubeUrlFieldRef, ...youtubeUrlField } = register('youtubeUrl');
+
+  useEffect(() => {
+    const input = videoUrlInputRef.current;
+    if (!input || typeof window === 'undefined') {
+      return;
+    }
+
+    const activeElement = document.activeElement;
+    if (window.location.hash || (activeElement && activeElement !== document.body)) {
+      return;
+    }
+
+    const timeoutId = window.setTimeout(() => {
+      const targetInput = videoUrlInputRef.current;
+      if (!targetInput) {
+        return;
+      }
+
+      const currentActiveElement = document.activeElement;
+      if (currentActiveElement && currentActiveElement !== document.body) {
+        return;
+      }
+
+      const scrollX = window.scrollX;
+      const scrollY = window.scrollY;
+
+      try {
+        targetInput.focus({ preventScroll: true });
+      } catch {
+        targetInput.focus();
+      }
+
+      if (window.scrollX !== scrollX || window.scrollY !== scrollY) {
+        window.scrollTo(scrollX, scrollY);
+      }
+    }, 0);
+
+    return () => window.clearTimeout(timeoutId);
+  }, []);
 
   const onSubmit = async (values: HeroSubmitFormValues) => {
     setIsSubmittingForm(true);
@@ -124,9 +166,15 @@ export const HeroSection = () => {
                 <Youtube className="w-5 h-5 group-focus-within:text-red-500 transition-colors" />
               </div>
               <Input
-                {...register('youtubeUrl')}
+                {...youtubeUrlField}
+                ref={(element) => {
+                  youtubeUrlFieldRef(element);
+                  videoUrlInputRef.current = element;
+                }}
                 id="youtube-url-hero"
                 type="text"
+                autoComplete="url"
+                inputMode="url"
                 placeholder={t('hero.submitUrlPlaceholder')}
                 className="border-0 bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0 placeholder:text-muted-foreground/70 h-10 md:h-12 text-foreground font-mono"
               />
