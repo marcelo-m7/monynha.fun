@@ -273,14 +273,17 @@ pnpm build:analyze
 
 ## 🐳 Deploying This Thing
 
-We use Docker to keep everything consistent. Nginx serves the static build.
+We use Docker to keep everything consistent. Production now uses a **Bun runtime server** that serves `dist/` and injects dynamic OG/Twitter tags for `/videos/:id` in the initial HTML.
 
 ```bash
 # Build the image
 docker build -t monynha-fun .
 
-# Run it locally
-docker run -p 80:80 monynha-fun
+# Run it locally (runtime Supabase vars required for dynamic OG tags)
+docker run -p 80:80 \
+	-e SUPABASE_URL=https://your-project.supabase.co \
+	-e SUPABASE_ANON_KEY=your_anon_key \
+	monynha-fun
 ```
 
 Then hit `http://localhost` and you're golden.
@@ -296,14 +299,27 @@ Just make sure your Supabase env vars are set. That's it.
 
 ## 🔐 Making It Work – Environment Variables
 
-You need two things from Supabase:
+There are two env-var groups now:
+
+### Build-time (Vite)
 
 ```env
 VITE_SUPABASE_URL=https://your-project.supabase.co
 VITE_SUPABASE_PUBLISHABLE_KEY=your_publishable_key_here
 ```
 
-These are public (it's fine, Supabase uses RLS to protect data). Create a `.env.local` file in the root and paste them in.
+These are embedded during `vite build`.
+
+### Runtime (Bun server)
+
+```env
+SUPABASE_URL=https://your-project.supabase.co
+SUPABASE_ANON_KEY=your_anon_key_here
+```
+
+These are used by `server/server.ts` at request time to fetch video metadata and inject OG/Twitter tags for `/videos/:id` before JS runs.
+
+`VITE_*` vars are build-time. `SUPABASE_*` vars are runtime.
 
 ---
 
