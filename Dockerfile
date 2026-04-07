@@ -27,22 +27,27 @@ ENV VITE_SUPABASE_URL=${VITE_SUPABASE_URL}
 # The build output will be in the 'dist' directory
 RUN bun run build
 
-# Stage 2: Serve the application with Nginx
-FROM nginx:alpine
+# Stage 2: Run with Bun server for dynamic OG/Twitter HTML injection
+FROM oven/bun:1-alpine AS runner
 
-WORKDIR /usr/share/nginx/html
+WORKDIR /app
 
-# Remove default Nginx configuration
-RUN rm /etc/nginx/conf.d/default.conf
+ENV NODE_ENV=production
+ENV PORT=80
 
-# Copy custom Nginx configuration
-COPY docker/nginx/nginx.conf /etc/nginx/conf.d/default.conf
+# Reuse dependencies from builder stage to avoid lockfile resolution at runtime
+COPY --from=builder /app/node_modules ./node_modules
+COPY --from=builder /app/package.json ./package.json
+COPY --from=builder /app/bun.lock ./bun.lock
 
-# Copy the built React app from the builder stage
-COPY --from=builder /app/dist .
+# Copy built client and server entrypoint
+COPY --from=builder /app/dist ./dist
+COPY server ./server
 
-# Expose port 80
+# Expose Bun server port
 EXPOSE 80
 
-# Start Nginx
-CMD ["nginx", "-g", "daemon off;"]
+# Runtime env vars expected by the server:
+# - SUPABASE_URL
+# - SUPABASE_ANON_KEY
+CMD ["bun", "server/server.ts"]
