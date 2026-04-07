@@ -38,12 +38,33 @@ const VideoDetails = () => {
   const addFavoriteMutation = useAddFavorite();
   const removeFavoriteMutation = useRemoveFavorite();
 
+  const trimDescription = (text?: string | null, maxLength = 160) => {
+    const value = (text ?? '').trim();
+    if (!value) return '';
+    if (value.length <= maxLength) return value;
+    return `${value.slice(0, maxLength - 1).trimEnd()}…`;
+  };
+
+  const metaDescription =
+    video?.enrichment?.short_summary?.trim() ||
+    trimDescription(video?.description) ||
+    'Curadoria coletiva de vídeos do YouTube.';
+
+  const metaTitle = video?.title
+    ? `${video.title.trim()} | Monynha Fun`
+    : 'Monynha Fun';
+
   // Set dynamic meta tags for social media sharing
   useMetaTags({
-    title: video?.title ? `${video.title} | Monynha Fun` : 'Monynha Fun',
-    description: video?.description || 'Curadoria coletiva de vídeos do YouTube.',
+    title: metaTitle,
+    description: metaDescription,
     image: video?.thumbnail_url || 'https://monynha.com/opengraph-image-monynha-fun.png',
     type: 'video.other',
+    siteName: 'Monynha Fun',
+    twitterImageAlt: video?.title || 'Capa do vídeo no Monynha Fun',
+    imageWidth: 1280,
+    imageHeight: 720,
+    imageType: 'image/jpeg',
   });
 
   const handleFavoriteToggle = async () => {

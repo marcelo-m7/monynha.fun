@@ -8,6 +8,11 @@ interface MetaTagsProps {
   url?: string;
   type?: 'website' | 'article' | 'video.other';
   imageAlt?: string;
+  siteName?: string;
+  twitterImageAlt?: string;
+  imageWidth?: number;
+  imageHeight?: number;
+  imageType?: string;
 }
 
 export const useMetaTags = ({
@@ -17,6 +22,11 @@ export const useMetaTags = ({
   url,
   type = 'website',
   imageAlt = 'Pré-visualização do Monynha Fun',
+  siteName = 'Monynha Fun',
+  twitterImageAlt,
+  imageWidth,
+  imageHeight,
+  imageType,
 }: MetaTagsProps) => {
   const location = useLocation();
 
@@ -24,15 +34,35 @@ export const useMetaTags = ({
     // Update document title
     document.title = title;
 
-    // Update meta tags
-    let descriptionMeta = document.querySelector('meta[name="description"]');
-    if (!descriptionMeta) {
-      descriptionMeta = document.createElement('meta');
-      descriptionMeta.setAttribute('name', 'description');
-      document.head.appendChild(descriptionMeta);
-    }
-    descriptionMeta.setAttribute('content', description);
+    const upsertMetaTag = (
+      selectorAttr: 'name' | 'property',
+      selectorValue: string,
+      content: string | null | undefined,
+    ) => {
+      const nodes = document.querySelectorAll(`meta[${selectorAttr}="${selectorValue}"]`);
+      const existing = nodes[0] as HTMLMetaElement | undefined;
+      const duplicates = Array.from(nodes).slice(1);
 
+      for (const duplicate of duplicates) {
+        duplicate.remove();
+      }
+
+      if (content === null || content === undefined || content === '') {
+        existing?.remove();
+        return;
+      }
+
+      const target = existing ?? document.createElement('meta');
+      target.setAttribute(selectorAttr, selectorValue);
+      target.setAttribute('content', content);
+
+      if (!existing) {
+        document.head.appendChild(target);
+      }
+    };
+
+    // Update meta tags
+    upsertMetaTag('name', 'description', description);
 
     const canonicalUrl = url || window.location.href;
     let canonicalLink = document.querySelector('link[rel="canonical"]');
@@ -44,38 +74,36 @@ export const useMetaTags = ({
     canonicalLink.setAttribute('href', canonicalUrl);
 
     // Open Graph tags
-    const updateOGTag = (property: string, content: string) => {
-      let meta = document.querySelector(`meta[property="${property}"]`);
-      if (!meta) {
-        meta = document.createElement('meta');
-        meta.setAttribute('property', property);
-        document.head.appendChild(meta);
-      }
-      meta.setAttribute('content', content);
-    };
-
-    updateOGTag('og:title', title);
-    updateOGTag('og:description', description);
-    updateOGTag('og:type', type);
-    updateOGTag('og:image', image);
-    updateOGTag('og:url', canonicalUrl);
-    updateOGTag('og:image:alt', imageAlt);
+    upsertMetaTag('property', 'og:title', title);
+    upsertMetaTag('property', 'og:description', description);
+    upsertMetaTag('property', 'og:type', type);
+    upsertMetaTag('property', 'og:image', image);
+    upsertMetaTag('property', 'og:url', canonicalUrl);
+    upsertMetaTag('property', 'og:site_name', siteName);
+    upsertMetaTag('property', 'og:image:alt', imageAlt);
+    upsertMetaTag('property', 'og:image:width', imageWidth?.toString());
+    upsertMetaTag('property', 'og:image:height', imageHeight?.toString());
+    upsertMetaTag('property', 'og:image:type', imageType);
 
     // Twitter tags
-    const updateTwitterTag = (name: string, content: string) => {
-      let meta = document.querySelector(`meta[name="${name}"]`);
-      if (!meta) {
-        meta = document.createElement('meta');
-        meta.setAttribute('name', name);
-        document.head.appendChild(meta);
-      }
-      meta.setAttribute('content', content);
-    };
-
-    updateTwitterTag('twitter:title', title);
-    updateTwitterTag('twitter:description', description);
-    updateTwitterTag('twitter:image', image);
-    updateTwitterTag('twitter:card', 'summary_large_image');
-    updateTwitterTag('twitter:url', canonicalUrl);
-  }, [title, description, image, url, type, imageAlt, location]);
+    upsertMetaTag('name', 'twitter:title', title);
+    upsertMetaTag('name', 'twitter:description', description);
+    upsertMetaTag('name', 'twitter:image', image);
+    upsertMetaTag('name', 'twitter:image:alt', twitterImageAlt ?? imageAlt);
+    upsertMetaTag('name', 'twitter:card', 'summary_large_image');
+    upsertMetaTag('name', 'twitter:url', canonicalUrl);
+  }, [
+    title,
+    description,
+    image,
+    url,
+    type,
+    imageAlt,
+    siteName,
+    twitterImageAlt,
+    imageWidth,
+    imageHeight,
+    imageType,
+    location,
+  ]);
 };

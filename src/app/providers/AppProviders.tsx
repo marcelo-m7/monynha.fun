@@ -18,7 +18,7 @@ export function AppProviders({ children }: { children: ReactNode }) {
     <HelmetProvider>
       <I18nextProvider i18n={i18n}>
         <QueryClientProvider client={queryClient}>
-          <ThemeProvider attribute="class" defaultTheme="dark" enableSystem>
+          <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
             <AuthProvider>
               <TooltipProvider>
                 <Sonner />
