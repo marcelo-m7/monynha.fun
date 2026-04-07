@@ -19,6 +19,9 @@ export interface VideoEnrichmentResult {
   summary_description: string;
   semantic_tags: string[];
   suggested_category_id: string | null;
+  suggested_category: string | null;
+  suggested_playlist_query: string | null;
+  classification_confidence: number;
   language: string;
   cultural_relevance: string;
   short_summary: string;
@@ -190,10 +193,17 @@ Please respond with JSON (no markdown, just raw JSON) with these fields:
   "optimized_title": "A catchy, SEO-friendly title (max 100 chars)",
   "summary_description": "A 2-3 sentence summary (max 250 chars)",
   "semantic_tags": ["tag1", "tag2", "tag3", "tag4", "tag5"],
-  "suggested_category": "One of: technology, arts, culture, education, entertainment, news, sports, business, other",
+  "suggested_category": "A category label or slug that best matches the content",
+  "suggested_playlist_query": "Short phrase to find a matching playlist (2-6 words)",
+  "classification_confidence": 0.0,
   "cultural_relevance": "High, Medium, or Low",
   "short_summary": "A single sentence summary for UI display"
 }
+
+Rules:
+- Return classification_confidence as a number between 0 and 1.
+- Keep semantic_tags specific and concise.
+- If uncertain, set suggested_playlist_query to null and classification_confidence below 0.6.
 
 Only return valid JSON, no explanations.
 `;
@@ -222,6 +232,17 @@ Only return valid JSON, no explanations.
           ? parsed.semantic_tags.slice(0, 5)
           : [],
         suggested_category_id: null, // Mapping done at database level
+        suggested_category:
+          typeof parsed.suggested_category === 'string'
+            ? parsed.suggested_category.trim() || null
+            : null,
+        suggested_playlist_query:
+          typeof parsed.suggested_playlist_query === 'string'
+            ? parsed.suggested_playlist_query.trim() || null
+            : null,
+        classification_confidence: this.normalizeConfidence(
+          parsed.classification_confidence
+        ),
         language: language || 'pt',
         cultural_relevance: this.normalizeRelevance(
           parsed.cultural_relevance
@@ -245,6 +266,24 @@ Only return valid JSON, no explanations.
     if (normalized?.includes('medium')) return 'Medium';
     if (normalized?.includes('low')) return 'Low';
     return 'Medium'; // Default
+  }
+
+  /**
+   * Normalize classification confidence to [0, 1]
+   */
+  private normalizeConfidence(value: unknown): number {
+    if (typeof value === 'number' && Number.isFinite(value)) {
+      return Math.min(1, Math.max(0, value));
+    }
+
+    if (typeof value === 'string') {
+      const parsed = Number.parseFloat(value);
+      if (Number.isFinite(parsed)) {
+        return Math.min(1, Math.max(0, parsed));
+      }
+    }
+
+    return 0.5;
   }
 }
 
