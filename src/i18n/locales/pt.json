@@ -68,6 +68,82 @@
       "emptyUrl": "Por favor, cole uma URL de vídeo do YouTube."
     }
   },
+  "home": {
+    "onboarding": {
+      "title": "Comece em menos de 1 minuto",
+      "subtitle": "Cole um link, revise os dados e publique para a comunidade."
+    },
+    "howItWorks": {
+      "title": "Como funciona",
+      "steps": {
+        "step1": {
+          "title": "Cole a URL",
+          "description": "Adicione um link do YouTube para iniciar."
+        },
+        "step2": {
+          "title": "Revise os metadados",
+          "description": "Confira título, idioma e categoria sugerida."
+        },
+        "step3": {
+          "title": "Publique com contexto",
+          "description": "Inclua uma descrição curta para ajudar outros curadores."
+        },
+        "step4": {
+          "title": "Descubra com a comunidade",
+          "description": "Navegue por coleções humanas, não por algoritmo."
+        }
+      }
+    },
+    "features": {
+      "title": "Recursos principais",
+      "cards": {
+        "card1": {
+          "title": "Curadoria humana",
+          "description": "Seleções feitas por pessoas com contexto cultural."
+        },
+        "card2": {
+          "title": "Playlists vivas",
+          "description": "Coleções que evoluem com novas contribuições."
+        },
+        "card3": {
+          "title": "Classificação inteligente",
+          "description": "Sugestões de categoria com revisão comunitária."
+        },
+        "card4": {
+          "title": "Busca sem ruído",
+          "description": "Encontre vídeos relevantes sem caça-cliques."
+        },
+        "card5": {
+          "title": "Foco em preservação",
+          "description": "Resgate conteúdos úteis que poderiam se perder."
+        },
+        "card6": {
+          "title": "Multilíngue",
+          "description": "Compartilhe e descubra em vários idiomas."
+        }
+      }
+    },
+    "useCases": {
+      "title": "Para quem é",
+      "items": {
+        "case1": {
+          "title": "Estudantes",
+          "description": "Monte trilhas confiáveis para aprender mais rápido."
+        },
+        "case2": {
+          "title": "Criadores",
+          "description": "Referencie fontes de qualidade para sua audiência."
+        },
+        "case3": {
+          "title": "Comunidades",
+          "description": "Preservem memória cultural em coleções compartilhadas."
+        }
+      }
+    },
+    "ctaSecondary": {
+      "label": "Ver exemplos"
+    }
+  },
   "auth": {
     "loginTitle": "Entre na sua conta",
     "signupTitle": "Crie sua conta",
