@@ -374,7 +374,7 @@ serve(async (req) => {
     const categoryRows = (categoriesData ?? []) as CategoryRow[];
 
     const effectiveLanguage = video.language || 'pt';
-    let { data: playlistsData, error: playlistFetchError } = await supabaseServiceRole
+    const { data: playlistsByLanguage, error: playlistFetchError } = await supabaseServiceRole
       .from('playlists')
       .select('id, name, description, language, is_public')
       .eq('is_public', true)
@@ -383,6 +383,7 @@ serve(async (req) => {
     if (playlistFetchError) {
       throw new Error(`Failed to load playlists: ${playlistFetchError.message}`);
     }
+    let playlistsData = playlistsByLanguage;
     if (!playlistsData || playlistsData.length === 0) {
       const { data: fallbackData, error: fallbackError } = await supabaseServiceRole
         .from('playlists')
