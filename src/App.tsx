@@ -40,6 +40,7 @@ const AccountSettings = lazy(() => import("./pages/AccountSettings"));
 const Messages = lazy(() => import("./pages/Messages"));
 const Notifications = lazy(() => import("./pages/Notifications"));
 const NotFound = lazy(() => import("./pages/NotFound"));
+const YouTubeRouteBridge = lazy(() => import("./pages/YouTubeRouteBridge"));
 
 const App = () => (
   <BrowserRouter
@@ -55,6 +56,11 @@ const App = () => (
         <Route path="/auth" element={<Auth />} />
         <Route path="/auth/verify-email" element={<VerifyEmail />} />
         <Route path="/submit" element={<Submit />} />
+        <Route path="/watch" element={<YouTubeRouteBridge />} />
+        <Route path="/shorts/:id" element={<YouTubeRouteBridge />} />
+        <Route path="/live/:id" element={<YouTubeRouteBridge />} />
+        <Route path="/embed/:id" element={<YouTubeRouteBridge />} />
+        <Route path="/v/:id" element={<YouTubeRouteBridge />} />
         <Route path="/videos/:videoId" element={<VideoDetails />} />
         <Route path="/videos" element={<Videos />} />
         <Route path="/favorites" element={<Favorites />} />
