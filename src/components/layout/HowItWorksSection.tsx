@@ -12,7 +12,7 @@ export const HowItWorksSection = () => {
     <section id="how-it-works" className="py-20 bg-background border-t border-primary/20">
       <div className="container space-y-8">
         <div className="space-y-3">
-          <Badge variant="outline" className="uppercase tracking-[0.2em] text-[0.65rem] font-bold border-primary/40 text-primary">
+          <Badge variant="outline" className="uppercase tracking-[0.2em] text-[0.65rem] font-bold border-primary/40 bg-primary/8 text-foreground">
             {t('home.howItWorks.title')}
           </Badge>
           <h2 className="text-2xl md:text-4xl font-extrabold uppercase tracking-[0.08em] font-mono">

@@ -89,7 +89,7 @@ export const MobileNav: React.FC<MobileNavProps> = ({
                   key={link.to}
                   to={link.to}
                   className="flex items-center gap-3 px-4 py-3.5 text-muted-foreground hover:text-foreground hover:bg-muted/50 rounded-2xl transition-all"
-                  activeClassName="bg-primary/5 text-primary font-bold"
+                  activeClassName="bg-primary/8 text-foreground font-bold"
                   onClick={onClose}
                 >
                   <link.icon className="h-5 w-5" />
@@ -123,7 +123,7 @@ export const MobileNav: React.FC<MobileNavProps> = ({
                 <NavLink
                   to={`/profile/${profile.username}`}
                   className="flex items-center gap-3 px-4 py-3 text-muted-foreground hover:text-foreground hover:bg-muted/50 rounded-2xl transition-all"
-                  activeClassName="bg-primary/5 text-primary font-medium"
+                  activeClassName="bg-primary/8 text-foreground font-medium"
                   onClick={onClose}
                 >
                   <UserIcon className="h-5 w-5" />
@@ -132,7 +132,7 @@ export const MobileNav: React.FC<MobileNavProps> = ({
                 <NavLink
                   to="/favorites"
                   className="flex items-center gap-3 px-4 py-3 text-muted-foreground hover:text-foreground hover:bg-muted/50 rounded-2xl transition-all"
-                  activeClassName="bg-primary/5 text-primary font-medium"
+                  activeClassName="bg-primary/8 text-foreground font-medium"
                   onClick={onClose}
                 >
                   <Heart className="h-5 w-5" />
@@ -141,7 +141,7 @@ export const MobileNav: React.FC<MobileNavProps> = ({
                 <NavLink
                   to="/messages"
                   className="flex items-center gap-3 px-4 py-3 text-muted-foreground hover:text-foreground hover:bg-muted/50 rounded-2xl transition-all"
-                  activeClassName="bg-primary/5 text-primary font-medium"
+                  activeClassName="bg-primary/8 text-foreground font-medium"
                   onClick={onClose}
                 >
                   <MessageCircle className="h-5 w-5" />
@@ -155,7 +155,7 @@ export const MobileNav: React.FC<MobileNavProps> = ({
                 <NavLink
                   to="/notifications"
                   className="flex items-center gap-3 px-4 py-3 text-muted-foreground hover:text-foreground hover:bg-muted/50 rounded-2xl transition-all"
-                  activeClassName="bg-primary/5 text-primary font-medium"
+                  activeClassName="bg-primary/8 text-foreground font-medium"
                   onClick={onClose}
                 >
                   <Bell className="h-5 w-5" />
@@ -169,7 +169,7 @@ export const MobileNav: React.FC<MobileNavProps> = ({
                 <NavLink
                   to="/account/settings"
                   className="flex items-center gap-3 px-4 py-3 text-muted-foreground hover:text-foreground hover:bg-muted/50 rounded-2xl transition-all"
-                  activeClassName="bg-primary/5 text-primary font-medium"
+                  activeClassName="bg-primary/8 text-foreground font-medium"
                   onClick={onClose}
                 >
                   <Settings className="h-5 w-5" />
