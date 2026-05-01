@@ -84,7 +84,7 @@ const Community = () => {
                   </AvatarFallback>
                 </Avatar>
                 <div className="flex-1">
-                  <h3 className="font-semibold text-lg group-hover:text-primary transition-colors line-clamp-1">
+                   <h3 className="font-semibold text-lg group-hover:opacity-75 transition-opacity line-clamp-1">
                     {profile.display_name || profile.username || t('common.anonymous')}
                   </h3>
                   {profile.username && (

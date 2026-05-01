@@ -63,7 +63,7 @@ const About = () => {
                 href="https://github.com/marcelo-m7" 
                 target="_blank" 
                 rel="noopener noreferrer" 
-                className="text-primary hover:underline text-sm"
+                 className="text-foreground underline hover:opacity-75 transition-opacity text-sm"
               >
                 {t('aboutPage.githubLink')}
               </a>
@@ -71,7 +71,7 @@ const About = () => {
                 href="https://marcelo.open2.tech" 
                 target="_blank" 
                 rel="noopener noreferrer" 
-                className="text-primary hover:underline text-sm"
+                 className="text-foreground underline hover:opacity-75 transition-opacity text-sm"
               >
                 {t('aboutPage.websiteLink')}
               </a>
