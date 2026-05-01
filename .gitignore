@@ -1,3 +1,5 @@
+backend/
+docker-compose.yml
 .codemachine/
 # Logs
 logs
