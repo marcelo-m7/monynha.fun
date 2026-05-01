@@ -73,7 +73,7 @@ export function PlaylistCard({ playlist, index = 0 }: PlaylistCardProps) {
 
       {/* Content */}
       <div className="p-4 flex flex-col flex-1">
-        <h2 className="font-semibold text-lg group-hover:text-primary transition-colors line-clamp-1 mb-1 uppercase tracking-[0.08em]">
+        <h2 className="font-semibold text-lg group-hover:opacity-75 transition-opacity line-clamp-1 mb-1 uppercase tracking-[0.08em]">
           {playlist.name}
         </h2>
         

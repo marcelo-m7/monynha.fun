@@ -28,10 +28,10 @@ export const Footer = () => {
           <div className="space-y-4">
             <h4 className="font-semibold text-xs uppercase tracking-widest text-muted-foreground">{t('footer.navigation')}</h4>
             <ul className="space-y-2 text-xs uppercase tracking-widest text-muted-foreground">
-              <li><Link to="/videos" className="hover:text-primary transition-colors">{t('footer.categories')}</Link></li>
-              <li><Link to="/videos?recent=true" className="hover:text-primary transition-colors">{t('footer.recent')}</Link></li>
-              <li><Link to="/videos?featured=true" className="hover:text-primary transition-colors">{t('footer.featured')}</Link></li>
-              <li><Link to="/submit" className="hover:text-primary transition-colors">{t('footer.submitVideo')}</Link></li>
+              <li><Link to="/videos" className="hover:opacity-75 transition-opacity">{t('footer.categories')}</Link></li>
+              <li><Link to="/videos?recent=true" className="hover:opacity-75 transition-opacity">{t('footer.recent')}</Link></li>
+              <li><Link to="/videos?featured=true" className="hover:opacity-75 transition-opacity">{t('footer.featured')}</Link></li>
+              <li><Link to="/submit" className="hover:opacity-75 transition-opacity">{t('footer.submitVideo')}</Link></li>
             </ul>
           </div>
 
@@ -39,11 +39,11 @@ export const Footer = () => {
           <div className="space-y-4">
             <h4 className="font-semibold text-xs uppercase tracking-widest text-muted-foreground">{t('footer.community')}</h4>
             <ul className="space-y-2 text-xs uppercase tracking-widest text-muted-foreground">
-              <li><Link to="/community" className="hover:text-primary transition-colors">{t('footer.community')}</Link></li>
-              <li><Link to="/about" className="hover:text-primary transition-colors">{t('footer.about')}</Link></li>
-              <li><Link to="/rules" className="hover:text-primary transition-colors">{t('footer.rules')}</Link></li>
-              <li><Link to="/contact" className="hover:text-primary transition-colors">{t('footer.contact')}</Link></li>
-              <li><Link to="/faq" className="hover:text-primary transition-colors">{t('footer.faq')}</Link></li>
+              <li><Link to="/community" className="hover:opacity-75 transition-opacity">{t('footer.community')}</Link></li>
+              <li><Link to="/about" className="hover:opacity-75 transition-opacity">{t('footer.about')}</Link></li>
+              <li><Link to="/rules" className="hover:opacity-75 transition-opacity">{t('footer.rules')}</Link></li>
+              <li><Link to="/contact" className="hover:opacity-75 transition-opacity">{t('footer.contact')}</Link></li>
+              <li><Link to="/faq" className="hover:opacity-75 transition-opacity">{t('footer.faq')}</Link></li>
             </ul>
           </div>
         </div>
@@ -56,16 +56,16 @@ export const Footer = () => {
               href="https://open2.tech" 
               target="_blank" 
               rel="noopener noreferrer" 
-              className="hover:text-primary transition-colors"
+              className="hover:opacity-75 transition-opacity"
             >
               {t('footer.byMonynhaSoftwares')}
             </a>
           </p>
           <div className="flex items-center gap-4">
-            <a href="https://open2.tech" target="_blank" rel="noopener noreferrer" aria-label="Open 2 Technology website" className="text-muted-foreground hover:text-primary transition-colors">
+            <a href="https://open2.tech" target="_blank" rel="noopener noreferrer" aria-label="Open 2 Technology website" className="text-muted-foreground hover:opacity-75 transition-opacity">
               <Globe className="w-5 h-5" />
             </a>
-            <a href="https://github.com/marcelo-m7/tube-o2" target="_blank" rel="noopener noreferrer" aria-label="GitHub repository" className="text-muted-foreground hover:text-primary transition-colors">
+            <a href="https://github.com/marcelo-m7/tube-o2" target="_blank" rel="noopener noreferrer" aria-label="GitHub repository" className="text-muted-foreground hover:opacity-75 transition-opacity">
               <Github className="w-5 h-5" />
             </a>
           </div>

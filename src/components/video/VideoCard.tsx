@@ -123,7 +123,7 @@ export const VideoCard = ({ video, onClick, variant = 'default' }: VideoCardProp
             <Tooltip delayDuration={300}>
               <TooltipTrigger asChild>
                 <h3 className={cn(
-                  "font-semibold leading-snug line-clamp-2 group-hover:text-primary transition-colors uppercase tracking-[0.05em]",
+                  "font-semibold leading-snug line-clamp-2 group-hover:opacity-75 transition-opacity uppercase tracking-[0.05em]",
                   variant === 'default' ? "text-sm" : "text-xs"
                 )}>
                   {video.title}

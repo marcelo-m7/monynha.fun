@@ -51,7 +51,7 @@ export const CategoryCard = ({ category, videoCount = 0, onClick, index = 0 }: C
       </div>
       
       <div className="text-center space-y-1">
-        <h3 className="font-bold text-sm sm:text-base text-foreground group-hover:text-primary transition-colors uppercase tracking-[0.08em]">
+        <h3 className="font-bold text-sm sm:text-base text-foreground group-hover:opacity-75 transition-opacity uppercase tracking-[0.08em]">
           {category.name}
         </h3>
         <p className="text-xs text-muted-foreground font-medium">

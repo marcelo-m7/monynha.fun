@@ -51,7 +51,7 @@ export const CategorySection = () => {
           
           <Button
             variant="ghost"
-            className="w-fit gap-2 group text-muted-foreground hover:text-primary transition-colors"
+            className="w-fit gap-2 group text-muted-foreground hover:opacity-75 transition-opacity"
             onClick={() => navigate('/videos')}
           >
             {t('index.viewAll')}
