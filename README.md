@@ -1,16 +1,16 @@
-# Monynha Fun – Cultural Video Curation Platform 🎬
+# Tube O2 – Cultural Video Curation Platform 🎬
 
-![Monynha Fun Hero](./docs/placeholder.png)
+![Tube O2 Hero](./docs/placeholder.png)
 
 > *A passion project by **Marcelo Santos**, crafted with care to bring together the best of cultural video content that gets lost in the algorithmic noise. Now with mention autocomplete because Marcelo got tired of copying usernames like it's 2005.*
 
-**🌐 Live Platform**: https://monynha.fun
+**🌐 Live Platform**: https://tube.open2.tech
 
 ---
 
 ## 💭 What's This All About?
 
-Look, I built Monynha Fun because I was fed up, sabe? Scrolling through YouTube, seeing the same algorithm-driven trash, while *amazing* cultural content just... disappears. So here's the deal:
+Look, I built Tube O2 because I was fed up, sabe? Scrolling through YouTube, seeing the same algorithm-driven trash, while *amazing* cultural content just... disappears. So here's the deal:
 
 We're creating a space where **human taste matters**. A place where curators (like you, like me) can say "ey, this video is worth your time" – and mean it. AI helps us out, sure, but **humans are in charge**. No predatory engagement metrics. No dark patterns. Just good content, properly organized.
 
@@ -111,7 +111,7 @@ Keep track of videos that hit different. Your personal collection grows with you
 See who else is curating. Check out their playlists. Learn from other people's taste. Share knowledge.
 
 ### 📹 Submit Content
-Found an amazing video the world should see? Add it to Monynha Fun. Our AI will help enrich it with metadata.
+Found an amazing video the world should see? Add it to Tube O2. Our AI will help enrich it with metadata.
 
 ### 🌐 Multi-Language
 Portuguese, English, Spanish, French – we're building for everyone. More languages coming.
@@ -127,10 +127,10 @@ Tag users in comments with autocomplete that actually works. Type `@` and boom �
 
 ```bash
 # Clone the repo
-git clone https://github.com/marcelo-m7/monynha.fun
+git clone https://github.com/marcelo-m7/tube-o2
 
 # Go into the folder
-cd monynha.fun
+cd tube-o2
 
 # Install dependencies
 pnpm install
@@ -277,13 +277,13 @@ We use Docker to keep everything consistent. Production now uses a **Bun runtime
 
 ```bash
 # Build the image
-docker build -t monynha-fun .
+docker build -t tube-o2 .
 
 # Run it locally (runtime Supabase vars required for dynamic OG tags)
 docker run -p 80:80 \
 	-e SUPABASE_URL=https://your-project.supabase.co \
 	-e SUPABASE_ANON_KEY=your_anon_key \
-	monynha-fun
+	tube-o2
 ```
 
 Then hit `http://localhost` and you're golden.
@@ -374,8 +374,8 @@ Great! You can work locally or directly on GitHub. Here's how:
 
 ### Option 1: Local Development (The Pro Way)
 ```bash
-git clone https://github.com/marcelo-m7/monynha.fun
-cd monynha.fun
+git clone https://github.com/marcelo-m7/tube-o2
+cd tube-o2
 pnpm install
 pnpm dev
 ```
@@ -448,7 +448,7 @@ Check the [Supabase docs](https://supabase.com/docs) or [Vite docs](https://vite
 ## 📝 About This Project
 
 **Built by**: Marcelo Santos  
-**Organization**: Monynha Softwares  
+**Organization**: Open 2 Technology  
 **License**: Check the LICENSE file  
 **Version**: 0.1.5 (and growing!)
 
@@ -476,5 +476,5 @@ We're constantly improving. On the roadmap:
 
 ---
 
-**Visit us at**: https://monynha.com  
+**Visit us at**: https://open2.tech  
 **Made with** ☕ **and** 💡 **by Marcelo Santos**

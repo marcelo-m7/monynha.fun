@@ -22,8 +22,8 @@ export default defineConfig(({ mode, command }) => ({
     VitePWA({
       registerType: 'autoUpdate',
       manifest: {
-        name: 'Monynha Fun',
-        short_name: 'Monynha',
+        name: 'Tube O2',
+        short_name: 'Tube O2',
         description: 'Cultural video curation platform with human curators',
         theme_color: '#1a1a1a',
         background_color: '#ffffff',

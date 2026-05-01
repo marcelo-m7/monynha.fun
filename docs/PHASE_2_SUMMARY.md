@@ -9,7 +9,7 @@
 
 ## 📋 Overview
 
-Phase 2 implements real OpenAI integration into Monynha Fun, replacing the placeholder `simulatedEnrichment` with actual AI-powered video metadata enrichment. This phase enables:
+Phase 2 implements real OpenAI integration into Tube O2, replacing the placeholder `simulatedEnrichment` with actual AI-powered video metadata enrichment. This phase enables:
 
 - **Video Title Optimization**: AI generates SEO-friendly titles
 - **Metadata Enrichment**: Summaries, semantic tags, cultural relevance assessment

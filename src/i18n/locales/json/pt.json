@@ -46,7 +46,7 @@
     "contact": "Contato",
     "faq": "FAQ",
     "madeWithLove": "Feito com",
-    "byMonynhaSoftwares": "pela Monynha Softwares"
+    "byMonynhaSoftwares": "pela Open 2 Technology"
   },
   "labels": {
     "featured": "Destaque"
@@ -226,7 +226,7 @@
   },
   "about": {
     "title": "Sobre",
-    "description": "Saiba mais sobre a Monynha Fun e nossa missão."
+    "description": "Saiba mais sobre o Tube O2 e nossa missão."
   },
   "rules": {
     "title": "Regras",
@@ -394,16 +394,16 @@
       },
       "success": {
         "playlistCreated": "Playlist '{{name}}' criada com sucesso!",
-        "videoAdded": "Vídeo '{{title}}' adicionado ao Monynha Fun.",
+        "videoAdded": "Vídeo '{{title}}' adicionado ao Tube O2.",
         "allVideosProcessed": "Todos os {{count}} vídeos foram importados para a playlist com sucesso."
       },
       "info": {
-        "videoAlreadyExists": "Vídeo '{{title}}' já existe no Monynha Fun. Ignorando criação."
+        "videoAlreadyExists": "Vídeo '{{title}}' já existe no Tube O2. Ignorando criação."
       },
       "warning": {
         "noVideosFoundInPlaylist": "Nenhum vídeo encontrado na playlist do YouTube. Uma playlist vazia será criada."
       },
-      "apiLimitationInfo": "O Monynha Fun usa um serviço de backend para buscar vídeos de playlists do YouTube, mas depende da API de Dados do YouTube, que possui cotas e pode nem sempre retornar todos os vídeos para playlists muito grandes. Para resultados ótimos, certifique-se de que a playlist seja pública."
+      "apiLimitationInfo": "O Tube O2 usa um serviço de backend para buscar vídeos de playlists do YouTube, mas depende da API de Dados do YouTube, que possui cotas e pode nem sempre retornar todos os vídeos para playlists muito grandes. Para resultados ótimos, certifique-se de que a playlist seja pública."
     }
   },
   "playlistDetails": {

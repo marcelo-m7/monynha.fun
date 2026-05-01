@@ -49,7 +49,7 @@
     "contact": "Contact",
     "faq": "FAQ",
     "madeWithLove": "Made with",
-    "byMonynhaSoftwares": "by Monynha Softwares"
+    "byMonynhaSoftwares": "by Open 2 Technology"
   },
   "labels": {
     "featured": "Featured"
@@ -428,7 +428,7 @@
   },
   "about": {
     "title": "About",
-    "description": "Learn more about Monynha Fun and our mission."
+    "description": "Learn more about Tube O2 and our mission."
   },
   "rules": {
     "title": "Rules",
@@ -494,8 +494,8 @@
   },
   "faqPage": {
     "q1": {
-      "question": "What is Monynha Fun?",
-      "answer": "Monynha Fun is a community-driven platform for curating valuable YouTube content."
+      "question": "What is Tube O2?",
+      "answer": "Tube O2 is a community-driven platform for curating valuable YouTube content."
     },
     "q2": {
       "question": "Who can submit videos?",
@@ -511,7 +511,7 @@
     },
     "q5": {
       "question": "How can I contact the team?",
-      "answer": "Use the contact form or email hello@monynha.com."
+      "answer": "Use the contact form or email hello@open2.tech."
     }
   },
   "playlists": {
@@ -562,16 +562,16 @@
       },
       "success": {
         "playlistCreated": "Playlist '{{name}}' created successfully!",
-        "videoAdded": "Video '{{title}}' added to Monynha Fun.",
+        "videoAdded": "Video '{{title}}' added to Tube O2.",
         "allVideosProcessed": "Successfully imported {{count}} videos into the playlist."
       },
       "info": {
-        "videoAlreadyExists": "Video '{{title}}' already exists in Monynha Fun. Skipping creation."
+        "videoAlreadyExists": "Video '{{title}}' already exists in Tube O2. Skipping creation."
       },
       "warning": {
         "noVideosFoundInPlaylist": "No videos found in the YouTube playlist. An empty playlist will be created."
       },
-      "apiLimitationInfo": "Monynha Fun uses a backend service to fetch YouTube playlist videos, but depends on the YouTube Data API which has quotas and may not always return all videos for very large playlists. For optimal results, ensure the playlist is public."
+      "apiLimitationInfo": "Tube O2 uses a backend service to fetch YouTube playlist videos, but depends on the YouTube Data API which has quotas and may not always return all videos for very large playlists. For optimal results, ensure the playlist is public."
     }
   },
   "playlistDetails": {

@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://monynha.fun/sitemap.xml
+Sitemap: https://tube.open2.tech/sitemap.xml

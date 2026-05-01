@@ -33,8 +33,8 @@ const PlaylistDetails = () => {
   const canEdit = useCanEditPlaylist(playlist);
 
   useMetaTags({
-    title: playlist?.name ? `${playlist.name} | Monynha Fun` : 'Monynha Fun',
-    description: playlist?.description || 'Playlist no Monynha Fun: Curadoria coletiva de vídeos do YouTube.',
+    title: playlist?.name ? `${playlist.name} | Tube O2` : 'Tube O2',
+    description: playlist?.description || 'Playlist no Tube O2: Curadoria coletiva de vídeos do YouTube.',
     type: 'website',
   });
 

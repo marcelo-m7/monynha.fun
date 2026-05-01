@@ -239,7 +239,7 @@ export default function Auth() {
               </div>
             </div>
             <h1 className="text-3xl font-bold text-foreground">
-              Monynha<span className="text-primary">Fun</span>
+              Tube<span className="text-primary">O2</span>
             </h1>
             {!showResetPassword && (
               <p className="text-muted-foreground mt-2">

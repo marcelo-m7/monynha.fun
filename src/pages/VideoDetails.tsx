@@ -51,17 +51,17 @@ const VideoDetails = () => {
     'Curadoria coletiva de vídeos do YouTube.';
 
   const metaTitle = video?.title
-    ? `${video.title.trim()} | Monynha Fun`
-    : 'Monynha Fun';
+    ? `${video.title.trim()} | Tube O2`
+    : 'Tube O2';
 
   // Set dynamic meta tags for social media sharing
   useMetaTags({
     title: metaTitle,
     description: metaDescription,
-    image: video?.thumbnail_url || 'https://monynha.com/opengraph-image-monynha-fun.png',
+    image: video?.thumbnail_url || 'https://tube.open2.tech/opengraph-image-tube-o2.png',
     type: 'video.other',
-    siteName: 'Monynha Fun',
-    twitterImageAlt: video?.title || 'Capa do vídeo no Monynha Fun',
+    siteName: 'Tube O2',
+    twitterImageAlt: video?.title || 'Capa do vídeo no Tube O2',
     imageWidth: 1280,
     imageHeight: 720,
     imageType: 'image/jpeg',

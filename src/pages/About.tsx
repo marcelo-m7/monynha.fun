@@ -68,7 +68,7 @@ const About = () => {
                 {t('aboutPage.githubLink')}
               </a>
               <a 
-                href="https://marcelo.monynha.com" 
+                href="https://marcelo.open2.tech" 
                 target="_blank" 
                 rel="noopener noreferrer" 
                 className="text-primary hover:underline text-sm"

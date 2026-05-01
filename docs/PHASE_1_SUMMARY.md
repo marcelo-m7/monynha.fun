@@ -109,8 +109,8 @@ pnpm build:analyze
 **Configuration:**
 ```javascript
 {
-  name: 'Monynha Fun',
-  short_name: 'Monynha',
+  name: 'Tube O2',
+  short_name: 'Tube O2',
   display: 'standalone',
   theme_color: '#1a1a1a',
   start_url: '/',

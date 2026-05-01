@@ -186,7 +186,7 @@ export default function CreateEditPlaylist() {
               <ListVideo className="w-4 h-4 text-primary-foreground fill-current" />
             </div>
             <span className="font-bold text-lg">
-              Monynha<span className="text-primary">Fun</span>
+              Tube<span className="text-primary">O2</span>
             </span>
           </div>
         </div>

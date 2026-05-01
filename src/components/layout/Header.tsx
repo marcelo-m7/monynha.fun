@@ -55,7 +55,7 @@ export const Header = () => {
             <span className="text-lg font-bold">M</span>
           </div>
           <span className="hidden font-bold text-xl tracking-[0.2em] uppercase sm:inline-block">
-            Monynha<span className="text-primary">Fun</span>
+            Tube<span className="text-primary">O2</span>
           </span>
         </Link>
 
@@ -246,7 +246,7 @@ export const Header = () => {
                       <span className="text-lg font-bold">M</span>
                     </div>
                     <span className="font-bold text-xl tracking-tight">
-                      Monynha<span className="text-primary">Fun</span>
+                      Tube<span className="text-primary">O2</span>
                     </span>
                   </Link>
                 </SheetTitle>

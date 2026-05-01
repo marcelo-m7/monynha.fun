@@ -3,7 +3,7 @@
 ## Overview
 *Where Marcelo documents his coding adventures and occasional "oh crap" moments* 😅
 
-Comprehensive updates to Monynha Fun codebase: mentions autocomplete (porque copiar usernames é coisa de 2005), public comments (everyone can see your hot takes now), bug fixes (DOM nesting horror resolved), and docs updates (because future-Marcelo will thank past-Marcelo).
+Comprehensive updates to Tube O2 codebase: mentions autocomplete (porque copiar usernames é coisa de 2005), public comments (everyone can see your hot takes now), bug fixes (DOM nesting horror resolved), and docs updates (because future-Marcelo will thank past-Marcelo).
 
 ---
 
@@ -301,7 +301,7 @@ Before deployment, verify:
 ## Contact & Support
 
 For questions about these updates:
-- **Repository**: https://github.com/marcelo-m7/monynha.fun
+- **Repository**: https://github.com/marcelo-m7/tube-o2
 - **Documentation**: See `docs/` folder
 - **Issues**: Report on GitHub Issues
 

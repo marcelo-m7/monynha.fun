@@ -1,8 +1,8 @@
-# Changelog - Monynha Fun 🎬
+# Changelog - Tube O2 🎬
 
 *Where we document every bug fix, feature drop, and "oops I broke production" moment*
 
-> **Monynha Softwares Philosophy**: Move fast, break things (but fix them quickly), and always keep it real. No corporate BS here. 🚀
+> **Open 2 Technology Philosophy**: Move fast, break things (but fix them quickly), and always keep it real. No corporate BS here. 🚀
 
 ---
 
@@ -188,8 +188,8 @@ OPENAI_MODEL=gpt-4o-mini              # Documented in .env.example
 **Configuration**:
 ```javascript
 {
-  name: 'Monynha Fun',
-  short_name: 'Monynha',
+  name: 'Tube O2',
+  short_name: 'Tube O2',
   display: 'standalone',
   theme_color: '#1a1a1a',
   icons: [192x192, 512x512],
@@ -472,4 +472,4 @@ When making changes, please:
 ## Resources
 - [Main README](../README.md)
 - [CODEBASE Documentation](./CODEBASE.md)
-- [GitHub Repository](https://github.com/marcelo-m7/monynha.fun)
+- [GitHub Repository](https://github.com/marcelo-m7/tube-o2)

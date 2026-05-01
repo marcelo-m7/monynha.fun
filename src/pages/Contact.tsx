@@ -153,7 +153,7 @@ const Contact = () => {
             <h2 className="text-2xl font-bold mb-4">{t('contactPage.directEmailLabel')}</h2>
             <div className="flex items-center gap-3 text-muted-foreground">
               <Mail className="w-5 h-5 text-primary" />
-              <a href="mailto:hello@monynha.com" className="text-foreground hover:underline">hello@monynha.com</a>
+              <a href="mailto:hello@open2.tech" className="text-foreground hover:underline">hello@open2.tech</a>
             </div>
 
             <h2 className="text-2xl font-bold mb-4">{t('contactPage.locationLabel')}</h2>

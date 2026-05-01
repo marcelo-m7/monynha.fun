@@ -46,7 +46,7 @@
     "contact": "Contacto",
     "faq": "Preguntas Frecuentes",
     "madeWithLove": "Hecho con",
-    "byMonynhaSoftwares": "por Monynha Softwares"
+    "byMonynhaSoftwares": "por Open 2 Technology"
   },
   "labels": {
     "featured": "Destacado"
@@ -622,11 +622,11 @@
       },
       "success": {
         "playlistCreated": "¡Lista de reproducción '{{name}}' creada con éxito!",
-        "videoAdded": "Video '{{title}}' añadido a Monynha Fun.",
+        "videoAdded": "Video '{{title}}' añadido a Tube O2.",
         "allVideosProcessed": "Se importaron {{count}} videos a la lista de reproducción con éxito."
       },
       "info": {
-        "videoAlreadyExists": "El video '{{title}}' ya existe en Monynha Fun. Se omite la creación."
+        "videoAlreadyExists": "El video '{{title}}' ya existe en Tube O2. Se omite la creación."
       },
       "warning": {
         "noVideosFoundInPlaylist": "No se encontraron videos en la lista de reproducción de YouTube. Se creará una lista de reproducción vacía."

@@ -1,4 +1,4 @@
-# Monynha Fun Codebase & Database Migrations Exploration 🚀
+# Tube O2 Codebase & Database Migrations Exploration 🚀
 
 *Marcelo's Guide to Not Getting Lost in His Own Code*
 
@@ -158,7 +158,7 @@ CREATE POLICY "Anyone can view all comments"
 
 ## Project Overview
 
-**Monynha Fun** is a React + TypeScript + Vite application for cultural video curation, using Supabase as a BaaS platform. The project emphasizes human curation assisted by AI, democratizing access to valuable YouTube content.
+**Tube O2** is a React + TypeScript + Vite application for cultural video curation, using Supabase as a BaaS platform. The project emphasizes human curation assisted by AI, democratizing access to valuable YouTube content.
 
 ### Technology Stack
 - **Frontend**: React 18 + TypeScript + Vite
@@ -623,8 +623,8 @@ export const Header = () => {
 ### Setup Local Development
 ```bash
 # Clone & install
-git clone https://github.com/marcelo-m7/monynha.fun
-cd monynha.fun
+git clone https://github.com/marcelo-m7/tube-o2
+cd tube-o2
 pnpm install
 
 # Environment variables (.env.local)
@@ -782,7 +782,7 @@ Always use the package's public entry points (check `package.json` exports). Dir
 5. **Social Features**: Comments, ratings, user follows
 6. **Analytics**: Track user engagement, popular videos, community growth
 7. **Offline Support**: Service workers for offline video playback
-8. **Mobile App**: React Native version of Monynha Fun
+8. **Mobile App**: React Native version of Tube O2
 9. **Performance**: Implement image optimization and lazy loading
 10. **Accessibility**: WCAG 2.1 AA compliance audit and improvements
 

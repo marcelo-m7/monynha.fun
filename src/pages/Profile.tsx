@@ -42,8 +42,8 @@ const Profile = () => {
 
   // Set dynamic meta tags for social media sharing
   useMetaTags({
-    title: profile?.display_name ? `${profile.display_name} | Monynha Fun` : 'Monynha Fun',
-    description: profile?.bio || `${profile?.display_name} on Monynha Fun: Curadoria coletiva de vídeos do YouTube.`,
+    title: profile?.display_name ? `${profile.display_name} | Tube O2` : 'Tube O2',
+    description: profile?.bio || `${profile?.display_name} on Tube O2: Curadoria coletiva de vídeos do YouTube.`,
   });
 
   if (profileLoading || authLoading || socialAccountsLoading) {
