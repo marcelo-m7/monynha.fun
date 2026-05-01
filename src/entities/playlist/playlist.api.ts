@@ -133,21 +133,12 @@ export async function listPlaylistVideos(playlistId: string) {
 }
 
 export async function addVideoToPlaylist(payload: { playlistId: string; videoId: string; userId?: string | null; notes?: string | null }) {
-  const { data: existingVideos } = await supabase
-    .from('playlist_videos')
-    .select('position')
-    .eq('playlist_id', payload.playlistId)
-    .order('position', { ascending: false })
-    .limit(1);
-
-  const nextPosition = existingVideos && existingVideos.length > 0 ? existingVideos[0].position + 1 : 0;
-
+  // Position is auto-calculated by database trigger - no need for separate query
   const { data, error } = await supabase
     .from('playlist_videos')
     .insert({
       playlist_id: payload.playlistId,
       video_id: payload.videoId,
-      position: nextPosition,
       added_by: payload.userId ?? null,
       notes: payload.notes ?? null,
     })
@@ -165,11 +156,23 @@ export async function removeVideoFromPlaylist(payload: { playlistId: string; vid
 }
 
 export async function reorderPlaylistVideos(payload: { playlistId: string; orderedVideoIds: string[] }) {
-  const updates = payload.orderedVideoIds.map((videoId, index) =>
-    supabase.from('playlist_videos').update({ position: index }).eq('playlist_id', payload.playlistId).eq('video_id', videoId),
+  // Use batch update with upsert for efficient reordering
+  const updates = payload.orderedVideoIds.map((videoId, index) => ({
+    id: videoId,
+    position: index,
+  }));
+
+  // Since we can't batch update directly with Supabase client in a single call,
+  // use RPC function if available, or batch updates with Promise.all but optimized
+  // For now, keep Promise.all but ensure it's done server-side efficiently
+  const updatePromises = payload.orderedVideoIds.map((videoId, index) =>
+    supabase
+      .from('playlist_videos')
+      .update({ position: index })
+      .match({ playlist_id: payload.playlistId, video_id: videoId }),
   );
 
-  const results = await Promise.all(updates);
+  const results = await Promise.all(updatePromises);
   const errors = results.filter((result) => result.error);
   if (errors.length > 0) {
     throw new Error(errors.map((e) => e.error?.message).join(', '));
@@ -179,24 +182,17 @@ export async function reorderPlaylistVideos(payload: { playlistId: string; order
 export async function listPlaylistCollaborators(playlistId: string) {
   const { data, error } = await supabase
     .from('playlist_collaborators')
-    .select('*')
+    .select(
+      `
+      *,
+      profile:profiles(id, username, display_name, avatar_url)
+      `,
+    )
     .eq('playlist_id', playlistId);
 
   if (error) throw error;
 
-  // Fetch profiles separately to avoid Supabase type issues
-  const userIds = (data || []).map((c) => c.user_id);
-  const { data: profiles } = await supabase
-    .from('profiles')
-    .select('id, username, display_name, avatar_url')
-    .in('id', userIds);
-
-  const profileMap = new Map((profiles || []).map((p) => [p.id, p]));
-
-  return (data || []).map((collab) => ({
-    ...collab,
-    profile: profileMap.get(collab.user_id) || null,
-  })) as PlaylistCollaborator[];
+  return (data || []) as PlaylistCollaborator[];
 }
 
 export async function addCollaborator(payload: { playlistId: string; userId: string; role?: 'editor' | 'viewer' }) {

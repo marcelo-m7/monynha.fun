@@ -1,10 +1,7 @@
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { ListVideo, BookOpen, Code, Globe, Lock, Users, GraduationCap } from 'lucide-react';
-import { Playlist, usePlaylistProgress, usePlaylistVideos } from '@/features/playlists';
-import { Progress } from '@/components/ui/progress';
-import { useAuth } from '@/features/auth/useAuth';
-import { Skeleton } from '@/components/ui/skeleton'; // Import Skeleton for loading states
+import { ListVideo, BookOpen, Code, Globe, Lock, GraduationCap } from 'lucide-react';
+import type { Playlist } from '@/entities/playlist/playlist.types';
 
 interface PlaylistCardProps {
   playlist: Playlist;
@@ -13,21 +10,10 @@ interface PlaylistCardProps {
 
 export function PlaylistCard({ playlist, index = 0 }: PlaylistCardProps) {
   const { t } = useTranslation();
-  const { user } = useAuth();
-  
-  // Only fetch videos and progress for authenticated users or public playlists
-  const shouldFetchData = user || playlist.is_public;
-  const { data: videos, isLoading: videosLoading } = usePlaylistVideos(shouldFetchData ? playlist.id : undefined);
-  const { data: progress, isLoading: progressLoading } = usePlaylistProgress(user ? playlist.id : undefined);
 
-  // Calculate progress percentage
-  // Use videos length if available, otherwise fall back to playlist video_count
-  const totalVideos = videos?.length ?? playlist.video_count ?? 0;
-  const watchedVideos = progress?.filter(p => p.watched).length ?? 0;
-  const progressPercent = totalVideos > 0 ? (watchedVideos / totalVideos) * 100 : 0;
-
-  // Get thumbnail from first video if no custom thumbnail
-  const thumbnailUrl = playlist.thumbnail_url || videos?.[0]?.video?.thumbnail_url;
+  // Use thumbnail_url from playlist, fallback to placeholder icon
+  const thumbnailUrl = playlist.thumbnail_url;
+  const totalVideos = playlist.video_count ?? 0;
 
   return (
     <Link
@@ -99,22 +85,6 @@ export function PlaylistCard({ playlist, index = 0 }: PlaylistCardProps) {
         <p className="text-muted-foreground text-sm line-clamp-2 mb-3 flex-1">
           {playlist.description || t('playlists.noDescription')}
         </p>
-
-        {/* Progress bar for logged-in users */}
-        {user && (videosLoading || progressLoading) ? (
-          <div className="mb-3 space-y-1">
-            <Skeleton className="h-4 w-full" />
-            <Skeleton className="h-2 w-full" />
-          </div>
-        ) : user && totalVideos > 0 && (
-          <div className="mb-3">
-            <div className="flex justify-between text-xs text-muted-foreground mb-1">
-              <span>{t('playlists.progress')}</span>
-              <span>{watchedVideos}/{totalVideos}</span>
-            </div>
-            <Progress value={progressPercent} className="h-2" />
-          </div>
-        )}
 
         {/* Metadata tags */}
         <div className="flex flex-wrap gap-2 text-[0.65rem] text-muted-foreground mt-auto uppercase tracking-widest">

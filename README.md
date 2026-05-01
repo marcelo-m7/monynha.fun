@@ -323,6 +323,65 @@ These are used by `server/server.ts` at request time to fetch video metadata and
 
 ---
 
+## ⚙️ Backend FastAPI (Supabase + YouTube)
+
+The backend lives in `backend/` and exposes two routes:
+- `GET /health` → `{"status": "ok"}`
+- `POST /sync_videos` → syncs channel uploads to Supabase
+
+### Backend Environment
+
+Create `backend/.env` using `backend/.env.example`:
+
+```env
+SUPABASE_URL=https://your-project.supabase.co
+SUPABASE_SERVICE_ROLE_KEY=your_service_role_key
+YOUTUBE_API_KEY=your_youtube_api_key
+```
+
+### Run with Docker Compose
+
+```bash
+docker-compose build backend
+docker-compose run --rm backend python -m pip install -r requirements.txt
+docker-compose up backend
+```
+
+In another terminal:
+
+```bash
+curl http://localhost:8000/health
+
+curl -X POST http://localhost:8000/sync_videos \
+	-H "Content-Type: application/json" \
+	-d '{"channel_id":"UCBR8-60-B28hp2BmDPdntcQ"}'
+```
+
+Expected sync response shape:
+
+```json
+{
+	"inserted_count": 0,
+	"new_videos": []
+}
+```
+
+### Run Locally (Development)
+
+```bash
+cd backend
+python -m venv .venv
+# Linux/macOS
+source .venv/bin/activate
+# Windows PowerShell
+# .\.venv\Scripts\Activate.ps1
+
+pip install -r requirements.txt
+uvicorn main:app --host 0.0.0.0 --port 8000 --reload
+```
+
+---
+
 ## 🗄️ The Database (Where The Magic Happens)
 
 I designed the database with security and simplicity in mind:
