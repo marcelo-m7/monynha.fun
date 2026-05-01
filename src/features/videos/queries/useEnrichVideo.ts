@@ -1,6 +1,6 @@
 import { useMutation } from '@tanstack/react-query';
 import { useAuth } from './useAuth';
-import { toast } from 'sonner';
+import { notify } from '@/shared/lib/notify';
 
 export interface EnrichVideoRequest {
   videoId: string;
@@ -80,11 +80,11 @@ export function useEnrichVideo() {
       return response.json();
     },
     onSuccess: (data) => {
-      toast.success('Video enriched successfully!');
+      notify.success('Video enriched successfully!');
     },
     onError: (error) => {
       const message = error instanceof Error ? error.message : 'Failed to enrich video';
-      toast.error(message);
+      notify.error(message);
     },
   });
 }

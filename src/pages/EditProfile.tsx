@@ -8,7 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { toast } from 'sonner';
+import { notify } from '@/shared/lib/notify';
 import { ArrowLeft, User, Loader2, Save } from 'lucide-react';
 import { z } from 'zod';
 import { useTranslation } from 'react-i18next';
@@ -68,7 +68,7 @@ export default function EditProfile() {
 
   const onSubmit = async (values: EditProfileFormValues) => {
     if (!user || !profile) {
-      toast.error(t('profile.edit.error.notLoggedInTitle'), {
+      notify.error(t('profile.edit.error.notLoggedInTitle'), {
         description: t('profile.edit.error.notLoggedInDescription'),
       });
       return;

@@ -10,7 +10,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { toast } from 'sonner';
+import { notify } from '@/shared/lib/notify';
 import { ArrowLeft, Link as LinkIcon, Loader2, Play, CheckCircle, AlertCircle, ListVideo } from 'lucide-react';
 import { submitVideoSchema, SubmitVideoFormValues } from '@/features/submit/submitVideoSchema';
 import { useTranslation } from 'react-i18next';
@@ -78,7 +78,7 @@ export default function Submit() {
       });
 
       if (result.status === 'exists') {
-        toast.error(t('submit.error.videoExistsTitle'), {
+        notify.error(t('submit.error.videoExistsTitle'), {
           description: t('submit.error.videoExistsDescription'),
         });
         return;
@@ -93,10 +93,10 @@ export default function Submit() {
         });
       }
 
-      toast.success(t('submit.success.videoSubmittedTitle'));
+      notify.success(t('submit.success.videoSubmittedTitle'));
       navigate('/');
     } catch (err) {
-      toast.error(t('submit.error.genericSubmitTitle'));
+      notify.error(t('submit.error.genericSubmitTitle'));
     }
   };
 

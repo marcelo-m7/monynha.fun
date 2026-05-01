@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Mail, Loader2, AlertCircle } from 'lucide-react';
-import { toast } from 'sonner';
+import { notify } from '@/shared/lib/notify';
 import { resendConfirmationEmail } from '@/features/auth/auth.api';
 import { useAuth } from '@/features/auth/useAuth';
 import { Alert, AlertDescription } from '@/components/ui/alert';
@@ -23,12 +23,12 @@ export const ResendConfirmationEmail: React.FC<ResendConfirmationEmailProps> = (
 
   const handleResend = async () => {
     if (!targetEmail) {
-      toast.error(t('account.settings.resendEmail.error.noEmail'));
+      notify.error(t('account.settings.resendEmail.error.noEmail'));
       return;
     }
 
     if (!canResend) {
-      toast.error(t('account.settings.resendEmail.error.cooldown'));
+      notify.error(t('account.settings.resendEmail.error.cooldown'));
       return;
     }
 
@@ -38,18 +38,18 @@ export const ResendConfirmationEmail: React.FC<ResendConfirmationEmailProps> = (
       const { error } = await resendConfirmationEmail(targetEmail);
 
       if (error) {
-        toast.error(t('account.settings.resendEmail.error.failed'), {
+        notify.error(t('account.settings.resendEmail.error.failed'), {
           description: error.message,
         });
         return;
       }
 
       setLastSent(new Date());
-      toast.success(t('account.settings.resendEmail.success.sent'), {
+      notify.success(t('account.settings.resendEmail.success.sent'), {
         description: t('account.settings.resendEmail.success.checkInbox'),
       });
     } catch (err) {
-      toast.error(t('auth.error.genericAuthError'), {
+      notify.error(t('auth.error.genericAuthError'), {
         description: err instanceof Error ? err.message : String(err),
       });
     } finally {

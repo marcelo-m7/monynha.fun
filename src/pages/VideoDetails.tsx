@@ -18,7 +18,7 @@ import { CulturalRelevanceBadge } from '@/components/video/CulturalRelevanceBadg
 import { SemanticTagBadge } from '@/components/video/SemanticTagBadge';
 import { Eye, Clock, Folder, ArrowLeft, Heart as HeartIcon, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { toast } from 'sonner';
+import { notify } from '@/shared/lib/notify';
 import { useTranslation } from 'react-i18next';
 import { CommentsSection } from '@/components/comment/CommentsSection'; // Import CommentsSection
 
@@ -69,7 +69,7 @@ const VideoDetails = () => {
 
   const handleFavoriteToggle = async () => {
     if (!user) {
-      toast.info(t('videoDetails.favoriteInfo'), {
+      notify.info(t('videoDetails.favoriteInfo'), {
         action: {
           label: t('videoDetails.loginAction'),
           onClick: () => navigate('/auth'),

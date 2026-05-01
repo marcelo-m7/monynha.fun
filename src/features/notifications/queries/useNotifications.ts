@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { toast } from 'sonner';
+import { notify } from '@/shared/lib/notify';
 import {
   getUnreadNotificationsCount,
   listNotifications,
@@ -41,7 +41,7 @@ export function useMarkNotificationAsRead() {
       queryClient.invalidateQueries({ queryKey: notificationKeys.list(variables.limit || 50) });
     },
     onError: (error) => {
-      toast.error('Nao foi possivel atualizar a notificacao.', { description: error.message });
+      notify.error('Nao foi possivel atualizar a notificacao.', { description: error.message });
     },
   });
 }
@@ -56,7 +56,7 @@ export function useMarkAllNotificationsAsRead() {
       queryClient.invalidateQueries({ queryKey: notificationKeys.list(variables?.limit || 50) });
     },
     onError: (error) => {
-      toast.error('Nao foi possivel marcar as notificacoes como lidas.', { description: error.message });
+      notify.error('Nao foi possivel marcar as notificacoes como lidas.', { description: error.message });
     },
   });
 }

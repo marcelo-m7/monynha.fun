@@ -10,7 +10,7 @@ import { useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { toast } from 'sonner';
+import { notify } from '@/shared/lib/notify';
 import { useState } from 'react';
 import { emailSchema } from '@/shared/lib/validation';
 
@@ -44,10 +44,10 @@ const Contact = () => {
     try {
       // Simulate API call - TODO: Replace with actual backend endpoint
       await new Promise(resolve => setTimeout(resolve, 1500)); 
-      toast.success(t('contactPage.successMessage'));
+      notify.success(t('contactPage.successMessage'));
       reset();
     } catch (error) {
-      toast.error(t('contactPage.errorMessage'));
+      notify.error(t('contactPage.errorMessage'));
     } finally {
       setIsSubmitting(false);
     }

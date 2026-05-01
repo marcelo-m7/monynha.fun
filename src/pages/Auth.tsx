@@ -4,7 +4,7 @@ import { useAuth } from '@/features/auth/useAuth';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { toast } from 'sonner';
+import { notify } from '@/shared/lib/notify';
 import { Play, Mail, Lock, User, ArrowLeft } from 'lucide-react';
 import { z } from 'zod';
 import { useTranslation } from 'react-i18next';
@@ -117,7 +117,7 @@ export default function Auth() {
           } else if (error.message.includes('Email not confirmed')) {
             message = t('auth.error.emailNotConfirmed');
           }
-          toast.error(t('auth.error.loginGeneric'), {
+          notify.error(t('auth.error.loginGeneric'), {
             description: message,
           });
           return;
@@ -127,7 +127,7 @@ export default function Auth() {
         if (data?.session?.user && !data.session.user.email_confirmed_at) {
           // If session exists but email is not confirmed, sign out immediately
           await signOutUser();
-          toast.error(t('auth.error.emailNotConfirmed'), { 
+          notify.error(t('auth.error.emailNotConfirmed'), { 
             description: t('auth.error.confirmBeforeLogin') 
           });
           // Redirect to verification page to allow resend
@@ -135,7 +135,7 @@ export default function Auth() {
           return;
         }
 
-        toast.success(t('auth.success.welcomeBack'), {
+        notify.success(t('auth.success.welcomeBack'), {
           description: t('auth.success.loginSuccess')
         });
         reset(); // Clear form on successful login
@@ -149,7 +149,7 @@ export default function Auth() {
           if (error.message.includes('already registered')) {
             message = t('auth.error.emailRegistered');
           }
-          toast.error(t('auth.error.signupGeneric'), {
+          notify.error(t('auth.error.signupGeneric'), {
             description: message,
           });
           return;
@@ -160,7 +160,7 @@ export default function Auth() {
           await signOutUser();
         }
 
-        toast.success(t('auth.success.accountCreated'), {
+        notify.success(t('auth.success.accountCreated'), {
           description: t('auth.success.confirmEmail')
         });
         
@@ -172,7 +172,7 @@ export default function Auth() {
       }
     } catch (err) {
       console.error('Auth submission error:', err);
-      toast.error(t('auth.error.genericAuthError'), {
+      notify.error(t('auth.error.genericAuthError'), {
         description: err instanceof Error ? err.message : String(err),
       });
     }
@@ -183,11 +183,11 @@ export default function Auth() {
       const { error } = await requestPasswordReset(values.email);
 
       if (error) {
-        toast.error(t('auth.error.forgotPasswordGeneric'), {
+        notify.error(t('auth.error.forgotPasswordGeneric'), {
           description: error.message,
         });
       } else {
-        toast.success(t('auth.success.passwordResetEmailSent'), {
+        notify.success(t('auth.success.passwordResetEmailSent'), {
           description: t('auth.success.checkEmailForReset'),
         });
         setShowForgotPassword(false);
@@ -195,7 +195,7 @@ export default function Auth() {
       }
     } catch (err) {
       console.error('Forgot password error:', err);
-      toast.error(t('auth.error.genericAuthError'), {
+      notify.error(t('auth.error.genericAuthError'), {
         description: err instanceof Error ? err.message : String(err),
       });
     }

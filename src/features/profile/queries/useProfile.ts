@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { toast } from 'sonner';
+import { notify } from '@/shared/lib/notify';
 import { useAuth } from '@/features/auth/useAuth';
 import { getContributorCount, getProfileById, getProfileByUsername, updateProfile, listProfiles, searchProfiles } from '@/entities/profile/profile.api';
 import { profileKeys } from '@/entities/profile/profile.keys';
@@ -37,14 +37,14 @@ export function useUpdateProfile() {
       return updateProfile(user.id, updatedProfileData);
     },
     onSuccess: (updatedProfile) => {
-      toast.success('Perfil atualizado com sucesso!');
+      notify.success('Perfil atualizado com sucesso!');
       queryClient.invalidateQueries({ queryKey: profileKeys.detail(user?.id ?? '') });
       if (updatedProfile.username) {
         queryClient.invalidateQueries({ queryKey: profileKeys.byUsername(updatedProfile.username) });
       }
     },
     onError: (error) => {
-      toast.error('Erro ao atualizar perfil', { description: error.message });
+      notify.error('Erro ao atualizar perfil', { description: error.message });
     },
   });
 }

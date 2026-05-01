@@ -8,7 +8,7 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
-import { toast } from 'sonner';
+import { notify } from '@/shared/lib/notify';
 import { ArrowLeft, ListVideo, Loader2, Save, BookOpen, Code, Globe, Image, GraduationCap } from 'lucide-react';
 import { z } from 'zod';
 import { useTranslation } from 'react-i18next';
@@ -109,7 +109,7 @@ export default function CreateEditPlaylist() {
 
   const onSubmit = async (values: PlaylistFormValues) => {
     if (!user) {
-      toast.error(t('createEditPlaylist.error.notLoggedInTitle'), {
+      notify.error(t('createEditPlaylist.error.notLoggedInTitle'), {
         description: t('createEditPlaylist.error.notLoggedInDescription'),
       });
       return;

@@ -6,9 +6,10 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Lock, KeyRound, Loader2, CheckCircle } from 'lucide-react';
-import { toast } from 'sonner';
+import { notify } from '@/shared/lib/notify';
 import { updateUserPassword } from '@/features/auth/auth.api';
 import { createPasswordConfirmationSchema } from '@/shared/lib/validation';
+import { z } from 'zod';
 
 const resetPasswordSchema = createPasswordConfirmationSchema('auth.resetPassword.error.passwordMismatch');
 
@@ -39,14 +40,14 @@ export const ResetPasswordForm: React.FC<ResetPasswordFormProps> = ({ onSuccess 
       const { error } = await updateUserPassword(values.password);
 
       if (error) {
-        toast.error(t('auth.resetPassword.error.generic'), {
+        notify.error(t('auth.resetPassword.error.generic'), {
           description: error.message,
         });
         return;
       }
 
       setIsSuccess(true);
-      toast.success(t('auth.resetPassword.success'));
+      notify.success(t('auth.resetPassword.success'));
 
       // Redirect after short delay
       setTimeout(() => {
@@ -54,7 +55,7 @@ export const ResetPasswordForm: React.FC<ResetPasswordFormProps> = ({ onSuccess 
       }, 2000);
     } catch (err) {
       console.error('Password reset error:', err);
-      toast.error(t('auth.error.genericAuthError'), {
+      notify.error(t('auth.error.genericAuthError'), {
         description: err instanceof Error ? err.message : String(err),
       });
     }

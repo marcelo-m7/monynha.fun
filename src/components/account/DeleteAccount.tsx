@@ -16,7 +16,7 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 import { AlertTriangle, Loader2, Trash2, HeartCrack } from 'lucide-react';
-import { toast } from 'sonner';
+import { notify } from '@/shared/lib/notify';
 import { deleteUserAccount } from '@/features/auth/auth.api';
 import { useAuth } from '@/features/auth/useAuth';
 import { Alert, AlertDescription } from '@/components/ui/alert';
@@ -33,7 +33,7 @@ export const DeleteAccount: React.FC = () => {
 
   const handleDelete = async () => {
     if (confirmText !== CONFIRMATION_TEXT) {
-      toast.error(t('account.settings.deleteAccount.error.confirmationMismatch'));
+      notify.error(t('account.settings.deleteAccount.error.confirmationMismatch'));
       return;
     }
 
@@ -43,14 +43,14 @@ export const DeleteAccount: React.FC = () => {
       const { error } = await deleteUserAccount();
 
       if (error) {
-        toast.error(t('account.settings.deleteAccount.error.failed'), {
+        notify.error(t('account.settings.deleteAccount.error.failed'), {
           description: error.message,
         });
         setIsDeleting(false);
         return;
       }
 
-      toast.success(t('account.settings.deleteAccount.success.deleted'), {
+      notify.success(t('account.settings.deleteAccount.success.deleted'), {
         description: t('account.settings.deleteAccount.success.goodbye'),
       });
 
@@ -58,7 +58,7 @@ export const DeleteAccount: React.FC = () => {
       await signOut();
       navigate('/');
     } catch (err) {
-      toast.error(t('auth.error.genericAuthError'), {
+      notify.error(t('auth.error.genericAuthError'), {
         description: err instanceof Error ? err.message : String(err),
       });
       setIsDeleting(false);
