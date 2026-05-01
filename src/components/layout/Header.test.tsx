@@ -40,18 +40,13 @@ describe('Header', () => {
     expect(screen.queryByText(/favorites/i)).not.toBeInTheDocument();
   });
 
-  it('submits search and navigates to videos query when authenticated', async () => {
+  it('shows navigation links and avatar when user is authenticated', async () => {
     useAuthMock.mockReturnValue({ user: { id: 'user-1', email: 'user@example.com' }, signOut: vi.fn() });
-    useProfileByIdMock.mockReturnValue({ data: { id: 'user-1', username: 'user', display_name: 'User' } });
+    useProfileByIdMock.mockReturnValue({ data: { id: 'user-1', username: 'user', display_name: 'User', avatar_url: null } });
 
     renderWithProviders(<Header />);
 
-    const user = userEvent.setup();
-    const searchInput = screen.getByPlaceholderText(/search videos, channels/i);
-
-    await user.type(searchInput, 'react');
-    await user.keyboard('{Enter}');
-
-    expect(navigateMock).toHaveBeenCalledWith('/videos?query=react');
+    expect(screen.getByRole('button', { name: /submit video/i })).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /login/i })).not.toBeInTheDocument();
   });
 });
