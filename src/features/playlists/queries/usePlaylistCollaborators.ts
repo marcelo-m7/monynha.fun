@@ -1,5 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
+import { useTranslation } from 'react-i18next';
 import { playlistKeys } from '@/entities/playlist/playlist.keys';
 import type { PlaylistCollaborator } from '@/entities/playlist/playlist.types';
 import {
@@ -22,6 +23,7 @@ export function usePlaylistCollaborators(playlistId: string | undefined) {
 
 export function useAddCollaborator() {
   const queryClient = useQueryClient();
+  const { t } = useTranslation();
 
   return useMutation<PlaylistCollaborator, Error, { playlistId: string; userId: string; role?: 'editor' | 'viewer' }>({
     mutationFn: async ({ playlistId, userId, role = 'editor' }) => {
@@ -30,16 +32,17 @@ export function useAddCollaborator() {
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: playlistKeys.collaborators(variables.playlistId) });
       queryClient.invalidateQueries({ queryKey: playlistKeys.all });
-      toast.success('Collaborator added!');
+      toast.success(t('playlists.feedback.collaboratorAdded'));
     },
     onError: (error) => {
-      toast.error('Failed to add collaborator', { description: error.message });
+      toast.error(t('playlists.feedback.collaboratorAddError'), { description: error.message });
     },
   });
 }
 
 export function useUpdateCollaboratorRole() {
   const queryClient = useQueryClient();
+  const { t } = useTranslation();
 
   return useMutation<void, Error, { playlistId: string; userId: string; role: 'editor' | 'viewer' }>({
     mutationFn: async ({ playlistId, userId, role }) => {
@@ -47,16 +50,17 @@ export function useUpdateCollaboratorRole() {
     },
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: playlistKeys.collaborators(variables.playlistId) });
-      toast.success('Collaborator role updated!');
+      toast.success(t('playlists.feedback.collaboratorRoleUpdated'));
     },
     onError: (error) => {
-      toast.error('Failed to update collaborator role', { description: error.message });
+      toast.error(t('playlists.feedback.collaboratorRoleUpdateError'), { description: error.message });
     },
   });
 }
 
 export function useRemoveCollaborator() {
   const queryClient = useQueryClient();
+  const { t } = useTranslation();
 
   return useMutation<void, Error, { playlistId: string; userId: string }>({
     mutationFn: async ({ playlistId, userId }) => {
@@ -65,10 +69,10 @@ export function useRemoveCollaborator() {
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: playlistKeys.collaborators(variables.playlistId) });
       queryClient.invalidateQueries({ queryKey: playlistKeys.all });
-      toast.success('Collaborator removed!');
+      toast.success(t('playlists.feedback.collaboratorRemoved'));
     },
     onError: (error) => {
-      toast.error('Failed to remove collaborator', { description: error.message });
+      toast.error(t('playlists.feedback.collaboratorRemoveError'), { description: error.message });
     },
   });
 }

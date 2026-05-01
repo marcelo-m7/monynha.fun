@@ -581,6 +581,29 @@
         "noVideosFoundInPlaylist": "No videos found in the YouTube playlist. An empty playlist will be created."
       },
       "apiLimitationInfo": "Tube O2 uses a backend service to fetch YouTube playlist videos, but depends on the YouTube Data API which has quotas and may not always return all videos for very large playlists. For optimal results, ensure the playlist is public."
+    },
+    "feedback": {
+      "createSuccess": "Playlist created successfully!",
+      "createError": "Failed to create playlist",
+      "updateSuccess": "Playlist updated successfully!",
+      "updateError": "Failed to update playlist",
+      "deleteSuccess": "Playlist deleted successfully!",
+      "deleteError": "Failed to delete playlist",
+      "addVideoSuccess": "Video added to playlist!",
+      "addVideoError": "Failed to add video to playlist",
+      "removeVideoSuccess": "Video removed from playlist!",
+      "removeVideoError": "Failed to remove video from playlist",
+      "reorderSuccess": "Playlist reordered successfully!",
+      "reorderError": "Failed to reorder playlist",
+      "markWatchedSuccess": "Video marked as watched!",
+      "markUnwatchedSuccess": "Video marked as unwatched!",
+      "progressError": "Failed to update video progress",
+      "collaboratorAdded": "Collaborator added!",
+      "collaboratorAddError": "Failed to add collaborator",
+      "collaboratorRoleUpdated": "Collaborator role updated!",
+      "collaboratorRoleUpdateError": "Failed to update collaborator role",
+      "collaboratorRemoved": "Collaborator removed!",
+      "collaboratorRemoveError": "Failed to remove collaborator"
     }
   },
   "playlistDetails": {
@@ -730,5 +753,24 @@
     "follow": "Follow",
     "unfollow": "Unfollow",
     "sendMessage": "Message"
+  },
+  "profile": {
+    "defaultMetaTitle": "Tube O2",
+    "metaTitle": "{{name}} | Tube O2",
+    "metaDescription": "{{name}} on Tube O2: community curation of YouTube videos.",
+    "notFoundTitle": "Profile not found",
+    "notFoundDescription": "The profile you are looking for does not exist or is unavailable.",
+    "joinedOn": "Joined on {{date}}",
+    "editProfile": "Edit Profile",
+    "uploadedVideos": "Uploaded videos",
+    "videosLoadError": "Could not load this profile's videos. Please try again later.",
+    "noVideosTitle": "No uploaded videos yet",
+    "noVideosDescription": "When videos are submitted, they will appear here.",
+    "uploadFirstVideo": "Upload first video",
+    "createdPlaylists": "Created playlists",
+    "playlistsLoadError": "Could not load this profile's playlists. Please try again later.",
+    "noPlaylistsTitle": "No playlists created yet",
+    "noPlaylistsDescription": "This profile's playlists will appear here.",
+    "createFirstPlaylist": "Create first playlist"
   }
 }

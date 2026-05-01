@@ -17,6 +17,7 @@ interface SortableVideoItemProps {
   canEdit: boolean;
   canTrackProgress: boolean;
   isWatched: boolean;
+  isRemoving: boolean;
   onRemove: () => void;
   onToggleWatched: () => void;
 }
@@ -28,6 +29,7 @@ export function SortableVideoItem({
   canEdit,
   canTrackProgress,
   isWatched,
+  isRemoving,
   onRemove,
   onToggleWatched,
 }: SortableVideoItemProps) {
@@ -135,13 +137,15 @@ export function SortableVideoItem({
         <Button
           variant="ghost"
           size="icon"
+          disabled={isRemoving}
           onClick={(e) => {
             e.preventDefault();
             onRemove();
           }}
-          className="opacity-0 group-hover:opacity-100 transition-opacity text-destructive hover:text-destructive hover:bg-destructive/10"
+          className="opacity-0 group-hover:opacity-100 transition-opacity text-destructive hover:text-destructive hover:bg-destructive/10 disabled:opacity-100"
+          aria-label={isRemoving ? t('common.loading') : t('common.delete')}
         >
-          <X className="w-4 h-4" />
+          {isRemoving ? <span className="w-4 h-4 animate-spin rounded-full border-2 border-destructive/30 border-t-destructive" /> : <X className="w-4 h-4" />}
         </Button>
       )}
     </div>

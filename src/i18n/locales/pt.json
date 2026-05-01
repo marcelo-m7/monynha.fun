@@ -581,6 +581,29 @@
         "noVideosFoundInPlaylist": "Nenhum vídeo encontrado na playlist do YouTube. Uma playlist vazia será criada."
       },
       "apiLimitationInfo": "O Tube O2 usa um serviço de backend para buscar vídeos de playlists do YouTube, mas depende da API de Dados do YouTube, que possui cotas e pode nem sempre retornar todos os vídeos para playlists muito grandes. Para resultados ótimos, certifique-se de que a playlist seja pública."
+    },
+    "feedback": {
+      "createSuccess": "Playlist criada com sucesso!",
+      "createError": "Falha ao criar playlist",
+      "updateSuccess": "Playlist atualizada com sucesso!",
+      "updateError": "Falha ao atualizar playlist",
+      "deleteSuccess": "Playlist excluída com sucesso!",
+      "deleteError": "Falha ao excluir playlist",
+      "addVideoSuccess": "Vídeo adicionado à playlist!",
+      "addVideoError": "Falha ao adicionar vídeo à playlist",
+      "removeVideoSuccess": "Vídeo removido da playlist!",
+      "removeVideoError": "Falha ao remover vídeo da playlist",
+      "reorderSuccess": "Ordem da playlist atualizada com sucesso!",
+      "reorderError": "Falha ao reordenar playlist",
+      "markWatchedSuccess": "Vídeo marcado como assistido!",
+      "markUnwatchedSuccess": "Vídeo desmarcado como assistido!",
+      "progressError": "Falha ao atualizar progresso do vídeo",
+      "collaboratorAdded": "Colaborador adicionado!",
+      "collaboratorAddError": "Falha ao adicionar colaborador",
+      "collaboratorRoleUpdated": "Função do colaborador atualizada!",
+      "collaboratorRoleUpdateError": "Falha ao atualizar função do colaborador",
+      "collaboratorRemoved": "Colaborador removido!",
+      "collaboratorRemoveError": "Falha ao remover colaborador"
     }
   },
   "playlistDetails": {
@@ -730,5 +753,24 @@
     "follow": "Seguir",
     "unfollow": "Deixar de seguir",
     "sendMessage": "Mensagem"
+  },
+  "profile": {
+    "defaultMetaTitle": "Tube O2",
+    "metaTitle": "{{name}} | Tube O2",
+    "metaDescription": "{{name}} no Tube O2: curadoria coletiva de vídeos do YouTube.",
+    "notFoundTitle": "Perfil não encontrado",
+    "notFoundDescription": "O perfil que você está procurando não existe ou não está disponível.",
+    "joinedOn": "Entrou em {{date}}",
+    "editProfile": "Editar Perfil",
+    "uploadedVideos": "Vídeos enviados",
+    "videosLoadError": "Não foi possível carregar os vídeos deste perfil. Tente novamente mais tarde.",
+    "noVideosTitle": "Nenhum vídeo enviado ainda",
+    "noVideosDescription": "Quando houver vídeos enviados, eles aparecerão aqui.",
+    "uploadFirstVideo": "Enviar primeiro vídeo",
+    "createdPlaylists": "Playlists criadas",
+    "playlistsLoadError": "Não foi possível carregar as playlists deste perfil. Tente novamente mais tarde.",
+    "noPlaylistsTitle": "Nenhuma playlist criada ainda",
+    "noPlaylistsDescription": "As playlists deste perfil aparecerão aqui.",
+    "createFirstPlaylist": "Criar primeira playlist"
   }
 }

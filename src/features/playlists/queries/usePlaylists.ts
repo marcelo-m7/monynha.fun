@@ -1,5 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
+import { useTranslation } from 'react-i18next';
 import { useAuth } from '@/features/auth/useAuth';
 import { playlistKeys } from '@/entities/playlist/playlist.keys';
 import type { Playlist } from '@/entities/playlist/playlist.types';
@@ -51,6 +52,7 @@ export function usePlaylistById(id: string | undefined) {
 export function useCreatePlaylist() {
   const queryClient = useQueryClient();
   const { user } = useAuth();
+  const { t } = useTranslation();
 
   return useMutation<Playlist, Error, Omit<Playlist, 'id' | 'author_id' | 'created_at' | 'updated_at' | 'author' | 'video_count' | 'total_duration_seconds'>>({
     mutationFn: async (playlist) => {
@@ -62,16 +64,17 @@ export function useCreatePlaylist() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: playlistKeys.all });
-      toast.success('Playlist created successfully!');
+      toast.success(t('playlists.feedback.createSuccess'));
     },
     onError: (error) => {
-      toast.error('Failed to create playlist', { description: error.message });
+      toast.error(t('playlists.feedback.createError'), { description: error.message });
     },
   });
 }
 
 export function useUpdatePlaylist() {
   const queryClient = useQueryClient();
+  const { t } = useTranslation();
 
   return useMutation<Playlist, Error, Partial<Omit<Playlist, 'author_id' | 'created_at' | 'author' | 'video_count'>> & { id: string }>({
     mutationFn: async (playlist) => {
@@ -91,16 +94,17 @@ export function useUpdatePlaylist() {
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: playlistKeys.all });
       queryClient.invalidateQueries({ queryKey: playlistKeys.detail(data.id) });
-      toast.success('Playlist updated successfully!');
+      toast.success(t('playlists.feedback.updateSuccess'));
     },
     onError: (error) => {
-      toast.error('Failed to update playlist', { description: error.message });
+      toast.error(t('playlists.feedback.updateError'), { description: error.message });
     },
   });
 }
 
 export function useDeletePlaylist() {
   const queryClient = useQueryClient();
+  const { t } = useTranslation();
 
   return useMutation<void, Error, string>({
     mutationFn: async (playlistId) => {
@@ -108,10 +112,10 @@ export function useDeletePlaylist() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: playlistKeys.all });
-      toast.success('Playlist deleted successfully!');
+      toast.success(t('playlists.feedback.deleteSuccess'));
     },
     onError: (error) => {
-      toast.error('Failed to delete playlist', { description: error.message });
+      toast.error(t('playlists.feedback.deleteError'), { description: error.message });
     },
   });
 }

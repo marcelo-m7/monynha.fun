@@ -639,6 +639,29 @@
         "noVideosFoundInPlaylist": "No se encontraron videos en la lista de reproducción de YouTube. Se creará una lista de reproducción vacía."
       },
       "apiLimitationInfo": "Monynha Fun utiliza un servicio de backend para obtener videos de listas de reproducción de YouTube, pero depende de la API de datos de YouTube, que tiene cuotas y puede que no siempre devuelva todos los videos para listas de reproducción muy grandes. Para obtener resultados óptimos, asegúrate de que la lista de reproducción sea pública."
+    },
+    "feedback": {
+      "createSuccess": "Playlist créée avec succès !",
+      "createError": "Échec de la création de la playlist",
+      "updateSuccess": "Playlist mise à jour avec succès !",
+      "updateError": "Échec de la mise à jour de la playlist",
+      "deleteSuccess": "Playlist supprimée avec succès !",
+      "deleteError": "Échec de la suppression de la playlist",
+      "addVideoSuccess": "Vidéo ajoutée à la playlist !",
+      "addVideoError": "Échec de l'ajout de la vidéo à la playlist",
+      "removeVideoSuccess": "Vidéo retirée de la playlist !",
+      "removeVideoError": "Échec du retrait de la vidéo de la playlist",
+      "reorderSuccess": "Playlist réorganisée avec succès !",
+      "reorderError": "Échec de la réorganisation de la playlist",
+      "markWatchedSuccess": "Vidéo marquée comme vue !",
+      "markUnwatchedSuccess": "Vidéo marquée comme non vue !",
+      "progressError": "Échec de la mise à jour de la progression de la vidéo",
+      "collaboratorAdded": "Collaborateur ajouté !",
+      "collaboratorAddError": "Échec de l'ajout du collaborateur",
+      "collaboratorRoleUpdated": "Rôle du collaborateur mis à jour !",
+      "collaboratorRoleUpdateError": "Échec de la mise à jour du rôle du collaborateur",
+      "collaboratorRemoved": "Collaborateur supprimé !",
+      "collaboratorRemoveError": "Échec de la suppression du collaborateur"
     }
   },
   "playlistDetails": {
@@ -762,5 +785,24 @@
       "contentRequired": "Le commentaire ne peut pas être vide",
       "contentMaxLength": "Le commentaire doit faire au maximum 500 caractères"
     }
+  },
+  "profile": {
+    "defaultMetaTitle": "Tube O2",
+    "metaTitle": "{{name}} | Tube O2",
+    "metaDescription": "{{name}} sur Tube O2 : curation collaborative de vidéos YouTube.",
+    "notFoundTitle": "Profil introuvable",
+    "notFoundDescription": "Le profil recherché n'existe pas ou n'est pas disponible.",
+    "joinedOn": "Inscrit le {{date}}",
+    "editProfile": "Modifier le profil",
+    "uploadedVideos": "Vidéos publiées",
+    "videosLoadError": "Impossible de charger les vidéos de ce profil. Veuillez réessayer plus tard.",
+    "noVideosTitle": "Aucune vidéo publiée pour le moment",
+    "noVideosDescription": "Lorsqu'une vidéo sera publiée, elle apparaîtra ici.",
+    "uploadFirstVideo": "Publier la première vidéo",
+    "createdPlaylists": "Playlists créées",
+    "playlistsLoadError": "Impossible de charger les playlists de ce profil. Veuillez réessayer plus tard.",
+    "noPlaylistsTitle": "Aucune playlist créée pour le moment",
+    "noPlaylistsDescription": "Les playlists de ce profil apparaîtront ici.",
+    "createFirstPlaylist": "Créer la première playlist"
   }
 }

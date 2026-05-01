@@ -150,7 +150,11 @@ export async function addVideoToPlaylist(payload: { playlistId: string; videoId:
 }
 
 export async function removeVideoFromPlaylist(payload: { playlistId: string; videoId: string }) {
-  const { error } = await supabase.from('playlist_videos').delete().eq('id', payload.playlistId).eq('video_id', payload.videoId);
+  const { error } = await supabase
+    .from('playlist_videos')
+    .delete()
+    .eq('playlist_id', payload.playlistId)
+    .eq('video_id', payload.videoId);
 
   if (error) throw error;
 }

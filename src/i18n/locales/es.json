@@ -641,6 +641,29 @@
         "noVideosFoundInPlaylist": "No se encontraron videos en la lista de reproducción de YouTube. Se creará una lista de reproducción vacía."
       },
       "apiLimitationInfo": "Monynha Fun utiliza un servicio de backend para obtener videos de listas de reproducción de YouTube, pero depende de la API de datos de YouTube, que tiene cuotas y puede que no siempre devuelva todos los videos para listas de reproducción muy grandes. Para obtener resultados óptimos, asegúrate de que la lista de reproducción sea pública."
+    },
+    "feedback": {
+      "createSuccess": "¡Lista de reproducción creada con éxito!",
+      "createError": "Error al crear la lista de reproducción",
+      "updateSuccess": "¡Lista de reproducción actualizada con éxito!",
+      "updateError": "Error al actualizar la lista de reproducción",
+      "deleteSuccess": "¡Lista de reproducción eliminada con éxito!",
+      "deleteError": "Error al eliminar la lista de reproducción",
+      "addVideoSuccess": "¡Video añadido a la lista de reproducción!",
+      "addVideoError": "Error al añadir video a la lista de reproducción",
+      "removeVideoSuccess": "¡Video eliminado de la lista de reproducción!",
+      "removeVideoError": "Error al eliminar video de la lista de reproducción",
+      "reorderSuccess": "¡Lista de reproducción reordenada con éxito!",
+      "reorderError": "Error al reordenar la lista de reproducción",
+      "markWatchedSuccess": "¡Video marcado como visto!",
+      "markUnwatchedSuccess": "¡Video marcado como no visto!",
+      "progressError": "Error al actualizar el progreso del video",
+      "collaboratorAdded": "¡Colaborador añadido!",
+      "collaboratorAddError": "Error al añadir colaborador",
+      "collaboratorRoleUpdated": "¡Rol del colaborador actualizado!",
+      "collaboratorRoleUpdateError": "Error al actualizar el rol del colaborador",
+      "collaboratorRemoved": "¡Colaborador eliminado!",
+      "collaboratorRemoveError": "Error al eliminar colaborador"
     }
   },
   "playlistDetails": {
@@ -764,5 +787,24 @@
       "contentRequired": "El comentario no puede estar vacío",
       "contentMaxLength": "El comentario debe tener como máximo 500 caracteres"
     }
+  },
+  "profile": {
+    "defaultMetaTitle": "Tube O2",
+    "metaTitle": "{{name}} | Tube O2",
+    "metaDescription": "{{name}} en Tube O2: curación colaborativa de videos de YouTube.",
+    "notFoundTitle": "Perfil no encontrado",
+    "notFoundDescription": "El perfil que buscas no existe o no está disponible.",
+    "joinedOn": "Se unió el {{date}}",
+    "editProfile": "Editar perfil",
+    "uploadedVideos": "Videos subidos",
+    "videosLoadError": "No se pudieron cargar los videos de este perfil. Inténtalo de nuevo más tarde.",
+    "noVideosTitle": "Aún no hay videos subidos",
+    "noVideosDescription": "Cuando se suban videos, aparecerán aquí.",
+    "uploadFirstVideo": "Subir primer video",
+    "createdPlaylists": "Listas de reproducción creadas",
+    "playlistsLoadError": "No se pudieron cargar las listas de reproducción de este perfil. Inténtalo de nuevo más tarde.",
+    "noPlaylistsTitle": "Aún no hay listas de reproducción creadas",
+    "noPlaylistsDescription": "Las listas de reproducción de este perfil aparecerán aquí.",
+    "createFirstPlaylist": "Crear primera lista de reproducción"
   }
 }

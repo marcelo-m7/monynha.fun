@@ -32,6 +32,7 @@ export function SortableVideoList({ playlistId, videos, progress, canEdit, isOrd
   const { t } = useTranslation();
   const { user } = useAuth();
   const [items, setItems] = useState(videos);
+  const [removingVideoId, setRemovingVideoId] = useState<string | null>(null);
   const reorderMutation = useReorderPlaylistVideos();
   const removeMutation = useRemoveVideoFromPlaylist();
   const markWatchedMutation = useMarkVideoWatched();
@@ -67,8 +68,17 @@ export function SortableVideoList({ playlistId, videos, progress, canEdit, isOrd
   };
 
   const handleRemove = (videoId: string) => {
-    setItems(items.filter(item => item.video_id !== videoId)); // Optimistic update
-    removeMutation.mutate({ playlistId, videoId });
+    const previousItems = items;
+    setRemovingVideoId(videoId);
+    setItems(items.filter((item) => item.video_id !== videoId));
+
+    removeMutation.mutate(
+      { playlistId, videoId },
+      {
+        onSettled: () => setRemovingVideoId(null),
+        onError: () => setItems(previousItems),
+      },
+    );
   };
 
   const handleToggleWatched = (videoId: string, currentlyWatched: boolean) => {
@@ -96,6 +106,7 @@ export function SortableVideoList({ playlistId, videos, progress, canEdit, isOrd
             canEdit={false}
             canTrackProgress={false}
             isWatched={false}
+            isRemoving={false}
             onRemove={() => {}}
             onToggleWatched={() => {}}
           />
@@ -124,6 +135,7 @@ export function SortableVideoList({ playlistId, videos, progress, canEdit, isOrd
               canEdit={canEdit}
               canTrackProgress={!!user}
               isWatched={getVideoProgress(item.video_id)?.watched || false}
+              isRemoving={removingVideoId === item.video_id}
               onRemove={() => handleRemove(item.video_id)}
               onToggleWatched={() => handleToggleWatched(item.video_id, getVideoProgress(item.video_id)?.watched || false)}
             />

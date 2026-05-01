@@ -17,7 +17,7 @@ import { SocialAccountsDisplay } from '@/components/profile/SocialAccountsDispla
 import { useFollowByUsername, useFollowStats, useIsFollowing, useUnfollowByUsername } from '@/features/follows';
 
 const Profile = () => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { username } = useParams<{ username: string }>();
   const navigate = useNavigate();
   const { user: authUser, loading: authLoading } = useAuth();
@@ -25,11 +25,11 @@ const Profile = () => {
 
   const { data: profile, isLoading: profileLoading, isError: profileError } = useProfileByUsername(username);
   const isCurrentUser = authUser && profile && authUser.id === profile.id;
-  const { data: userVideos, isLoading: videosLoading } = useVideos({
+  const { data: userVideos, isLoading: videosLoading, isError: videosError } = useVideos({
     submittedBy: profile?.id,
     enabled: !!profile?.id,
   });
-  const { data: userPlaylists, isLoading: playlistsLoading } = usePlaylists({
+  const { data: userPlaylists, isLoading: playlistsLoading, isError: playlistsError } = usePlaylists({
     authorId: profile?.id,
     isPublic: isCurrentUser ? undefined : true,
     enabled: !!profile?.id,
@@ -42,8 +42,10 @@ const Profile = () => {
 
   // Set dynamic meta tags for social media sharing
   useMetaTags({
-    title: profile?.display_name ? `${profile.display_name} | Tube O2` : 'Tube O2',
-    description: profile?.bio || `${profile?.display_name} on Tube O2: Curadoria coletiva de vídeos do YouTube.`,
+    title: profile?.display_name
+      ? t('profile.metaTitle', { name: profile.display_name })
+      : t('profile.defaultMetaTitle'),
+    description: profile?.bio || t('profile.metaDescription', { name: profile?.display_name || profile?.username || t('common.anonymous') }),
   });
 
   if (profileLoading || authLoading || socialAccountsLoading) {
@@ -117,7 +119,7 @@ const Profile = () => {
             <p className="text-muted-foreground text-lg">@{profile.username}</p>
             <div className="flex items-center justify-center sm:justify-start gap-2 text-sm text-muted-foreground mt-2">
               <CalendarDays className="w-4 h-4" />
-              <span>{t('profile.joinedOn', { date: new Date(profile.created_at).toLocaleDateString() })}</span>
+              <span>{t('profile.joinedOn', { date: new Date(profile.created_at).toLocaleDateString(i18n.language) })}</span>
             </div>
             <div className="flex items-center justify-center sm:justify-start gap-6 mt-4 text-sm">
               <div>
@@ -187,6 +189,10 @@ const Profile = () => {
               <Skeleton key={i} className="h-64 rounded-2xl" />
             ))}
           </div>
+        ) : videosError ? (
+          <div className="rounded-xl border border-destructive/20 bg-destructive/5 p-4 text-sm text-destructive">
+            {t('profile.videosLoadError')}
+          </div>
         ) : userVideos && userVideos.length > 0 ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {userVideos.map((video, index) => (
@@ -220,6 +226,10 @@ const Profile = () => {
             {Array.from({ length: 3 }).map((_, i) => (
               <Skeleton key={i} className="h-48 rounded-2xl" />
             ))}
+          </div>
+        ) : playlistsError ? (
+          <div className="rounded-xl border border-destructive/20 bg-destructive/5 p-4 text-sm text-destructive">
+            {t('profile.playlistsLoadError')}
           </div>
         ) : userPlaylists && userPlaylists.length > 0 ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
