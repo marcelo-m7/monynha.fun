@@ -235,7 +235,7 @@ const Profile = () => {
                     <ListVideo className="w-6 h-6" />
                   </div>
                   <div>
-                    <h2 className="font-semibold text-lg group-hover:text-primary transition-colors line-clamp-1">{playlist.name}</h2>
+                     <h2 className="font-semibold text-lg group-hover:opacity-75 transition-opacity line-clamp-1">{playlist.name}</h2>
                     <p className="text-sm text-muted-foreground">
                       {t('playlists.videoCount', { count: playlist.video_count || 0 })}
                     </p>
