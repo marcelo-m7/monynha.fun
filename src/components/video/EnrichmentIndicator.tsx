@@ -16,7 +16,7 @@ export function EnrichmentIndicator({ className, size = 'sm' }: EnrichmentIndica
   return (
     <div
       className={cn(
-        'flex items-center justify-center rounded-full bg-gradient-to-r from-purple-500 to-pink-500 p-1',
+        'flex items-center justify-center bg-primary p-1',
         className,
       )}
       title="Enhanced with AI"

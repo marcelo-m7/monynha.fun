@@ -38,7 +38,7 @@ export const FeaturedHero = ({ video }: FeaturedHeroProps) => {
       onKeyDown={handleKeyDown}
       tabIndex={0}
       role="link"
-      className="group cursor-pointer overflow-hidden rounded-md shadow-lg border border-primary/30 bg-card/95 transition-transform hover:scale-[1.01] hover:shadow-[0_0_25px_var(--glow-primary)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/80 focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+      className="group cursor-pointer overflow-hidden border border-border bg-card transition-colors hover:border-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
       aria-label={`Featured: ${video.title}`}
     >
       <div className="relative aspect-video">
@@ -55,7 +55,8 @@ export const FeaturedHero = ({ video }: FeaturedHeroProps) => {
           className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
         />
 
-        <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent flex items-end p-6">
+        <div className="absolute inset-0 bg-foreground/0 group-hover:bg-foreground/5 transition-colors" />
+        <div className="absolute inset-0 flex items-end p-6" style={{ background: 'linear-gradient(to top, rgba(0,0,0,0.85) 0%, transparent 60%)' }}>
           <div className="w-full text-white">
             <h3 className="text-2xl md:text-3xl font-bold uppercase tracking-[0.08em] line-clamp-2 font-mono">{video.title}</h3>
             <p className="mt-2 text-xs max-w-2xl line-clamp-2 text-white/90 uppercase tracking-widest">{video.description}</p>

@@ -12,7 +12,7 @@ export const Footer = () => {
           {/* Brand */}
           <div className="md:col-span-2 space-y-4">
             <Link to="/" className="flex items-center gap-2">
-              <div className="flex h-9 w-9 items-center justify-center rounded-sm bg-primary text-primary-foreground shadow-[0_0_12px_var(--glow-primary)]">
+              <div className="flex h-9 w-9 items-center justify-center bg-primary text-primary-foreground">
                 <span className="text-lg font-bold">M</span>
               </div>
               <span className="font-bold text-xl tracking-[0.2em] uppercase">
@@ -49,7 +49,7 @@ export const Footer = () => {
         </div>
 
         {/* Bottom */}
-        <div className="flex flex-col md:flex-row items-center justify-between gap-4 pt-8 mt-8 border-t border-primary/30">
+          <div className="flex flex-col md:flex-row items-center justify-between gap-4 pt-8 mt-8 border-t border-border">
           <p className="text-sm text-muted-foreground flex items-center gap-1">
             {t('footer.madeWithLove')} <Heart className="w-4 h-4 text-primary fill-primary inline-block" />{" "}
             <a 

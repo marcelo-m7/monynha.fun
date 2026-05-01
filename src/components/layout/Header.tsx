@@ -47,11 +47,11 @@ export const Header = () => {
   };
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-primary/30 bg-background/90 backdrop-blur-xl">
+    <header className="sticky top-0 z-50 w-full border-b border-border bg-background">
       <div className="container flex h-16 items-center justify-between gap-4">
         {/* Logo */}
         <Link to="/" className="flex items-center gap-2 group">
-          <div className="relative flex h-9 w-9 items-center justify-center rounded-sm bg-primary text-primary-foreground shadow-[0_0_12px_var(--glow-primary)] transition-transform group-hover:scale-105">
+          <div className="relative flex h-9 w-9 items-center justify-center bg-primary text-primary-foreground transition-transform group-hover:scale-105">
             <span className="text-lg font-bold">M</span>
           </div>
           <span className="hidden font-bold text-xl tracking-[0.2em] uppercase sm:inline-block">

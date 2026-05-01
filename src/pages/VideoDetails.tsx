@@ -230,9 +230,9 @@ const VideoDetails = () => {
 
               {/* AI-Generated Summary */}
               {video.enrichment && (
-                <Card className="p-6 bg-gradient-to-br from-purple-50/50 to-pink-50/50 dark:from-purple-950/20 dark:to-pink-950/20 border-purple-200/50 dark:border-purple-800/50">
+                <Card className="p-6 border border-primary/30 bg-card">
                   <div className="flex items-start gap-3">
-                    <div className="rounded-full bg-gradient-to-r from-purple-500 to-pink-500 p-2 flex-shrink-0">
+                    <div className="bg-primary p-2 flex-shrink-0">
                       <Sparkles className="w-5 h-5 text-white" />
                     </div>
                     <div className="flex-1 space-y-3">

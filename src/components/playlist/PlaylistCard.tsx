@@ -18,7 +18,7 @@ export function PlaylistCard({ playlist, index = 0 }: PlaylistCardProps) {
   return (
     <Link
       to={`/playlists/${playlist.id}`}
-      className="group bg-card/95 border border-primary/20 rounded-md overflow-hidden shadow-sm hover:shadow-[0_0_15px_var(--glow-primary)] transition-all duration-300 animate-fade-up flex flex-col"
+      className="group bg-card border border-border overflow-hidden transition-colors hover:border-primary flex flex-col"
       style={{ animationDelay: `${index * 0.05}s` }}
     >
       {/* Thumbnail / Header */}

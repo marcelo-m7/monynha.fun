@@ -15,19 +15,10 @@ export default {
     },
     extend: {
       fontFamily: {
-        sans: ['"Plus Jakarta Sans"', 'system-ui', 'sans-serif'],
+        sans: ['"Space Grotesk"', 'system-ui', 'sans-serif'],
+        mono: ['"Space Grotesk"', 'monospace'],
       },
       colors: {
-        neon: {
-          cyan: "#00F5FF",
-          pink: "#FF00C8",
-          green: "#00FFA3",
-        },
-        dark: {
-          base: "#000000",
-          surface: "#0B0F14",
-          card: "#111827",
-        },
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
         ring: "hsl(var(--ring))",
@@ -82,23 +73,20 @@ export default {
         },
       },
       borderRadius: {
-        lg: "var(--radius)",
-        md: "calc(var(--radius) - 2px)",
-        sm: "calc(var(--radius) - 4px)",
-        xl: "calc(var(--radius) + 4px)",
-        "2xl": "calc(var(--radius) + 8px)",
+        none: "0px",
+        sm: "0px",
+        DEFAULT: "0px",
+        md: "0px",
+        lg: "0px",
+        xl: "0px",
+        "2xl": "0px",
+        "3xl": "0px",
+        full: "0px",
       },
       boxShadow: {
-        neon: "0 0 10px var(--glow-primary), 0 0 20px var(--glow-primary)",
-        "neon-pink": "0 0 10px var(--glow-secondary), 0 0 20px var(--glow-secondary)",
-        "neon-green": "0 0 10px var(--glow-accent), 0 0 20px var(--glow-accent)",
-        sm: "var(--shadow-sm)",
-        md: "var(--shadow-md)",
-        lg: "var(--shadow-lg)",
-        "depth-1": "var(--shadow-depth-1)",
-        "depth-2": "var(--shadow-depth-2)",
-        "depth-3": "var(--shadow-depth-3)",
-        glow: "var(--shadow-glow)",
+        sm: "none",
+        md: "none",
+        lg: "none",
       },
       keyframes: {
         "accordion-down": {
@@ -109,13 +97,6 @@ export default {
           from: { height: "var(--radix-accordion-content-height)" },
           to: { height: "0" },
         },
-        shimmer: {
-          "100%": { transform: "translateX(100%)" },
-        },
-        pulse: {
-          "0%, 100%": { opacity: "1" },
-          "50%": { opacity: "0.5" },
-        },
         pop: {
           "0%": { transform: "translateY(0) scale(1)", opacity: "1" },
           "50%": { transform: "translateY(-8px) scale(1.18)", opacity: "1" },
@@ -125,8 +106,6 @@ export default {
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
-        shimmer: "shimmer 2s infinite",
-        pulse: "pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite",
         pop: "pop 700ms ease-out both",
       },
     },

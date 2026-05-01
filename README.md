@@ -380,6 +380,32 @@ pip install -r requirements.txt
 uvicorn main:app --host 0.0.0.0 --port 8000 --reload
 ```
 
+### Run Tests
+
+The backend includes comprehensive tests with mocked YouTube and Supabase APIs:
+
+```bash
+cd backend
+pip install -r requirements.txt  # if not already installed
+pytest tests/ -v                  # run all tests
+pytest tests/test_youtube_api.py  # run YouTube API tests
+pytest tests/test_video_sync.py   # run sync logic tests
+pytest tests/test_endpoints.py    # run endpoint tests
+```
+
+Coverage report:
+
+```bash
+pytest tests/ --cov=services --cov=main
+```
+
+#### Test Structure
+- `tests/test_youtube_api.py` – YouTube API integration, error handling, pagination
+- `tests/test_video_sync.py` – Core sync logic, deduplication, fallback behavior
+- `tests/test_endpoints.py` – FastAPI endpoint validation, error responses, request/response shapes
+
+Tests use `unittest.mock` to avoid live API calls and database access. Safe to run anytime. ✅
+
 ---
 
 ## 🗄️ The Database (Where The Magic Happens)

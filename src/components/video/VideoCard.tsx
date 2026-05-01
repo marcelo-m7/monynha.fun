@@ -50,7 +50,7 @@ export const VideoCard = ({ video, onClick, variant = 'default' }: VideoCardProp
       role="link"
       aria-label={video.title}
       className={cn(
-        "group cursor-pointer rounded-md bg-card/95 overflow-hidden shadow-sm transition-all duration-300 border border-primary/15 hover:border-primary/60 hover:shadow-[0_0_15px_var(--glow-primary)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/80 focus-visible:ring-offset-2 focus-visible:ring-offset-background",
+        "group cursor-pointer bg-card overflow-hidden transition-colors border border-border hover:border-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background",
         variant === 'default' && "flex h-full min-h-[320px] flex-col",
         variant === 'compact' && "flex items-center gap-3 p-2 rounded-md hover:bg-muted/30 hover:shadow-none border border-border/40"
       )}
@@ -85,7 +85,7 @@ export const VideoCard = ({ video, onClick, variant = 'default' }: VideoCardProp
         {/* Overlay on hover */}
         <div className="absolute inset-0 bg-foreground/0 group-hover:bg-foreground/15 transition-colors duration-300 flex items-center justify-center">
           <div className={cn(
-            "rounded-full bg-primary flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 scale-75 group-hover:scale-100 shadow-[0_0_15px_var(--glow-primary)]",
+            "bg-primary flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 scale-75 group-hover:scale-100",
             variant === 'default' ? "w-14 h-14" : "w-10 h-10"
           )}>
             <Play className={cn(
@@ -97,7 +97,7 @@ export const VideoCard = ({ video, onClick, variant = 'default' }: VideoCardProp
 
         {/* Duration badge */}
         {variant === 'default' && video.duration_seconds && video.duration_seconds > 0 && (
-          <div className="absolute bottom-2 right-2 px-2 py-1 rounded-sm bg-foreground/80 text-background text-xs font-medium backdrop-blur-sm">
+          <div className="absolute bottom-2 right-2 px-2 py-1 bg-foreground/80 text-background text-xs font-medium">
             {formatDuration(video.duration_seconds)}
           </div>
         )}
@@ -106,7 +106,7 @@ export const VideoCard = ({ video, onClick, variant = 'default' }: VideoCardProp
         <Badge
           variant="secondary"
           className={cn(
-            "absolute top-2 left-2 text-[0.65rem] font-bold bg-background/90 backdrop-blur-sm uppercase tracking-widest",
+            "absolute top-2 left-2 text-[0.65rem] font-bold bg-background/90 uppercase tracking-widest",
             variant === 'compact' && "hidden"
           )}
         >

@@ -136,43 +136,35 @@ export const HeroSection = () => {
   };
 
   return (
-    <section className="relative w-full overflow-hidden py-20 md:py-32 flex flex-col items-center justify-center min-h-[70vh] border-b border-border/40 bg-background">
-      {/* Cyberpunk Grid Background */}
-      <div className="absolute inset-0 z-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-background via-background to-background opacity-80 pointer-events-none" />
-      
-      {/* Glow Orbs */}
-      <div className="absolute top-1/4 left-1/4 w-[500px] h-[500px] bg-primary/10 rounded-full blur-[120px] pointer-events-none animate-pulse" />
-      <div className="absolute bottom-1/4 right-1/4 w-[500px] h-[500px] bg-secondary/10 rounded-full blur-[120px] pointer-events-none animate-pulse delay-700" />
+    <section className="relative w-full py-20 md:py-32 flex flex-col items-center justify-center min-h-[70vh] border-b border-border bg-background">
+      <div className="container flex flex-col items-center text-center space-y-10">
 
-      <div className="container relative z-10 flex flex-col items-center text-center space-y-10">
-        
         {/* Badge */}
-        <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-sm border border-primary/50 bg-card/70 backdrop-blur-sm text-primary text-xs font-bold tracking-[0.35em] uppercase animate-fade-in shadow-[0_0_12px_var(--glow-primary)]">
-          <Sparkles className="w-3 h-3 text-neon-cyan" />
+        <div className="inline-flex items-center gap-2 px-4 py-1.5 border border-primary/50 text-primary text-xs font-bold tracking-[0.35em] uppercase">
+          <Sparkles className="w-3 h-3" />
           <span>{t('hero.badge')}</span>
         </div>
 
         {/* Heading */}
-        <h1 className="text-4xl md:text-6xl lg:text-7xl font-black uppercase tracking-[0.1em] leading-[1.05] animate-fade-up font-mono" style={{ animationDelay: '0.1s' }}>
-          <span className="block text-foreground drop-shadow-[0_0_10px_var(--glow-primary)]">
+        <h1 className="text-4xl md:text-6xl lg:text-7xl font-black uppercase tracking-[0.06em] leading-[1.05] font-mono">
+          <span className="block text-foreground">
             {t('hero.headingPart1')}
           </span>
-          <span className="bg-clip-text text-transparent bg-gradient-to-r from-primary via-foreground to-secondary drop-shadow-[0_0_15px_var(--glow-primary)] animate-flicker">
+          <span className="text-primary">
             {t('hero.headingPart2')}
           </span>
         </h1>
 
-        <p className="max-w-2xl text-lg md:text-xl text-muted-foreground/80 md:leading-relaxed animate-fade-up" style={{ animationDelay: '0.2s' }}>
+        <p className="max-w-2xl text-lg md:text-xl text-muted-foreground leading-relaxed">
           {t('hero.description')}
         </p>
 
         {/* Action Area */}
-        <div className="w-full max-w-md space-y-4 animate-fade-up" style={{ animationDelay: '0.3s' }}>
-          <form onSubmit={handleSubmit(onSubmit)} className="relative group">
-            <div className="absolute -inset-0.5 bg-gradient-to-r from-neon-cyan to-neon-pink rounded-lg opacity-30 group-hover:opacity-100 transition duration-500 blur"></div>
-            <div className="relative flex items-center bg-card/95 rounded-lg p-1 border border-border/60 group-hover:border-transparent transition-colors">
+        <div className="w-full max-w-md space-y-4">
+          <form onSubmit={handleSubmit(onSubmit)} className="relative">
+            <div className="flex items-center border border-border bg-card focus-within:border-primary transition-colors">
               <div className="pl-3 text-muted-foreground">
-                <Youtube className="w-5 h-5 group-focus-within:text-red-500 transition-colors" />
+                <Youtube className="w-5 h-5" />
               </div>
               <Input
                 {...youtubeUrlField}
@@ -185,12 +177,12 @@ export const HeroSection = () => {
                 autoComplete="url"
                 inputMode="url"
                 placeholder={t('hero.submitUrlPlaceholder')}
-                className="border-0 bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0 placeholder:text-muted-foreground/70 h-10 md:h-12 text-foreground font-mono"
+                className="border-0 bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0 focus-visible:border-0 placeholder:text-muted-foreground/70 h-10 md:h-12 text-foreground font-mono"
               />
-              <Button 
-                type="submit" 
+              <Button
+                type="submit"
                 variant="default"
-                className="h-10 md:h-12 px-6 rounded-md"
+                className="h-10 md:h-12 px-6"
                 disabled={isSubmittingForm || authLoading}
               >
                 {isSubmittingForm || authLoading ? (
@@ -217,24 +209,21 @@ export const HeroSection = () => {
             >
               {t('home.howItWorks.title')}
             </Button>
-
-             {/* Secondary Action - Explore */}
-             <Button
-               variant="outline"
-               size="lg"
-               className="w-full sm:w-auto"
-               onClick={() => navigate('/videos')}
-             >
-                {t('hero.exploreVideosButton')}
-             </Button>
-
-            <Button 
-                variant="ghost" 
-                size="lg"
-                className="w-full sm:w-auto text-muted-foreground hover:text-foreground"
-                onClick={handleDirectSubmitClick}
+            <Button
+              variant="outline"
+              size="lg"
+              className="w-full sm:w-auto"
+              onClick={() => navigate('/videos')}
             >
-                {t('hero.submitVideoButton')}
+              {t('hero.exploreVideosButton')}
+            </Button>
+            <Button
+              variant="ghost"
+              size="lg"
+              className="w-full sm:w-auto text-muted-foreground hover:text-foreground"
+              onClick={handleDirectSubmitClick}
+            >
+              {t('hero.submitVideoButton')}
             </Button>
           </div>
         </div>
