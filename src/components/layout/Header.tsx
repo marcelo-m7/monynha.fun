@@ -47,6 +47,7 @@ export const Header = () => {
 
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+      <Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>
       <div className="container flex h-16 items-center gap-6">
 
         {/* Logo */}
@@ -232,50 +233,63 @@ export const Header = () => {
             </SelectContent>
           </Select>
           <ThemeToggle />
+
+          <div className="h-5 w-px bg-border mx-0.5 shrink-0" />
+          <SheetTrigger asChild>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="rounded-full hover:bg-muted/60 h-9 w-9"
+              aria-label={t('header.toggleMenu')}
+            >
+              <Menu className="h-5 w-5" />
+              <span className="sr-only">{t('header.toggleMenu')}</span>
+            </Button>
+          </SheetTrigger>
         </div>
 
         {/* Mobile: theme + menu trigger */}
         <div className="flex md:hidden items-center gap-1">
           <ThemeToggle />
-          <Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>
-            <SheetTrigger asChild>
-              <Button
-                variant="ghost"
-                size="icon"
-                className="rounded-full hover:bg-muted/60 h-10 w-10"
-              >
-                <Menu className="h-5 w-5" />
-                <span className="sr-only">{t('header.toggleMenu')}</span>
-              </Button>
-            </SheetTrigger>
-            <SheetContent side="right" className="w-full sm:w-[400px] flex flex-col p-6 rounded-l-3xl border-none elevation-dialog">
-              <SheetHeader className="mb-4">
-                <SheetTitle className="text-left">
-                  <Link to="/" className="flex items-center gap-2" onClick={() => setIsSheetOpen(false)}>
-                    <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-primary text-primary-foreground shadow-md">
-                      <span className="text-sm font-bold tracking-tighter">O2</span>
-                    </div>
-                    <span className="font-bold text-xl tracking-tight">
-                      Tube<span className="text-primary">O2</span>
-                    </span>
-                  </Link>
-                </SheetTitle>
-              </SheetHeader>
-              <MobileNav
-                user={user}
-                profile={profile}
-                unreadMessagesCount={unreadMessagesCount}
-                unreadNotificationsCount={unreadNotificationsCount}
-                onClose={() => setIsSheetOpen(false)}
-                onSignOut={handleSignOut}
-                searchQuery={searchQuery}
-                setSearchQuery={setSearchQuery}
-                onSearchSubmit={handleSearchSubmit}
-              />
-            </SheetContent>
-          </Sheet>
+          <SheetTrigger asChild>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="rounded-full hover:bg-muted/60 h-10 w-10"
+            >
+              <Menu className="h-5 w-5" />
+              <span className="sr-only">{t('header.toggleMenu')}</span>
+            </Button>
+          </SheetTrigger>
         </div>
+
+        <SheetContent side="right" className="w-full sm:w-[400px] md:w-[420px] flex flex-col p-6 rounded-l-3xl border-none elevation-dialog">
+          <SheetHeader className="mb-4">
+            <SheetTitle className="text-left">
+              <Link to="/" className="flex items-center gap-2" onClick={() => setIsSheetOpen(false)}>
+                <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-primary text-primary-foreground shadow-md">
+                  <span className="text-sm font-bold tracking-tighter">O2</span>
+                </div>
+                <span className="font-bold text-xl tracking-tight">
+                  Tube<span className="text-primary">O2</span>
+                </span>
+              </Link>
+            </SheetTitle>
+          </SheetHeader>
+          <MobileNav
+            user={user}
+            profile={profile}
+            unreadMessagesCount={unreadMessagesCount}
+            unreadNotificationsCount={unreadNotificationsCount}
+            onClose={() => setIsSheetOpen(false)}
+            onSignOut={handleSignOut}
+            searchQuery={searchQuery}
+            setSearchQuery={setSearchQuery}
+            onSearchSubmit={handleSearchSubmit}
+          />
+        </SheetContent>
       </div>
+      </Sheet>
     </header>
   );
 };
