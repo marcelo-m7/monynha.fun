@@ -163,8 +163,8 @@ const fetchVideoMeta = async (videoIdOrYoutubeId: string): Promise<{
   const fallbackDescription = trimSummary(video.description, 160);
 
   return {
-    title: `${video.title} | Tube O2`,
-    description: shortSummary || fallbackDescription || 'Watch this video on Tube O2.',
+    title: `${video.title} | Tube Open2`,
+    description: shortSummary || fallbackDescription || 'Watch this video on Tube Open2.',
     image: video.thumbnail_url || 'https://tube.open2.tech/placeholder.png',
   };
 };
