@@ -140,7 +140,7 @@ export const HeroSection = () => {
       <div className="container flex flex-col items-center text-center space-y-10">
 
         {/* Badge */}
-        <div className="inline-flex items-center gap-2 px-4 py-1.5 border border-primary/50 text-primary text-xs font-bold tracking-[0.35em] uppercase">
+        <div className="inline-flex items-center gap-2 px-4 py-1.5 border border-primary/50 bg-primary/8 text-foreground text-xs font-bold tracking-[0.35em] uppercase">
           <Sparkles className="w-3 h-3" />
           <span>{t('hero.badge')}</span>
         </div>
@@ -150,7 +150,7 @@ export const HeroSection = () => {
           <span className="block text-foreground">
             {t('hero.headingPart1')}
           </span>
-          <span className="text-primary">
+          <span className="text-foreground">
             {t('hero.headingPart2')}
           </span>
         </h1>

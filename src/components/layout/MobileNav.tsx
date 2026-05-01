@@ -208,7 +208,7 @@ export const MobileNav: React.FC<MobileNavProps> = ({
               </Button>
               <Button
                 variant="outline"
-                className="w-full h-12 rounded-2xl border-primary/20 text-primary hover:bg-primary/5 font-bold"
+                className="w-full h-12 rounded-2xl border-primary/20 text-foreground hover:bg-primary/5 font-bold"
                 onClick={() => { navigate('/auth'); onClose(); }}
               >
                 {t('header.login')}
