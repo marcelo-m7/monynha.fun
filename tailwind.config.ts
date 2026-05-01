@@ -84,9 +84,14 @@ export default {
         full: "0px",
       },
       boxShadow: {
-        sm: "none",
-        md: "none",
-        lg: "none",
+        sm: "0 2px 4px rgba(0, 0, 0, 0.08)",
+        md: "0 4px 8px rgba(0, 0, 0, 0.12)",
+        lg: "0 8px 16px rgba(0, 0, 0, 0.16)",
+        xl: "0 12px 24px rgba(0, 0, 0, 0.2)",
+        "sm-dark": "0 2px 4px rgba(0, 0, 0, 0.3)",
+        "md-dark": "0 4px 8px rgba(0, 0, 0, 0.4)",
+        "lg-dark": "0 8px 16px rgba(0, 0, 0, 0.5)",
+        "xl-dark": "0 12px 24px rgba(0, 0, 0, 0.6)",
       },
       keyframes: {
         "accordion-down": {
