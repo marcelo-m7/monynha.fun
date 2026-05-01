@@ -325,25 +325,139 @@ These are used by `server/server.ts` at request time to fetch video metadata and
 
 ## ⚙️ Backend FastAPI (Supabase + YouTube)
 
-The backend lives in `backend/` and exposes two routes:
-- `GET /health` → `{"status": "ok"}`
-- `POST /sync_videos` → syncs channel uploads to Supabase
+Production-grade backend for syncing YouTube channels to Supabase with optional scheduled jobs.
 
-### Backend Environment
+### Quick Start
 
-Create `backend/.env` using `backend/.env.example`:
+**1. Create environment file:**
+
+```bash
+cd backend
+cp .env.example .env
+```
+
+Edit `backend/.env` with your credentials:
 
 ```env
 SUPABASE_URL=https://your-project.supabase.co
 SUPABASE_SERVICE_ROLE_KEY=your_service_role_key
 YOUTUBE_API_KEY=your_youtube_api_key
+
+# Optional: Enable scheduled syncs
+SCHEDULED_SYNCS=UCBR8-60-B28hp2BmDPdntcQ:videos
+SYNC_INTERVAL_HOURS=6
+SYNC_TIME=02:00
 ```
 
-### Run with Docker Compose
+**2. Run locally:**
 
 ```bash
-docker-compose build backend
-docker-compose run --rm backend python -m pip install -r requirements.txt
+python -m venv .venv
+source .venv/bin/activate  # or .\.venv\Scripts\Activate.ps1 on Windows
+pip install -r requirements.txt
+uvicorn main:app --host 0.0.0.0 --port 8000 --reload
+```
+
+**3. Test the endpoints:**
+
+```bash
+# Health check
+curl http://localhost:8000/health
+
+# Sync videos from a YouTube channel
+curl -X POST http://localhost:8000/sync_videos \
+  -H "Content-Type: application/json" \
+  -d '{"channel_id":"UCBR8-60-B28hp2BmDPdntcQ"}'
+
+# Check scheduler status
+curl http://localhost:8000/status
+```
+
+### API Endpoints
+
+See [backend/API_REFERENCE.md](backend/API_REFERENCE.md) for complete endpoint documentation.
+
+**GET /health**
+```json
+{"status": "ok"}
+```
+
+**GET /status**
+```json
+{
+  "status": "ok",
+  "scheduler_running": true,
+  "scheduled_jobs": [
+    {
+      "id": "sync_UCBR8-60-B28hp2BmDPdntcQ",
+      "name": "Sync videos from UCBR8-60-B28hp2BmDPdntcQ",
+      "next_run": "2024-05-02T08:00:00"
+    }
+  ]
+}
+```
+
+**POST /sync_videos**
+```json
+{
+  "channel_id": "UCBR8-60-B28hp2BmDPdntcQ",
+  "table_name": "videos"
+}
+```
+
+Response:
+```json
+{
+  "inserted_count": 5,
+  "new_videos": [
+    {
+      "video_id": "dQw4w9WgXcQ",
+      "youtube_id": "dQw4w9WgXcQ",
+      "title": "Video Title",
+      "description": "Video description",
+      "channel_name": "Channel Name",
+      "thumbnail_url": "https://...",
+      "video_url": "https://youtube.com/watch?v=dQw4w9WgXcQ",
+      "language": "pt"
+    }
+  ]
+}
+```
+
+### Scheduled Syncs
+
+Enable automatic periodic syncing by setting `SCHEDULED_SYNCS` in `.env`:
+
+```env
+# Single channel - daily at 2 AM UTC
+SCHEDULED_SYNCS=UCBR8-60-B28hp2BmDPdntcQ:videos
+SYNC_TIME=02:00
+
+# Multiple channels - every 6 hours
+SCHEDULED_SYNCS=UCBR8-60-B28hp2BmDPdntcQ:videos,UCHANNELID2:custom_videos
+SYNC_INTERVAL_HOURS=6
+```
+
+Check job status:
+```bash
+curl http://localhost:8000/status
+```
+
+### Run Tests
+
+```bash
+cd backend
+pytest tests/ -v                      # all tests
+pytest tests/test_youtube_api.py -v  # YouTube API tests (16 tests)
+pytest tests/test_video_sync.py -v   # sync logic tests (14 tests)
+pytest tests/test_integration.py -v  # endpoint tests (5 tests)
+```
+
+All tests use mocked APIs (no live YouTube/Supabase calls). **Test coverage: 35/35 passing ✅**
+
+### Docker Compose
+
+```bash
 docker-compose up backend
 ```
 
@@ -351,49 +465,20 @@ In another terminal:
 
 ```bash
 curl http://localhost:8000/health
-
-curl -X POST http://localhost:8000/sync_videos \
-	-H "Content-Type: application/json" \
-	-d '{"channel_id":"UCBR8-60-B28hp2BmDPdntcQ"}'
 ```
 
-Expected sync response shape:
+### Features
 
-```json
-{
-	"inserted_count": 0,
-	"new_videos": []
-}
-```
+- ✅ **Supabase Integration** - Authenticated writes via service role key
+- ✅ **YouTube API** - Channel uploads with pagination (50 videos/page)
+- ✅ **Deduplication** - Avoids re-inserting existing videos
+- ✅ **Error Handling** - Custom exceptions for API failures, rate limits, auth errors
+- ✅ **Scheduled Jobs** - Optional APScheduler for background syncs
+- ✅ **Structured Logging** - Debug visibility into sync operations
+- ✅ **Input Validation** - Pydantic models for request validation
+- ✅ **Status Monitoring** - Check scheduler status and next job times
 
-### Run Locally (Development)
-
-```bash
-cd backend
-python -m venv .venv
-# Linux/macOS
-source .venv/bin/activate
-# Windows PowerShell
-# .\.venv\Scripts\Activate.ps1
-
-pip install -r requirements.txt
-uvicorn main:app --host 0.0.0.0 --port 8000 --reload
-```
-
-### Run Tests
-
-The backend includes comprehensive tests with mocked YouTube and Supabase APIs:
-
-```bash
-cd backend
-pip install -r requirements.txt  # if not already installed
-pytest tests/ -v                  # run all tests
-pytest tests/test_youtube_api.py  # run YouTube API tests
-pytest tests/test_video_sync.py   # run sync logic tests
-pytest tests/test_endpoints.py    # run endpoint tests
-```
-
-Coverage report:
+### Coverage report:
 
 ```bash
 pytest tests/ --cov=services --cov=main
