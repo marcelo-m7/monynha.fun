@@ -121,9 +121,13 @@
   }
 
   h1, h2, h3, h4, h5, h6 {
-    @apply font-bold uppercase;
+    @apply uppercase;
     letter-spacing: 0.04em;
     text-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+  }
+
+  h2, h3, h4, h5, h6 {
+    @apply font-bold;
   }
 
   .dark h1, .dark h2, .dark h3, .dark h4, .dark h5, .dark h6 {
@@ -131,7 +135,7 @@
   }
 
   h1 {
-    font-weight: 900;
+    @apply font-black;
     letter-spacing: -0.05em;
     line-height: 0.95;
     text-shadow: 0 3px 6px rgba(0, 0, 0, 0.12);
