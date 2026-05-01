@@ -94,33 +94,38 @@
         }
       }
     },
-    "features": {
-      "title": "Key features",
-      "cards": {
-        "card1": {
-          "title": "Human curation",
-          "description": "Selections made by people with cultural context."
+    "intelligence": {
+      "badge": "AI-powered",
+      "title": "Intelligence inside",
+      "description": "Every submitted video is automatically processed by an AI pipeline that enriches it with semantic data — before it reaches the community.",
+      "features": {
+        "tags": {
+          "title": "Semantic tagging",
+          "description": "AI reads the video and generates precise topic tags — no manual input needed."
         },
-        "card2": {
-          "title": "Living playlists",
-          "description": "Collections that evolve as the community contributes."
+        "summary": {
+          "title": "Auto summaries",
+          "description": "Viewers get an accurate, spoiler-free description before they decide to watch."
         },
-        "card3": {
-          "title": "Smart classification",
-          "description": "AI suggestions with community oversight."
+        "relevance": {
+          "title": "Cultural context",
+          "description": "AI explains why a video matters, helping curators write more meaningful notes."
         },
-        "card4": {
-          "title": "Low-noise search",
-          "description": "Find useful videos without clickbait clutter."
-        },
-        "card5": {
-          "title": "Preservation first",
-          "description": "Save valuable videos that might disappear over time."
-        },
-        "card6": {
-          "title": "Multilingual",
-          "description": "Share and discover content across languages."
+        "category": {
+          "title": "Category matching",
+          "description": "The right category is suggested automatically, reviewable before publishing."
         }
+      },
+      "preview": {
+        "label": "AI enrichment · live example",
+        "titleLabel": "Optimized title",
+        "tagsLabel": "Semantic tags",
+        "summaryLabel": "Summary",
+        "relevanceLabel": "Cultural relevance",
+        "categoryLabel": "Suggested category",
+        "mockSummary": "Ken Thompson and Dennis Ritchie's design principles for composable, single-purpose tools. A foundational concept for anyone working with software systems.",
+        "mockRelevance": "Foundational reference in software engineering culture, widely cited in modern DevOps and platform engineering discussions.",
+        "mockCategory": "Technology"
       }
     },
     "useCases": {

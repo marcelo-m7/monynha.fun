@@ -91,33 +91,38 @@
         }
       }
     },
-    "features": {
-      "title": "Funciones clave",
-      "cards": {
-        "card1": {
-          "title": "Curaduría humana",
-          "description": "Selecciones hechas por personas con contexto cultural."
+    "intelligence": {
+      "badge": "Potenciado por IA",
+      "title": "Inteligencia incorporada",
+      "description": "Cada video enviado es procesado automáticamente por un pipeline de IA que lo enriquece con datos semánticos — antes de llegar a la comunidad.",
+      "features": {
+        "tags": {
+          "title": "Etiquetado semántico",
+          "description": "La IA lee el video y genera etiquetas temáticas precisas — sin entrada manual."
         },
-        "card2": {
-          "title": "Playlists vivas",
-          "description": "Colecciones que evolucionan con nuevos aportes."
+        "summary": {
+          "title": "Resúmenes automáticos",
+          "description": "Los espectadores obtienen una descripción precisa antes de decidir ver el video."
         },
-        "card3": {
-          "title": "Clasificación inteligente",
-          "description": "Sugerencias de IA con revisión comunitaria."
+        "relevance": {
+          "title": "Contexto cultural",
+          "description": "La IA explica por qué importa un video, ayudando a los curadores a escribir notas más significativas."
         },
-        "card4": {
-          "title": "Búsqueda sin ruido",
-          "description": "Encuentra videos útiles sin exceso de clickbait."
-        },
-        "card5": {
-          "title": "Preservación primero",
-          "description": "Rescata videos valiosos antes de que se pierdan."
-        },
-        "card6": {
-          "title": "Multilingüe",
-          "description": "Comparte y descubre contenido en varios idiomas."
+        "category": {
+          "title": "Categorización automática",
+          "description": "La categoría correcta se sugiere automáticamente, revisable antes de publicar."
         }
+      },
+      "preview": {
+        "label": "Enriquecimiento IA · ejemplo real",
+        "titleLabel": "Título optimizado",
+        "tagsLabel": "Etiquetas semánticas",
+        "summaryLabel": "Resumen",
+        "relevanceLabel": "Relevancia cultural",
+        "categoryLabel": "Categoría sugerida",
+        "mockSummary": "Los principios de diseño de Ken Thompson y Dennis Ritchie para herramientas componibles de propósito único. Un concepto fundamental para quienes trabajan con sistemas de software.",
+        "mockRelevance": "Referencia fundamental en la cultura de ingeniería de software, ampliamente citada en discusiones modernas de DevOps y plataformas.",
+        "mockCategory": "Tecnología"
       }
     },
     "useCases": {

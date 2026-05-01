@@ -94,33 +94,38 @@
         }
       }
     },
-    "features": {
-      "title": "Recursos principais",
-      "cards": {
-        "card1": {
-          "title": "Curadoria humana",
-          "description": "Seleções feitas por pessoas com contexto cultural."
+    "intelligence": {
+      "badge": "Movido por IA",
+      "title": "Inteligência embutida",
+      "description": "Todo vídeo enviado passa automaticamente por um pipeline de IA que o enriquece com dados semânticos — antes de chegar à comunidade.",
+      "features": {
+        "tags": {
+          "title": "Tagueamento semântico",
+          "description": "A IA lê o vídeo e gera tags temáticas precisas — sem entrada manual."
         },
-        "card2": {
-          "title": "Playlists vivas",
-          "description": "Coleções que evoluem com novas contribuições."
+        "summary": {
+          "title": "Resumos automáticos",
+          "description": "O espectador recebe uma descrição precisa antes de decidir assistir."
         },
-        "card3": {
-          "title": "Classificação inteligente",
-          "description": "Sugestões de categoria com revisão comunitária."
+        "relevance": {
+          "title": "Contexto cultural",
+          "description": "A IA explica por que o vídeo importa, ajudando curadores a escrever notas mais ricas."
         },
-        "card4": {
-          "title": "Busca sem ruído",
-          "description": "Encontre vídeos relevantes sem caça-cliques."
-        },
-        "card5": {
-          "title": "Foco em preservação",
-          "description": "Resgate conteúdos úteis que poderiam se perder."
-        },
-        "card6": {
-          "title": "Multilíngue",
-          "description": "Compartilhe e descubra em vários idiomas."
+        "category": {
+          "title": "Correspondência de categoria",
+          "description": "A categoria certa é sugerida automaticamente, revisável antes da publicação."
         }
+      },
+      "preview": {
+        "label": "Enriquecimento por IA · exemplo real",
+        "titleLabel": "Título otimizado",
+        "tagsLabel": "Tags semânticas",
+        "summaryLabel": "Resumo",
+        "relevanceLabel": "Relevância cultural",
+        "categoryLabel": "Categoria sugerida",
+        "mockSummary": "Os princípios de design de Ken Thompson e Dennis Ritchie para ferramentas composíveis e de propósito único. Um conceito fundamental para quem trabalha com sistemas de software.",
+        "mockRelevance": "Referência fundamental na cultura de engenharia de software, amplamente citada em discussões modernas de DevOps e plataformas.",
+        "mockCategory": "Tecnologia"
       }
     },
     "useCases": {

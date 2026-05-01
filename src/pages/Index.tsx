@@ -13,7 +13,7 @@ import { PlaylistCard } from "@/components/playlist/PlaylistCard";
 import { CategorySection } from "@/components/layout/CategorySection";
 import { CommunitySpotlightSection } from "@/components/layout/CommunitySpotlightSection";
 import { HowItWorksSection } from "@/components/layout/HowItWorksSection";
-import { FeaturesSection } from "@/components/layout/FeaturesSection";
+import { IntelligentSystemSection } from "@/components/layout/IntelligentSystemSection";
 import { UseCasesSection } from "@/components/layout/UseCasesSection";
 
 const Index = () => {
@@ -28,7 +28,7 @@ const Index = () => {
     <MainLayout>
       <HeroSection />
       <HowItWorksSection />
-      <FeaturesSection />
+      <IntelligentSystemSection />
       <UseCasesSection />
       <CategorySection />
 

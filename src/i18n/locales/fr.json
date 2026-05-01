@@ -91,33 +91,38 @@
         }
       }
     },
-    "features": {
-      "title": "Fonctionnalités clés",
-      "cards": {
-        "card1": {
-          "title": "Curation humaine",
-          "description": "Des sélections faites par des personnes avec contexte culturel."
+    "intelligence": {
+      "badge": "Propulsé par l'IA",
+      "title": "Intelligence intégrée",
+      "description": "Chaque vidéo soumise est automatiquement traitée par un pipeline IA qui l'enrichit avec des données sémantiques — avant d'atteindre la communauté.",
+      "features": {
+        "tags": {
+          "title": "Balisage sémantique",
+          "description": "L'IA analyse la vidéo et génère des tags thématiques précis — sans saisie manuelle."
         },
-        "card2": {
-          "title": "Playlists vivantes",
-          "description": "Des collections qui évoluent avec les contributions."
+        "summary": {
+          "title": "Résumés automatiques",
+          "description": "Les spectateurs reçoivent une description précise avant de décider de regarder."
         },
-        "card3": {
-          "title": "Classification intelligente",
-          "description": "Suggestions IA avec validation communautaire."
+        "relevance": {
+          "title": "Contexte culturel",
+          "description": "L'IA explique pourquoi la vidéo est importante, aidant les curateurs à rédiger des notes plus riches."
         },
-        "card4": {
-          "title": "Recherche sans bruit",
-          "description": "Trouvez l'essentiel sans surcharge de clickbait."
-        },
-        "card5": {
-          "title": "Préservation d'abord",
-          "description": "Sauvegardez les vidéos utiles avant qu'elles disparaissent."
-        },
-        "card6": {
-          "title": "Multilingue",
-          "description": "Partagez et découvrez des contenus en plusieurs langues."
+        "category": {
+          "title": "Catégorisation automatique",
+          "description": "La bonne catégorie est suggérée automatiquement, vérifiable avant publication."
         }
+      },
+      "preview": {
+        "label": "Enrichissement IA · exemple réel",
+        "titleLabel": "Titre optimisé",
+        "tagsLabel": "Tags sémantiques",
+        "summaryLabel": "Résumé",
+        "relevanceLabel": "Pertinence culturelle",
+        "categoryLabel": "Catégorie suggérée",
+        "mockSummary": "Les principes de conception de Ken Thompson et Dennis Ritchie pour des outils composables à usage unique. Un concept fondamental pour quiconque travaille avec des systèmes logiciels.",
+        "mockRelevance": "Référence fondamentale dans la culture de l'ingénierie logicielle, largement citée dans les discussions modernes sur le DevOps et les plateformes.",
+        "mockCategory": "Technologie"
       }
     },
     "useCases": {
