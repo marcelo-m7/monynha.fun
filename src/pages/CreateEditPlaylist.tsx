@@ -11,7 +11,7 @@ import { Switch } from '@/components/ui/switch';
 import { notify } from '@/shared/lib/notify';
 import { ArrowLeft, ListVideo, Loader2, Save, BookOpen, Code, Globe, Image, GraduationCap } from 'lucide-react';
 import { z } from 'zod';
-import { useTranslation } from 'react-i18next';
+import { useTranslation, Trans } from 'react-i18next';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Header } from '@/components/layout/Header';
@@ -247,7 +247,7 @@ export default function CreateEditPlaylist() {
                   aria-invalid={errors.description ? "true" : "false"}
                 />
                 <p className="text-xs text-muted-foreground text-right">
-                  {description.length}/500
+                  {(description ?? '').length}/500
                 </p>
                 {errors.description && (
                   <p role="alert" className="text-sm text-destructive">{t(errors.description.message as string)}</p>
@@ -314,10 +314,14 @@ export default function CreateEditPlaylist() {
                     <RadioGroupItem value="ordered" id="ordered" />
                     <Label htmlFor="ordered">{t('createEditPlaylist.form.learningPath')}</Label>
                   </div>
-                  <p 
-                    className="text-xs text-muted-foreground ml-6 -mt-1"
-                    dangerouslySetInnerHTML={{ __html: t('createEditPlaylist.form.learningPathHint') }}
-                  />
+                  <p className="text-xs text-muted-foreground ml-6 -mt-1">
+                    <Trans
+                      i18nKey="createEditPlaylist.form.learningPathHint"
+                      components={{
+                        facodiLink: <a href="https://facodi.pt" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline" />
+                      }}
+                    />
+                  </p>
                 </RadioGroup>
               </div>
 

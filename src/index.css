@@ -9,7 +9,58 @@
 
 @layer base {
   :root {
-    /* ── Digital Vanguard ── dark-only design system ─────────── */
+    /* ── Digital Vanguard ── light theme ─────────────────────── */
+    --background:         0 0% 97%;      /* #f8f8f8 */
+    --foreground:         0 0% 8%;       /* #141414 */
+
+    --card:               0 0% 100%;     /* #ffffff */
+    --card-foreground:    0 0% 8%;
+
+    --popover:            0 0% 100%;     /* #ffffff */
+    --popover-foreground: 0 0% 8%;
+
+    --primary:            64 100% 33%;   /* ~#7f8200 — dark lime */
+    --primary-foreground: 0 0% 100%;     /* white on dark lime */
+    --primary-hover:      64 100% 28%;
+
+    --secondary:          0 0% 92%;      /* #ebebeb */
+    --secondary-foreground: 0 0% 8%;
+
+    --muted:              0 0% 94%;      /* #f0f0f0 */
+    --muted-foreground:   0 0% 40%;      /* #666666 */
+
+    --accent:             64 100% 33%;   /* dark lime */
+    --accent-foreground:  0 0% 100%;
+
+    --destructive:        6 80% 42%;     /* #c43830 */
+    --destructive-foreground: 0 0% 100%;
+
+    --border:             0 0% 86%;      /* #dbdbdb */
+    --input:              0 0% 90%;      /* #e6e6e6 */
+    --ring:               64 100% 33%;
+
+    --radius: 0rem;
+
+    --category-tutorials: 210 80% 48%;
+    --category-recipes:   30 90% 48%;
+    --category-education: 150 70% 38%;
+    --category-memes:     280 80% 52%;
+    --category-music:     320 80% 48%;
+    --category-culture:   50 90% 43%;
+
+    /* Sidebar */
+    --sidebar-background:         0 0% 95%;
+    --sidebar-foreground:         0 0% 8%;
+    --sidebar-primary:            64 100% 33%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent:             0 0% 90%;
+    --sidebar-accent-foreground:  0 0% 8%;
+    --sidebar-border:             0 0% 86%;
+    --sidebar-ring:               64 100% 33%;
+  }
+
+  .dark {
+    /* ── Digital Vanguard ── dark theme ──────────────────────── */
     --background:         0 0% 7%;       /* #131313 */
     --foreground:         0 0% 89%;      /* #e2e2e2 */
 
@@ -37,57 +88,6 @@
 
     --border:             63 18% 24%;    /* #474832 */
     --input:              0 0% 21%;      /* #353535 */
-    --ring:               64 100% 46%;
-
-    --radius: 0rem;
-
-    --category-tutorials: 210 80% 60%;
-    --category-recipes:   30 90% 60%;
-    --category-education: 150 70% 50%;
-    --category-memes:     280 80% 65%;
-    --category-music:     320 80% 60%;
-    --category-culture:   50 90% 55%;
-
-    /* Sidebar */
-    --sidebar-background:         0 0% 7%;
-    --sidebar-foreground:         0 0% 89%;
-    --sidebar-primary:            64 100% 46%;
-    --sidebar-primary-foreground: 64 100% 6%;
-    --sidebar-accent:             0 0% 16%;
-    --sidebar-accent-foreground:  0 0% 89%;
-    --sidebar-border:             63 18% 24%;
-    --sidebar-ring:               64 100% 46%;
-  }
-
-  .dark {
-    /* Digital Vanguard — mirrors :root (dark is the only theme) */
-    --background:         0 0% 7%;
-    --foreground:         0 0% 89%;
-
-    --card:               0 0% 12%;
-    --card-foreground:    0 0% 89%;
-
-    --popover:            0 0% 6%;
-    --popover-foreground: 0 0% 89%;
-
-    --primary:            64 100% 46%;
-    --primary-foreground: 64 100% 6%;
-    --primary-hover:      64 100% 52%;
-
-    --secondary:          0 0% 78%;
-    --secondary-foreground: 0 0% 11%;
-
-    --muted:              0 0% 16%;
-    --muted-foreground:   60 10% 52%;
-
-    --accent:             64 100% 46%;
-    --accent-foreground:  64 100% 6%;
-
-    --destructive:        6 100% 84%;
-    --destructive-foreground: 354 100% 21%;
-
-    --border:             63 18% 24%;
-    --input:              0 0% 21%;
     --ring:               64 100% 46%;
 
     --radius: 0rem;

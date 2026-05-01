@@ -52,7 +52,7 @@ export const Header = () => {
         {/* Logo */}
         <Link to="/" className="flex items-center gap-2 group">
           <div className="relative flex h-9 w-9 items-center justify-center bg-primary text-primary-foreground transition-transform group-hover:scale-105">
-            <span className="text-lg font-bold">M</span>
+            <span className="text-sm font-bold tracking-tighter">O2</span>
           </div>
           <span className="hidden font-bold text-xl tracking-[0.2em] uppercase sm:inline-block">
             Tube<span className="text-primary">O2</span>
@@ -80,7 +80,7 @@ export const Header = () => {
             className="text-xs font-bold uppercase tracking-widest text-muted-foreground hover:text-foreground transition-colors"
             activeClassName="text-primary"
           >
-            {t('footer.community')}
+            {t('header.community')}
           </NavLink>
         </nav>
 
@@ -90,6 +90,7 @@ export const Header = () => {
             <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
             <Input
               type="search"
+              aria-label={t('header.searchPlaceholder')}
               placeholder={t('header.searchPlaceholder')}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
@@ -212,7 +213,7 @@ export const Header = () => {
 
           {/* Desktop Language Switcher */}
           <Select value={i18n.language} onValueChange={changeLanguage}>
-            <SelectTrigger className="w-[85px] h-9 bg-muted/50 border-0 focus:ring-primary/30 hidden sm:flex rounded-full">
+            <SelectTrigger aria-label={t('header.languageLabel')} className="w-[85px] h-9 bg-muted/50 border-0 focus:ring-primary/30 hidden sm:flex rounded-full">
               <Globe className="w-4 h-4 mr-1 text-muted-foreground" />
               <SelectValue />
             </SelectTrigger>
@@ -243,7 +244,7 @@ export const Header = () => {
                 <SheetTitle className="text-left">
                   <Link to="/" className="flex items-center gap-2" onClick={() => setIsSheetOpen(false)}>
                     <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-primary text-primary-foreground shadow-md">
-                      <span className="text-lg font-bold">M</span>
+                      <span className="text-sm font-bold tracking-tighter">O2</span>
                     </div>
                     <span className="font-bold text-xl tracking-tight">
                       Tube<span className="text-primary">O2</span>

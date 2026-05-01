@@ -34,7 +34,10 @@
     "notifications": "Notifications",
     "toggleMenu": "Toggle menu",
     "closeMenu": "Close menu",
-    "languageLabel": "Language"
+    "languageLabel": "Language",
+    "switchToDark": "Switch to dark mode",
+    "switchToLight": "Switch to light mode",
+    "community": "Community"
   },
   "footer": {
     "description": "A collective curation platform for YouTube videos. Preserving and discovering valuable content together.",
@@ -437,6 +440,7 @@
   },
   "rules": {
     "title": "Rules",
+    "subtitle": "Community Guidelines",
     "description": "Community guidelines and content policies."
   },
   "faq": {
@@ -656,7 +660,7 @@
       "isPublicHint": "Public playlists are visible to all users.",
       "playlistTypeLabel": "Playlist Type",
       "learningPath": "Learning Path",
-      "learningPathHint": "Videos are ordered and meant to be followed sequentially. FACODI fields will appear if selected. For more information, visit <a href=\"https://facodi.pt\" target=\"_blank\" rel=\"noopener noreferrer\" class=\"text-primary hover:underline\">FACODI.pt</a>.",
+      "learningPathHint": "Videos are ordered and meant to be followed sequentially. FACODI fields will appear if selected. For more information, visit <facodiLink>FACODI.pt</facodiLink>.",
       "collection": "Collection",
       "collectionHint": "Videos are a curated set, order is not strictly enforced.",
       "facodiFieldsTitle": "FACODI Course Details",

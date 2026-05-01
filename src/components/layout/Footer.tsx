@@ -13,7 +13,7 @@ export const Footer = () => {
           <div className="md:col-span-2 space-y-4">
             <Link to="/" className="flex items-center gap-2">
               <div className="flex h-9 w-9 items-center justify-center bg-primary text-primary-foreground">
-                <span className="text-lg font-bold">M</span>
+                <span className="text-sm font-bold tracking-tighter">O2</span>
               </div>
               <span className="font-bold text-xl tracking-[0.2em] uppercase">
                 Tube<span className="text-primary">O2</span>
@@ -49,7 +49,7 @@ export const Footer = () => {
         </div>
 
         {/* Bottom */}
-          <div className="flex flex-col md:flex-row items-center justify-between gap-4 pt-8 mt-8 border-t border-border">
+        <div className="flex flex-col md:flex-row items-center justify-between gap-4 pt-8 mt-8 border-t border-border">
           <p className="text-sm text-muted-foreground flex items-center gap-1">
             {t('footer.madeWithLove')} <Heart className="w-4 h-4 text-primary fill-primary inline-block" />{" "}
             <a 
@@ -62,10 +62,10 @@ export const Footer = () => {
             </a>
           </p>
           <div className="flex items-center gap-4">
-            <a href="https://open2.tech" target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-primary transition-colors">
+            <a href="https://open2.tech" target="_blank" rel="noopener noreferrer" aria-label="Open 2 Technology website" className="text-muted-foreground hover:text-primary transition-colors">
               <Globe className="w-5 h-5" />
             </a>
-            <a href="https://github.com/marcelo-m7/tube-o2" target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-primary transition-colors">
+            <a href="https://github.com/marcelo-m7/tube-o2" target="_blank" rel="noopener noreferrer" aria-label="GitHub repository" className="text-muted-foreground hover:text-primary transition-colors">
               <Github className="w-5 h-5" />
             </a>
           </div>

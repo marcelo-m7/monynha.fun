@@ -17,7 +17,7 @@ import { emailSchema } from '@/shared/lib/validation';
 // Define Zod schema for the contact form
 const contactFormSchema = z.object({
   name: z.string().min(1, 'contactPage.form.nameRequired'),
-  email: emailSchema.refine(() => true, { message: 'contactPage.form.emailInvalid' }),
+  email: emailSchema,
   subject: z.string().min(1, 'contactPage.form.subjectRequired'),
   message: z.string().min(1, 'contactPage.form.messageRequired').max(1000, 'contactPage.form.messageMaxLength'),
 });

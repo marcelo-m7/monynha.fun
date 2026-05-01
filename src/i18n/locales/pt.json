@@ -34,7 +34,10 @@
     "notifications": "Notificações",
     "toggleMenu": "Alternar menu",
     "closeMenu": "Fechar menu",
-    "languageLabel": "Idioma"
+    "languageLabel": "Idioma",
+    "switchToDark": "Mudar para modo escuro",
+    "switchToLight": "Mudar para modo claro",
+    "community": "Comunidade"
   },
   "footer": {
     "description": "Uma plataforma de curadoria coletiva de vídeos do YouTube. Preservando e descobrindo conteúdos valiosos juntos.",
@@ -317,6 +320,7 @@
   },
   "rules": {
     "title": "Regras",
+    "subtitle": "Diretrizes da Comunidade",
     "description": "Diretrizes da comunidade e políticas de conteúdo."
   },
   "faq": {
@@ -498,6 +502,15 @@
     "description": "Oops! Página não encontrada",
     "returnHome": "Voltar para Home"
   },
+  "favorites": {
+    "title": "Meus Favoritos",
+    "description": "Todos os vídeos que você salvou para assistir mais tarde.",
+    "loadingErrorTitle": "Erro ao carregar favoritos",
+    "loadingErrorDescription": "Não foi possível carregar seus vídeos favoritos. Por favor, tente novamente mais tarde.",
+    "noFavoritesTitle": "Nenhum vídeo favorito ainda.",
+    "noFavoritesDescription": "Comece a explorar e salve seus vídeos favoritos!",
+    "exploreVideos": "Explorar Vídeos"
+  },
   "community": {
     "title": "Comunidade",
     "description": "Conecte-se com outros curadores e entusiastas de vídeo.",
@@ -614,6 +627,61 @@
       "noCollaborators": "Nenhum colaborador ainda.",
       "roleEditor": "Editor",
       "roleViewer": "Visualizador"
+    }
+  },
+  "createEditPlaylist": {
+    "createTitle": "Criar Nova Playlist",
+    "createDescription": "Organize vídeos em trilhas de aprendizado ou coleções coerentes.",
+    "editTitle": "Editar Playlist",
+    "editDescription": "Atualize os detalhes da sua playlist.",
+    "loadErrorTitle": "Erro ao carregar playlist",
+    "loadErrorDescription": "Não foi possível carregar os detalhes da playlist. Por favor, tente novamente mais tarde.",
+    "backToPlaylists": "Voltar para Playlists",
+    "form": {
+      "nameLabel": "Nome da Playlist",
+      "namePlaceholder": "Nome da sua playlist",
+      "slugLabel": "Slug da Playlist",
+      "slugPlaceholder": "nome-da-sua-playlist",
+      "slugHint": "Um identificador único para a URL (somente letras minúsculas, números e hifens).",
+      "descriptionLabel": "Descrição",
+      "descriptionPlaceholder": "Uma breve descrição do que esta playlist cobre.",
+      "thumbnailUrlLabel": "URL da Miniatura (opcional)",
+      "thumbnailUrlPlaceholder": "https://exemplo.com/miniatura-playlist.jpg",
+      "thumbnailUrlHint": "Link direto para uma imagem personalizada da sua playlist. Se vazio, a miniatura do primeiro vídeo será usada.",
+      "courseCodeLabel": "Código do Curso (FACODI)",
+      "courseCodePlaceholder": "Ex: LESTI-ALG1",
+      "courseCodeHint": "O código do curso ao qual esta playlist pertence (opcional).",
+      "unitCodeLabel": "Código da Unidade (FACODI)",
+      "unitCodePlaceholder": "Ex: INTRO-ALGORITMOS",
+      "unitCodeHint": "O código da unidade dentro do curso (opcional).",
+      "languageLabel": "Idioma da Playlist",
+      "languagePlaceholder": "Selecione o idioma",
+      "isPublicLabel": "Tornar Pública",
+      "isPublicHint": "Playlists públicas são visíveis para todos os usuários.",
+      "playlistTypeLabel": "Tipo de Playlist",
+      "learningPath": "Trilha de Aprendizado",
+      "learningPathHint": "Os vídeos são ordenados e devem ser seguidos sequencialmente. Os campos FACODI aparecerão se selecionado. Para mais informações, visite <facodiLink>FACODI.pt</facodiLink>.",
+      "collection": "Coleção",
+      "collectionHint": "Os vídeos são um conjunto curado, a ordem não é estritamente obrigatória.",
+      "facodiFieldsTitle": "Detalhes do Curso FACODI",
+      "facodiFieldsDescription": "Estes campos são para playlists que fazem parte de um curso FACODI estruturado.",
+      "submittingButton": "Salvando...",
+      "saveButton": "Salvar Playlist",
+      "createButton": "Criar Playlist"
+    },
+    "error": {
+      "nameMinLength": "O nome da playlist deve ter pelo menos 3 caracteres",
+      "nameMaxLength": "O nome da playlist não pode exceder 100 caracteres",
+      "slugMinLength": "O slug deve ter pelo menos 3 caracteres",
+      "slugMaxLength": "O slug não pode exceder 100 caracteres",
+      "slugInvalidFormat": "O slug deve conter apenas letras minúsculas, números e hifens",
+      "descriptionMaxLength": "A descrição não pode exceder 500 caracteres",
+      "invalidThumbnailUrl": "URL de miniatura inválida",
+      "courseCodeMaxLength": "O código do curso não pode exceder 50 caracteres",
+      "unitCodeMaxLength": "O código da unidade não pode exceder 50 caracteres",
+      "languageRequired": "O idioma é obrigatório",
+      "notLoggedInTitle": "Erro",
+      "notLoggedInDescription": "Você precisa estar logado para criar ou editar playlists."
     }
   },
   "comments": {
