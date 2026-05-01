@@ -366,7 +366,7 @@ export default function Auth() {
                         setShowForgotPassword(true);
                         resetForgotPassword({ email: watch('email') });
                       }}
-                      className="text-sm text-muted-foreground hover:text-primary transition-colors"
+                       className="text-sm text-muted-foreground hover:opacity-75 transition-opacity underline"
                     >
                       {t('auth.forgotPasswordLink')}
                     </button>
