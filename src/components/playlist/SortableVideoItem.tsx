@@ -120,7 +120,7 @@ export function SortableVideoItem({
         className="flex-1 min-w-0"
       >
         <h3 className={cn(
-          "font-medium line-clamp-1 group-hover:text-primary transition-colors",
+          "font-medium line-clamp-1 group-hover:opacity-75 transition-opacity",
           isWatched && "text-muted-foreground"
         )}>
           {item.video?.title}

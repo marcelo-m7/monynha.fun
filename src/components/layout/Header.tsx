@@ -56,7 +56,7 @@ export const Header = () => {
             <span className="text-sm font-bold tracking-tighter">O2</span>
           </div>
           <span className="hidden font-bold text-lg tracking-[0.2em] uppercase sm:inline-block">
-            Tube<span className="text-primary">O2</span>
+            Tube<span className="text-primary font-black">O2</span>
           </span>
         </Link>
 
@@ -68,21 +68,21 @@ export const Header = () => {
           <NavLink
             to="/videos"
             className="px-3 py-1.5 text-sm font-semibold rounded-md text-muted-foreground hover:text-foreground hover:bg-muted/60 transition-all"
-            activeClassName="text-primary bg-primary/8 hover:bg-primary/10 hover:text-primary"
+            activeClassName="text-foreground bg-primary/12 hover:bg-primary/16"
           >
             {t('header.videos')}
           </NavLink>
           <NavLink
             to="/playlists"
             className="px-3 py-1.5 text-sm font-semibold rounded-md text-muted-foreground hover:text-foreground hover:bg-muted/60 transition-all"
-            activeClassName="text-primary bg-primary/8 hover:bg-primary/10 hover:text-primary"
+            activeClassName="text-foreground bg-primary/12 hover:bg-primary/16"
           >
             {t('header.playlists')}
           </NavLink>
           <NavLink
             to="/community"
             className="px-3 py-1.5 text-sm font-semibold rounded-md text-muted-foreground hover:text-foreground hover:bg-muted/60 transition-all"
-            activeClassName="text-primary bg-primary/8 hover:bg-primary/10 hover:text-primary"
+            activeClassName="text-foreground bg-primary/12 hover:bg-primary/16"
           >
             {t('header.community')}
           </NavLink>

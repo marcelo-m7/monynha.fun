@@ -22,7 +22,7 @@ export const MentionLink: React.FC<MentionLinkProps> = ({ username }) => {
   return (
     <HoverCard>
       <HoverCardTrigger asChild>
-        <Link to={`/profile/${username}`} className="text-primary font-semibold hover:underline">
+        <Link to={`/profile/${username}`} className="text-foreground font-semibold underline hover:opacity-75 transition-opacity">
           @{username}
         </Link>
       </HoverCardTrigger>
