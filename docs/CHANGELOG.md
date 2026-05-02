@@ -6,6 +6,43 @@
 
 ---
 
+## [v0.3.1] - May 2, 2026 ⚡ **Playlists UX + Build Performance**
+
+### 🎓 Course-Centric Playlists Discovery
+
+**What's New**:
+- Added aggregated course data integration on playlists page:
+  - `src/entities/course/course.types.ts`
+  - `src/entities/course/course.keys.ts`
+  - `src/entities/course/course.api.ts`
+  - `src/features/courses/queries/useCoursePlaylists.ts`
+- `src/pages/Playlists.tsx` now consumes `v_course_playlist_summary` and shows course summary cards.
+- Advanced filter UX improvements:
+  - removable active filter chips
+  - responsive filter layout
+  - URL-persisted filter state
+  - fallback options when course summary view is empty
+
+**Testing**:
+- `src/pages/Playlists.test.tsx` updated to mock course summary hook and avoid unhandled network warnings.
+- Typecheck and playlists tests passing after integration.
+
+### 📦 Build Performance Improvements
+
+**The Problem**: Initial bundle was too large (~570 kB minified for `index`) with chunk warning in production build.
+
+**The Solution**: Updated `vite.config.ts` manual chunk strategy by domain (`react-core`, `router`, `query`, `supabase`, `i18n`, `radix-ui`, `icons`, `zod`, `i18n-locales`).
+
+**Result**:
+- Main `index` chunk reduced from ~570 kB to ~75 kB.
+- Large chunk warning eliminated in build output.
+
+### 🖼️ Docs Refresh
+
+- README screenshots updated to current UI state (homepage, videos, playlists, comments, community/profile).
+
+---
+
 ## [v0.3.0] - March 12, 2026 🤖 **Phase 2: AI Integration**
 
 ### 🤖 OpenAI Integration for Video Enrichment
