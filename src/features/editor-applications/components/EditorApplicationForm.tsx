@@ -35,37 +35,31 @@ export function EditorApplicationForm({ sourcePath }: EditorApplicationFormProps
   });
 
   const onSubmit = async (values: EditorApplicationFormValues) => {
-    try {
-      const portfolioLinks = (values.portfolioLinks || '')
-        .split(/\r?\n/)
-        .map((item) => item.trim())
-        .filter(Boolean);
+    const portfolioLinks = (values.portfolioLinks || '')
+      .split(/\r?\n/)
+      .map((item) => item.trim())
+      .filter(Boolean);
 
-      const result = await submitMutation.mutateAsync({
-        applicantName: values.applicantName,
-        applicantEmail: values.applicantEmail,
-        motivation: values.motivation || undefined,
-        portfolioLinks,
-        consentPrivacy: values.consentPrivacy,
-        sourcePath,
+    const result = await submitMutation.mutateAsync({
+      applicantName: values.applicantName,
+      applicantEmail: values.applicantEmail,
+      motivation: values.motivation || undefined,
+      portfolioLinks,
+      consentPrivacy: values.consentPrivacy,
+      sourcePath,
+    });
+
+    if (result.edgeError) {
+      notify.warning(t('editorApplications.form.successTitle'), {
+        description: t('editorApplications.form.successWithEmailWarningDescription'),
       });
-
-      if (result.edgeError) {
-        notify.warning(t('editorApplications.form.successTitle'), {
-          description: t('editorApplications.form.successWithEmailWarningDescription'),
-        });
-      } else {
-        notify.success(t('editorApplications.form.successTitle'), {
-          description: t('editorApplications.form.successDescription'),
-        });
-      }
-
-      reset();
-    } catch {
-      notify.error(t('editorApplications.form.errorTitle'), {
-        description: t('editorApplications.form.errorDescription'),
+    } else {
+      notify.success(t('editorApplications.form.successTitle'), {
+        description: t('editorApplications.form.successDescription'),
       });
     }
+
+    reset();
   };
 
   return (

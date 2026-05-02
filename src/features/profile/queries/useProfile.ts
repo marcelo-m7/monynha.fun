@@ -6,7 +6,7 @@ import { profileKeys } from '@/entities/profile/profile.keys';
 import type { Profile } from '@/entities/profile/profile.types';
 
 export function useProfileById(userId: string | undefined) {
-  return useQuery<Profile, Error>({
+  return useQuery<Profile | null, Error>({
     queryKey: userId ? profileKeys.detail(userId) : profileKeys.detail(''),
     queryFn: async () => {
       if (!userId) throw new Error('User ID is required');
@@ -17,7 +17,7 @@ export function useProfileById(userId: string | undefined) {
 }
 
 export function useProfileByUsername(username: string | undefined) {
-  return useQuery<Profile, Error>({
+  return useQuery<Profile | null, Error>({
     queryKey: username ? profileKeys.byUsername(username) : profileKeys.byUsername(''),
     queryFn: async () => {
       if (!username) throw new Error('Username is required');

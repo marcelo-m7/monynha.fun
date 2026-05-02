@@ -17,7 +17,12 @@ export async function createEditorApplication(payload: EditorApplicationInsert) 
     .select()
     .single();
 
-  if (error) throw error;
+  if (error) {
+    if (error.code === 'PGRST205' || error.message.includes('editor_applications')) {
+      throw new Error('Editor applications schema is not available yet. Please contact support.');
+    }
+    throw error;
+  }
   return data as EditorApplication;
 }
 

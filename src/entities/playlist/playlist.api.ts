@@ -17,27 +17,35 @@ export interface ListPlaylistsParams {
 }
 
 export async function listPlaylists(params: ListPlaylistsParams = {}) {
-  let query = supabase
-    .from('playlists')
-    .select(
-      `
+  const buildQuery = (includeAuthor: boolean) => {
+    const baseQuery = includeAuthor
+      ? `
       *,
       author:profiles(id, username, display_name, avatar_url)
-    `,
-    )
-    .order('created_at', { ascending: false });
+    `
+      : '*';
 
-  if (params.authorId) {
-    query = query.eq('author_id', params.authorId);
-  }
+    let query = supabase
+      .from('playlists')
+      .select(baseQuery)
+      .order('created_at', { ascending: false });
 
-  if (params.isPublic !== undefined) {
-    query = query.eq('is_public', params.isPublic);
-  }
+    if (params.authorId) {
+      query = query.eq('author_id', params.authorId);
+    }
 
-  if (params.searchQuery) {
-    query = query.or(`name.ilike.%${params.searchQuery}%,description.ilike.%${params.searchQuery}%`);
-  }
+    if (params.isPublic !== undefined) {
+      query = query.eq('is_public', params.isPublic);
+    }
+
+    if (params.searchQuery) {
+      query = query.or(`name.ilike.%${params.searchQuery}%,description.ilike.%${params.searchQuery}%`);
+    }
+
+    return query;
+  };
+
+  let query = buildQuery(true);
 
   if (params.filter === 'my' && params.userId) {
     query = query.eq('author_id', params.userId);
@@ -65,7 +73,39 @@ export async function listPlaylists(params: ListPlaylistsParams = {}) {
     query = query.or(`author_id.eq.${params.userId},id.in.(${collabPlaylistIds.length > 0 ? collabPlaylistIds.join(',') : '00000000-0000-0000-0000-000000000000'})`);
   }
 
-  const { data, error } = await query;
+  let { data, error } = await query;
+
+  // Fallback for environments where nested profiles relation is not publicly readable.
+  if (error && (error.status === 401 || error.status === 403)) {
+    query = buildQuery(false);
+
+    if (params.filter === 'my' && params.userId) {
+      query = query.eq('author_id', params.userId);
+    } else if (params.filter === 'collaborating' && params.userId) {
+      const { data: collabData, error: collabError } = await supabase
+        .from('playlist_collaborators')
+        .select('playlist_id')
+        .eq('user_id', params.userId);
+
+      if (collabError) throw collabError;
+      const collabPlaylistIds = (collabData || []).map((c) => c.playlist_id);
+      query = query.in('id', collabPlaylistIds);
+    } else if (params.filter === 'editable' && params.userId) {
+      const { data: collabData, error: collabError } = await supabase
+        .from('playlist_collaborators')
+        .select('playlist_id')
+        .eq('user_id', params.userId)
+        .eq('role', 'editor');
+
+      if (collabError) throw collabError;
+      const collabPlaylistIds = (collabData || []).map((c) => c.playlist_id);
+      query = query.or(`author_id.eq.${params.userId},id.in.(${collabPlaylistIds.length > 0 ? collabPlaylistIds.join(',') : '00000000-0000-0000-0000-000000000000'})`);
+    }
+
+    const fallbackResult = await query;
+    data = fallbackResult.data;
+    error = fallbackResult.error;
+  }
 
   if (error) throw error;
 
@@ -73,7 +113,7 @@ export async function listPlaylists(params: ListPlaylistsParams = {}) {
 }
 
 export async function getPlaylistById(id: string) {
-  const { data, error } = await supabase
+  let { data, error } = await supabase
     .from('playlists')
     .select(
       `
@@ -83,6 +123,17 @@ export async function getPlaylistById(id: string) {
     )
     .eq('id', id)
     .single();
+
+  if (error && (error.status === 401 || error.status === 403)) {
+    const fallbackResult = await supabase
+      .from('playlists')
+      .select('*')
+      .eq('id', id)
+      .single();
+
+    data = fallbackResult.data;
+    error = fallbackResult.error;
+  }
 
   if (error) throw error;
 
