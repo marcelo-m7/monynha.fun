@@ -189,10 +189,16 @@ export const Header = () => {
                     <span>{t('header.accountSettings')}</span>
                   </DropdownMenuItem>
                   {(profile.role === 'editor' || profile.role === 'admin') && (
-                    <DropdownMenuItem onClick={() => navigate('/editorial')} className="rounded-xl py-2">
-                      <ShieldCheck className="mr-2 h-4 w-4" />
-                      <span>{t('header.editorialPortal')}</span>
-                    </DropdownMenuItem>
+                    <>
+                      <DropdownMenuItem onClick={() => navigate('/editorial')} className="rounded-xl py-2">
+                        <ShieldCheck className="mr-2 h-4 w-4" />
+                        <span>{t('header.editorialPortal')}</span>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => navigate('/editor/applications')} className="rounded-xl py-2">
+                        <ShieldCheck className="mr-2 h-4 w-4" />
+                        <span>{t('editorApplications.adminPage.title')}</span>
+                      </DropdownMenuItem>
+                    </>
                   )}
                   <DropdownMenuSeparator className="my-1" />
                   <DropdownMenuItem onClick={handleSignOut} className="rounded-xl py-2 text-destructive focus:text-destructive focus:bg-destructive/5">

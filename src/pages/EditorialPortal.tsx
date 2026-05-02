@@ -90,6 +90,9 @@ const EditorialPortal = () => {
                 className="pl-10"
               />
             </div>
+            <Button variant="outline" onClick={() => navigate('/editor/applications')}>
+              {t('editorApplications.adminPage.title')}
+            </Button>
             <Button onClick={() => navigate('/playlists/new')} className="gap-2">
               <Plus className="w-4 h-4" />
               {t('playlists.createPlaylist')}

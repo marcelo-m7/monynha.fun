@@ -501,4 +501,67 @@
       "notLoggedInDescription": "Debes iniciar sesión para crear o editar listas de reproducción."
     }
   }
+  ,
+  "editorApplications": {
+    "cta": {
+      "badge": "Équipe éditoriale",
+      "title": "Candidatez pour devenir éditrice",
+      "description": "Aidez à curer des playlists de qualité et à organiser le contenu de la communauté.",
+      "button": "Je candidate"
+    },
+    "status": {
+      "pending": "En attente",
+      "under_review": "En analyse",
+      "approved": "Approuvée",
+      "rejected": "Rejetée"
+    },
+    "applyPage": {
+      "badge": "Appel ouvert",
+      "title": "Candidature éditoriale",
+      "description": "Parlez-nous de votre expérience et de votre motivation pour la curation sur Tube O2."
+    },
+    "form": {
+      "fields": {
+        "nameLabel": "Nom complet",
+        "namePlaceholder": "Votre nom complet",
+        "emailLabel": "Email",
+        "emailPlaceholder": "vous@exemple.com",
+        "motivationLabel": "Motivation",
+        "motivationPlaceholder": "Partagez votre motivation et votre expérience éditoriale (optionnel)",
+        "portfolioLinksLabel": "Liens de portfolio",
+        "portfolioLinksPlaceholder": "Un lien par ligne (optionnel)",
+        "consentLabel": "J'accepte la politique de confidentialité et j'autorise le traitement de mes données pour cette candidature."
+      },
+      "submitButton": "Envoyer la candidature",
+      "successTitle": "Candidature reçue",
+      "successDescription": "Merci. Nous avons reçu votre candidature et envoyé un email de confirmation.",
+      "successWithEmailWarningDescription": "Votre candidature est enregistrée, mais l'email de confirmation n'a pas pu être envoyé pour le moment.",
+      "errorTitle": "Erreur d'envoi",
+      "errorDescription": "Impossible d'envoyer votre candidature. Veuillez réessayer.",
+      "errors": {
+        "nameRequired": "Le nom est obligatoire",
+        "nameTooLong": "Le nom ne peut pas dépasser 120 caractères",
+        "motivationTooLong": "La motivation ne peut pas dépasser 2000 caractères",
+        "portfolioTooLong": "Les liens de portfolio ne peuvent pas dépasser 2000 caractères",
+        "consentRequired": "Vous devez accepter le consentement de confidentialité"
+      }
+    },
+    "adminPage": {
+      "title": "Candidatures éditoriales",
+      "description": "Examinez les candidatures reçues et mettez à jour leur statut.",
+      "searchPlaceholder": "Rechercher par nom ou email",
+      "statusFilterPlaceholder": "Filtrer par statut",
+      "statusFilterAll": "Tous les statuts",
+      "appliedAt": "Candidature le",
+      "loadError": "Impossible de charger les candidatures.",
+      "empty": "Aucune candidature trouvée pour les filtres actuels.",
+      "statusUpdatedTitle": "Statut mis à jour",
+      "statusUpdatedDescription": "Candidature déplacée vers {{status}}.",
+      "statusUpdateErrorTitle": "Impossible de mettre à jour le statut",
+      "statusUpdateErrorDescription": "Veuillez réessayer.",
+      "noAccessTitle": "Zone restreinte",
+      "noAccessDescription": "Seules les éditrices et administratrices peuvent accéder à cette page.",
+      "backToEditorial": "Retour au portail éditorial"
+    }
+  }
 }

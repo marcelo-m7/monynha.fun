@@ -176,15 +176,26 @@ export const MobileNav: React.FC<MobileNavProps> = ({
                   <span className="text-sm">{t('header.accountSettings')}</span>
                 </NavLink>
                 {(profile.role === 'editor' || profile.role === 'admin') && (
-                  <NavLink
-                    to="/editorial"
-                    className="flex items-center gap-3 px-4 py-3 text-muted-foreground hover:text-foreground hover:bg-muted/50 rounded-2xl transition-all"
-                    activeClassName="bg-primary/8 text-foreground font-medium"
-                    onClick={onClose}
-                  >
-                    <ShieldCheck className="h-5 w-5" />
-                    <span className="text-sm">{t('header.editorialPortal')}</span>
-                  </NavLink>
+                  <>
+                    <NavLink
+                      to="/editorial"
+                      className="flex items-center gap-3 px-4 py-3 text-muted-foreground hover:text-foreground hover:bg-muted/50 rounded-2xl transition-all"
+                      activeClassName="bg-primary/8 text-foreground font-medium"
+                      onClick={onClose}
+                    >
+                      <ShieldCheck className="h-5 w-5" />
+                      <span className="text-sm">{t('header.editorialPortal')}</span>
+                    </NavLink>
+                    <NavLink
+                      to="/editor/applications"
+                      className="flex items-center gap-3 px-4 py-3 text-muted-foreground hover:text-foreground hover:bg-muted/50 rounded-2xl transition-all"
+                      activeClassName="bg-primary/8 text-foreground font-medium"
+                      onClick={onClose}
+                    >
+                      <ShieldCheck className="h-5 w-5" />
+                      <span className="text-sm">{t('editorApplications.adminPage.title')}</span>
+                    </NavLink>
+                  </>
                 )}
               </div>
 
