@@ -1,6 +1,6 @@
 # Tube O2 – Cultural Video Curation Platform 🎬
 
-![Tube O2 Hero](./docs/placeholder.png)
+![Tube O2 Hero](./docs/readme-homepage.png)
 
 > *A passion project by **Marcelo Santos**, crafted with care to bring together the best of cultural video content that gets lost in the algorithmic noise. Now with mention autocomplete because Marcelo got tired of copying usernames like it's 2005.*
 
@@ -26,22 +26,24 @@ We're creating a space where **human taste matters**. A place where curators (li
 ## 📸 See It In Action
 
 ### Homepage – Where Magic Happens ✨
-![Homepage Screenshot](./docs/homepage.png)
+![Homepage Screenshot](./docs/readme-homepage.png)
 
 Your first impression matters, né? Clean hero section, easy access to what's hot right now, and categories that actually make sense. No fluff.
 
 ### Discover Videos 🔍
-![Video Discovery](./docs/videos.png)
+![Video Discovery](./docs/readme-videos.png)
 
 Browse through categories that real people organized. Search, filter, read about *why* someone added a video. Simple as that.
 
 ### Create Playlists Like You Own The Place 📋
-![Playlists](./docs/placeholder.png)
+![Playlists](./docs/readme-playlists.png)
 
 Build learning paths. Curate collections. Share with friends or the whole community. Your taste, your rules. You can even invite collaborators to help build something together.
 
+**✨ NEW**: Course-focused filtering with active removable chips, semester/language/type/video-range filters, URL-persisted state, and summary cards per course for quick drill-in.
+
 ### Comments & Community Interaction 💬
-![Comments Preview](./docs/preview.png)
+![Comments Preview](./docs/readme-comments.png)
 
 Every video deserves thoughtful discussion. Leave comments, reply to curators, share why a video matters to you. Build real conversations around content that resonates.
 
@@ -52,7 +54,7 @@ Every video deserves thoughtful discussion. Leave comments, reply to curators, s
 No algorithms deciding what's visible – comments stay honest and community-driven. Tag people with `@username` and actually see their face pop up. Because UX matters, viu?
 
 ### Your Profile 👤
-![User Profile](./docs/placeholder.png)
+![User Profile](./docs/readme-profile.png)
 
 Show the world what you're passionate about. Add a bio, customize your presence. People will see the videos *you* curated. Be proud of that.
 
@@ -127,10 +129,10 @@ Tag users in comments with autocomplete that actually works. Type `@` and boom �
 
 ```bash
 # Clone the repo
-git clone https://github.com/marcelo-m7/tube-o2
+git clone https://github.com/marcelo-m7/monynha.fun
 
 # Go into the folder
-cd tube-o2
+cd monynha.fun
 
 # Install dependencies
 pnpm install

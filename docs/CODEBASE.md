@@ -6,6 +6,26 @@
 
 ---
 
+## Recent Changes & Improvements (May 2, 2026 - Playlists + Performance)
+
+### Playlists Page Evolution
+- Added course aggregation support via `v_course_playlist_summary`.
+- New course entity layer:
+  - `src/entities/course/course.types.ts`
+  - `src/entities/course/course.keys.ts`
+  - `src/entities/course/course.api.ts`
+- New feature hook module: `src/features/courses/queries/useCoursePlaylists.ts`.
+- `src/pages/Playlists.tsx` now exposes:
+  - summary cards per course,
+  - advanced filters with removable chips,
+  - URL-synced filtering state for shareable filtered views.
+
+### Build Strategy Update
+- `vite.config.ts` received a domain-based `manualChunks` strategy to reduce initial JS payload.
+- This split improved entry chunk size and removed previous large-chunk warning during production build.
+
+---
+
 ## Recent Changes & Improvements (February 1, 2026 - Feature Drop Edition) 🎉
 
 ### 🎤 NEW: Mention Autocomplete in Comments
