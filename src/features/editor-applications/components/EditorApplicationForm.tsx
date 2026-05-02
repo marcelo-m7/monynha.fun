@@ -40,14 +40,21 @@ export function EditorApplicationForm({ sourcePath }: EditorApplicationFormProps
       .map((item) => item.trim())
       .filter(Boolean);
 
-    const result = await submitMutation.mutateAsync({
-      applicantName: values.applicantName,
-      applicantEmail: values.applicantEmail,
-      motivation: values.motivation || undefined,
-      portfolioLinks,
-      consentPrivacy: values.consentPrivacy,
-      sourcePath,
-    });
+    let result: Awaited<ReturnType<typeof submitMutation.mutateAsync>> | null = null;
+
+    try {
+      result = await submitMutation.mutateAsync({
+        applicantName: values.applicantName,
+        applicantEmail: values.applicantEmail,
+        motivation: values.motivation || undefined,
+        portfolioLinks,
+        consentPrivacy: values.consentPrivacy,
+        sourcePath,
+      });
+    } catch {
+      // Error notification is handled by the mutation's onError callback.
+      return;
+    }
 
     if (result.edgeError) {
       notify.warning(t('editorApplications.form.successTitle'), {
