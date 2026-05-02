@@ -542,7 +542,16 @@
     "filter": {
       "all": "Todas as Playlists",
       "myPlaylists": "Minhas Playlists",
-      "collaborating": "Colaborando"
+      "collaborating": "Colaborando",
+      "allCourseCodes": "Todos os cursos",
+      "allSemesters": "Todos os semestres",
+      "allLanguages": "Todos os idiomas",
+      "allTypes": "Todos os tipos",
+      "allVideoRanges": "Todas as quantidades de vídeos",
+      "withVideos": "Com vídeos",
+      "emptyVideos": "Playlists vazias",
+      "videos1to9": "1 a 9 vídeos",
+      "videos10plus": "10+ vídeos"
     },
     "import": {
       "button": "Importar do YouTube",
@@ -787,5 +796,68 @@
     "noPlaylistsTitle": "Nenhuma playlist criada ainda",
     "noPlaylistsDescription": "As playlists deste perfil aparecerão aqui.",
     "createFirstPlaylist": "Criar primeira playlist"
+  }
+  ,
+  "editorApplications": {
+    "cta": {
+      "badge": "Equipe editorial",
+      "title": "Candidate-se para ser editora",
+      "description": "Ajude a curar playlists de qualidade e manter o conteúdo da comunidade bem organizado.",
+      "button": "Quero me candidatar"
+    },
+    "status": {
+      "pending": "Pendente",
+      "under_review": "Em análise",
+      "approved": "Aprovada",
+      "rejected": "Rejeitada"
+    },
+    "applyPage": {
+      "badge": "Chamada aberta",
+      "title": "Candidatura editorial",
+      "description": "Conte um pouco da sua experiência e por que quer ajudar na curadoria do Tube O2."
+    },
+    "form": {
+      "fields": {
+        "nameLabel": "Nome completo",
+        "namePlaceholder": "Seu nome completo",
+        "emailLabel": "Email",
+        "emailPlaceholder": "voce@exemplo.com",
+        "motivationLabel": "Motivação",
+        "motivationPlaceholder": "Compartilhe sua motivação e experiência editorial (opcional)",
+        "portfolioLinksLabel": "Links de portfólio",
+        "portfolioLinksPlaceholder": "Um link por linha (opcional)",
+        "consentLabel": "Concordo com a política de privacidade e autorizo o tratamento dos meus dados para esta candidatura."
+      },
+      "submitButton": "Enviar candidatura",
+      "successTitle": "Candidatura recebida",
+      "successDescription": "Obrigada! Recebemos sua candidatura e enviamos um email de confirmação.",
+      "successWithEmailWarningDescription": "Sua candidatura foi salva, mas não foi possível enviar o email de confirmação agora.",
+      "errorTitle": "Erro no envio",
+      "errorDescription": "Não foi possível enviar sua candidatura. Tente novamente.",
+      "errors": {
+        "nameRequired": "O nome é obrigatório",
+        "nameTooLong": "O nome não pode exceder 120 caracteres",
+        "motivationTooLong": "A motivação não pode exceder 2000 caracteres",
+        "portfolioTooLong": "Os links de portfólio não podem exceder 2000 caracteres",
+        "consentRequired": "Você precisa aceitar o consentimento de privacidade"
+      }
+    },
+    "adminPage": {
+      "title": "Candidaturas editoriais",
+      "description": "Revise as candidaturas recebidas e atualize o status.",
+      "searchPlaceholder": "Buscar por nome ou email",
+      "statusFilterPlaceholder": "Filtrar por status",
+      "statusFilterAll": "Todos os status",
+      "appliedAt": "Candidatura em",
+      "loadError": "Não foi possível carregar as candidaturas.",
+      "empty": "Nenhuma candidatura encontrada para os filtros atuais.",
+      "statusUpdatedTitle": "Status atualizado",
+      "statusUpdatedDescription": "Candidatura movida para {{status}}.",
+      "statusUpdateErrorTitle": "Não foi possível atualizar o status",
+      "statusUpdateErrorDescription": "Tente novamente.",
+      "noAccessTitle": "Área restrita",
+      "noAccessDescription": "Apenas editoras e administradoras podem acessar esta página.",
+      "backToEditorial": "Voltar para o portal editorial"
+    }
   }
 }
