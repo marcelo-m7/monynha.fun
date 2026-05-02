@@ -30,7 +30,8 @@
     "home": "Accueil",
     "toggleMenu": "Basculer le menu",
     "closeMenu": "Fermer le menu",
-    "languageLabel": "Langue"
+    "languageLabel": "Langue",
+    "editorialPortal": "Portail Éditorial"
   },
   "footer": {
     "description": "Une plateforme de curation collective de vidéos YouTube. Préserver et découvrir du contenu précieux ensemble.",
@@ -383,6 +384,20 @@
         "noVideosFoundInPlaylist": "No se encontraron videos en la lista de reproducción de YouTube. Se creará una lista de reproducción vacía."
       },
       "apiLimitationInfo": "Monynha Fun utiliza un servicio de backend para obtener videos de listas de reproducción de YouTube, pero depende de la API de datos de YouTube, que tiene cuotas y puede que no siempre devuelva todos los videos para listas de reproducción muy grandes. Para obtener resultados óptimos, asegúrate de que la lista de reproducción sea pública."
+    }
+  },
+  "editorialPortal": {
+    "title": "Portail Éditorial FACODI",
+    "description": "Gérez les playlists FACODI avec un accès global éditeur.",
+    "searchPlaceholder": "Rechercher des playlists FACODI...",
+    "noAccessTitle": "Zone restreinte",
+    "noAccessDescription": "Seuls les utilisateurs avec le rôle éditeur peuvent accéder à ce portail.",
+    "emptyTitle": "Aucune playlist FACODI trouvée.",
+    "emptyDescription": "Créez ou mettez à jour des playlists avec un code de cours ou d'unité pour les gérer ici.",
+    "stats": {
+      "editableTotal": "Playlists modifiables",
+      "facodiTotal": "Playlists FACODI",
+      "withUnitCode": "Avec code d'unité"
     }
   },
   "playlistDetails": {

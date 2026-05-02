@@ -31,7 +31,8 @@
     "home": "Início",
     "toggleMenu": "Alternar menu",
     "closeMenu": "Fechar menu",
-    "languageLabel": "Idioma"
+    "languageLabel": "Idioma",
+    "editorialPortal": "Portal Editorial"
   },
   "footer": {
     "description": "Uma plataforma de curadoria coletiva de vídeos do YouTube. Preservando e descobrindo conteúdos valiosos juntos.",
@@ -404,6 +405,20 @@
         "noVideosFoundInPlaylist": "Nenhum vídeo encontrado na playlist do YouTube. Uma playlist vazia será criada."
       },
       "apiLimitationInfo": "O Tube O2 usa um serviço de backend para buscar vídeos de playlists do YouTube, mas depende da API de Dados do YouTube, que possui cotas e pode nem sempre retornar todos os vídeos para playlists muito grandes. Para resultados ótimos, certifique-se de que a playlist seja pública."
+    }
+  },
+  "editorialPortal": {
+    "title": "Portal Editorial FACODI",
+    "description": "Gerencie playlists FACODI com acesso global de editor.",
+    "searchPlaceholder": "Buscar playlists FACODI...",
+    "noAccessTitle": "Área restrita",
+    "noAccessDescription": "Apenas usuários com função de editor podem acessar este portal.",
+    "emptyTitle": "Nenhuma playlist FACODI encontrada.",
+    "emptyDescription": "Crie ou atualize playlists com código de curso ou unidade para gerenciá-las aqui.",
+    "stats": {
+      "editableTotal": "Playlists editáveis",
+      "facodiTotal": "Playlists FACODI",
+      "withUnitCode": "Com código de unidade"
     }
   },
   "playlistDetails": {

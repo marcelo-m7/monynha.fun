@@ -37,7 +37,8 @@
     "languageLabel": "Idioma",
     "switchToDark": "Mudar para modo escuro",
     "switchToLight": "Mudar para modo claro",
-    "community": "Comunidade"
+    "community": "Comunidade",
+    "editorialPortal": "Portal Editorial"
   },
   "footer": {
     "description": "Uma plataforma de curadoria coletiva de vídeos do YouTube. Preservando e descobrindo conteúdos valiosos juntos.",
@@ -604,6 +605,20 @@
       "collaboratorRoleUpdateError": "Falha ao atualizar função do colaborador",
       "collaboratorRemoved": "Colaborador removido!",
       "collaboratorRemoveError": "Falha ao remover colaborador"
+    }
+  },
+  "editorialPortal": {
+    "title": "Portal Editorial FACODI",
+    "description": "Gerencie playlists FACODI com acesso global de editor.",
+    "searchPlaceholder": "Buscar playlists FACODI...",
+    "noAccessTitle": "Área restrita",
+    "noAccessDescription": "Apenas usuários com função de editor podem acessar este portal.",
+    "emptyTitle": "Nenhuma playlist FACODI encontrada.",
+    "emptyDescription": "Crie ou atualize playlists com código de curso ou unidade para gerenciá-las aqui.",
+    "stats": {
+      "editableTotal": "Playlists editáveis",
+      "facodiTotal": "Playlists FACODI",
+      "withUnitCode": "Com código de unidade"
     }
   },
   "playlistDetails": {
