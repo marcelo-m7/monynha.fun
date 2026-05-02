@@ -4,7 +4,7 @@ import { usePlaylists } from '@/features/playlists/queries/usePlaylists';
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { Plus, ListVideo, Search, Filter, Youtube, X } from 'lucide-react';
+import { Plus, ListVideo, Search, Filter, Youtube, X, BookOpen, Layers3, FileVideo } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Input } from '@/components/ui/input';
 import { useEffect, useMemo, useState } from 'react';
@@ -12,6 +12,9 @@ import { PlaylistCard } from '@/components/playlist/PlaylistCard';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useAuth } from '@/features/auth/useAuth';
 import { PlaylistImportDialog } from '@/components/playlist/PlaylistImportDialog';
+import { useCoursePlaylistSummary } from '@/features/courses/queries/useCoursePlaylists';
+import { Card, CardContent } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
 
 function extractSemesterLabel(name: string): string | null {
   const match = name.match(/(\d+[ºo]\s*Ano\s*\d+[ºo]\s*Semestre)/i);
@@ -49,6 +52,7 @@ const Playlists = () => {
     filter: filter,
     enabled: filter !== 'my' || !!user, // Only enable 'my' filter if user is logged in
   });
+  const { data: courseSummary, isLoading: isCourseSummaryLoading } = useCoursePlaylistSummary();
 
   useEffect(() => {
     const newSearchParams = new URLSearchParams();
@@ -75,11 +79,19 @@ const Playlists = () => {
 
   const courseCodeOptions = useMemo(() => {
     const values = new Set<string>();
-    (playlists || []).forEach((playlist) => {
-      if (playlist.course_code) values.add(playlist.course_code);
+    (courseSummary || []).forEach((course) => {
+      values.add(course.course_code);
     });
+
+    // Fallback for local/dev states when summary view has no rows.
+    if (values.size === 0) {
+      (playlists || []).forEach((playlist) => {
+        if (playlist.course_code) values.add(playlist.course_code);
+      });
+    }
+
     return Array.from(values).sort((a, b) => a.localeCompare(b));
-  }, [playlists]);
+  }, [courseSummary, playlists]);
 
   const semesterOptions = useMemo(() => {
     const values = new Set<string>();
@@ -121,6 +133,10 @@ const Playlists = () => {
       return true;
     });
   }, [playlists, selectedCourseCode, selectedSemester, selectedLanguage, selectedPlaylistType, selectedVideoRange]);
+
+  const courseSummaryCards = useMemo(() => {
+    return (courseSummary || []).filter((course) => course.playlists_total > 0);
+  }, [courseSummary]);
 
   const hasAdvancedFilters =
     !!selectedCourseCode ||
@@ -403,6 +419,64 @@ const Playlists = () => {
             </div>
           </div>
         </div>
+
+        {!isCourseSummaryLoading && courseSummaryCards.length > 0 && (
+          <div className="mb-8 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+            {courseSummaryCards.map((course) => {
+              const isActive = selectedCourseCode === course.course_code;
+
+              return (
+                <Card
+                  key={course.course_code}
+                  className={isActive ? 'border-primary ring-1 ring-primary/30' : ''}
+                >
+                  <CardContent className="p-4 space-y-3">
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="min-w-0">
+                        <p className="text-sm font-semibold truncate">{course.course_name}</p>
+                        <p className="text-xs text-muted-foreground truncate">{course.course_code}</p>
+                      </div>
+                      <Badge variant="outline">{course.playlists_total}</Badge>
+                    </div>
+
+                    <div className="grid grid-cols-3 gap-2 text-xs">
+                      <div className="rounded-md bg-muted/50 px-2 py-1.5">
+                        <div className="flex items-center gap-1 text-muted-foreground">
+                          <BookOpen className="h-3.5 w-3.5" />
+                          <span>{t('playlists.learningPath')}</span>
+                        </div>
+                        <p className="text-sm font-semibold mt-1">{course.learning_paths_total}</p>
+                      </div>
+                      <div className="rounded-md bg-muted/50 px-2 py-1.5">
+                        <div className="flex items-center gap-1 text-muted-foreground">
+                          <Layers3 className="h-3.5 w-3.5" />
+                          <span>{t('playlists.collection')}</span>
+                        </div>
+                        <p className="text-sm font-semibold mt-1">{course.collections_total}</p>
+                      </div>
+                      <div className="rounded-md bg-muted/50 px-2 py-1.5">
+                        <div className="flex items-center gap-1 text-muted-foreground">
+                          <FileVideo className="h-3.5 w-3.5" />
+                          <span>{t('header.videos')}</span>
+                        </div>
+                        <p className="text-sm font-semibold mt-1">{course.videos_total}</p>
+                      </div>
+                    </div>
+
+                    <Button
+                      type="button"
+                      variant={isActive ? 'default' : 'outline'}
+                      className="w-full"
+                      onClick={() => setSelectedCourseCode(isActive ? '' : course.course_code)}
+                    >
+                      {isActive ? t('common.clear') : course.course_code}
+                    </Button>
+                  </CardContent>
+                </Card>
+              );
+            })}
+          </div>
+        )}
 
         {filteredPlaylists.length > 0 ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
