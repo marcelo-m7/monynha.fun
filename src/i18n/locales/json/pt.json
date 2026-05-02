@@ -31,7 +31,8 @@
     "home": "Início",
     "toggleMenu": "Alternar menu",
     "closeMenu": "Fechar menu",
-    "languageLabel": "Idioma"
+    "languageLabel": "Idioma",
+    "editorialPortal": "Portal Editorial"
   },
   "footer": {
     "description": "Uma plataforma de curadoria coletiva de vídeos do YouTube. Preservando e descobrindo conteúdos valiosos juntos.",
@@ -406,6 +407,20 @@
       "apiLimitationInfo": "O Tube O2 usa um serviço de backend para buscar vídeos de playlists do YouTube, mas depende da API de Dados do YouTube, que possui cotas e pode nem sempre retornar todos os vídeos para playlists muito grandes. Para resultados ótimos, certifique-se de que a playlist seja pública."
     }
   },
+  "editorialPortal": {
+    "title": "Portal Editorial FACODI",
+    "description": "Gerencie playlists FACODI com acesso global de editor.",
+    "searchPlaceholder": "Buscar playlists FACODI...",
+    "noAccessTitle": "Área restrita",
+    "noAccessDescription": "Apenas usuários com função de editor podem acessar este portal.",
+    "emptyTitle": "Nenhuma playlist FACODI encontrada.",
+    "emptyDescription": "Crie ou atualize playlists com código de curso ou unidade para gerenciá-las aqui.",
+    "stats": {
+      "editableTotal": "Playlists editáveis",
+      "facodiTotal": "Playlists FACODI",
+      "withUnitCode": "Com código de unidade"
+    }
+  },
   "playlistDetails": {
     "notFoundTitle": "Playlist não encontrada",
     "notFoundDescription": "A playlist que você está procurando pode não existir ou ter sido removida.",
@@ -450,6 +465,69 @@
       "noCollaborators": "Nenhum colaborador ainda.",
       "roleEditor": "Editor",
       "roleViewer": "Visualizador"
+    }
+  }
+  ,
+  "editorApplications": {
+    "cta": {
+      "badge": "Equipe editorial",
+      "title": "Candidate-se para ser editora",
+      "description": "Ajude a curar playlists de qualidade e manter o conteúdo da comunidade bem organizado.",
+      "button": "Quero me candidatar"
+    },
+    "status": {
+      "pending": "Pendente",
+      "under_review": "Em análise",
+      "approved": "Aprovada",
+      "rejected": "Rejeitada"
+    },
+    "applyPage": {
+      "badge": "Chamada aberta",
+      "title": "Candidatura editorial",
+      "description": "Conte um pouco da sua experiência e por que quer ajudar na curadoria do Tube O2."
+    },
+    "form": {
+      "fields": {
+        "nameLabel": "Nome completo",
+        "namePlaceholder": "Seu nome completo",
+        "emailLabel": "Email",
+        "emailPlaceholder": "voce@exemplo.com",
+        "motivationLabel": "Motivação",
+        "motivationPlaceholder": "Compartilhe sua motivação e experiência editorial (opcional)",
+        "portfolioLinksLabel": "Links de portfólio",
+        "portfolioLinksPlaceholder": "Um link por linha (opcional)",
+        "consentLabel": "Concordo com a política de privacidade e autorizo o tratamento dos meus dados para esta candidatura."
+      },
+      "submitButton": "Enviar candidatura",
+      "successTitle": "Candidatura recebida",
+      "successDescription": "Obrigada! Recebemos sua candidatura e enviamos um email de confirmação.",
+      "successWithEmailWarningDescription": "Sua candidatura foi salva, mas não foi possível enviar o email de confirmação agora.",
+      "errorTitle": "Erro no envio",
+      "errorDescription": "Não foi possível enviar sua candidatura. Tente novamente.",
+      "errors": {
+        "nameRequired": "O nome é obrigatório",
+        "nameTooLong": "O nome não pode exceder 120 caracteres",
+        "motivationTooLong": "A motivação não pode exceder 2000 caracteres",
+        "portfolioTooLong": "Os links de portfólio não podem exceder 2000 caracteres",
+        "consentRequired": "Você precisa aceitar o consentimento de privacidade"
+      }
+    },
+    "adminPage": {
+      "title": "Candidaturas editoriais",
+      "description": "Revise as candidaturas recebidas e atualize o status.",
+      "searchPlaceholder": "Buscar por nome ou email",
+      "statusFilterPlaceholder": "Filtrar por status",
+      "statusFilterAll": "Todos os status",
+      "appliedAt": "Candidatura em",
+      "loadError": "Não foi possível carregar as candidaturas.",
+      "empty": "Nenhuma candidatura encontrada para os filtros atuais.",
+      "statusUpdatedTitle": "Status atualizado",
+      "statusUpdatedDescription": "Candidatura movida para {{status}}.",
+      "statusUpdateErrorTitle": "Não foi possível atualizar o status",
+      "statusUpdateErrorDescription": "Tente novamente.",
+      "noAccessTitle": "Área restrita",
+      "noAccessDescription": "Apenas editoras e administradoras podem acessar esta página.",
+      "backToEditorial": "Voltar para o portal editorial"
     }
   }
 }

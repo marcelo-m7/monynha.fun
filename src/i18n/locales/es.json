@@ -34,7 +34,8 @@
     "languageLabel": "Idioma",
     "switchToDark": "Cambiar al modo oscuro",
     "switchToLight": "Cambiar al modo claro",
-    "community": "Comunidad"
+    "community": "Comunidad",
+    "editorialPortal": "Portal Editorial"
   },
   "footer": {
     "description": "Una plataforma de curación colectiva de videos de YouTube. Preservando y descubriendo contenido valioso juntos.",
@@ -601,7 +602,16 @@
     "filter": {
       "all": "Todas las Listas",
       "myPlaylists": "Mis Listas",
-      "collaborating": "Colaborando"
+      "collaborating": "Colaborando",
+      "allCourseCodes": "Todos los cursos",
+      "allSemesters": "Todos los semestres",
+      "allLanguages": "Todos los idiomas",
+      "allTypes": "Todos los tipos",
+      "allVideoRanges": "Todas las cantidades de videos",
+      "withVideos": "Con videos",
+      "emptyVideos": "Listas vacías",
+      "videos1to9": "1 a 9 videos",
+      "videos10plus": "10+ videos"
     },
     "import": {
       "button": "Importar de YouTube",
@@ -664,6 +674,20 @@
       "collaboratorRoleUpdateError": "Error al actualizar el rol del colaborador",
       "collaboratorRemoved": "¡Colaborador eliminado!",
       "collaboratorRemoveError": "Error al eliminar colaborador"
+    }
+  },
+  "editorialPortal": {
+    "title": "Portal Editorial FACODI",
+    "description": "Gestiona playlists de FACODI con acceso global de editor.",
+    "searchPlaceholder": "Buscar playlists FACODI...",
+    "noAccessTitle": "Área restringida",
+    "noAccessDescription": "Solo los usuarios con rol de editor pueden acceder a este portal.",
+    "emptyTitle": "No se encontraron playlists FACODI.",
+    "emptyDescription": "Crea o actualiza playlists con código de curso o unidad para gestionarlas aquí.",
+    "stats": {
+      "editableTotal": "Playlists editables",
+      "facodiTotal": "Playlists FACODI",
+      "withUnitCode": "Con código de unidad"
     }
   },
   "playlistDetails": {
@@ -806,5 +830,68 @@
     "noPlaylistsTitle": "Aún no hay listas de reproducción creadas",
     "noPlaylistsDescription": "Las listas de reproducción de este perfil aparecerán aquí.",
     "createFirstPlaylist": "Crear primera lista de reproducción"
+  }
+  ,
+  "editorApplications": {
+    "cta": {
+      "badge": "Equipo editorial",
+      "title": "Postúlate para ser editora",
+      "description": "Ayuda a curar playlists de calidad y mantener el contenido de la comunidad organizado.",
+      "button": "Quiero postularme"
+    },
+    "status": {
+      "pending": "Pendiente",
+      "under_review": "En revisión",
+      "approved": "Aprobada",
+      "rejected": "Rechazada"
+    },
+    "applyPage": {
+      "badge": "Convocatoria abierta",
+      "title": "Solicitud editorial",
+      "description": "Cuéntanos sobre tu experiencia y por qué quieres ayudar en la curación de Tube O2."
+    },
+    "form": {
+      "fields": {
+        "nameLabel": "Nombre completo",
+        "namePlaceholder": "Tu nombre completo",
+        "emailLabel": "Correo electrónico",
+        "emailPlaceholder": "tu@ejemplo.com",
+        "motivationLabel": "Motivación",
+        "motivationPlaceholder": "Comparte tu motivación y experiencia editorial (opcional)",
+        "portfolioLinksLabel": "Enlaces de portafolio",
+        "portfolioLinksPlaceholder": "Un enlace por línea (opcional)",
+        "consentLabel": "Acepto la política de privacidad y autorizo el tratamiento de mis datos para esta solicitud."
+      },
+      "submitButton": "Enviar solicitud",
+      "successTitle": "Solicitud recibida",
+      "successDescription": "Gracias. Recibimos tu solicitud y enviamos un correo de confirmación.",
+      "successWithEmailWarningDescription": "Tu solicitud fue guardada, pero no se pudo enviar el correo de confirmación ahora.",
+      "errorTitle": "Error de envío",
+      "errorDescription": "No pudimos enviar tu solicitud. Inténtalo de nuevo.",
+      "errors": {
+        "nameRequired": "El nombre es obligatorio",
+        "nameTooLong": "El nombre no puede superar 120 caracteres",
+        "motivationTooLong": "La motivación no puede superar 2000 caracteres",
+        "portfolioTooLong": "Los enlaces de portafolio no pueden superar 2000 caracteres",
+        "consentRequired": "Debes aceptar el consentimiento de privacidad"
+      }
+    },
+    "adminPage": {
+      "title": "Solicitudes editoriales",
+      "description": "Revisa las solicitudes recibidas y actualiza el estado.",
+      "searchPlaceholder": "Buscar por nombre o correo",
+      "statusFilterPlaceholder": "Filtrar por estado",
+      "statusFilterAll": "Todos los estados",
+      "appliedAt": "Solicitud en",
+      "loadError": "No se pudieron cargar las solicitudes.",
+      "empty": "No hay solicitudes con los filtros actuales.",
+      "statusUpdatedTitle": "Estado actualizado",
+      "statusUpdatedDescription": "Solicitud movida a {{status}}.",
+      "statusUpdateErrorTitle": "No se pudo actualizar el estado",
+      "statusUpdateErrorDescription": "Inténtalo de nuevo.",
+      "noAccessTitle": "Área restringida",
+      "noAccessDescription": "Solo editoras y administradoras pueden acceder a esta página.",
+      "backToEditorial": "Volver al portal editorial"
+    }
   }
 }

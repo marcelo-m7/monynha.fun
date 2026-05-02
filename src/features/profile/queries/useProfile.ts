@@ -71,3 +71,18 @@ export function useSearchProfiles(query: string, limit = 10) {
     staleTime: 30000, // Cache for 30 seconds
   });
 }
+
+export function useCurrentUserProfile() {
+  const { user } = useAuth();
+  return useProfileById(user?.id);
+}
+
+export function useIsEditor() {
+  const { data: profile, isLoading } = useCurrentUserProfile();
+
+  return {
+    isEditor: profile?.role === 'editor' || profile?.role === 'admin',
+    isLoading,
+    role: profile?.role,
+  };
+}

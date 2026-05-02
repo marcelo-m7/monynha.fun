@@ -15,6 +15,7 @@ import { CommunitySpotlightSection } from "@/components/layout/CommunitySpotligh
 import { HowItWorksSection } from "@/components/layout/HowItWorksSection";
 import { IntelligentSystemSection } from "@/components/layout/IntelligentSystemSection";
 import { UseCasesSection } from "@/components/layout/UseCasesSection";
+import { EditorApplicationCTA } from "@/features/editor-applications";
 
 const Index = () => {
   const { t } = useTranslation();
@@ -164,6 +165,8 @@ const Index = () => {
           </Button>
         </div>
       </section>
+
+      <EditorApplicationCTA />
     </MainLayout>
   );
 };

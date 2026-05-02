@@ -5,9 +5,14 @@ import { renderWithProviders } from '@/shared/test/renderWithProviders';
 
 const usePlaylistsMock = vi.fn();
 const useAuthMock = vi.fn();
+const useCoursePlaylistSummaryMock = vi.fn();
 
 vi.mock('@/features/playlists/queries/usePlaylists', () => ({
   usePlaylists: () => usePlaylistsMock(),
+}));
+
+vi.mock('@/features/courses/queries/useCoursePlaylists', () => ({
+  useCoursePlaylistSummary: () => useCoursePlaylistSummaryMock(),
 }));
 
 vi.mock('@/features/playlists', () => ({
@@ -32,6 +37,11 @@ vi.mock('@/features/auth/useAuth', () => ({
 
 beforeEach(() => {
   useAuthMock.mockReturnValue({ user: null });
+  useCoursePlaylistSummaryMock.mockReturnValue({
+    data: [],
+    isLoading: false,
+    isError: false,
+  });
   usePlaylistsMock.mockReturnValue({
     data: [
       {

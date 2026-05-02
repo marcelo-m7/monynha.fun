@@ -37,7 +37,8 @@
     "languageLabel": "Language",
     "switchToDark": "Switch to dark mode",
     "switchToLight": "Switch to light mode",
-    "community": "Community"
+    "community": "Community",
+    "editorialPortal": "Editorial Portal"
   },
   "footer": {
     "description": "A collective curation platform for YouTube videos. Preserving and discovering valuable content together.",
@@ -541,7 +542,16 @@
     "filter": {
       "all": "All Playlists",
       "myPlaylists": "My Playlists",
-      "collaborating": "Collaborating"
+      "collaborating": "Collaborating",
+      "allCourseCodes": "All courses",
+      "allSemesters": "All semesters",
+      "allLanguages": "All languages",
+      "allTypes": "All types",
+      "allVideoRanges": "All video counts",
+      "withVideos": "With videos",
+      "emptyVideos": "Empty playlists",
+      "videos1to9": "1 to 9 videos",
+      "videos10plus": "10+ videos"
     },
     "import": {
       "button": "Import from YouTube",
@@ -604,6 +614,20 @@
       "collaboratorRoleUpdateError": "Failed to update collaborator role",
       "collaboratorRemoved": "Collaborator removed!",
       "collaboratorRemoveError": "Failed to remove collaborator"
+    }
+  },
+  "editorialPortal": {
+    "title": "FACODI Editorial Portal",
+    "description": "Manage FACODI playlists with global editor access.",
+    "searchPlaceholder": "Search FACODI playlists...",
+    "noAccessTitle": "Restricted area",
+    "noAccessDescription": "Only users with the editor role can access this portal.",
+    "emptyTitle": "No FACODI playlists found.",
+    "emptyDescription": "Create or update playlists with course or unit codes to manage them here.",
+    "stats": {
+      "editableTotal": "Editable playlists",
+      "facodiTotal": "FACODI playlists",
+      "withUnitCode": "With unit code"
     }
   },
   "playlistDetails": {
@@ -772,5 +796,68 @@
     "noPlaylistsTitle": "No playlists created yet",
     "noPlaylistsDescription": "This profile's playlists will appear here.",
     "createFirstPlaylist": "Create first playlist"
+  }
+  ,
+  "editorApplications": {
+    "cta": {
+      "badge": "Editorial team",
+      "title": "Apply to become an editor",
+      "description": "Help curate high-quality playlists and keep community content organized.",
+      "button": "Apply now"
+    },
+    "status": {
+      "pending": "Pending",
+      "under_review": "Under review",
+      "approved": "Approved",
+      "rejected": "Rejected"
+    },
+    "applyPage": {
+      "badge": "Open call",
+      "title": "Editor application",
+      "description": "Tell us about your background and why you want to help curate Tube O2."
+    },
+    "form": {
+      "fields": {
+        "nameLabel": "Full name",
+        "namePlaceholder": "Your full name",
+        "emailLabel": "Email",
+        "emailPlaceholder": "you@example.com",
+        "motivationLabel": "Motivation",
+        "motivationPlaceholder": "Share your motivation and editorial experience (optional)",
+        "portfolioLinksLabel": "Portfolio links",
+        "portfolioLinksPlaceholder": "One link per line (optional)",
+        "consentLabel": "I agree to the privacy policy and consent to data processing for this application."
+      },
+      "submitButton": "Send application",
+      "successTitle": "Application received",
+      "successDescription": "Thank you! We received your application and sent a confirmation email.",
+      "successWithEmailWarningDescription": "Your application was saved, but email confirmation could not be sent right now.",
+      "errorTitle": "Submission error",
+      "errorDescription": "We could not submit your application. Please try again.",
+      "errors": {
+        "nameRequired": "Name is required",
+        "nameTooLong": "Name cannot exceed 120 characters",
+        "motivationTooLong": "Motivation cannot exceed 2000 characters",
+        "portfolioTooLong": "Portfolio links cannot exceed 2000 characters",
+        "consentRequired": "You must accept the privacy consent"
+      }
+    },
+    "adminPage": {
+      "title": "Editor applications",
+      "description": "Review incoming applications and update their status.",
+      "searchPlaceholder": "Search by name or email",
+      "statusFilterPlaceholder": "Filter by status",
+      "statusFilterAll": "All statuses",
+      "appliedAt": "Applied at",
+      "loadError": "Unable to load applications.",
+      "empty": "No applications found for current filters.",
+      "statusUpdatedTitle": "Status updated",
+      "statusUpdatedDescription": "Application moved to {{status}}.",
+      "statusUpdateErrorTitle": "Could not update status",
+      "statusUpdateErrorDescription": "Please try again.",
+      "noAccessTitle": "Restricted area",
+      "noAccessDescription": "Only editors and admins can access this page.",
+      "backToEditorial": "Back to editorial portal"
+    }
   }
 }

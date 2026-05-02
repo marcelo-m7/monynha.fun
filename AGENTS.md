@@ -21,6 +21,35 @@ Run from repository root:
 | Tests | `pnpm test` |
 | Coverage | `pnpm test:coverage` |
 
+Backend commands:
+
+| Goal | Command |
+|---|---|
+| Development | `cd backend && uvicorn main:app --reload` |
+| Tests | `cd backend && pytest tests/ -v` |
+
+Backend setup details: [backend/QUICK_START.md](backend/QUICK_START.md) and [backend/API_REFERENCE.md](backend/API_REFERENCE.md).
+
+## Runtime & Ports
+
+- Frontend dev server runs on port `8080` (see [vite.config.ts](vite.config.ts)).
+- SSR preview server runs on port `3000` by default (see [server/server.ts](server/server.ts)); override with `PORT`.
+- Production preview flow: run `pnpm build` then `pnpm preview`.
+
+## Test Runner Notes
+
+- Tests use Vitest + jsdom with shared setup in [src/shared/test/setup.ts](src/shared/test/setup.ts).
+- Use `pnpm test -- <pattern>` for targeted tests.
+- Do **not** use Jest-style `--testPathPattern` with Vitest in this repo.
+- Networked frontend tests should follow MSW patterns in [src/shared/test/mswHandlers.ts](src/shared/test/mswHandlers.ts).
+
+## Instruction Files
+
+- Frontend code rules: [.github/instructions/frontend.instructions.md](.github/instructions/frontend.instructions.md)
+- Backend code rules: [.github/instructions/backend.instructions.md](.github/instructions/backend.instructions.md)
+- i18n rules (keep locales aligned): [.github/instructions/i18n.instructions.md](.github/instructions/i18n.instructions.md)
+- Test rules: [.github/instructions/testing.instructions.md](.github/instructions/testing.instructions.md)
+
 ## Architecture Boundaries
 
 Use these boundaries when deciding where code belongs:
@@ -76,6 +105,7 @@ Reference architecture details in [docs/CODEBASE.md](docs/CODEBASE.md).
 
 - Do not hard-code user-facing strings.
 - Use i18n keys and update locale resources in [src/i18n/locales](src/i18n/locales).
+- Keep locale files aligned (pt, en, es, fr) when adding or changing translation keys.
 
 ### 7. Imports
 
@@ -92,6 +122,8 @@ Reference architecture details in [docs/CODEBASE.md](docs/CODEBASE.md).
 - Bypassing access constraints in mutations instead of respecting RLS-compatible patterns.
 - Putting business logic utilities in `src/lib/` instead of `src/shared/lib/`.
 - Calling `supabase.functions.invoke` directly instead of using `invokeEdgeFunction()`.
+- Updating one locale file but leaving other locales missing the same key.
+- Running `pnpm test -- --testPathPattern=...` (unsupported by Vitest in this repo).
 
 ## Adding New Pages
 

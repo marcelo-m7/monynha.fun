@@ -185,6 +185,62 @@ export type Database = {
           },
         ]
       }
+      editor_applications: {
+        Row: {
+          consent_privacy: boolean
+          created_at: string
+          email: string
+          full_name: string
+          id: string
+          motivation: string | null
+          portfolio_url: string | null
+          review_notes: string | null
+          reviewed_at: string | null
+          reviewed_by: string | null
+          source_page: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          consent_privacy: boolean
+          created_at?: string
+          email: string
+          full_name: string
+          id?: string
+          motivation?: string | null
+          portfolio_url?: string | null
+          review_notes?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          source_page?: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          consent_privacy?: boolean
+          created_at?: string
+          email?: string
+          full_name?: string
+          id?: string
+          motivation?: string | null
+          portfolio_url?: string | null
+          review_notes?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          source_page?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "editor_applications_reviewed_by_fkey"
+            columns: ["reviewed_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       favorites: {
         Row: {
           created_at: string
@@ -476,6 +532,7 @@ export type Database = {
           created_at: string
           display_name: string | null
           id: string
+          role: string
           submissions_count: number
           updated_at: string
           username: string | null
@@ -487,6 +544,7 @@ export type Database = {
           created_at?: string
           display_name?: string | null
           id: string
+          role?: string
           submissions_count?: number
           updated_at?: string
           username?: string | null
@@ -498,6 +556,7 @@ export type Database = {
           created_at?: string
           display_name?: string | null
           id?: string
+          role?: string
           submissions_count?: number
           updated_at?: string
           username?: string | null

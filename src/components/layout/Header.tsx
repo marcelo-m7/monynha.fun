@@ -1,5 +1,5 @@
 import { Link, useNavigate } from "react-router-dom";
-import { Plus, Menu, Heart, Globe, User as UserIcon, Settings, KeyRound, LogOut, Bell, MessageCircle } from "lucide-react";
+import { Plus, Menu, Heart, Globe, User as UserIcon, Settings, KeyRound, LogOut, Bell, MessageCircle, ShieldCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import { useAuth } from "@/features/auth/useAuth";
@@ -188,6 +188,18 @@ export const Header = () => {
                     <KeyRound className="mr-2 h-4 w-4" />
                     <span>{t('header.accountSettings')}</span>
                   </DropdownMenuItem>
+                  {(profile.role === 'editor' || profile.role === 'admin') && (
+                    <>
+                      <DropdownMenuItem onClick={() => navigate('/editorial')} className="rounded-xl py-2">
+                        <ShieldCheck className="mr-2 h-4 w-4" />
+                        <span>{t('header.editorialPortal')}</span>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => navigate('/editor/applications')} className="rounded-xl py-2">
+                        <ShieldCheck className="mr-2 h-4 w-4" />
+                        <span>{t('editorApplications.adminPage.title')}</span>
+                      </DropdownMenuItem>
+                    </>
+                  )}
                   <DropdownMenuSeparator className="my-1" />
                   <DropdownMenuItem onClick={handleSignOut} className="rounded-xl py-2 text-destructive focus:text-destructive focus:bg-destructive/5">
                     <LogOut className="mr-2 h-4 w-4" />

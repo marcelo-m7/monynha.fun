@@ -39,6 +39,9 @@ const EditProfile = lazy(() => import("./pages/EditProfile"));
 const AccountSettings = lazy(() => import("./pages/AccountSettings"));
 const Messages = lazy(() => import("./pages/Messages"));
 const Notifications = lazy(() => import("./pages/Notifications"));
+const EditorialPortal = lazy(() => import("./pages/EditorialPortal"));
+const EditorApply = lazy(() => import("./pages/EditorApply"));
+const EditorApplications = lazy(() => import("./pages/EditorApplications"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 const YouTubeRouteBridge = lazy(() => import("./pages/YouTubeRouteBridge"));
 const SmartSlugRoute = lazy(() => import("./pages/SmartSlugRoute"));
@@ -79,6 +82,9 @@ const App = () => (
         <Route path="/account/settings" element={<AccountSettings />} />
         <Route path="/messages" element={<Messages />} />
         <Route path="/notifications" element={<Notifications />} />
+        <Route path="/editorial" element={<EditorialPortal />} />
+        <Route path="/editor/apply" element={<EditorApply />} />
+        <Route path="/editor/applications" element={<EditorApplications />} />
         <Route path="/:username" element={<SmartSlugRoute />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
