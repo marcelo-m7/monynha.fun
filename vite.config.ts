@@ -83,10 +83,21 @@ export default defineConfig(({ mode, command }) => ({
   build: {
     rollupOptions: {
       output: {
-        manualChunks: {
-          'vendor': ['react', 'react-dom'],
-          'ui': ['lucide-react', '@radix-ui/react-dialog'],
-          'query': ['@tanstack/react-query'],
+        manualChunks(id) {
+          if (id.includes('/src/i18n/locales/')) return 'i18n-locales';
+
+          if (!id.includes('node_modules')) return undefined;
+
+          if (id.includes('/react-dom/') || id.includes('/react/')) return 'react-core';
+          if (id.includes('react-router') || id.includes('@remix-run/router')) return 'router';
+          if (id.includes('@tanstack/react-query')) return 'query';
+          if (id.includes('@supabase/')) return 'supabase';
+          if (id.includes('i18next') || id.includes('react-i18next')) return 'i18n';
+          if (id.includes('lucide-react')) return 'icons';
+          if (id.includes('@radix-ui')) return 'radix-ui';
+          if (id.includes('zod')) return 'zod';
+
+          return undefined;
         },
       },
     },
