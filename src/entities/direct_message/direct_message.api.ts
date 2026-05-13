@@ -120,9 +120,13 @@ export async function markConversationAsReadByUsername(otherUsername: string) {
   return Number(data || 0);
 }
 
-export async function getUnreadMessagesCount() {
-  const { data, error } = await supabase.rpc('get_unread_messages_count_secure');
+export async function getUnreadMessagesCount(userId: string) {
+  const { count, error } = await supabase
+    .from('direct_messages')
+    .select('id', { count: 'exact', head: true })
+    .eq('receiver_id', userId)
+    .eq('is_read', false);
 
   if (error) throw error;
-  return Number(data || 0);
+  return Number(count || 0);
 }

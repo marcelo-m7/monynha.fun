@@ -24,7 +24,7 @@ export function useUnreadNotificationsCount() {
     queryKey: notificationKeys.unreadCount(),
     queryFn: async () => {
       if (!user) return 0;
-      return getUnreadNotificationsCount();
+      return getUnreadNotificationsCount(user.id);
     },
     enabled: !!user,
     staleTime: 15000,
