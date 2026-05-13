@@ -5,6 +5,12 @@ import type { Profile } from '@/entities/profile/profile.types';
 export type Playlist = Database['public']['Tables']['playlists']['Row'] & {
   author?: Pick<Profile, 'id' | 'username' | 'display_name' | 'avatar_url'> | null;
   video_count?: number;
+  collaborator_count?: number;
+  preview_video_id?: string | null;
+  preview_video_title?: string | null;
+  preview_video_thumbnail_url?: string | null;
+  preview_video_channel_name?: string | null;
+  activity_at?: string | null;
 };
 
 export type PlaylistInsert = Database['public']['Tables']['playlists']['Insert'];

@@ -16,19 +16,31 @@ export interface ListPlaylistsParams {
   userId?: string;
 }
 
-export async function listPlaylists(params: ListPlaylistsParams = {}) {
-  const buildQuery = (includeAuthor: boolean) => {
-    const baseQuery = includeAuthor
-      ? `
-      *,
-      author:profiles(id, username, display_name, avatar_url)
-    `
-      : '*';
+type PlaylistExhibitionRow = Playlist & {
+  author_username?: string | null;
+  author_display_name?: string | null;
+  author_avatar_url?: string | null;
+};
 
+function toPlaylistEntity(row: PlaylistExhibitionRow): Playlist {
+  return {
+    ...row,
+    thumbnail_url: row.thumbnail_url ?? row.preview_video_thumbnail_url ?? null,
+    author: {
+      id: row.author_id,
+      username: row.author_username ?? null,
+      display_name: row.author_display_name ?? null,
+      avatar_url: row.author_avatar_url ?? null,
+    },
+  };
+}
+
+export async function listPlaylists(params: ListPlaylistsParams = {}) {
+  const buildQuery = () => {
     let query = supabase
-      .from('playlists')
-      .select(baseQuery)
-      .order('created_at', { ascending: false });
+      .from('v_playlist_exhibition')
+      .select('*')
+      .order('activity_at', { ascending: false, nullsFirst: false });
 
     if (params.authorId) {
       query = query.eq('author_id', params.authorId);
@@ -45,7 +57,7 @@ export async function listPlaylists(params: ListPlaylistsParams = {}) {
     return query;
   };
 
-  let query = buildQuery(true);
+  let query = buildQuery();
 
   if (params.filter === 'my' && params.userId) {
     query = query.eq('author_id', params.userId);
@@ -73,71 +85,24 @@ export async function listPlaylists(params: ListPlaylistsParams = {}) {
     query = query.or(`author_id.eq.${params.userId},id.in.(${collabPlaylistIds.length > 0 ? collabPlaylistIds.join(',') : '00000000-0000-0000-0000-000000000000'})`);
   }
 
-  let { data, error } = await query;
-
-  // Fallback for environments where nested profiles relation is not publicly readable.
-  if (error && (error.status === 401 || error.status === 403)) {
-    query = buildQuery(false);
-
-    if (params.filter === 'my' && params.userId) {
-      query = query.eq('author_id', params.userId);
-    } else if (params.filter === 'collaborating' && params.userId) {
-      const { data: collabData, error: collabError } = await supabase
-        .from('playlist_collaborators')
-        .select('playlist_id')
-        .eq('user_id', params.userId);
-
-      if (collabError) throw collabError;
-      const collabPlaylistIds = (collabData || []).map((c) => c.playlist_id);
-      query = query.in('id', collabPlaylistIds);
-    } else if (params.filter === 'editable' && params.userId) {
-      const { data: collabData, error: collabError } = await supabase
-        .from('playlist_collaborators')
-        .select('playlist_id')
-        .eq('user_id', params.userId)
-        .eq('role', 'editor');
-
-      if (collabError) throw collabError;
-      const collabPlaylistIds = (collabData || []).map((c) => c.playlist_id);
-      query = query.or(`author_id.eq.${params.userId},id.in.(${collabPlaylistIds.length > 0 ? collabPlaylistIds.join(',') : '00000000-0000-0000-0000-000000000000'})`);
-    }
-
-    const fallbackResult = await query;
-    data = fallbackResult.data;
-    error = fallbackResult.error;
-  }
+  const { data, error } = await query;
 
   if (error) throw error;
 
-  return data as Playlist[];
+  return ((data as PlaylistExhibitionRow[] | null) || []).map(toPlaylistEntity);
 }
 
 export async function getPlaylistById(id: string) {
-  let { data, error } = await supabase
-    .from('playlists')
-    .select(
-      `
-        *,
-        author:profiles(id, username, display_name, avatar_url)
-      `,
-    )
+  const { data, error } = await supabase
+    .from('v_playlist_exhibition')
+    .select('*')
     .eq('id', id)
-    .single();
-
-  if (error && (error.status === 401 || error.status === 403)) {
-    const fallbackResult = await supabase
-      .from('playlists')
-      .select('*')
-      .eq('id', id)
-      .single();
-
-    data = fallbackResult.data;
-    error = fallbackResult.error;
-  }
+    .maybeSingle();
 
   if (error) throw error;
+  if (!data) throw new Error('Playlist not found');
 
-  return data as Playlist;
+  return toPlaylistEntity(data as PlaylistExhibitionRow);
 }
 
 export async function createPlaylist(payload: PlaylistInsert) {

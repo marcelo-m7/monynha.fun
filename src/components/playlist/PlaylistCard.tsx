@@ -1,7 +1,8 @@
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { ListVideo, BookOpen, Code, Globe, Lock, GraduationCap } from 'lucide-react';
+import { ListVideo, BookOpen, Code, Globe, Lock, GraduationCap, Users, Clock3 } from 'lucide-react';
 import type { Playlist } from '@/entities/playlist/playlist.types';
+import { formatDuration } from '@/shared/lib/format';
 
 interface PlaylistCardProps {
   playlist: Playlist;
@@ -14,6 +15,8 @@ export function PlaylistCard({ playlist, index = 0 }: PlaylistCardProps) {
   // Use thumbnail_url from playlist, fallback to placeholder icon
   const thumbnailUrl = playlist.thumbnail_url;
   const totalVideos = playlist.video_count ?? 0;
+  const totalDuration = playlist.total_duration_seconds ?? 0;
+  const collaboratorCount = playlist.collaborator_count ?? 0;
 
   return (
     <Link
@@ -78,9 +81,22 @@ export function PlaylistCard({ playlist, index = 0 }: PlaylistCardProps) {
         </h2>
         
         <p className="text-sm text-muted-foreground mb-2">
-          {t('playlists.videoCount', { count: playlist.video_count || 0 })}
+          {t('playlists.videoCount', { count: totalVideos })}
           {playlist.author?.username && ` • ${playlist.author.username}`}
         </p>
+
+        <div className="flex items-center gap-3 text-xs text-muted-foreground mb-3 uppercase tracking-widest">
+          {totalDuration > 0 && (
+            <span className="inline-flex items-center gap-1">
+              <Clock3 className="w-3 h-3" /> {formatDuration(totalDuration)}
+            </span>
+          )}
+          {collaboratorCount > 0 && (
+            <span className="inline-flex items-center gap-1">
+              <Users className="w-3 h-3" /> {collaboratorCount + 1}
+            </span>
+          )}
+        </div>
 
         <p className="text-muted-foreground text-sm line-clamp-2 mb-3 flex-1">
           {playlist.description || t('playlists.noDescription')}

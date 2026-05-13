@@ -2,7 +2,7 @@
 
 import type { VideoWithCategory } from "@/entities/video/video.types";
 import { formatDuration, formatViewCount } from "@/shared/lib/format";
-import { Play, Eye } from "lucide-react";
+import { Play, Eye, Heart, ListPlus } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { useNavigate } from "react-router-dom";
@@ -159,9 +159,19 @@ export const VideoCard = ({ video, onClick, variant = 'default' }: VideoCardProp
           variant === 'compact' && "hidden",
           variant === 'default' && "mt-auto"
         )}>
-          <div className="flex items-center gap-1 relative">
-            <Eye className="w-3.5 h-3.5" aria-hidden="true" />
-            <span>{formatViewCount(viewCount)}</span>
+          <div className="flex items-center gap-3 relative">
+            <span className="inline-flex items-center gap-1">
+              <Eye className="w-3.5 h-3.5" aria-hidden="true" />
+              <span>{formatViewCount(viewCount)}</span>
+            </span>
+            <span className="inline-flex items-center gap-1">
+              <Heart className="w-3.5 h-3.5" aria-hidden="true" />
+              <span>{video.favorites_count ?? 0}</span>
+            </span>
+            <span className="inline-flex items-center gap-1">
+              <ListPlus className="w-3.5 h-3.5" aria-hidden="true" />
+              <span>{video.playlist_add_count ?? 0}</span>
+            </span>
             {showPlus && (
               <span className="absolute -right-6 -top-1 text-xs text-green-400 font-semibold animate-pop">+1</span>
             )}
