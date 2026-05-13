@@ -13,6 +13,7 @@ import { z } from 'zod';
 import { notify } from '@/shared/lib/notify';
 import { useState } from 'react';
 import { emailSchema } from '@/shared/lib/validation';
+import { submitContactForm } from '@/shared/api/contact.api';
 
 // Define Zod schema for the contact form
 const contactFormSchema = z.object({
@@ -42,8 +43,12 @@ const Contact = () => {
   const onSubmit = async (values: ContactFormValues) => {
     setIsSubmitting(true);
     try {
-      // Simulate API call - TODO: Replace with actual backend endpoint
-      await new Promise(resolve => setTimeout(resolve, 1500)); 
+      await submitContactForm({
+        name: values.name,
+        email: values.email,
+        subject: values.subject,
+        message: values.message,
+      });
       notify.success(t('contactPage.successMessage'));
       reset();
     } catch (error) {
