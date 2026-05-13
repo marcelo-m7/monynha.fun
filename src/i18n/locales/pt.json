@@ -207,7 +207,10 @@
       "invalidEmail": "Email inválido",
       "passwordMinLength": "Senha deve ter pelo menos 6 caracteres",
       "usernameMinLength": "Username deve ter pelo menos 3 caracteres",
-      "genericAuthError": "Ocorreu um erro de autenticação. Tente novamente."
+      "genericAuthError": "Ocorreu um erro de autenticação. Tente novamente.",
+      "searchPlaceholder": "Buscar videos, canales o temas...",
+      "searchButton": "Buscar",
+      "trendingLabel": "Tendencias:"
     },
     "success": {
       "welcomeBack": "Bem-vindo de volta!",
@@ -796,8 +799,7 @@
     "noPlaylistsTitle": "Nenhuma playlist criada ainda",
     "noPlaylistsDescription": "As playlists deste perfil aparecerão aqui.",
     "createFirstPlaylist": "Criar primeira playlist"
-  }
-  ,
+  },
   "editorApplications": {
     "cta": {
       "badge": "Equipe editorial",

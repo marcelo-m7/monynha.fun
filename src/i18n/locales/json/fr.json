@@ -14,7 +14,9 @@
     "validationError": "Erreur de Validation",
     "cancel": "Annuler",
     "delete": "Supprimer",
-    "anonymous": "Anonyme"
+    "anonymous": "Anonyme",
+    "loading": "Loading...",
+    "none": "Aucun"
   },
   "header": {
     "searchPlaceholder": "Rechercher des vidéos, des chaînes...",
@@ -31,7 +33,12 @@
     "toggleMenu": "Basculer le menu",
     "closeMenu": "Fermer le menu",
     "languageLabel": "Langue",
-    "editorialPortal": "Portail Éditorial"
+    "editorialPortal": "Portail Éditorial",
+    "messages": "Messages",
+    "notifications": "Notifications",
+    "switchToDark": "Passer en mode sombre",
+    "switchToLight": "Passer en mode clair",
+    "community": "Communauté"
   },
   "footer": {
     "description": "Une plateforme de curation collective de vidéos YouTube. Préserver et découvrir du contenu précieux ensemble.",
@@ -103,7 +110,9 @@
       "title": "Vérifiez Votre E-mail",
       "description": "Nous avons envoyé un lien de confirmation à votre adresse e-mail. Veuillez vérifier votre boîte de réception (et les spams) pour activer votre compte.",
       "sentTo": "Lien envoyé à",
-      "goToLogin": "Aller à la Connexion"
+      "goToLogin": "Aller à la Connexion",
+      "successConfirmed": "Votre e-mail a été confirmé avec succès ! Vous pouvez maintenant accéder à l'application.",
+      "goToApp": "Aller à l'Application"
     },
     "error": {
       "validationTitle": "Erreur de Validation",
@@ -182,12 +191,45 @@
         },
         "error": {
           "failed": "Échec de l'envoi de l'e-mail de confirmation",
-          "cooldown": "Veuillez attendre avant de demander un autre e-mail"
+          "cooldown": "Veuillez attendre avant de demander un autre e-mail",
+          "noEmail": "E-mail introuvable pour renvoyer la confirmation."
         }
       },
       "dangerZone": {
         "title": "Zone Dangereuse",
         "description": "Actions irréversibles qui affectent définitivement votre compte."
+      },
+      "deleteAccount": {
+        "title": "Delete Account",
+        "description": "Permanently delete your account and all associated data.",
+        "button": "Delete My Account",
+        "warning": "This action cannot be undone. All your data will be permanently deleted.",
+        "consequences": {
+          "title": "What will be deleted:",
+          "data": "Your profile and account information",
+          "videos": "All videos you've submitted",
+          "playlists": "All your playlists",
+          "favorites": "Your favorites and preferences",
+          "irreversible": "This action is permanent and irreversible"
+        },
+        "dialog": {
+          "title": "Wait! Are you really sure? 🥺",
+          "playfulMessage": "We're sad to see you go! Are you sure you want to delete your account? There's no coming back from this... 💔",
+          "reallyConfirm": "If you're absolutely certain, type DELETE below to confirm:",
+          "typeToConfirm": "Type \"{{text}}\" to confirm",
+          "finalWarning": "Last chance! This will permanently delete everything.",
+          "confirm": "Yes, Delete Forever",
+          "deleting": "Deleting...",
+          "cancel": "No, Keep My Account"
+        },
+        "success": {
+          "deleted": "Account deleted successfully",
+          "goodbye": "We're sorry to see you go. Goodbye! 👋"
+        },
+        "error": {
+          "failed": "Failed to delete account",
+          "confirmationMismatch": "Please type DELETE to confirm"
+        }
       }
     }
   },
@@ -201,7 +243,8 @@
   },
   "rules": {
     "title": "Règles",
-    "description": "Directives communautaires et politiques de contenu."
+    "description": "Directives communautaires et politiques de contenu.",
+    "subtitle": "Directives de la Communauté"
   },
   "faq": {
     "title": "FAQ",
@@ -324,7 +367,8 @@
     "submissionsCount": "{{count}} soumissions",
     "loadUsersError": "Échec du chargement des utilisateurs de la communauté. Veuillez réessayer plus tard.",
     "noUsersFoundTitle": "Aucun utilisateur trouvé.",
-    "noUsersFoundDescription": "Il semble qu'il n'y ait pas encore d'utilisateurs dans la communauté. Soyez le premier à nous rejoindre !"
+    "noUsersFoundDescription": "Il semble qu'il n'y ait pas encore d'utilisateurs dans la communauté. Soyez le premier à nous rejoindre !",
+    "createFirstPlaylist": "Créez votre première playlist"
   },
   "playlists": {
     "title": "Listas de Reproducción",
@@ -344,7 +388,16 @@
     "filter": {
       "all": "Todas las Listas",
       "myPlaylists": "Mis Listas",
-      "collaborating": "Colaborando"
+      "collaborating": "Colaborando",
+      "allCourseCodes": "Tous les cours",
+      "allSemesters": "Tous les semestres",
+      "allLanguages": "Toutes les langues",
+      "allTypes": "Tous les types",
+      "allVideoRanges": "Tous les volumes de vidéos",
+      "withVideos": "Avec vidéos",
+      "emptyVideos": "Playlists vides",
+      "videos1to9": "1 à 9 vidéos",
+      "videos10plus": "10+ vidéos"
     },
     "import": {
       "button": "Importar de YouTube",
@@ -384,6 +437,29 @@
         "noVideosFoundInPlaylist": "No se encontraron videos en la lista de reproducción de YouTube. Se creará una lista de reproducción vacía."
       },
       "apiLimitationInfo": "Monynha Fun utiliza un servicio de backend para obtener videos de listas de reproducción de YouTube, pero depende de la API de datos de YouTube, que tiene cuotas y puede que no siempre devuelva todos los videos para listas de reproducción muy grandes. Para obtener resultados óptimos, asegúrate de que la lista de reproducción sea pública."
+    },
+    "feedback": {
+      "createSuccess": "Playlist créée avec succès !",
+      "createError": "Échec de la création de la playlist",
+      "updateSuccess": "Playlist mise à jour avec succès !",
+      "updateError": "Échec de la mise à jour de la playlist",
+      "deleteSuccess": "Playlist supprimée avec succès !",
+      "deleteError": "Échec de la suppression de la playlist",
+      "addVideoSuccess": "Vidéo ajoutée à la playlist !",
+      "addVideoError": "Échec de l'ajout de la vidéo à la playlist",
+      "removeVideoSuccess": "Vidéo retirée de la playlist !",
+      "removeVideoError": "Échec du retrait de la vidéo de la playlist",
+      "reorderSuccess": "Playlist réorganisée avec succès !",
+      "reorderError": "Échec de la réorganisation de la playlist",
+      "markWatchedSuccess": "Vidéo marquée comme vue !",
+      "markUnwatchedSuccess": "Vidéo marquée comme non vue !",
+      "progressError": "Échec de la mise à jour de la progression de la vidéo",
+      "collaboratorAdded": "Collaborateur ajouté !",
+      "collaboratorAddError": "Échec de l'ajout du collaborateur",
+      "collaboratorRoleUpdated": "Rôle du collaborateur mis à jour !",
+      "collaboratorRoleUpdateError": "Échec de la mise à jour du rôle du collaborateur",
+      "collaboratorRemoved": "Collaborateur supprimé !",
+      "collaboratorRemoveError": "Échec de la suppression du collaborateur"
     }
   },
   "editorialPortal": {
@@ -500,8 +576,7 @@
       "notLoggedInTitle": "Error",
       "notLoggedInDescription": "Debes iniciar sesión para crear o editar listas de reproducción."
     }
-  }
-  ,
+  },
   "editorApplications": {
     "cta": {
       "badge": "Équipe éditoriale",
@@ -563,5 +638,228 @@
       "noAccessDescription": "Seules les éditrices et administratrices peuvent accéder à cette page.",
       "backToEditorial": "Retour au portail éditorial"
     }
+  },
+  "home": {
+    "onboarding": {
+      "title": "Commencez en moins d'une minute",
+      "subtitle": "Collez un lien, vérifiez les infos, puis publiez pour la communauté."
+    },
+    "howItWorks": {
+      "title": "Comment ça marche",
+      "steps": {
+        "step1": {
+          "title": "Collez l'URL",
+          "description": "Ajoutez un lien YouTube pour démarrer."
+        },
+        "step2": {
+          "title": "Vérifiez les métadonnées",
+          "description": "Confirmez le titre, la langue et la catégorie suggérée."
+        },
+        "step3": {
+          "title": "Publiez avec contexte",
+          "description": "Ajoutez une note courte pour aider les autres curateurs."
+        },
+        "step4": {
+          "title": "Explorez avec des humains",
+          "description": "Parcourez des collections humaines, pas des flux algorithmiques."
+        }
+      }
+    },
+    "intelligence": {
+      "badge": "Propulsé par l'IA",
+      "title": "Intelligence intégrée",
+      "description": "Chaque vidéo soumise est automatiquement traitée par un pipeline IA qui l'enrichit avec des données sémantiques — avant d'atteindre la communauté.",
+      "features": {
+        "tags": {
+          "title": "Balisage sémantique",
+          "description": "L'IA analyse la vidéo et génère des tags thématiques précis — sans saisie manuelle."
+        },
+        "summary": {
+          "title": "Résumés automatiques",
+          "description": "Les spectateurs reçoivent une description précise avant de décider de regarder."
+        },
+        "relevance": {
+          "title": "Contexte culturel",
+          "description": "L'IA explique pourquoi la vidéo est importante, aidant les curateurs à rédiger des notes plus riches."
+        },
+        "category": {
+          "title": "Catégorisation automatique",
+          "description": "La bonne catégorie est suggérée automatiquement, vérifiable avant publication."
+        }
+      },
+      "preview": {
+        "label": "Enrichissement IA · exemple réel",
+        "titleLabel": "Titre optimisé",
+        "tagsLabel": "Tags sémantiques",
+        "summaryLabel": "Résumé",
+        "relevanceLabel": "Pertinence culturelle",
+        "categoryLabel": "Catégorie suggérée",
+        "mockSummary": "Les principes de conception de Ken Thompson et Dennis Ritchie pour des outils composables à usage unique. Un concept fondamental pour quiconque travaille avec des systèmes logiciels.",
+        "mockRelevance": "Référence fondamentale dans la culture de l'ingénierie logicielle, largement citée dans les discussions modernes sur le DevOps et les plateformes.",
+        "mockCategory": "Technologie"
+      }
+    },
+    "useCases": {
+      "title": "Pour qui",
+      "items": {
+        "case1": {
+          "title": "Étudiants",
+          "description": "Créez des parcours fiables pour apprendre plus vite."
+        },
+        "case2": {
+          "title": "Créateurs",
+          "description": "Référencez des sources de qualité pour votre audience."
+        },
+        "case3": {
+          "title": "Communautés",
+          "description": "Préservez la mémoire culturelle en collections partagées."
+        }
+      }
+    },
+    "ctaSecondary": {
+      "label": "Voir des exemples"
+    }
+  },
+  "aboutPage": {
+    "missionTitle": "Notre mission",
+    "missionDescription": "Nous aidons les personnes à découvrir et préserver des vidéos précieuses grâce à la curation humaine et à la collaboration communautaire.",
+    "founderTitle": "À propos du fondateur",
+    "founderName": "Marcelo Santos",
+    "founderRole": "Fondateur et curateur",
+    "founderDescription": "Marcelo construit des produits centrés sur la communauté, axés sur la culture, l'apprentissage et la découverte attentive.",
+    "githubLink": "Profil GitHub",
+    "websiteLink": "Site personnel",
+    "valuesTitle": "Nos valeurs",
+    "value1": "La curation humaine avant les algorithmes",
+    "value2": "Respect des créateurs et des communautés",
+    "value3": "Apprentissage, curiosité et savoir-faire",
+    "value4": "Collaboration et responsabilité partagée",
+    "value5": "Préservation du savoir à long terme",
+    "philosophyTitle": "Notre philosophie",
+    "philosophyDescription": "Nous pensons que les meilleures recommandations viennent de personnes qui valorisent la qualité, le contexte et la culture."
+  },
+  "rulesPage": {
+    "rule1": "Soyez respectueux et constructif dans toutes les interactions.",
+    "rule2": "Aucun harcèlement, discours de haine ni attaques personnelles.",
+    "rule3": "Soumettez uniquement des vidéos YouTube que vous êtes autorisé à partager.",
+    "rule4": "Priorisez les contenus de haute qualité, utiles et originaux.",
+    "rule5": "Respectez les lois locales et les règles de la plateforme.",
+    "rule6": "Attribuez correctement le crédit et évitez les erreurs d'attribution.",
+    "rule7": "Aidez à maintenir la communauté sûre et accueillante."
+  },
+  "contactPage": {
+    "successMessage": "Message envoyé avec succès !",
+    "errorMessage": "Une erreur s'est produite. Veuillez réessayer.",
+    "directEmailLabel": "Email direct",
+    "locationLabel": "Localisation",
+    "locationValue": "À distance, dans le monde entier",
+    "responseTimeLabel": "Délai de réponse",
+    "responseTimeValue": "Sous 48 heures",
+    "feedbackTitle": "Retours et suggestions",
+    "feedbackDescription": "Nous nous améliorons en continu. Envoyez vos retours, idées et questions.",
+    "form": {
+      "nameLabel": "Nom",
+      "namePlaceholder": "Votre nom",
+      "nameRequired": "Veuillez saisir votre nom",
+      "emailLabel": "Email",
+      "emailPlaceholder": "vous@exemple.com",
+      "emailInvalid": "Veuillez saisir un email valide",
+      "subjectLabel": "Sujet",
+      "subjectPlaceholder": "Comment pouvons-nous aider ?",
+      "subjectRequired": "Veuillez saisir un sujet",
+      "messageLabel": "Message",
+      "messagePlaceholder": "Dites-nous en plus sur votre demande...",
+      "messageRequired": "Veuillez saisir un message",
+      "messageMaxLength": "Le message ne peut pas dépasser 1000 caractères",
+      "sendButton": "Envoyer le message"
+    }
+  },
+  "faqPage": {
+    "q1": {
+      "question": "Qu'est-ce que Monynha Fun ?",
+      "answer": "Monynha Fun est une plateforme communautaire de curation de contenus YouTube utiles."
+    },
+    "q2": {
+      "question": "Qui peut soumettre des vidéos ?",
+      "answer": "Toute personne ayant un compte peut soumettre des vidéos pour revue et curation."
+    },
+    "q3": {
+      "question": "Comment les vidéos mises en avant sont-elles sélectionnées ?",
+      "answer": "Les vidéos mises en avant sont choisies selon l'engagement de la communauté et la revue des curateurs."
+    },
+    "q4": {
+      "question": "Puis-je créer des playlists ?",
+      "answer": "Oui. Vous pouvez créer des playlists pour organiser et partager des parcours d'apprentissage."
+    },
+    "q5": {
+      "question": "Comment contacter l'équipe ?",
+      "answer": "Utilisez le formulaire de contact ou écrivez à hello@monynha.com."
+    }
+  },
+  "comments": {
+    "title": "Commentaires",
+    "noComments": "Pas encore de commentaires. Soyez le premier à commenter !",
+    "loadError": "Erreur lors du chargement des commentaires",
+    "deleteError": "Erreur lors de la suppression du commentaire",
+    "loginToComment": "Connexion requise",
+    "loginAction": "Connexion",
+    "loginToCommentPrompt": "Connectez-vous pour rejoindre la conversation.",
+    "noUsersFound": "Aucun utilisateur trouvé",
+    "form": {
+      "placeholder": "Écrire un commentaire...",
+      "submitButton": "Poster le Commentaire",
+      "submitting": "Publication...",
+      "mentionHelper": "Tapez @ pour mentionner quelqu'un",
+      "keyboardHint": "Utilisez les flèches pour naviguer et Entrée pour sélectionner",
+      "searchingUsers": "Recherche d'utilisateurs...",
+      "mentionSuggestions": "Suggestions de mention",
+      "contentRequired": "Le commentaire ne peut pas être vide",
+      "contentMaxLength": "Le commentaire doit faire au maximum 500 caractères"
+    }
+  },
+  "messages": {
+    "title": "Messages",
+    "description": "Your direct conversations with other curators.",
+    "inbox": "Inbox",
+    "emptyInbox": "No conversations yet.",
+    "selectConversation": "Select a conversation to start chatting.",
+    "emptyConversation": "No messages yet. Say hello!",
+    "inputPlaceholder": "Write a message...",
+    "tipPrefix": "Tip:",
+    "tipLink": "visit community profiles"
+  },
+  "notifications": {
+    "title": "Notifications",
+    "description": "Follow updates, new messages, and account activity.",
+    "inbox": "Recent notifications",
+    "empty": "You have no notifications yet.",
+    "markAsRead": "Mark read",
+    "markAllAsRead": "Mark all as read"
+  },
+  "socialProfile": {
+    "followers": "followers",
+    "following": "following",
+    "follow": "Follow",
+    "unfollow": "Unfollow",
+    "sendMessage": "Message"
+  },
+  "profile": {
+    "defaultMetaTitle": "Tube O2",
+    "metaTitle": "{{name}} | Tube O2",
+    "metaDescription": "{{name}} sur Tube O2 : curation collaborative de vidéos YouTube.",
+    "notFoundTitle": "Profil introuvable",
+    "notFoundDescription": "Le profil recherché n'existe pas ou n'est pas disponible.",
+    "joinedOn": "Inscrit le {{date}}",
+    "editProfile": "Modifier le profil",
+    "uploadedVideos": "Vidéos publiées",
+    "videosLoadError": "Impossible de charger les vidéos de ce profil. Veuillez réessayer plus tard.",
+    "noVideosTitle": "Aucune vidéo publiée pour le moment",
+    "noVideosDescription": "Lorsqu'une vidéo sera publiée, elle apparaîtra ici.",
+    "uploadFirstVideo": "Publier la première vidéo",
+    "createdPlaylists": "Playlists créées",
+    "playlistsLoadError": "Impossible de charger les playlists de ce profil. Veuillez réessayer plus tard.",
+    "noPlaylistsTitle": "Aucune playlist créée pour le moment",
+    "noPlaylistsDescription": "Les playlists de ce profil apparaîtront ici.",
+    "createFirstPlaylist": "Créer la première playlist"
   }
 }
