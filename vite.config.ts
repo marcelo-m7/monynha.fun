@@ -1,4 +1,5 @@
 import { defineConfig, loadEnv } from "vite";
+import type { PluginOption } from "vite";
 import react from "@vitejs/plugin-react-swc";
 import path from "path";
 import { componentTagger } from "lovable-tagger";
@@ -27,11 +28,11 @@ export default defineConfig(({ mode, command }) => {
     plugins: [
       react(),
       mode === 'development' && componentTagger(),
-      command === 'build' && visualizer({
+      command === 'build' && (visualizer({
         open: false,
         brotliSize: true,
         filename: 'dist/stats.html',
-      }),
+      }) as PluginOption),
       VitePWA({
         registerType: 'autoUpdate',
         manifest: {
@@ -87,7 +88,7 @@ export default defineConfig(({ mode, command }) => {
           ],
         },
       }),
-    ].filter(Boolean),
+    ].filter((plugin): plugin is PluginOption => Boolean(plugin)),
     resolve: {
       alias: {
         "@": path.resolve(__dirname, "./src"),
