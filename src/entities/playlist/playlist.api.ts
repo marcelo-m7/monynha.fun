@@ -14,6 +14,7 @@ export interface ListPlaylistsParams {
   searchQuery?: string;
   filter?: 'all' | 'my' | 'collaborating' | 'editable';
   userId?: string;
+  onlyWithVideos?: boolean;
 }
 
 type PlaylistExhibitionRow = Playlist & {
@@ -58,6 +59,11 @@ export async function listPlaylists(params: ListPlaylistsParams = {}) {
   };
 
   let query = buildQuery();
+
+  const onlyWithVideos = params.onlyWithVideos ?? (!params.filter || params.filter === 'all');
+  if (onlyWithVideos) {
+    query = query.gt('video_count', 0);
+  }
 
   if (params.filter === 'my' && params.userId) {
     query = query.eq('author_id', params.userId);

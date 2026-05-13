@@ -4,6 +4,7 @@ export interface PlaylistListParams {
   searchQuery?: string;
   filter?: 'all' | 'my' | 'collaborating';
   userId?: string;
+  onlyWithVideos?: boolean;
 }
 
 const normalizePlaylistListParams = (params: PlaylistListParams = {}) => ({
@@ -12,6 +13,7 @@ const normalizePlaylistListParams = (params: PlaylistListParams = {}) => ({
   searchQuery: params.searchQuery ?? '',
   filter: params.filter ?? 'all',
   userId: params.userId ?? '',
+  onlyWithVideos: params.onlyWithVideos ?? null,
 });
 
 export const playlistKeys = {
