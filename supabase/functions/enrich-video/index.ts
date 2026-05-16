@@ -43,12 +43,26 @@ type EnhancedAssignmentResult = {
   reason: string;
 };
 
+class HttpError extends Error {
+  status: number;
+
+  constructor(message: string, status: number) {
+    super(message);
+    this.status = status;
+  }
+}
+
 function normalizeText(value: string | null | undefined): string {
   return (value ?? '')
     .normalize('NFD')
     .replace(/[\u0300-\u036f]/g, '')
     .toLowerCase()
     .trim();
+}
+
+function normalizeLanguage(value: string | null | undefined): string | null {
+  const normalized = (value ?? '').trim().toLowerCase();
+  return normalized.length >= 2 ? normalized : null;
 }
 
 function tokenize(value: string | null | undefined): string[] {
@@ -196,6 +210,40 @@ async function assignVideoToPlaylist(
   }
 }
 
+async function updateSubmissionStatus(
+  supabaseServiceRole: ReturnType<typeof createClient>,
+  submissionId: string,
+  values: Record<string, unknown>,
+) {
+  const { error } = await supabaseServiceRole
+    .from('video_submissions')
+    .update(values)
+    .eq('id', submissionId);
+
+  if (error) {
+    throw new Error(`Failed to update submission status: ${error.message}`);
+  }
+}
+
+async function safeUpdateSubmissionStatus(
+  supabaseServiceRole: ReturnType<typeof createClient> | null,
+  submissionId: string | null,
+  values: Record<string, unknown>,
+) {
+  if (!supabaseServiceRole || !submissionId) {
+    return;
+  }
+
+  try {
+    await updateSubmissionStatus(supabaseServiceRole, submissionId, values);
+  } catch (statusError) {
+    const statusErrorMessage = statusError instanceof Error
+      ? statusError.message
+      : 'Unknown submission status update error';
+    console.error(`[enrich-video] ${statusErrorMessage}`);
+  }
+}
+
 async function runEnhancedAssignments(params: {
   supabaseServiceRole: ReturnType<typeof createClient>;
   enrichment: EnrichmentPayload;
@@ -336,21 +384,52 @@ serve(async (req) => {
     })
   }
 
+  let submissionId: string | null = null;
+  let submissionBelongsToUser = false;
+  let supabaseServiceRole: ReturnType<typeof createClient> | null = null;
+
   try {
-    const { videoId, youtubeUrl } = await req.json()
+    const { videoId, youtubeUrl, submissionId: requestedSubmissionId } = await req.json()
+    submissionId = typeof requestedSubmissionId === 'string' && requestedSubmissionId.trim()
+      ? requestedSubmissionId.trim()
+      : null;
+
     if (!videoId || !youtubeUrl) {
-      return new Response(JSON.stringify({ error: 'videoId and youtubeUrl are required' }), {
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        status: 400,
-      })
+      throw new HttpError('videoId and youtubeUrl are required', 400);
     }
 
-    console.log(`[enrich-video] Received request for videoId: ${videoId}, youtubeUrl: ${youtubeUrl} by user: ${user.id}`)
+    console.log(`[enrich-video] Received request for videoId: ${videoId}, youtubeUrl: ${youtubeUrl}, submissionId: ${submissionId ?? 'none'} by user: ${user.id}`)
 
-    const supabaseServiceRole = createClient(
+    supabaseServiceRole = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     );
+
+    if (submissionId) {
+      const { data: submission, error: submissionError } = await supabaseServiceRole
+        .from('video_submissions')
+        .select('id, user_id')
+        .eq('id', submissionId)
+        .single();
+
+      if (submissionError || !submission) {
+        throw new HttpError(`Submission not found: ${submissionError?.message || 'Unknown error'}`, 404);
+      }
+
+      if (submission.user_id !== user.id) {
+        throw new HttpError('Submission does not belong to the authenticated user', 403);
+      }
+
+      submissionBelongsToUser = true;
+
+      await updateSubmissionStatus(supabaseServiceRole, submissionId, {
+        video_id: videoId,
+        status: 'processing',
+        error_message: null,
+        recoverable: false,
+        processing_started_at: new Date().toISOString(),
+      });
+    }
 
     const { data: video, error: videoError } = await supabaseServiceRole
       .from('videos')
@@ -360,7 +439,7 @@ serve(async (req) => {
 
     if (videoError || !video) {
       console.error("[enrich-video] Video not found:", videoError?.message);
-      throw new Error(`Video not found: ${videoError?.message || 'Unknown error'}`);
+      throw new HttpError(`Video not found: ${videoError?.message || 'Unknown error'}`, 404);
     }
 
     // Fetch categories and playlists BEFORE calling OpenAI so they can be
@@ -373,7 +452,7 @@ serve(async (req) => {
     }
     const categoryRows = (categoriesData ?? []) as CategoryRow[];
 
-    const effectiveLanguage = video.language || 'pt';
+    const effectiveLanguage = video.language && video.language !== 'und' ? video.language : 'pt';
     const { data: playlistsByLanguage, error: playlistFetchError } = await supabaseServiceRole
       .from('playlists')
       .select('id, name, description, language, is_public')
@@ -484,6 +563,38 @@ serve(async (req) => {
       throw new Error(`Failed to save AI enrichment: ${error.message}`);
     }
 
+    const detectedLanguage = normalizeLanguage(enrichment.language);
+    if (detectedLanguage && detectedLanguage !== 'und') {
+      const { error: updateLanguageError } = await supabaseServiceRole
+        .from('videos')
+        .update({ language: detectedLanguage })
+        .eq('id', videoId);
+
+      if (updateLanguageError) {
+        throw new Error(`Failed to update detected language: ${updateLanguageError.message}`);
+      }
+    }
+
+    if (submissionId) {
+      await updateSubmissionStatus(supabaseServiceRole, submissionId, {
+        status: 'success',
+        error_message: null,
+        recoverable: false,
+        completed_at: new Date().toISOString(),
+        metadata: {
+          enrichmentId: data.id,
+          detectedLanguage,
+          assignment: {
+            fallbackUsed: enhancedAssignment.fallbackUsed,
+            reliability: enhancedAssignment.reliability,
+            reason: enhancedAssignment.reason,
+            assignedCategoryId: enhancedAssignment.assignedCategoryId,
+            assignedPlaylistId: enhancedAssignment.assignedPlaylistId,
+          },
+        },
+      });
+    }
+
     console.log(`[enrich-video] AI enrichment processed and saved for videoId: ${videoId}`);
 
     return new Response(JSON.stringify({
@@ -502,10 +613,19 @@ serve(async (req) => {
     })
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
+    const status = error instanceof HttpError ? error.status : 500;
     console.error(`[enrich-video] Error processing request: ${errorMessage}`)
+    if (submissionBelongsToUser) {
+      await safeUpdateSubmissionStatus(supabaseServiceRole, submissionId, {
+        status: status >= 500 ? 'recoverable_error' : 'failed',
+        error_message: errorMessage,
+        recoverable: status >= 500,
+        completed_at: new Date().toISOString(),
+      });
+    }
     return new Response(JSON.stringify({ error: errorMessage }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      status: 500,
+      status,
     })
   }
 })

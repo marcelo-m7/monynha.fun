@@ -626,6 +626,79 @@ export type Database = {
         }
         Relationships: []
       }
+      video_submissions: {
+        Row: {
+          completed_at: string | null
+          created_at: string
+          duplicate_video_id: string | null
+          error_message: string | null
+          id: string
+          metadata: Json
+          processing_started_at: string | null
+          recoverable: boolean
+          status: string
+          updated_at: string
+          user_id: string
+          video_id: string | null
+          youtube_id: string
+          youtube_url: string
+        }
+        Insert: {
+          completed_at?: string | null
+          created_at?: string
+          duplicate_video_id?: string | null
+          error_message?: string | null
+          id?: string
+          metadata?: Json
+          processing_started_at?: string | null
+          recoverable?: boolean
+          status?: string
+          updated_at?: string
+          user_id: string
+          video_id?: string | null
+          youtube_id: string
+          youtube_url: string
+        }
+        Update: {
+          completed_at?: string | null
+          created_at?: string
+          duplicate_video_id?: string | null
+          error_message?: string | null
+          id?: string
+          metadata?: Json
+          processing_started_at?: string | null
+          recoverable?: boolean
+          status?: string
+          updated_at?: string
+          user_id?: string
+          video_id?: string | null
+          youtube_id?: string
+          youtube_url?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "video_submissions_duplicate_video_id_fkey"
+            columns: ["duplicate_video_id"]
+            isOneToOne: false
+            referencedRelation: "videos"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "video_submissions_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "video_submissions_video_id_fkey"
+            columns: ["video_id"]
+            isOneToOne: false
+            referencedRelation: "videos"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       video_view_events: {
         Row: {
           created_at: string
@@ -738,6 +811,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      current_profile_can_manage_facodi_playlist: {
+        Args: Record<PropertyKey, never>
+        Returns: boolean
+      }
       follow_by_username_secure: {
         Args: { p_target_username: string }
         Returns: string
@@ -779,6 +856,14 @@ export type Database = {
             Args: { p_session_id?: string; p_video_id: string }
             Returns: number
           }
+      is_facodi_playlist: {
+        Args: {
+          p_course_code: string
+          p_is_ordered: boolean
+          p_unit_code: string
+        }
+        Returns: boolean
+      }
       list_featured_videos: {
         Args: { p_limit?: number; p_offset?: number }
         Returns: {
