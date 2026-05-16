@@ -11,10 +11,31 @@ export type VideoSubmissionStatus =
   | 'duplicate'
   | 'recoverable_error';
 
+export type VideoSubmissionAssignmentCandidate = {
+  playlistId: string;
+  name: string;
+  score?: number | null;
+  compatible?: boolean | null;
+  isAiSuggested?: boolean | null;
+};
+
+export type VideoSubmissionAssignment = {
+  fallbackUsed?: boolean | null;
+  reliability?: 'high' | 'low' | string | null;
+  reason?: string | null;
+  assignedCategoryId?: string | null;
+  assignedPlaylistId?: string | null;
+  algorithmVersion?: string | null;
+  score?: number | null;
+  signals?: Record<string, number> | null;
+  topCandidates?: VideoSubmissionAssignmentCandidate[];
+  rejectedAiPlaylistId?: string | null;
+};
+
 export type VideoSubmissionMetadata = {
   enrichmentId?: string | null;
   detectedLanguage?: string | null;
-  assignment?: Json;
+  assignment?: VideoSubmissionAssignment;
 };
 
 export function getVideoSubmissionMetadata(metadata: Json): VideoSubmissionMetadata {

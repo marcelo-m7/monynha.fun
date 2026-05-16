@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { AlertCircle, ArrowLeft, CheckCircle2, CopyCheck, Loader2, RefreshCw, Wand2 } from 'lucide-react';
+import { AlertCircle, ArrowLeft, CheckCircle2, CopyCheck, ListVideo, Loader2, RefreshCw, Wand2 } from 'lucide-react';
 import { MainLayout } from '@/components/layout/MainLayout';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
@@ -68,6 +68,10 @@ export default function SubmitStatus() {
   const detectedLanguage = metadata.detectedLanguage;
   const detectedLanguageKey = languageLabelKey(detectedLanguage);
   const videoId = submission?.video_id ?? submission?.duplicate_video_id;
+  const assignedPlaylistId = metadata.assignment?.assignedPlaylistId ?? null;
+  const assignedPlaylist = assignedPlaylistId
+    ? metadata.assignment?.topCandidates?.find((candidate) => candidate.playlistId === assignedPlaylistId) ?? null
+    : null;
 
   const handleRetry = () => {
     if (!submission?.video_id || !submission.youtube_url) {
@@ -172,6 +176,22 @@ export default function SubmitStatus() {
                   {detectedLanguageKey ? t(detectedLanguageKey) : detectedLanguage}
                 </p>
               </div>
+              {assignedPlaylist && (
+                <div className="rounded-md border border-border p-4 sm:col-span-2">
+                  <div className="flex items-start gap-3">
+                    <ListVideo className="mt-0.5 h-5 w-5 shrink-0 text-primary" />
+                    <div>
+                      <p className="text-xs font-medium uppercase text-muted-foreground">
+                        {t('submitStatus.assignment.label')}
+                      </p>
+                      <p className="mt-1 text-sm font-medium">{assignedPlaylist.name}</p>
+                      {metadata.assignment?.reason && (
+                        <p className="mt-1 text-xs text-muted-foreground">{metadata.assignment.reason}</p>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
 
             {!isTerminal && (

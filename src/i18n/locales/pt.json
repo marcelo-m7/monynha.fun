@@ -471,6 +471,9 @@
       "label": "Idioma detectado",
       "pending": "Detectando automaticamente"
     },
+    "assignment": {
+      "label": "Playlist atribuída"
+    },
     "statusLabels": {
       "pending": "Pendente",
       "processing": "Processando",

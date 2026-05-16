@@ -378,6 +378,9 @@
       "label": "Detected language",
       "pending": "Detecting automatically"
     },
+    "assignment": {
+      "label": "Assigned playlist"
+    },
     "statusLabels": {
       "pending": "Pending",
       "processing": "Processing",

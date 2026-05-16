@@ -105,6 +105,39 @@ describe('SubmitStatus page', () => {
     expect(startProcessingMock).not.toHaveBeenCalled();
   });
 
+  it('shows the assigned playlist when assignment audit metadata is present', () => {
+    useVideoSubmissionMock.mockReturnValue({
+      data: {
+        ...baseSubmission,
+        status: 'success',
+        metadata: {
+          detectedLanguage: 'pt',
+          enrichmentId: 'enrichment-1',
+          assignment: {
+            assignedPlaylistId: 'playlist-math',
+            reason: 'Best compatible playlist selected by source and enrichment score',
+            topCandidates: [
+              {
+                playlistId: 'playlist-math',
+                name: 'Analise Matematica II - 1º Ano 2º Semestre - LESTI',
+                score: 32,
+              },
+            ],
+          },
+        },
+      },
+      isLoading: false,
+      isError: false,
+      refetch: refetchMock,
+    });
+
+    renderWithProviders(<SubmitStatus />, { route: '/submit/status/submission-1' });
+
+    expect(screen.getByText('Assigned playlist')).toBeInTheDocument();
+    expect(screen.getByText('Analise Matematica II - 1º Ano 2º Semestre - LESTI')).toBeInTheDocument();
+    expect(screen.getByText('Best compatible playlist selected by source and enrichment score')).toBeInTheDocument();
+  });
+
   it('shows duplicate status with link to the existing video', () => {
     useVideoSubmissionMock.mockReturnValue({
       data: {
