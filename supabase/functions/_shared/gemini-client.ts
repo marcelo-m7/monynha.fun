@@ -62,6 +62,27 @@ function optionalString(value: unknown): string | null {
   return typeof value === 'string' && value.trim() ? value.trim() : null;
 }
 
+function compactSummaryFallback(content: string): GeminiTranscriptResult | null {
+  const summary = content
+    .replace(/```(?:json)?/gi, '')
+    .replace(/```/g, '')
+    .trim()
+    .slice(0, 700)
+    .trim();
+
+  if (!summary) {
+    return null;
+  }
+
+  return {
+    transcriptText: null,
+    transcriptSummary: summary,
+    language: null,
+    confidence: 0.35,
+    unavailableReason: 'Gemini returned a non-JSON transcript summary',
+  };
+}
+
 function readPositiveIntegerEnv(name: string, fallback: number): number {
   const value = Number.parseInt(Deno.env.get(name) || '', 10);
   return Number.isFinite(value) && value > 0 ? value : fallback;
@@ -231,6 +252,10 @@ Rules:
     try {
       const jsonMatch = content.match(/\{[\s\S]*\}/);
       if (!jsonMatch) {
+        const fallback = compactSummaryFallback(content);
+        if (fallback) {
+          return fallback;
+        }
         throw new Error('No JSON found in Gemini response');
       }
 
@@ -243,6 +268,11 @@ Rules:
         unavailableReason: optionalString(parsed.unavailableReason),
       };
     } catch (error) {
+      const fallback = compactSummaryFallback(content);
+      if (fallback) {
+        return fallback;
+      }
+
       throw createGeminiError({
         message: `Failed to parse Gemini transcript response: ${
           error instanceof Error ? error.message : 'Unknown parse error'
