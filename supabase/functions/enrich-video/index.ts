@@ -445,11 +445,50 @@ async function processTranscript(params: {
     model: geminiClient.modelName,
   });
 
-  const transcript = await geminiClient.transcribeYouTubeVideo({
-    youtubeUrl,
-    title: videoTitle,
-    language: effectiveLanguage,
-  });
+  let transcript;
+  try {
+    transcript = await geminiClient.transcribeYouTubeVideo({
+      youtubeUrl,
+      title: videoTitle,
+      language: effectiveLanguage,
+    });
+  } catch (error) {
+    const geminiError = error as Partial<GeminiError>;
+    const errorMessage = error instanceof Error ? error.message : 'Unknown Gemini transcription error';
+    const transcriptId = await insertTranscriptRecord(supabaseServiceRole, {
+      videoId,
+      providerModel: geminiClient.modelName,
+      status: 'failed',
+      language: normalizeLanguage(effectiveLanguage),
+      transcriptText: null,
+      summary: null,
+      confidence: 0,
+      errorMessage,
+      metadata: {
+        requestId,
+        code: geminiError.code ?? 'GEMINI_TRANSCRIPTION_FAILED',
+        recoverable: geminiError.recoverable ?? isRecoverableExternalError(error),
+      },
+    });
+
+    logProcessingError(requestId, 'transcription', 'Gemini transcript extraction failed, continuing without transcript', {
+      videoId,
+      transcriptId,
+      code: geminiError.code ?? 'GEMINI_TRANSCRIPTION_FAILED',
+      error: errorMessage,
+    });
+
+    return {
+      id: transcriptId,
+      provider: 'gemini',
+      providerModel: geminiClient.modelName,
+      status: 'failed',
+      language: normalizeLanguage(effectiveLanguage),
+      summary: null,
+      confidence: 0,
+      errorMessage,
+    };
+  }
 
   const status: 'completed' | 'unavailable' = transcript.transcriptText || transcript.transcriptSummary
     ? 'completed'

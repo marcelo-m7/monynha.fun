@@ -62,6 +62,11 @@ function optionalString(value: unknown): string | null {
   return typeof value === 'string' && value.trim() ? value.trim() : null;
 }
 
+function readPositiveIntegerEnv(name: string, fallback: number): number {
+  const value = Number.parseInt(Deno.env.get(name) || '', 10);
+  return Number.isFinite(value) && value > 0 ? value : fallback;
+}
+
 export class GeminiClient {
   private apiKey: string;
   private model: string;
@@ -209,7 +214,7 @@ Rules:
       const geminiError = error as Partial<GeminiError>;
       const retryable = geminiError.recoverable === true || geminiError.retryAfter !== undefined;
 
-      if (retryable && attempt < this.maxRetries) {
+      if (retryable && geminiError.code !== 'GEMINI_TIMEOUT' && attempt < this.maxRetries) {
         const delay = (geminiError.retryAfter ? geminiError.retryAfter * 1000 : Math.pow(2, attempt) * 1000);
         console.log(`[Gemini] Retrying after ${delay}ms (attempt ${attempt + 1}/${this.maxRetries})`);
         await new Promise((resolve) => setTimeout(resolve, delay));
@@ -260,7 +265,7 @@ export function createGeminiClient(): GeminiClient {
   return new GeminiClient({
     apiKey,
     model: Deno.env.get('GEMINI_MODEL') || 'gemini-2.5-flash',
-    timeout: 30000,
-    maxRetries: 1,
+    timeout: readPositiveIntegerEnv('GEMINI_TIMEOUT_MS', 90000),
+    maxRetries: readPositiveIntegerEnv('GEMINI_MAX_RETRIES', 1),
   });
 }
