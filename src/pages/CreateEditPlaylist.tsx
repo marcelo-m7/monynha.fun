@@ -2,6 +2,7 @@ import { useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useAuth } from '@/features/auth/useAuth';
 import { useCreatePlaylist, usePlaylistById, useUpdatePlaylist } from '@/features/playlists/queries/usePlaylists';
+import { useCurrentUserProfile } from '@/features/profile/queries/useProfile';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -40,9 +41,11 @@ export default function CreateEditPlaylist() {
   const isEditing = !!playlistId;
 
   const { user, loading: authLoading } = useAuth();
+  const { data: currentProfile, isLoading: profileLoading } = useCurrentUserProfile();
   const { data: existingPlaylist, isLoading: playlistLoading, isError: playlistLoadError } = usePlaylistById(playlistId);
   const createPlaylistMutation = useCreatePlaylist();
   const updatePlaylistMutation = useUpdatePlaylist();
+  const canManageStudyPlaylists = currentProfile?.role === 'editor' || currentProfile?.role === 'admin';
 
   const { register, handleSubmit, watch, setValue, formState: { errors, dirtyFields }, reset } = useForm<PlaylistFormValues>({
     resolver: zodResolver(playlistSchema),
@@ -67,6 +70,7 @@ export default function CreateEditPlaylist() {
   const language = watch('language');
   const isPublic = watch('is_public');
   const isOrdered = watch('is_ordered'); // Watch the is_ordered state
+  const existingPlaylistIsStudy = !!existingPlaylist?.is_ordered || !!existingPlaylist?.course_code || !!existingPlaylist?.unit_code;
 
   useEffect(() => {
     if (!authLoading && !user) {
@@ -99,13 +103,17 @@ export default function CreateEditPlaylist() {
     }
   }, [name, dirtyFields.slug, setValue]);
 
-  // Clear FACODI fields if playlist type changes to 'Collection'
+  // Clear FACODI fields if playlist type changes to 'Collection' or the profile is not eligible.
   useEffect(() => {
-    if (!isOrdered) {
+    const shouldForceCollection = !profileLoading && !canManageStudyPlaylists;
+    if (!isOrdered || shouldForceCollection) {
+      if (shouldForceCollection && isOrdered) {
+        setValue('is_ordered', false);
+      }
       setValue('course_code', '');
       setValue('unit_code', '');
     }
-  }, [isOrdered, setValue]);
+  }, [canManageStudyPlaylists, isOrdered, profileLoading, setValue]);
 
   const onSubmit = async (values: PlaylistFormValues) => {
     if (!user) {
@@ -115,18 +123,23 @@ export default function CreateEditPlaylist() {
       return;
     }
 
+    if (values.is_ordered && !canManageStudyPlaylists) {
+      notify.error(t('createEditPlaylist.error.facodiRoleRequired'));
+      return;
+    }
+
     try {
+      const isStudyPlaylist = canManageStudyPlaylists && values.is_ordered;
       const playlistData = {
         name: values.name,
         slug: values.slug,
         description: values.description || null,
         thumbnail_url: values.thumbnail_url || null,
-        // Only include course_code and unit_code if is_ordered is true
-        course_code: values.is_ordered ? (values.course_code || null) : null,
-        unit_code: values.is_ordered ? (values.unit_code || null) : null,
+        course_code: isStudyPlaylist ? (values.course_code || null) : null,
+        unit_code: isStudyPlaylist ? (values.unit_code || null) : null,
         language: values.language,
         is_public: values.is_public,
-        is_ordered: values.is_ordered,
+        is_ordered: isStudyPlaylist,
       };
 
       if (isEditing) {
@@ -141,10 +154,29 @@ export default function CreateEditPlaylist() {
     }
   };
 
-  if (authLoading || playlistLoading) {
+  if (authLoading || playlistLoading || profileLoading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
         <Loader2 className="w-8 h-8 animate-spin text-primary" />
+      </div>
+    );
+  }
+
+  if (isEditing && existingPlaylistIsStudy && !canManageStudyPlaylists) {
+    return (
+      <div className="min-h-screen flex flex-col">
+        <Header />
+        <main className="flex-1 container py-16 text-center">
+          <h1 className="text-3xl font-bold mb-4">{t('createEditPlaylist.facodiRestrictedTitle')}</h1>
+          <p className="text-muted-foreground mb-8">
+            {t('createEditPlaylist.facodiRestrictedDescription')}
+          </p>
+          <Button onClick={() => navigate(`/playlists/${playlistId}`)}>
+            <ArrowLeft className="w-4 h-4 mr-2" />
+            {t('createEditPlaylist.backToPlaylists')}
+          </Button>
+        </main>
+        <Footer />
       </div>
     );
   }
@@ -309,24 +341,28 @@ export default function CreateEditPlaylist() {
                   </div>
                   <p className="text-xs text-muted-foreground ml-6 -mt-1 mb-2">{t('createEditPlaylist.form.collectionHint')}</p>
                   
-                  {/* Learning Path (ordered) as the second option */}
-                  <div className="flex items-center space-x-2">
-                    <RadioGroupItem value="ordered" id="ordered" />
-                    <Label htmlFor="ordered">{t('createEditPlaylist.form.learningPath')}</Label>
-                  </div>
-                  <p className="text-xs text-muted-foreground ml-6 -mt-1">
-                    <Trans
-                      i18nKey="createEditPlaylist.form.learningPathHint"
-                      components={{
-                        facodiLink: <a href="https://facodi.pt" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline" />
-                      }}
-                    />
-                  </p>
+                  {canManageStudyPlaylists && (
+                    <>
+                      {/* Learning Path (ordered) as the second option */}
+                      <div className="flex items-center space-x-2">
+                        <RadioGroupItem value="ordered" id="ordered" />
+                        <Label htmlFor="ordered">{t('createEditPlaylist.form.learningPath')}</Label>
+                      </div>
+                      <p className="text-xs text-muted-foreground ml-6 -mt-1">
+                        <Trans
+                          i18nKey="createEditPlaylist.form.learningPathHint"
+                          components={{
+                            facodiLink: <a href="https://facodi.pt" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline" />
+                          }}
+                        />
+                      </p>
+                    </>
+                  )}
                 </RadioGroup>
               </div>
 
               {/* FACODI Fields - Conditionally rendered */}
-              {isOrdered && (
+              {isOrdered && canManageStudyPlaylists && (
                 <div className="space-y-6 border-t border-border/50 pt-6 animate-fade-in">
                   <h3 className="text-lg font-semibold flex items-center gap-2">
                     <GraduationCap className="w-5 h-5 text-primary" />

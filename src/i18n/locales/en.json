@@ -702,6 +702,8 @@
     "editDescription": "Update the details of your playlist.",
     "loadErrorTitle": "Error loading playlist",
     "loadErrorDescription": "Could not load playlist details. Please try again later.",
+    "facodiRestrictedTitle": "Restricted area",
+    "facodiRestrictedDescription": "FACODI study playlists can only be created or edited by eligible profiles.",
     "backToPlaylists": "Back to Playlists",
     "form": {
       "nameLabel": "Playlist Name",
@@ -747,7 +749,8 @@
       "unitCodeMaxLength": "Unit code cannot exceed 50 characters",
       "languageRequired": "Language is required",
       "notLoggedInTitle": "Error",
-      "notLoggedInDescription": "You need to be logged in to create or edit playlists."
+      "notLoggedInDescription": "You need to be logged in to create or edit playlists.",
+      "facodiRoleRequired": "Only eligible profiles can create FACODI study playlists."
     }
   },
   "comments": {
