@@ -811,6 +811,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      add_video_to_default_education_playlist: {
+        Args: { p_video_id: string }
+        Returns: string
+      }
       current_profile_can_manage_facodi_playlist: {
         Args: Record<PropertyKey, never>
         Returns: boolean
@@ -849,6 +853,10 @@ export type Database = {
       get_unread_notifications_count_secure: {
         Args: Record<PropertyKey, never>
         Returns: number
+      }
+      get_default_education_playlist_id: {
+        Args: Record<PropertyKey, never>
+        Returns: string
       }
       increment_video_view_count:
         | { Args: { p_video_id: string }; Returns: number }

@@ -171,6 +171,15 @@ export async function addVideoToPlaylist(payload: { playlistId: string; videoId:
   return data as PlaylistVideo;
 }
 
+export async function addVideoToDefaultEducationPlaylist(videoId: string) {
+  const { data, error } = await supabase.rpc('add_video_to_default_education_playlist', {
+    p_video_id: videoId,
+  });
+
+  if (error) throw error;
+  return data;
+}
+
 export async function removeVideoFromPlaylist(payload: { playlistId: string; videoId: string }) {
   const { error } = await supabase
     .from('playlist_videos')
