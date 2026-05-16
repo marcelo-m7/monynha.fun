@@ -7,7 +7,13 @@ export type VideoUpdate = Database['public']['Tables']['videos']['Update'];
 
 export type VideoCategory = Database['public']['Tables']['categories']['Row'];
 
+export type VideoAssignedPlaylist = Pick<
+  Database['public']['Tables']['playlists']['Row'],
+  'id' | 'name' | 'slug' | 'is_ordered' | 'course_code' | 'unit_code'
+>;
+
 export type VideoWithCategory = Video & {
   category?: VideoCategory | null;
   enrichment?: AiEnrichment | null;
+  assignedPlaylists?: VideoAssignedPlaylist[];
 };

@@ -27,6 +27,7 @@ export interface VideoEnrichmentParams {
   title: string;
   description: string;
   language?: string;
+  channelName?: string | null;
   categories?: CategoryContext[];
   playlists?: PlaylistContext[];
 }
@@ -69,7 +70,7 @@ export class OpenAIClient {
   }) {
     this.apiKey = options.apiKey;
     this.model = options.model || 'gpt-4o-mini';
-    this.timeout = options.timeout || 15000; // 15 seconds
+    this.timeout = options.timeout || 30000; // 30 seconds
     this.maxRetries = options.maxRetries || 2;
   }
 
@@ -158,7 +159,10 @@ export class OpenAIClient {
     } catch (error) {
       clearTimeout(timeoutId);
 
-      if (error instanceof TypeError && error.message.includes('signal')) {
+      if (
+        error instanceof Error &&
+        (error.name === 'AbortError' || error.message.toLowerCase().includes('aborted') || error.message.includes('signal'))
+      ) {
         throw new Error(`OpenAI request timeout after ${this.timeout}ms`);
       }
 
@@ -227,6 +231,7 @@ export class OpenAIClient {
 
 Title: "${params.title}"
 Description: "${params.description}"
+Channel: "${params.channelName || 'Unknown'}"
 Preferred Language: ${params.language || 'Portuguese'}
 ${categoryBlock}${playlistBlock}
 Respond ONLY with valid JSON (no markdown, no explanation):
@@ -235,7 +240,9 @@ Respond ONLY with valid JSON (no markdown, no explanation):
   "summary_description": "A 2-3 sentence summary (max 250 chars)",
   "semantic_tags": ["tag1", "tag2", "tag3", "tag4", "tag5"],
   "suggested_category_id": "exact-uuid-from-list-or-null",
+  "suggested_category": "short category/topic label",
   "suggested_playlist_id": "exact-uuid-from-list-or-null",
+  "suggested_playlist_query": "short natural-language course/topic query",
   "classification_confidence": 0.0,
   "cultural_relevance": "High, Medium, or Low",
   "short_summary": "A single sentence summary for UI display"
@@ -244,6 +251,7 @@ Respond ONLY with valid JSON (no markdown, no explanation):
 Rules:
 - suggested_category_id MUST be one of the exact UUIDs from the categories list above, or null.
 - suggested_playlist_id MUST be one of the exact UUIDs from the playlists list above, or null.
+- Prefer the original title, description, and channel when classifying course/topic. Do not infer a design/communication topic from decorative symbols, handwriting/pencil emojis, or generic visual wording when the title/channel indicates mathematics or another subject.
 - classification_confidence: number 0-1 reflecting how confident you are in the category choice.
 - If uncertain about category or playlist, return null for that field and set confidence < 0.5.
 `;
@@ -350,7 +358,7 @@ export function createOpenAIClient(): OpenAIClient {
   return new OpenAIClient({
     apiKey,
     model: Deno.env.get('OPENAI_MODEL') || 'gpt-4o-mini',
-    timeout: 15000,
+    timeout: 30000,
     maxRetries: 2,
   });
 }

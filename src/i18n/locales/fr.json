@@ -533,6 +533,7 @@
     "languageLabel": "Langue",
     "detectedAutomatically": "Détectée automatiquement",
     "detectingLanguage": "Détection de la langue",
+    "assignedPlaylistLabel": "Playlist attribuée",
     "management": {
       "editVideo": "Modifier la vidéo",
       "deleteVideo": "Supprimer la vidéo",

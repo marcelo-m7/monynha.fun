@@ -440,6 +440,7 @@
     "languageLabel": "Language",
     "detectedAutomatically": "Detected automatically",
     "detectingLanguage": "Detecting language",
+    "assignedPlaylistLabel": "Assigned playlist",
     "management": {
       "editVideo": "Edit video",
       "deleteVideo": "Remove video",

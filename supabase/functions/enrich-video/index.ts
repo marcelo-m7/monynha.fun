@@ -46,6 +46,8 @@ type EnhancedAssignmentResult = {
   reason: string;
 };
 
+type SubjectSignal = 'math' | 'design' | 'programming';
+
 class HttpError extends Error {
   status: number;
 
@@ -86,6 +88,161 @@ function tokenOverlapScore(left: string | null | undefined, right: string | null
   }
 
   return score;
+}
+
+const subjectKeywords: Record<SubjectSignal, string[]> = {
+  math: [
+    'matematica',
+    'matematico',
+    'calculo',
+    'analise',
+    'integral',
+    'integrais',
+    'integracao',
+    'derivada',
+    'limite',
+    'equacao',
+    'algebra',
+    'matriz',
+    'vetor',
+    'linha',
+    'coordenadas',
+    'polares',
+    'murakami',
+    'rapidola',
+  ],
+  design: [
+    'design',
+    'comunicacao',
+    'grafico',
+    'grafica',
+    'visual',
+    'tipografia',
+    'ilustracao',
+    'multimedia',
+    'interacao',
+    'marketing',
+    'caligrafia',
+  ],
+  programming: [
+    'programacao',
+    'programming',
+    'javascript',
+    'typescript',
+    'python',
+    'java',
+    'react',
+    'node',
+    'codigo',
+    'algoritmo',
+    'dados',
+    'software',
+  ],
+};
+
+function subjectSignalScore(text: string, subject: SubjectSignal): number {
+  const normalized = normalizeText(text);
+  return subjectKeywords[subject].reduce(
+    (score, keyword) => score + (normalized.includes(keyword) ? 1 : 0),
+    0,
+  );
+}
+
+function playlistSubjectScore(playlist: PlaylistRow, subject: SubjectSignal): number {
+  const playlistText = [
+    playlist.name,
+    playlist.description ?? '',
+    playlist.course_code ?? '',
+    playlist.unit_code ?? '',
+  ].join(' ');
+
+  return subjectSignalScore(playlistText, subject);
+}
+
+function getOriginalVideoText(params: {
+  title: string | null;
+  description: string | null;
+  channelName: string | null;
+}): string {
+  return [
+    params.title ?? '',
+    params.description ?? '',
+    params.channelName ?? '',
+  ].join(' ');
+}
+
+function scorePlaylistAgainstOriginalSource(
+  playlist: PlaylistRow,
+  sourceText: string,
+  videoLanguage: string,
+): number {
+  let score = 0;
+  const playlistText = [
+    playlist.name,
+    playlist.description ?? '',
+    playlist.course_code ?? '',
+    playlist.unit_code ?? '',
+  ].join(' ');
+
+  score += Math.min(8, tokenOverlapScore(sourceText, playlistText));
+
+  const mathSignal = subjectSignalScore(sourceText, 'math');
+  const designSignal = subjectSignalScore(sourceText, 'design');
+  const programmingSignal = subjectSignalScore(sourceText, 'programming');
+
+  const playlistMath = playlistSubjectScore(playlist, 'math');
+  const playlistDesign = playlistSubjectScore(playlist, 'design');
+  const playlistProgramming = playlistSubjectScore(playlist, 'programming');
+
+  if (mathSignal >= 2) {
+    score += playlistMath * 6;
+    if (playlistDesign > 0 && playlistMath === 0) score -= 18;
+    if (normalizeText(playlist.name).includes('matematica ii')) score += 14;
+    if (normalizeText(playlist.name).includes('matematica i')) score += 6;
+  }
+
+  if (designSignal >= 2) {
+    score += playlistDesign * 5;
+    if (playlistMath > 0 && playlistDesign === 0) score -= 8;
+  }
+
+  if (programmingSignal >= 2) {
+    score += playlistProgramming * 5;
+    if (playlistDesign > 0 && playlistProgramming === 0) score -= 8;
+  }
+
+  if (normalizeText(playlist.language) === normalizeText(videoLanguage)) {
+    score += 1;
+  }
+
+  if (playlist.course_code || playlist.unit_code) {
+    score += 1;
+  }
+
+  return score;
+}
+
+function isPlaylistCompatibleWithOriginalSource(
+  playlist: PlaylistRow,
+  sourceText: string,
+): boolean {
+  const mathSignal = subjectSignalScore(sourceText, 'math');
+  const designSignal = subjectSignalScore(sourceText, 'design');
+  const programmingSignal = subjectSignalScore(sourceText, 'programming');
+
+  if (mathSignal >= 2) {
+    return playlistSubjectScore(playlist, 'math') > 0;
+  }
+
+  if (designSignal >= 2) {
+    return playlistSubjectScore(playlist, 'design') > 0;
+  }
+
+  if (programmingSignal >= 2) {
+    return playlistSubjectScore(playlist, 'programming') > 0;
+  }
+
+  return true;
 }
 
 function resolveSuggestedCategoryId(
@@ -129,6 +286,7 @@ function pickPlaylistCandidate(
   enrichment: EnrichmentPayload,
   category: CategoryRow | null,
   videoLanguage: string,
+  sourceText: string,
 ): { playlistId: string | null; score: number } {
   let bestMatch: { playlistId: string | null; score: number } = {
     playlistId: null,
@@ -138,7 +296,7 @@ function pickPlaylistCandidate(
   const tagsText = enrichment.semantic_tags.join(' ');
 
   for (const playlist of playlists) {
-    let score = 0;
+    let score = scorePlaylistAgainstOriginalSource(playlist, sourceText, videoLanguage);
     const playlistText = [
       playlist.name,
       playlist.description ?? '',
@@ -264,6 +422,9 @@ async function runEnhancedAssignments(params: {
   videoId: string;
   currentVideoCategoryId: string | null;
   videoLanguage: string;
+  videoTitle: string | null;
+  videoDescription: string | null;
+  channelName: string | null;
   userId: string;
 }): Promise<EnhancedAssignmentResult> {
   const {
@@ -274,10 +435,18 @@ async function runEnhancedAssignments(params: {
     videoId,
     currentVideoCategoryId,
     videoLanguage,
+    videoTitle,
+    videoDescription,
+    channelName,
     userId,
   } = params;
 
   const categoryConfidence = enrichment.classification_confidence;
+  const originalSourceText = getOriginalVideoText({
+    title: videoTitle,
+    description: videoDescription,
+    channelName,
+  });
 
   // Primary path: AI returned a valid UUID from the provided categories list
   let resolvedCategoryId: string | null =
@@ -321,7 +490,10 @@ async function runEnhancedAssignments(params: {
   // Primary path: AI returned a valid UUID from the provided playlists list
   let resolvedPlaylistId: string | null =
     enrichment.suggested_playlist_id &&
-    playlistRows.some((p) => p.id === enrichment.suggested_playlist_id)
+    playlistRows.some((p) => {
+      return p.id === enrichment.suggested_playlist_id &&
+        isPlaylistCompatibleWithOriginalSource(p, originalSourceText);
+    })
       ? enrichment.suggested_playlist_id
       : null;
 
@@ -334,8 +506,9 @@ async function runEnhancedAssignments(params: {
       enrichment,
       categoryRow,
       effectiveLanguage,
+      originalSourceText,
     );
-    if (playlistCandidate.score >= 5 && categoryConfidence >= 0.55) {
+    if (playlistCandidate.score >= 5 && categoryConfidence >= 0.40) {
       resolvedPlaylistId = playlistCandidate.playlistId;
     }
   }
@@ -445,7 +618,7 @@ serve(async (req) => {
 
     const { data: video, error: videoError } = await supabaseServiceRole
       .from('videos')
-      .select('title, description, language, category_id')
+      .select('title, description, channel_name, language, category_id')
       .eq('id', videoId)
       .single();
 
@@ -494,6 +667,7 @@ serve(async (req) => {
       const enrichmentParams: VideoEnrichmentParams = {
         title: video.title || '',
         description: video.description || '',
+        channelName: video.channel_name || null,
         language: effectiveLanguage,
         categories: categoryRows,
         playlists: playlistRows,
@@ -524,6 +698,9 @@ serve(async (req) => {
         videoId,
         currentVideoCategoryId: video.category_id ?? null,
         videoLanguage: effectiveLanguage,
+        videoTitle: video.title ?? null,
+        videoDescription: video.description ?? null,
+        channelName: video.channel_name ?? null,
         userId: user.id,
       });
 

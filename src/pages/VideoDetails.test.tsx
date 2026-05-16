@@ -87,6 +87,7 @@ const sampleVideo: VideoWithCategory = {
     icon: 'BookOpen',
     created_at: new Date().toISOString(),
   },
+  assignedPlaylists: [],
 };
 
 function renderVideoDetails() {
@@ -173,6 +174,35 @@ describe('VideoDetails owner management', () => {
     renderVideoDetails();
 
     expect(screen.getByText(/Detecting language/)).toBeInTheDocument();
+  });
+
+  it('shows assigned playlists with links', () => {
+    useVideoByIdMock.mockReturnValue({
+      data: {
+        ...sampleVideo,
+        assignedPlaylists: [
+          {
+            id: 'playlist-1',
+            name: 'Análise Matemática II - 1º Ano 2º Semestre - LESTI',
+            slug: 'lesti-19411008',
+            is_ordered: true,
+            course_code: 'LESTI',
+            unit_code: '19411008',
+          },
+        ],
+      },
+      isLoading: false,
+      isError: false,
+    });
+
+    renderVideoDetails();
+
+    expect(screen.getByText(/Assigned playlist:/)).toBeInTheDocument();
+    expect(screen.getByText(/Análise Matemática II/)).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: /Assigned playlist: Análise Matemática II/ })).toHaveAttribute(
+      'href',
+      '/playlists/playlist-1',
+    );
   });
 
   it('submits edited metadata through the update mutation', async () => {

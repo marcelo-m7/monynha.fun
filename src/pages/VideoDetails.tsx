@@ -18,7 +18,7 @@ import { Card } from '@/components/ui/card';
 import { Sparkles } from 'lucide-react';
 import { CulturalRelevanceBadge } from '@/components/video/CulturalRelevanceBadge';
 import { SemanticTagBadge } from '@/components/video/SemanticTagBadge';
-import { Eye, Clock, Folder, ArrowLeft, Heart as HeartIcon, Loader2, Edit, Trash2, Languages } from 'lucide-react';
+import { Eye, Clock, Folder, ArrowLeft, Heart as HeartIcon, Loader2, Edit, Trash2, Languages, ListVideo } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -333,6 +333,14 @@ const VideoDetails = () => {
                     )}
                   </Badge>
                 )}
+                {video.assignedPlaylists?.map((playlist) => (
+                  <Link key={playlist.id} to={`/playlists/${playlist.id}`}>
+                    <Badge variant="outline" className="text-sm px-2.5 py-1 flex items-center gap-1 hover:bg-muted">
+                      <ListVideo className="w-3.5 h-3.5" />
+                      <span>{t('videoDetails.assignedPlaylistLabel')}: {playlist.name}</span>
+                    </Badge>
+                  </Link>
+                ))}
               </div>
             </div>
 

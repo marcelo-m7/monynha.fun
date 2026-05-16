@@ -1,5 +1,12 @@
 import { supabase } from '@/shared/api/supabase/supabaseClient';
-import type { Video, VideoCategory, VideoInsert, VideoUpdate, VideoWithCategory } from './video.types';
+import type {
+  Video,
+  VideoAssignedPlaylist,
+  VideoCategory,
+  VideoInsert,
+  VideoUpdate,
+  VideoWithCategory,
+} from './video.types';
 import type { AiEnrichment } from '@/entities/ai_enrichment/ai_enrichment.types';
 import { extractYouTubeId } from '@/shared/lib/youtube';
 import type { Json } from '@/integrations/supabase/types';
@@ -14,6 +21,9 @@ function getLatestEnrichment(enrichments: AiEnrichment[] | null | undefined): Ai
 type VideoWithRelations = Video & {
   category?: VideoCategory | null;
   ai_enrichments?: AiEnrichment[] | null;
+  playlist_videos?: Array<{
+    playlist?: VideoAssignedPlaylist | null;
+  }> | null;
 };
 
 type FeaturedVideoRpcRow = Video & {
@@ -146,7 +156,10 @@ export async function getVideoById(id: string) {
       `
       *,
         category:categories(id, name, slug, color),
-        ai_enrichments!video_id(*)
+        ai_enrichments!video_id(*),
+        playlist_videos!playlist_videos_video_id_fkey(
+          playlist:playlists(id, name, slug, is_ordered, course_code, unit_code)
+        )
     `,
       )
       .order('created_at', { foreignTable: 'ai_enrichments', ascending: false });
@@ -167,7 +180,11 @@ export async function getVideoById(id: string) {
       return {
         ...video,
         enrichment: getLatestEnrichment(video.ai_enrichments),
+        assignedPlaylists: (video.playlist_videos ?? [])
+          .map((entry) => entry.playlist)
+          .filter((playlist): playlist is VideoAssignedPlaylist => !!playlist),
         ai_enrichments: undefined,
+        playlist_videos: undefined,
       } as VideoWithCategory;
     }
   
