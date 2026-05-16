@@ -34,7 +34,7 @@ const PlaylistDetails = () => {
 
   useMetaTags({
     title: playlist?.name ? `${playlist.name} | Tube O2` : 'Tube O2',
-    description: playlist?.description || 'Playlist no Tube O2: Curadoria coletiva de vídeos do YouTube.',
+    description: playlist?.description || t('playlistDetails.metaFallbackDescription'),
     type: 'website',
   });
 

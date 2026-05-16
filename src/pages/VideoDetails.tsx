@@ -77,7 +77,7 @@ const VideoDetails = () => {
   const metaDescription =
     video?.enrichment?.short_summary?.trim() ||
     trimDescription(video?.description) ||
-    'Curadoria coletiva de vídeos do YouTube.';
+    t('videoDetails.metaFallbackDescription');
 
   const metaTitle = video?.title
     ? `${video.title.trim()} | Tube O2`
@@ -90,7 +90,7 @@ const VideoDetails = () => {
     image: video?.thumbnail_url || 'https://tube.open2.tech/opengraph-image-tube-o2.png',
     type: 'video.other',
     siteName: 'Tube O2',
-    twitterImageAlt: video?.title || 'Capa do vídeo no Tube O2',
+    twitterImageAlt: video?.title || t('videoDetails.metaImageAlt'),
     imageWidth: 1280,
     imageHeight: 720,
     imageType: 'image/jpeg',
@@ -202,6 +202,14 @@ const VideoDetails = () => {
   const languageLabelKey = getLanguageLabelKey(video.language);
   const languageLabel = languageLabelKey ? t(languageLabelKey) : video.language;
   const hasDetectedLanguage = !!video.enrichment?.language && video.enrichment.language === video.language && video.language !== 'und';
+  const assignedPlaylists = [...(video.assignedPlaylists ?? [])].sort((left, right) => {
+    const leftIsLearningPath = left.is_ordered || !!left.course_code || !!left.unit_code;
+    const rightIsLearningPath = right.is_ordered || !!right.course_code || !!right.unit_code;
+    if (leftIsLearningPath !== rightIsLearningPath) {
+      return leftIsLearningPath ? -1 : 1;
+    }
+    return left.name.localeCompare(right.name);
+  });
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -333,15 +341,43 @@ const VideoDetails = () => {
                     )}
                   </Badge>
                 )}
-                {video.assignedPlaylists?.map((playlist) => (
-                  <Link key={playlist.id} to={`/playlists/${playlist.id}`}>
-                    <Badge variant="outline" className="text-sm px-2.5 py-1 flex items-center gap-1 hover:bg-muted">
-                      <ListVideo className="w-3.5 h-3.5" />
-                      <span>{t('videoDetails.assignedPlaylistLabel')}: {playlist.name}</span>
-                    </Badge>
-                  </Link>
-                ))}
               </div>
+              {assignedPlaylists.length > 0 && (
+                <section
+                  aria-labelledby="assigned-playlists-heading"
+                  className="rounded-md border border-border bg-muted/20 p-4"
+                >
+                  <div className="flex items-start gap-3">
+                    <ListVideo className="mt-0.5 h-5 w-5 shrink-0 text-primary" />
+                    <div>
+                      <h2 id="assigned-playlists-heading" className="text-sm font-semibold">
+                        {t('videoDetails.assignedPlaylistsTitle')}
+                      </h2>
+                      <p className="mt-1 text-xs text-muted-foreground">
+                        {t('videoDetails.assignedPlaylistsDescription')}
+                      </p>
+                    </div>
+                  </div>
+                  <div className="mt-3 flex flex-wrap gap-2">
+                    {assignedPlaylists.map((playlist) => {
+                      const isLearningPath = playlist.is_ordered || !!playlist.course_code || !!playlist.unit_code;
+                      return (
+                        <Link key={playlist.id} to={`/playlists/${playlist.id}`}>
+                          <Badge
+                            variant="outline"
+                            className="max-w-full gap-1.5 px-2.5 py-1 text-sm hover:bg-muted"
+                          >
+                            <span className="truncate">{playlist.name}</span>
+                            <span className="shrink-0 text-xs text-muted-foreground">
+                              {isLearningPath ? t('playlists.learningPath') : t('playlists.collection')}
+                            </span>
+                          </Badge>
+                        </Link>
+                      );
+                    })}
+                  </div>
+                </section>
+              )}
             </div>
 
             {/* Description */}
@@ -352,7 +388,7 @@ const VideoDetails = () => {
               </p>
             </div>
 
-              {/* AI-Generated Summary */}
+              {/* AI-generated summary */}
               {video.enrichment && (
                 <Card className="p-6 border border-primary/30 bg-card">
                   <div className="flex items-start gap-3">
@@ -361,7 +397,7 @@ const VideoDetails = () => {
                     </div>
                     <div className="flex-1 space-y-3">
                       <div className="flex items-center justify-between">
-                        <h3 className="text-lg font-semibold">AI-Generated Summary</h3>
+                        <h3 className="text-lg font-semibold">{t('videoDetails.aiSummaryTitle')}</h3>
                         <CulturalRelevanceBadge relevance={video.enrichment.cultural_relevance} />
                       </div>
                     
@@ -374,7 +410,7 @@ const VideoDetails = () => {
                       {video.enrichment.summary_description && video.enrichment.summary_description !== video.enrichment.short_summary && (
                         <details className="group">
                           <summary className="text-sm text-primary cursor-pointer hover:underline">
-                            Read full summary
+                            {t('videoDetails.readFullSummary')}
                           </summary>
                           <p className="text-sm text-muted-foreground mt-2 leading-relaxed">
                             {video.enrichment.summary_description}

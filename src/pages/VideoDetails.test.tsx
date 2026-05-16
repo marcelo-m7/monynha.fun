@@ -182,6 +182,14 @@ describe('VideoDetails owner management', () => {
         ...sampleVideo,
         assignedPlaylists: [
           {
+            id: 'playlist-education',
+            name: 'Educacao',
+            slug: 'educacao',
+            is_ordered: false,
+            course_code: null,
+            unit_code: null,
+          },
+          {
             id: 'playlist-1',
             name: 'Análise Matemática II - 1º Ano 2º Semestre - LESTI',
             slug: 'lesti-19411008',
@@ -197,11 +205,16 @@ describe('VideoDetails owner management', () => {
 
     renderVideoDetails();
 
-    expect(screen.getByText(/Assigned playlist:/)).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'Assigned playlists' })).toBeInTheDocument();
     expect(screen.getByText(/Análise Matemática II/)).toBeInTheDocument();
-    expect(screen.getByRole('link', { name: /Assigned playlist: Análise Matemática II/ })).toHaveAttribute(
+    expect(screen.getByText('Educacao')).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: /Análise Matemática II .* Learning Path/i })).toHaveAttribute(
       'href',
       '/playlists/playlist-1',
+    );
+    expect(screen.getByRole('link', { name: /Educacao Collection/i })).toHaveAttribute(
+      'href',
+      '/playlists/playlist-education',
     );
   });
 
