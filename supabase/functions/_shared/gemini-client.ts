@@ -101,14 +101,14 @@ export class GeminiClient {
   }
 
   private buildTranscriptPrompt(title: string, language?: string | null) {
-    return `Analyze the public YouTube video and extract a faithful transcript if available.
+    return `Analyze the public YouTube video and extract a compact transcript summary.
 
 Video title: "${title}"
 Preferred language: ${language || 'auto'}
 
 Respond ONLY with valid JSON:
 {
-  "transcriptText": "full transcript text when available, otherwise null",
+  "transcriptText": "short faithful transcript excerpt only when captions/audio are immediately available, otherwise null",
   "transcriptSummary": "public-safe 2-4 sentence summary of the spoken content",
   "language": "ISO 639-1 language code if detected, otherwise null",
   "confidence": 0.0,
@@ -116,9 +116,11 @@ Respond ONLY with valid JSON:
 }
 
 Rules:
-- Do not invent a transcript when the audio or captions are unavailable.
-- transcriptSummary may be present even if transcriptText is unavailable.
+- Do not attempt a long full-video transcript.
+- Do not invent transcriptText when captions/audio are unavailable quickly.
+- transcriptSummary should be present when the video can be analyzed.
 - Keep transcriptSummary under 700 characters.
+- Keep transcriptText under 1200 characters when present.
 - confidence must be a number between 0 and 1.
 `;
   }
@@ -149,7 +151,7 @@ Rules:
           ],
           generationConfig: {
             temperature: 0.2,
-            maxOutputTokens: 4096,
+            maxOutputTokens: 1024,
             responseMimeType: 'application/json',
           },
         }),
