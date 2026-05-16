@@ -1,5 +1,6 @@
 .codemachine/
 backend/
+.agents/*
 backend/.env
 backend/.env.local
 # Logs
@@ -31,3 +32,4 @@ dist-ssr
 /.playwright-mcp
 .dyad/
 docker-compose.yml
+skills-lock.json

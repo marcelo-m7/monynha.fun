@@ -1,5 +1,5 @@
 import { supabase } from '@/shared/api/supabase/supabaseClient';
-import type { Video, VideoCategory, VideoInsert, VideoWithCategory } from './video.types';
+import type { Video, VideoCategory, VideoInsert, VideoUpdate, VideoWithCategory } from './video.types';
 import type { AiEnrichment } from '@/entities/ai_enrichment/ai_enrichment.types';
 import { extractYouTubeId } from '@/shared/lib/youtube';
 import type { Json } from '@/integrations/supabase/types';
@@ -301,6 +301,24 @@ export async function createVideo(payload: VideoInsert) {
 
   if (error) throw error;
   return data as Video;
+}
+
+export async function updateVideo(payload: VideoUpdate & { id: string }) {
+  const { id, ...updates } = payload;
+  const { data, error } = await supabase
+    .from('videos')
+    .update(updates)
+    .eq('id', id)
+    .select()
+    .single();
+
+  if (error) throw error;
+  return data as Video;
+}
+
+export async function deleteVideo(videoId: string) {
+  const { error } = await supabase.from('videos').delete().eq('id', videoId);
+  if (error) throw error;
 }
 
 export async function findVideoByYoutubeId(youtubeId: string) {

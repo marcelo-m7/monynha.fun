@@ -383,7 +383,23 @@
     "relatedVideosTitle": "Related Videos",
     "noRelatedVideos": "No related videos found.",
     "favoriteInfo": "You need to be logged in to favorite videos.",
-    "loginAction": "Login"
+    "loginAction": "Login",
+    "management": {
+      "editVideo": "Edit video",
+      "deleteVideo": "Remove video",
+      "editDescription": "Update the allowed metadata for this video.",
+      "titleLabel": "Title",
+      "descriptionLabel": "Description",
+      "categoryLabel": "Category",
+      "languageLabel": "Language",
+      "saveChanges": "Save changes",
+      "updateSuccess": "Video updated successfully.",
+      "updateError": "Could not update the video.",
+      "deleteSuccess": "Video removed successfully.",
+      "deleteError": "Could not remove the video.",
+      "confirmDeleteTitle": "Remove video?",
+      "confirmDeleteDescription": "This action cannot be undone. The video '{{title}}' will be permanently removed."
+    }
   },
   "favorites": {
     "title": "My Favorites",

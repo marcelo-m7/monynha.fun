@@ -320,7 +320,7 @@
   },
   "about": {
     "title": "Acerca de",
-    "description": "Conoce más sobre Monynha Fun y nuestra misión."
+    "description": "Conoce más sobre Tube O2 y nuestra misión."
   },
   "rules": {
     "title": "Reglas",
@@ -387,8 +387,8 @@
   },
   "faqPage": {
     "q1": {
-      "question": "¿Qué es Monynha Fun?",
-      "answer": "Monynha Fun es una plataforma comunitaria para curar contenido valioso de YouTube."
+      "question": "¿Qué es Tube O2?",
+      "answer": "Tube O2 es una plataforma comunitaria para curar contenido valioso de YouTube."
     },
     "q2": {
       "question": "¿Quién puede enviar videos?",
@@ -404,7 +404,7 @@
     },
     "q5": {
       "question": "¿Cómo puedo contactar al equipo?",
-      "answer": "Usa el formulario de contacto o envía un email a hello@monynha.com."
+      "answer": "Usa el formulario de contacto o envía un email a hello@open2.tech."
     }
   },
   "submit": {
@@ -476,7 +476,23 @@
     "relatedVideosTitle": "Videos Relacionados",
     "noRelatedVideos": "No se encontraron videos relacionados.",
     "favoriteInfo": "Debes iniciar sesión para añadir videos a favoritos.",
-    "loginAction": "Iniciar Sesión"
+    "loginAction": "Iniciar Sesión",
+    "management": {
+      "editVideo": "Editar video",
+      "deleteVideo": "Eliminar video",
+      "editDescription": "Actualiza los metadatos permitidos de este video.",
+      "titleLabel": "Título",
+      "descriptionLabel": "Descripción",
+      "categoryLabel": "Categoría",
+      "languageLabel": "Idioma",
+      "saveChanges": "Guardar cambios",
+      "updateSuccess": "Video actualizado correctamente.",
+      "updateError": "No se pudo actualizar el video.",
+      "deleteSuccess": "Video eliminado correctamente.",
+      "deleteError": "No se pudo eliminar el video.",
+      "confirmDeleteTitle": "¿Eliminar video?",
+      "confirmDeleteDescription": "Esta acción no se puede deshacer. El video '{{title}}' se eliminará permanentemente."
+    }
   },
   "favorites": {
     "title": "Mis Favoritos",
@@ -593,7 +609,7 @@
       "warning": {
         "noVideosFoundInPlaylist": "No se encontraron videos en la lista de reproducción de YouTube. Se creará una lista de reproducción vacía."
       },
-      "apiLimitationInfo": "Monynha Fun utiliza un servicio de backend para obtener videos de listas de reproducción de YouTube, pero depende de la API de datos de YouTube, que tiene cuotas y puede que no siempre devuelva todos los videos para listas de reproducción muy grandes. Para obtener resultados óptimos, asegúrate de que la lista de reproducción sea pública."
+      "apiLimitationInfo": "Tube O2 utiliza un servicio de backend para obtener videos de listas de reproducción de YouTube, pero depende de la API de datos de YouTube, que tiene cuotas y puede que no siempre devuelva todos los videos para listas de reproducción muy grandes. Para obtener resultados óptimos, asegúrate de que la lista de reproducción sea pública."
     },
     "feedback": {
       "createSuccess": "¡Lista de reproducción creada con éxito!",

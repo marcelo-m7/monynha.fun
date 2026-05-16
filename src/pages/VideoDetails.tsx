@@ -1,5 +1,7 @@
+import { useState } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
-import { useVideoById, useRelatedVideos } from '@/features/videos/queries/useVideos';
+import { useDeleteVideo, useUpdateVideo, useVideoById, useRelatedVideos } from '@/features/videos/queries/useVideos';
+import { useCategories } from '@/features/categories/queries/useCategories';
 import { formatDuration, formatViewCount } from '@/shared/lib/format';
 import { useAuth } from '@/features/auth/useAuth';
 import { useIsFavorited, useAddFavorite, useRemoveFavorite } from '@/features/favorites/queries/useFavorites';
@@ -16,8 +18,14 @@ import { Card } from '@/components/ui/card';
 import { Sparkles } from 'lucide-react';
 import { CulturalRelevanceBadge } from '@/components/video/CulturalRelevanceBadge';
 import { SemanticTagBadge } from '@/components/video/SemanticTagBadge';
-import { Eye, Clock, Folder, ArrowLeft, Heart as HeartIcon, Loader2 } from 'lucide-react';
+import { Eye, Clock, Folder, ArrowLeft, Heart as HeartIcon, Loader2, Edit, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 import { notify } from '@/shared/lib/notify';
 import { useTranslation } from 'react-i18next';
 import { CommentsSection } from '@/components/comment/CommentsSection'; // Import CommentsSection
@@ -28,6 +36,7 @@ const VideoDetails = () => {
   const navigate = useNavigate();
   const { user, loading: authLoading } = useAuth();
   const { data: video, isLoading, isError } = useVideoById(videoId);
+  const { data: categories } = useCategories();
   const { data: profile } = useProfileById(video?.submitted_by);
   const { data: relatedVideos, isLoading: relatedLoading } = useRelatedVideos(
     video?.id || '', 
@@ -37,6 +46,14 @@ const VideoDetails = () => {
   const { data: isFavorited, isLoading: isFavoritedLoading } = useIsFavorited(video?.id);
   const addFavoriteMutation = useAddFavorite();
   const removeFavoriteMutation = useRemoveFavorite();
+  const updateVideoMutation = useUpdateVideo();
+  const deleteVideoMutation = useDeleteVideo();
+
+  const [editDialogOpen, setEditDialogOpen] = useState(false);
+  const [editTitle, setEditTitle] = useState('');
+  const [editDescription, setEditDescription] = useState('');
+  const [editCategoryId, setEditCategoryId] = useState('none');
+  const [editLanguage, setEditLanguage] = useState('pt');
 
   const trimDescription = (text?: string | null, maxLength = 160) => {
     const value = (text ?? '').trim();
@@ -85,6 +102,36 @@ const VideoDetails = () => {
     } else {
       await addFavoriteMutation.mutateAsync(video.id);
     }
+  };
+
+  const isOwner = !!user && !!video?.submitted_by && video.submitted_by === user.id;
+
+  const openEditDialog = () => {
+    if (!video) return;
+    setEditTitle(video.title);
+    setEditDescription(video.description || '');
+    setEditCategoryId(video.category_id || 'none');
+    setEditLanguage(video.language || 'pt');
+    setEditDialogOpen(true);
+  };
+
+  const handleUpdateVideo = async () => {
+    if (!video || !editTitle.trim()) return;
+
+    await updateVideoMutation.mutateAsync({
+      id: video.id,
+      title: editTitle.trim(),
+      description: editDescription.trim() || null,
+      category_id: editCategoryId === 'none' ? null : editCategoryId,
+      language: editLanguage,
+    });
+    setEditDialogOpen(false);
+  };
+
+  const handleDeleteVideo = async () => {
+    if (!video) return;
+    await deleteVideoMutation.mutateAsync(video.id);
+    navigate('/videos');
   };
 
   if (isLoading || authLoading) {
@@ -169,21 +216,65 @@ const VideoDetails = () => {
 
             {/* Video Info */}
             <div className="space-y-3">
-              <div className="flex items-center justify-between">
+              <div className="flex items-center justify-between gap-3">
                 <h1 className="text-2xl md:text-3xl font-bold leading-tight">{video.title}</h1>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={handleFavoriteToggle}
-                  disabled={isFavoritedLoading || addFavoriteMutation.isPending || removeFavoriteMutation.isPending}
-                  className="text-muted-foreground hover:text-primary"
-                >
-                  {isFavoritedLoading || addFavoriteMutation.isPending || removeFavoriteMutation.isPending ? (
-                    <Loader2 className="w-6 h-6 animate-spin" />
-                  ) : (
-                    <HeartIcon className={`w-6 h-6 ${isFavorited ? 'fill-primary text-primary' : ''}`} />
+                <div className="flex shrink-0 items-center gap-1">
+                  {isOwner && (
+                    <>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={openEditDialog}
+                        disabled={updateVideoMutation.isPending || deleteVideoMutation.isPending}
+                        className="text-muted-foreground hover:text-foreground"
+                        aria-label={t('videoDetails.management.editVideo')}
+                      >
+                        <Edit className="w-5 h-5" />
+                      </Button>
+                      <AlertDialog>
+                        <AlertDialogTrigger asChild>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            disabled={deleteVideoMutation.isPending}
+                            className="text-muted-foreground hover:text-destructive"
+                            aria-label={t('videoDetails.management.deleteVideo')}
+                          >
+                            <Trash2 className="w-5 h-5" />
+                          </Button>
+                        </AlertDialogTrigger>
+                        <AlertDialogContent>
+                          <AlertDialogHeader>
+                            <AlertDialogTitle>{t('videoDetails.management.confirmDeleteTitle')}</AlertDialogTitle>
+                            <AlertDialogDescription>
+                              {t('videoDetails.management.confirmDeleteDescription', { title: video.title })}
+                            </AlertDialogDescription>
+                          </AlertDialogHeader>
+                          <AlertDialogFooter>
+                            <AlertDialogCancel>{t('common.cancel')}</AlertDialogCancel>
+                            <AlertDialogAction onClick={handleDeleteVideo} disabled={deleteVideoMutation.isPending}>
+                              {deleteVideoMutation.isPending ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : null}
+                              {t('common.delete')}
+                            </AlertDialogAction>
+                          </AlertDialogFooter>
+                        </AlertDialogContent>
+                      </AlertDialog>
+                    </>
                   )}
-                </Button>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={handleFavoriteToggle}
+                    disabled={isFavoritedLoading || addFavoriteMutation.isPending || removeFavoriteMutation.isPending}
+                    className="text-muted-foreground hover:text-primary"
+                  >
+                    {isFavoritedLoading || addFavoriteMutation.isPending || removeFavoriteMutation.isPending ? (
+                      <Loader2 className="w-6 h-6 animate-spin" />
+                    ) : (
+                      <HeartIcon className={`w-6 h-6 ${isFavorited ? 'fill-primary text-primary' : ''}`} />
+                    )}
+                  </Button>
+                </div>
               </div>
               <p className="text-lg text-muted-foreground">{video.channel_name}</p>
               <p className="text-sm text-muted-foreground">
@@ -310,6 +401,84 @@ const VideoDetails = () => {
           </div>
         </div>
       </main>
+      <Dialog open={editDialogOpen} onOpenChange={setEditDialogOpen}>
+        <DialogContent className="sm:max-w-lg">
+          <DialogHeader>
+            <DialogTitle>{t('videoDetails.management.editVideo')}</DialogTitle>
+            <DialogDescription>{t('videoDetails.management.editDescription')}</DialogDescription>
+          </DialogHeader>
+
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="video-title">{t('videoDetails.management.titleLabel')}</Label>
+              <Input
+                id="video-title"
+                value={editTitle}
+                onChange={(event) => setEditTitle(event.target.value)}
+                maxLength={120}
+                aria-invalid={!editTitle.trim()}
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="video-description">{t('videoDetails.management.descriptionLabel')}</Label>
+              <Textarea
+                id="video-description"
+                value={editDescription}
+                onChange={(event) => setEditDescription(event.target.value)}
+                rows={4}
+                maxLength={500}
+              />
+              <p className="text-xs text-muted-foreground text-right">{editDescription.length}/500</p>
+            </div>
+
+            <div className="grid gap-4 sm:grid-cols-2">
+              <div className="space-y-2">
+                <Label>{t('videoDetails.management.categoryLabel')}</Label>
+                <Select value={editCategoryId} onValueChange={setEditCategoryId}>
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="none">{t('common.none')}</SelectItem>
+                    {categories?.map((category) => (
+                      <SelectItem key={category.id} value={category.id}>
+                        {category.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="space-y-2">
+                <Label>{t('videoDetails.management.languageLabel')}</Label>
+                <Select value={editLanguage} onValueChange={setEditLanguage}>
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="pt">{t('common.language.pt')}</SelectItem>
+                    <SelectItem value="en">{t('common.language.en')}</SelectItem>
+                    <SelectItem value="es">{t('common.language.es')}</SelectItem>
+                    <SelectItem value="fr">{t('common.language.fr')}</SelectItem>
+                    <SelectItem value="other">{t('common.language.other')}</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+          </div>
+
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setEditDialogOpen(false)}>
+              {t('common.cancel')}
+            </Button>
+            <Button onClick={handleUpdateVideo} disabled={updateVideoMutation.isPending || !editTitle.trim()}>
+              {updateVideoMutation.isPending ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : null}
+              {t('videoDetails.management.saveChanges')}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
       <Footer />
     </div>
   );

@@ -239,7 +239,7 @@
   },
   "about": {
     "title": "À Propos",
-    "description": "En savoir plus sur Monynha Fun et notre mission."
+    "description": "En savoir plus sur Tube O2 et notre mission."
   },
   "rules": {
     "title": "Règles",
@@ -319,7 +319,23 @@
     "relatedVideosTitle": "Vidéos Similaires",
     "noRelatedVideos": "Aucune vidéo similaire trouvée.",
     "favoriteInfo": "Vous devez être connecté pour ajouter des vidéos aux favoris.",
-    "loginAction": "Connexion"
+    "loginAction": "Connexion",
+    "management": {
+      "editVideo": "Modifier la vidéo",
+      "deleteVideo": "Supprimer la vidéo",
+      "editDescription": "Mettez à jour les métadonnées autorisées pour cette vidéo.",
+      "titleLabel": "Titre",
+      "descriptionLabel": "Description",
+      "categoryLabel": "Catégorie",
+      "languageLabel": "Langue",
+      "saveChanges": "Enregistrer",
+      "updateSuccess": "Vidéo mise à jour avec succès.",
+      "updateError": "Impossible de mettre à jour la vidéo.",
+      "deleteSuccess": "Vidéo supprimée avec succès.",
+      "deleteError": "Impossible de supprimer la vidéo.",
+      "confirmDeleteTitle": "Supprimer la vidéo ?",
+      "confirmDeleteDescription": "Cette action est irréversible. La vidéo '{{title}}' sera supprimée définitivement."
+    }
   },
   "favorites": {
     "title": "Mes Favoris",
@@ -427,16 +443,16 @@
       },
       "success": {
         "playlistCreated": "¡Lista de reproducción '{{name}}' creada con éxito!",
-        "videoAdded": "Video '{{title}}' añadido a Monynha Fun.",
+        "videoAdded": "Vidéo '{{title}}' ajoutée à Tube O2.",
         "allVideosProcessed": "Se importaron {{count}} videos a la lista de reproducción con éxito."
       },
       "info": {
-        "videoAlreadyExists": "El video '{{title}}' ya existe en Monynha Fun. Se omite la creación."
+        "videoAlreadyExists": "La vidéo '{{title}}' existe déjà dans Tube O2. Création ignorée."
       },
       "warning": {
         "noVideosFoundInPlaylist": "No se encontraron videos en la lista de reproducción de YouTube. Se creará una lista de reproducción vacía."
       },
-      "apiLimitationInfo": "Monynha Fun utiliza un servicio de backend para obtener videos de listas de reproducción de YouTube, pero depende de la API de datos de YouTube, que tiene cuotas y puede que no siempre devuelva todos los videos para listas de reproducción muy grandes. Para obtener resultados óptimos, asegúrate de que la lista de reproducción sea pública."
+      "apiLimitationInfo": "Tube O2 utilise un service backend pour récupérer les vidéos des playlists YouTube, mais dépend de l'API YouTube Data, qui possède des quotas et peut ne pas toujours renvoyer toutes les vidéos des très grandes playlists. Pour de meilleurs résultats, assurez-vous que la playlist est publique."
     },
     "feedback": {
       "createSuccess": "Playlist créée avec succès !",
@@ -776,8 +792,8 @@
   },
   "faqPage": {
     "q1": {
-      "question": "Qu'est-ce que Monynha Fun ?",
-      "answer": "Monynha Fun est une plateforme communautaire de curation de contenus YouTube utiles."
+      "question": "Qu'est-ce que Tube O2 ?",
+      "answer": "Tube O2 est une plateforme communautaire de curation de contenus YouTube utiles."
     },
     "q2": {
       "question": "Qui peut soumettre des vidéos ?",
@@ -793,7 +809,7 @@
     },
     "q5": {
       "question": "Comment contacter l'équipe ?",
-      "answer": "Utilisez le formulaire de contact ou écrivez à hello@monynha.com."
+      "answer": "Utilisez le formulaire de contact ou écrivez à hello@open2.tech."
     }
   },
   "comments": {

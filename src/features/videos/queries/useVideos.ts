@@ -1,15 +1,19 @@
-import { useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import {
+  deleteVideo,
   getVideoById,
   getVideoCount,
   listFeaturedVideos,
   listRecentVideos,
   listRelatedVideos,
   listVideos,
+  updateVideo,
 } from '@/entities/video/video.api';
 import { videoKeys } from '@/entities/video/video.keys';
 import type { VideoListParams } from '@/entities/video/video.keys';
-import type { VideoWithCategory } from '@/entities/video/video.types';
+import type { Video, VideoUpdate, VideoWithCategory } from '@/entities/video/video.types';
+import { notify } from '@/shared/lib/notify';
+import { useTranslation } from 'react-i18next';
 
 interface UseVideosOptions extends VideoListParams {
   enabled?: boolean;
@@ -63,5 +67,38 @@ export function useVideoCount() {
   return useQuery<number, Error>({
     queryKey: videoKeys.count(),
     queryFn: () => getVideoCount(),
+  });
+}
+
+export function useUpdateVideo() {
+  const queryClient = useQueryClient();
+  const { t } = useTranslation();
+
+  return useMutation<Video, Error, VideoUpdate & { id: string }>({
+    mutationFn: updateVideo,
+    onSuccess: (video) => {
+      queryClient.invalidateQueries({ queryKey: videoKeys.all });
+      queryClient.invalidateQueries({ queryKey: videoKeys.detail(video.id) });
+      notify.success(t('videoDetails.management.updateSuccess'));
+    },
+    onError: (error) => {
+      notify.error(t('videoDetails.management.updateError'), { description: error.message });
+    },
+  });
+}
+
+export function useDeleteVideo() {
+  const queryClient = useQueryClient();
+  const { t } = useTranslation();
+
+  return useMutation<void, Error, string>({
+    mutationFn: deleteVideo,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: videoKeys.all });
+      notify.success(t('videoDetails.management.deleteSuccess'));
+    },
+    onError: (error) => {
+      notify.error(t('videoDetails.management.deleteError'), { description: error.message });
+    },
   });
 }
