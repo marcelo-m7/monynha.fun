@@ -702,6 +702,8 @@
     "editDescription": "Actualiza los detalles de tu lista de reproducción.",
     "loadErrorTitle": "Error al cargar lista de reproducción",
     "loadErrorDescription": "No se pudieron cargar los detalles de la lista de reproducción. Por favor, inténtalo de nouveau plus tard.",
+    "facodiRestrictedTitle": "Zone restreinte",
+    "facodiRestrictedDescription": "Les playlists d'étude FACODI ne peuvent être créées ou modifiées que par des profils éligibles.",
     "backToPlaylists": "Volver a Listas de Reproducción",
     "form": {
       "nameLabel": "Nombre de la Lista de Reproducción",
@@ -747,7 +749,8 @@
       "unitCodeMaxLength": "Le code de l'unité ne peut pas dépasser 50 caractères",
       "languageRequired": "La langue est obligatoire",
       "notLoggedInTitle": "Erreur",
-      "notLoggedInDescription": "Vous devez être connecté pour créer ou modifier des playlists."
+      "notLoggedInDescription": "Vous devez être connecté pour créer ou modifier des playlists.",
+      "facodiRoleRequired": "Seuls les profils éligibles peuvent créer des playlists d'étude FACODI."
     }
   },
   "comments": {
