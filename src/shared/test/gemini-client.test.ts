@@ -110,4 +110,38 @@ describe('GeminiClient', () => {
       unavailableReason: 'Gemini returned a non-JSON transcript summary',
     });
   });
+
+  it('extracts useful transcript data from truncated Gemini JSON', async () => {
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue(
+      new Response(JSON.stringify({
+        candidates: [
+          {
+            content: {
+              parts: [
+                {
+                  text: '{\\n  "transcriptText": "Partial transcript text",\\n  "language": "pt"',
+                },
+              ],
+            },
+          },
+        ],
+      }), {
+        status: 200,
+        headers: { 'Content-Type': 'application/json' },
+      }),
+    ));
+
+    const client = new GeminiClient({ apiKey: 'gemini-key', timeout: 1000, maxRetries: 0 });
+    await expect(client.transcribeYouTubeVideo({
+      youtubeUrl: 'https://youtu.be/USW31veYWAc',
+      title: 'Integrais Duplas',
+      language: 'pt',
+    })).resolves.toEqual({
+      transcriptText: 'Partial transcript text',
+      transcriptSummary: 'Partial transcript text',
+      language: 'pt',
+      confidence: 0.35,
+      unavailableReason: 'Gemini returned partial JSON transcript data',
+    });
+  });
 });

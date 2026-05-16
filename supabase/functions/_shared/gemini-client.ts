@@ -62,6 +62,46 @@ function optionalString(value: unknown): string | null {
   return typeof value === 'string' && value.trim() ? value.trim() : null;
 }
 
+function extractPartialJsonStringField(content: string, field: string): string | null {
+  const fieldMarker = `"${field}"`;
+  const fieldIndex = content.indexOf(fieldMarker);
+  if (fieldIndex === -1) {
+    return null;
+  }
+
+  const afterField = content.slice(fieldIndex + fieldMarker.length);
+  const colonIndex = afterField.indexOf(':');
+  if (colonIndex === -1) {
+    return null;
+  }
+
+  const afterColon = afterField.slice(colonIndex + 1).trimStart();
+  if (!afterColon.startsWith('"')) {
+    return null;
+  }
+
+  let result = '';
+  let escaped = false;
+  for (let index = 1; index < afterColon.length; index += 1) {
+    const char = afterColon[index];
+    if (escaped) {
+      result += char;
+      escaped = false;
+      continue;
+    }
+    if (char === '\\') {
+      escaped = true;
+      continue;
+    }
+    if (char === '"') {
+      break;
+    }
+    result += char;
+  }
+
+  return optionalString(result);
+}
+
 function compactSummaryFallback(content: string): GeminiTranscriptResult | null {
   const summary = content
     .replace(/```(?:json)?/gi, '')
@@ -69,6 +109,19 @@ function compactSummaryFallback(content: string): GeminiTranscriptResult | null 
     .trim()
     .slice(0, 700)
     .trim();
+  const transcriptText = extractPartialJsonStringField(content, 'transcriptText');
+  const transcriptSummary = extractPartialJsonStringField(content, 'transcriptSummary');
+  const language = extractPartialJsonStringField(content, 'language');
+
+  if (transcriptText || transcriptSummary) {
+    return {
+      transcriptText: transcriptText ? transcriptText.slice(0, 1200).trim() : null,
+      transcriptSummary: (transcriptSummary ?? transcriptText ?? null)?.slice(0, 700).trim() ?? null,
+      language: language?.slice(0, 12).trim() ?? null,
+      confidence: 0.35,
+      unavailableReason: 'Gemini returned partial JSON transcript data',
+    };
+  }
 
   if (!summary) {
     return null;
