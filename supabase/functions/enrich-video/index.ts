@@ -19,6 +19,9 @@ type PlaylistRow = {
   description: string | null;
   language: string;
   is_public: boolean;
+  is_ordered: boolean;
+  course_code: string | null;
+  unit_code: string | null;
 };
 
 type EnrichmentPayload = {
@@ -136,7 +139,12 @@ function pickPlaylistCandidate(
 
   for (const playlist of playlists) {
     let score = 0;
-    const playlistText = `${playlist.name} ${playlist.description ?? ''}`;
+    const playlistText = [
+      playlist.name,
+      playlist.description ?? '',
+      playlist.course_code ?? '',
+      playlist.unit_code ?? '',
+    ].join(' ');
 
     score += Math.min(4, tokenOverlapScore(enrichment.suggested_playlist_query, playlistText));
     score += Math.min(2, tokenOverlapScore(enrichment.suggested_category, playlistText));
@@ -147,6 +155,10 @@ function pickPlaylistCandidate(
     }
 
     if (normalizeText(playlist.language) === normalizeText(videoLanguage)) {
+      score += 1;
+    }
+
+    if (playlist.course_code || playlist.unit_code) {
       score += 1;
     }
 
@@ -454,21 +466,20 @@ serve(async (req) => {
 
     const effectiveLanguage = video.language && video.language !== 'und' ? video.language : 'pt';
     const { data: playlistsByLanguage, error: playlistFetchError } = await supabaseServiceRole
-      .from('playlists')
-      .select('id, name, description, language, is_public')
-      .eq('is_public', true)
-      .eq('language', effectiveLanguage)
-      .limit(30);
+      .rpc('list_education_playlists_for_assignment', {
+        p_language: effectiveLanguage,
+        p_limit: 120,
+      });
     if (playlistFetchError) {
       throw new Error(`Failed to load playlists: ${playlistFetchError.message}`);
     }
     let playlistsData = playlistsByLanguage;
     if (!playlistsData || playlistsData.length === 0) {
       const { data: fallbackData, error: fallbackError } = await supabaseServiceRole
-        .from('playlists')
-        .select('id, name, description, language, is_public')
-        .eq('is_public', true)
-        .limit(30);
+        .rpc('list_education_playlists_for_assignment', {
+          p_language: null,
+          p_limit: 120,
+        });
       if (fallbackError) {
         throw new Error(`Failed to load fallback playlists: ${fallbackError.message}`);
       }

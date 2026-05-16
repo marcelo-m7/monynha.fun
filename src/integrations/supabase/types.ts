@@ -872,6 +872,28 @@ export type Database = {
         }
         Returns: boolean
       }
+      is_education_assignment_playlist: {
+        Args: {
+          p_course_code: string
+          p_is_ordered: boolean
+          p_slug: string
+          p_unit_code: string
+        }
+        Returns: boolean
+      }
+      list_education_playlists_for_assignment: {
+        Args: { p_language?: string; p_limit?: number }
+        Returns: {
+          course_code: string | null
+          description: string | null
+          id: string
+          is_ordered: boolean
+          is_public: boolean
+          language: string
+          name: string
+          unit_code: string | null
+        }[]
+      }
       list_featured_videos: {
         Args: { p_limit?: number; p_offset?: number }
         Returns: {

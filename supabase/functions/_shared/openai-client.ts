@@ -18,6 +18,9 @@ export interface PlaylistContext {
   id: string;
   name: string;
   description: string | null;
+  language?: string | null;
+  course_code?: string | null;
+  unit_code?: string | null;
 }
 
 export interface VideoEnrichmentParams {
@@ -207,7 +210,16 @@ export class OpenAIClient {
     const playlistBlock =
       params.playlists && params.playlists.length > 0
         ? `\nAvailable playlists (return the EXACT id of the best match, or null if none is clearly relevant):\n${params.playlists
-            .map((p) => `  {"id": "${p.id}", "name": "${p.name}"${p.description ? `, "description": "${p.description.substring(0, 80)}"` : ''}}`)
+            .map((p) => {
+              const context = [
+                p.description ? `"description": "${p.description.substring(0, 80)}"` : null,
+                p.course_code ? `"course_code": "${p.course_code}"` : null,
+                p.unit_code ? `"unit_code": "${p.unit_code}"` : null,
+                p.language ? `"language": "${p.language}"` : null,
+              ].filter(Boolean).join(', ');
+
+              return `  {"id": "${p.id}", "name": "${p.name}"${context ? `, ${context}` : ''}}`;
+            })
             .join('\n')}\n`
         : '';
 
