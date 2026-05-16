@@ -11,7 +11,7 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { notify } from '@/shared/lib/notify';
-import { ArrowLeft, Link as LinkIcon, Loader2, Play, CheckCircle, AlertCircle, ListVideo } from 'lucide-react';
+import { Link as LinkIcon, Loader2, ListVideo, Wand2 } from 'lucide-react';
 import { submitVideoSchema, SubmitVideoFormValues } from '@/features/submit/submitVideoSchema';
 import { useTranslation } from 'react-i18next';
 import { useForm } from 'react-hook-form';
@@ -35,7 +35,6 @@ export default function Submit() {
     defaultValues: {
       youtubeUrl: '',
       description: '',
-      language: 'pt',
       categoryId: '',
       playlistId: 'none',
     },
@@ -43,7 +42,6 @@ export default function Submit() {
 
   const youtubeUrl = watch('youtubeUrl');
   const description = watch('description');
-  const language = watch('language');
   const categoryId = watch('categoryId');
   const playlistId = watch('playlistId');
 
@@ -71,16 +69,13 @@ export default function Submit() {
       const result = await submitVideoMutation.mutateAsync({
         metadata,
         description: values.description,
-        language: values.language,
         categoryId: values.categoryId || undefined,
         userId: user.id,
         youtubeUrl,
       });
 
-      if (result.status === 'exists') {
-        notify.error(t('submit.error.videoExistsTitle'), {
-          description: t('submit.error.videoExistsDescription'),
-        });
+      if (result.status === 'duplicate') {
+        navigate(`/submit/status/${result.submission.id}`);
         return;
       }
 
@@ -93,8 +88,8 @@ export default function Submit() {
         });
       }
 
-      notify.success(t('submit.success.videoSubmittedTitle'));
-      navigate('/');
+      notify.success(t('submit.success.videoQueuedTitle'));
+      navigate(`/submit/status/${result.submission.id}`);
     } catch (err) {
       notify.error(t('submit.error.genericSubmitTitle'));
     }
@@ -151,22 +146,6 @@ export default function Submit() {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="language">{t('submit.form.languageLabel')}</Label>
-                <Select value={language} onValueChange={(value) => setValue('language', value)}>
-                  <SelectTrigger>
-                    <SelectValue placeholder={t('submit.form.languagePlaceholder')} />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="pt">{t('common.language.pt')}</SelectItem>
-                    <SelectItem value="en">{t('common.language.en')}</SelectItem>
-                    <SelectItem value="es">{t('common.language.es')}</SelectItem>
-                    <SelectItem value="fr">{t('common.language.fr')}</SelectItem>
-                    <SelectItem value="other">{t('common.language.other')}</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div className="space-y-2">
                 <Label htmlFor="category">{t('submit.form.categoryLabel')}</Label>
                 <Select value={categoryId} onValueChange={(value) => setValue('categoryId', value)}>
                   <SelectTrigger>
@@ -178,6 +157,13 @@ export default function Submit() {
                     ))}
                   </SelectContent>
                 </Select>
+              </div>
+
+              <div className="rounded-md border border-border bg-muted/30 p-3 text-sm text-muted-foreground">
+                <div className="flex items-start gap-2">
+                  <Wand2 className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
+                  <p>{t('submit.form.languageAutoDetectionHint')}</p>
+                </div>
               </div>
 
               <div className="space-y-2">

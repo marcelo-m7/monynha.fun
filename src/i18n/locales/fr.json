@@ -417,6 +417,7 @@
       "descriptionPlaceholder": "Pourquoi cette vidéo est-elle intéressante ?",
       "languageLabel": "Langue de la Vidéo",
       "languagePlaceholder": "Sélectionner la langue",
+      "languageAutoDetectionHint": "La langue de la vidéo sera détectée automatiquement pendant le traitement.",
       "categoryLabel": "Catégorie (facultatif)",
       "categoryPlaceholder": "Sélectionner une catégorie",
       "submitButton": "Soumettre la Vidéo",
@@ -446,11 +447,63 @@
     },
     "success": {
       "videoSubmittedTitle": "Vidéo Soumise !",
-      "videoSubmittedDescription": "Votre vidéo a été ajoutée avec succès à la collection"
+      "videoSubmittedDescription": "Votre vidéo a été ajoutée avec succès à la collection",
+      "videoQueuedTitle": "Vidéo soumise. Traitement démarré."
     },
     "info": {
       "aiEnrichmentStartedTitle": "Enrichissement IA Démarré",
       "aiEnrichmentStartedDescription": "L'IA traite maintenant les métadonnées vidéo pour l'enrichissement."
+    }
+  },
+  "submitStatus": {
+    "backToSubmit": "Retour à la soumission",
+    "notFoundTitle": "Soumission introuvable",
+    "notFoundDescription": "Nous n'avons pas trouvé cette soumission, ou vous n'y avez pas accès.",
+    "startErrorTitle": "Impossible de démarrer le traitement",
+    "processingErrorTitle": "Problème de traitement",
+    "youtubeIdLabel": "ID YouTube",
+    "processingTitle": "Traitement des métadonnées vidéo",
+    "processingDescription": "Tube O2 enrichit cette soumission et mettra cette page à jour automatiquement.",
+    "viewVideo": "Voir la vidéo",
+    "retry": "Réessayer",
+    "exploreVideos": "Explorer les vidéos",
+    "language": {
+      "label": "Langue détectée",
+      "pending": "Détection automatique"
+    },
+    "statusLabels": {
+      "pending": "En attente",
+      "processing": "Traitement",
+      "success": "Prête",
+      "failed": "Échec",
+      "duplicate": "Doublon",
+      "recoverable_error": "À réessayer"
+    },
+    "states": {
+      "pending": {
+        "title": "Soumission reçue",
+        "description": "Le traitement va commencer dans un instant."
+      },
+      "processing": {
+        "title": "Traitement de la vidéo",
+        "description": "Nous détectons la langue et enrichissons les métadonnées."
+      },
+      "success": {
+        "title": "Vidéo prête",
+        "description": "La vidéo a été enrichie et peut être consultée."
+      },
+      "failed": {
+        "title": "Le traitement a échoué",
+        "description": "Cette soumission n'a pas pu être traitée."
+      },
+      "duplicate": {
+        "title": "Doublon détecté",
+        "description": "Cette vidéo YouTube existe déjà dans Tube O2."
+      },
+      "recoverable_error": {
+        "title": "Le traitement doit être réessayé",
+        "description": "La soumission a été enregistrée, mais l'enrichissement peut être relancé."
+      }
     }
   },
   "videos": {
@@ -477,6 +530,9 @@
     "noRelatedVideos": "Aucune vidéo similaire trouvée.",
     "favoriteInfo": "Vous devez être connecté pour ajouter des vidéos aux favoris.",
     "loginAction": "Connexion",
+    "languageLabel": "Langue",
+    "detectedAutomatically": "Détectée automatiquement",
+    "detectingLanguage": "Détection de la langue",
     "management": {
       "editVideo": "Modifier la vidéo",
       "deleteVideo": "Supprimer la vidéo",

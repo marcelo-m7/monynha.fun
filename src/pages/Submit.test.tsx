@@ -56,7 +56,11 @@ beforeEach(() => {
   useEditablePlaylistsMock.mockReturnValue({ data: [], isLoading: false });
   useAddVideoToPlaylistMock.mockReturnValue({ mutateAsync: vi.fn(), isPending: false });
   useProfileByIdMock.mockReturnValue({ data: null, isLoading: false, isError: false });
-  mutateAsyncMock.mockResolvedValue({ status: 'created', video: { id: 'video-1' }, edgeError: null });
+  mutateAsyncMock.mockResolvedValue({
+    status: 'created',
+    video: { id: 'video-1' },
+    submission: { id: 'submission-1' },
+  });
 });
 
 describe('Submit page', () => {
@@ -126,6 +130,25 @@ describe('Submit page', () => {
         userId: 'user-1',
       }),
     );
+    expect(mutateAsyncMock).toHaveBeenCalledWith(
+      expect.not.objectContaining({
+        language: expect.anything(),
+      }),
+    );
+    expect(navigateMock).toHaveBeenCalledWith('/submit/status/submission-1');
+  });
+
+  it('does not ask for a manual language during initial submit', () => {
+    useYouTubeMetadataMock.mockReturnValue({
+      metadata: null,
+      isLoading: false,
+      error: null,
+    });
+
+    renderWithProviders(<Submit />);
+
+    expect(screen.queryByText('Video Language')).not.toBeInTheDocument();
+    expect(screen.getByText('The video language will be detected automatically during processing.')).toBeInTheDocument();
   });
 
   it('redirects to auth when user is not authenticated', async () => {

@@ -142,6 +142,39 @@ describe('VideoDetails owner management', () => {
     expect(screen.queryByLabelText('Remove video')).not.toBeInTheDocument();
   });
 
+  it('shows the canonical language and automatic detection hint when enrichment matches', () => {
+    useVideoByIdMock.mockReturnValue({
+      data: {
+        ...sampleVideo,
+        language: 'pt',
+        enrichment: { language: 'pt' },
+      },
+      isLoading: false,
+      isError: false,
+    });
+
+    renderVideoDetails();
+
+    expect(screen.getByText(/Language:/)).toBeInTheDocument();
+    expect(screen.getByText(/Portuguese/)).toBeInTheDocument();
+    expect(screen.getByText('(Detected automatically)')).toBeInTheDocument();
+  });
+
+  it('shows a detecting state while the canonical language is unknown', () => {
+    useVideoByIdMock.mockReturnValue({
+      data: {
+        ...sampleVideo,
+        language: 'und',
+      },
+      isLoading: false,
+      isError: false,
+    });
+
+    renderVideoDetails();
+
+    expect(screen.getByText(/Detecting language/)).toBeInTheDocument();
+  });
+
   it('submits edited metadata through the update mutation', async () => {
     const user = userEvent.setup();
     const mutateAsync = vi.fn().mockResolvedValue(sampleVideo);

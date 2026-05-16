@@ -417,6 +417,7 @@
       "descriptionPlaceholder": "Por que este vídeo é interessante?",
       "languageLabel": "Idioma do vídeo",
       "languagePlaceholder": "Selecione o idioma",
+      "languageAutoDetectionHint": "O idioma do vídeo será detectado automaticamente durante o processamento.",
       "categoryLabel": "Categoria (opcional)",
       "categoryPlaceholder": "Selecione uma categoria",
       "submitButton": "Enviar Vídeo",
@@ -446,11 +447,63 @@
     },
     "success": {
       "videoSubmittedTitle": "Vídeo enviado!",
-      "videoSubmittedDescription": "Seu vídeo foi adicionado com sucesso ao acervo"
+      "videoSubmittedDescription": "Seu vídeo foi adicionado com sucesso ao acervo",
+      "videoQueuedTitle": "Vídeo enviado. Processamento iniciado."
     },
     "info": {
       "aiEnrichmentStartedTitle": "Enriquecimento de IA Iniciado",
       "aiEnrichmentStartedDescription": "A IA está processando os metadados do vídeo para enriquecimento."
+    }
+  },
+  "submitStatus": {
+    "backToSubmit": "Voltar ao envio",
+    "notFoundTitle": "Submissão não encontrada",
+    "notFoundDescription": "Não conseguimos encontrar esta submissão, ou você não tem acesso a ela.",
+    "startErrorTitle": "Não foi possível iniciar o processamento",
+    "processingErrorTitle": "Problema no processamento",
+    "youtubeIdLabel": "ID do YouTube",
+    "processingTitle": "Processando metadados do vídeo",
+    "processingDescription": "O Tube O2 está enriquecendo esta submissão e atualizará esta página automaticamente.",
+    "viewVideo": "Ver vídeo",
+    "retry": "Tentar novamente",
+    "exploreVideos": "Explorar vídeos",
+    "language": {
+      "label": "Idioma detectado",
+      "pending": "Detectando automaticamente"
+    },
+    "statusLabels": {
+      "pending": "Pendente",
+      "processing": "Processando",
+      "success": "Pronto",
+      "failed": "Falhou",
+      "duplicate": "Duplicado",
+      "recoverable_error": "Precisa tentar novamente"
+    },
+    "states": {
+      "pending": {
+        "title": "Submissão recebida",
+        "description": "O processamento começará em instantes."
+      },
+      "processing": {
+        "title": "Processando vídeo",
+        "description": "Estamos detectando o idioma e enriquecendo os metadados."
+      },
+      "success": {
+        "title": "Vídeo pronto",
+        "description": "O vídeo foi enriquecido e está pronto para visualização."
+      },
+      "failed": {
+        "title": "Processamento falhou",
+        "description": "Esta submissão não pôde ser processada."
+      },
+      "duplicate": {
+        "title": "Duplicado detectado",
+        "description": "Este vídeo do YouTube já está no Tube O2."
+      },
+      "recoverable_error": {
+        "title": "Processamento precisa de nova tentativa",
+        "description": "A submissão foi salva, mas o enriquecimento pode ser tentado novamente."
+      }
     }
   },
   "videos": {
@@ -477,6 +530,9 @@
     "noRelatedVideos": "Nenhum vídeo relacionado encontrado.",
     "favoriteInfo": "Você precisa estar logado para favoritar vídeos.",
     "loginAction": "Entrar",
+    "languageLabel": "Idioma",
+    "detectedAutomatically": "Detectado automaticamente",
+    "detectingLanguage": "Detectando idioma",
     "management": {
       "editVideo": "Editar vídeo",
       "deleteVideo": "Remover vídeo",

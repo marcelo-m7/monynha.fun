@@ -18,7 +18,7 @@ import { Card } from '@/components/ui/card';
 import { Sparkles } from 'lucide-react';
 import { CulturalRelevanceBadge } from '@/components/video/CulturalRelevanceBadge';
 import { SemanticTagBadge } from '@/components/video/SemanticTagBadge';
-import { Eye, Clock, Folder, ArrowLeft, Heart as HeartIcon, Loader2, Edit, Trash2 } from 'lucide-react';
+import { Eye, Clock, Folder, ArrowLeft, Heart as HeartIcon, Loader2, Edit, Trash2, Languages } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -29,6 +29,18 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import { notify } from '@/shared/lib/notify';
 import { useTranslation } from 'react-i18next';
 import { CommentsSection } from '@/components/comment/CommentsSection'; // Import CommentsSection
+
+function getLanguageLabelKey(language?: string | null) {
+  if (!language || language === 'und') {
+    return 'videoDetails.detectingLanguage';
+  }
+
+  if (['pt', 'en', 'es', 'fr', 'other'].includes(language)) {
+    return `common.language.${language}`;
+  }
+
+  return null;
+}
 
 const VideoDetails = () => {
   const { t } = useTranslation();
@@ -111,7 +123,7 @@ const VideoDetails = () => {
     setEditTitle(video.title);
     setEditDescription(video.description || '');
     setEditCategoryId(video.category_id || 'none');
-    setEditLanguage(video.language || 'pt');
+    setEditLanguage(video.language && video.language !== 'und' ? video.language : video.enrichment?.language || 'pt');
     setEditDialogOpen(true);
   };
 
@@ -186,6 +198,10 @@ const VideoDetails = () => {
       </div>
     );
   }
+
+  const languageLabelKey = getLanguageLabelKey(video.language);
+  const languageLabel = languageLabelKey ? t(languageLabelKey) : video.language;
+  const hasDetectedLanguage = !!video.enrichment?.language && video.enrichment.language === video.language && video.language !== 'und';
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -306,6 +322,15 @@ const VideoDetails = () => {
                   >
                     <Folder className="w-3.5 h-3.5" />
                     {video.category.name}
+                  </Badge>
+                )}
+                {video.language && (
+                  <Badge variant="outline" className="text-sm px-2.5 py-1 flex items-center gap-1">
+                    <Languages className="w-3.5 h-3.5" />
+                    <span>{t('videoDetails.languageLabel')}: {languageLabel}</span>
+                    {hasDetectedLanguage && (
+                      <span className="text-muted-foreground">({t('videoDetails.detectedAutomatically')})</span>
+                    )}
                   </Badge>
                 )}
               </div>
