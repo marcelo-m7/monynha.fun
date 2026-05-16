@@ -476,7 +476,23 @@
     "relatedVideosTitle": "Vídeos Relacionados",
     "noRelatedVideos": "Nenhum vídeo relacionado encontrado.",
     "favoriteInfo": "Você precisa estar logado para favoritar vídeos.",
-    "loginAction": "Entrar"
+    "loginAction": "Entrar",
+    "management": {
+      "editVideo": "Editar vídeo",
+      "deleteVideo": "Remover vídeo",
+      "editDescription": "Atualize os metadados permitidos para este vídeo.",
+      "titleLabel": "Título",
+      "descriptionLabel": "Descrição",
+      "categoryLabel": "Categoria",
+      "languageLabel": "Idioma",
+      "saveChanges": "Salvar alterações",
+      "updateSuccess": "Vídeo atualizado com sucesso.",
+      "updateError": "Não foi possível atualizar o vídeo.",
+      "deleteSuccess": "Vídeo removido com sucesso.",
+      "deleteError": "Não foi possível remover o vídeo.",
+      "confirmDeleteTitle": "Remover vídeo?",
+      "confirmDeleteDescription": "Esta ação não pode ser desfeita. O vídeo '{{title}}' será removido permanentemente."
+    }
   },
   "index": {
     "categoriesTitle": "Categorias",
