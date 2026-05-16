@@ -40,6 +40,9 @@ type VideoExhibitionRow = Video & {
   enrichment_cultural_relevance?: string | null;
   enrichment_semantic_tags?: string[] | null;
   enrichment_language?: string | null;
+  transcript_summary?: string | null;
+  transcript_language?: string | null;
+  transcript_status?: string | null;
 };
 
 function mapExhibitionRowToVideoWithCategory(row: VideoExhibitionRow, includeEnrichment = true): VideoWithCategory {
@@ -75,6 +78,9 @@ function mapExhibitionRowToVideoWithCategory(row: VideoExhibitionRow, includeEnr
     ...row,
     category,
     enrichment,
+    transcriptSummary: row.transcript_summary ?? null,
+    transcriptLanguage: row.transcript_language ?? null,
+    transcriptStatus: row.transcript_status ?? null,
   };
 }
 
@@ -177,12 +183,24 @@ export async function getVideoById(id: string) {
     // Process enrichment - extract only the latest one
     if (data) {
       const video = data as VideoWithRelations;
+      const { data: exhibitionRow } = await supabase
+        .from('v_video_exhibition')
+        .select('id, transcript_summary, transcript_language, transcript_status')
+        .eq(isUuid ? 'id' : 'youtube_id', id)
+        .maybeSingle();
+      const transcriptData = exhibitionRow as Pick<
+        VideoExhibitionRow,
+        'transcript_summary' | 'transcript_language' | 'transcript_status'
+      > | null;
       return {
         ...video,
         enrichment: getLatestEnrichment(video.ai_enrichments),
         assignedPlaylists: (video.playlist_videos ?? [])
           .map((entry) => entry.playlist)
           .filter((playlist): playlist is VideoAssignedPlaylist => !!playlist),
+        transcriptSummary: transcriptData?.transcript_summary ?? null,
+        transcriptLanguage: transcriptData?.transcript_language ?? null,
+        transcriptStatus: transcriptData?.transcript_status ?? null,
         ai_enrichments: undefined,
         playlist_videos: undefined,
       } as VideoWithCategory;

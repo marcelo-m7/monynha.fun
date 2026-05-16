@@ -699,6 +699,62 @@ export type Database = {
           },
         ]
       }
+      video_transcripts: {
+        Row: {
+          confidence: number
+          created_at: string
+          error_message: string | null
+          id: string
+          language: string | null
+          metadata: Json
+          provider: string
+          provider_model: string
+          status: string
+          summary: string | null
+          transcript_text: string | null
+          updated_at: string
+          video_id: string
+        }
+        Insert: {
+          confidence?: number
+          created_at?: string
+          error_message?: string | null
+          id?: string
+          language?: string | null
+          metadata?: Json
+          provider?: string
+          provider_model: string
+          status?: string
+          summary?: string | null
+          transcript_text?: string | null
+          updated_at?: string
+          video_id: string
+        }
+        Update: {
+          confidence?: number
+          created_at?: string
+          error_message?: string | null
+          id?: string
+          language?: string | null
+          metadata?: Json
+          provider?: string
+          provider_model?: string
+          status?: string
+          summary?: string | null
+          transcript_text?: string | null
+          updated_at?: string
+          video_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "video_transcripts_video_id_fkey"
+            columns: ["video_id"]
+            isOneToOne: false
+            referencedRelation: "videos"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       video_view_events: {
         Row: {
           created_at: string
@@ -969,6 +1025,15 @@ export type Database = {
       mark_top_videos_as_featured: {
         Args: { p_limit?: number }
         Returns: number
+      }
+      mark_video_submission_client_error: {
+        Args: {
+          p_error_code?: string
+          p_error_message: string
+          p_stage?: string
+          p_submission_id: string
+        }
+        Returns: Database["public"]["Tables"]["video_submissions"]["Row"]
       }
       mark_all_notifications_as_read_secure: {
         Args: Record<PropertyKey, never>

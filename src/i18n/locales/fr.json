@@ -461,6 +461,7 @@
     "notFoundDescription": "Nous n'avons pas trouvé cette soumission, ou vous n'y avez pas accès.",
     "startErrorTitle": "Impossible de démarrer le traitement",
     "processingErrorTitle": "Problème de traitement",
+    "requestIdLabel": "ID de requête",
     "youtubeIdLabel": "ID YouTube",
     "processingTitle": "Traitement des métadonnées vidéo",
     "processingDescription": "Tube O2 enrichit cette soumission et mettra cette page à jour automatiquement.",
@@ -470,6 +471,23 @@
     "language": {
       "label": "Langue détectée",
       "pending": "Détection automatique"
+    },
+    "stage": {
+      "label": "Étape actuelle",
+      "values": {
+        "submission_validation": "Validation de la soumission",
+        "video_load": "Chargement de la vidéo",
+        "context_load": "Chargement des catégories et playlists",
+        "transcription": "Génération du résumé de transcription",
+        "enrichment": "Enrichissement des métadonnées",
+        "assignment": "Attribution des playlists",
+        "storage": "Enregistrement des résultats",
+        "success": "Terminé",
+        "start_processing": "Démarrage du traitement"
+      }
+    },
+    "transcription": {
+      "label": "Résumé de transcription"
     },
     "assignment": {
       "label": "Playlist attribuée"
@@ -540,6 +558,7 @@
     "assignedPlaylistsTitle": "Playlists attribuées",
     "assignedPlaylistsDescription": "Cette vidéo fait partie de ces parcours d'apprentissage et collections.",
     "aiSummaryTitle": "Résumé généré par IA",
+    "transcriptSummaryTitle": "Résumé de transcription",
     "readFullSummary": "Lire le résumé complet",
     "metaFallbackDescription": "Curation collective de vidéos YouTube.",
     "metaImageAlt": "Couverture de la vidéo sur Tube O2",

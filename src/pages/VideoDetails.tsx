@@ -15,7 +15,7 @@ import { AspectRatio } from '@/components/ui/aspect-ratio';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Badge } from '@/components/ui/badge'; // Import Badge component
 import { Card } from '@/components/ui/card';
-import { Sparkles } from 'lucide-react';
+import { FileText, Sparkles } from 'lucide-react';
 import { CulturalRelevanceBadge } from '@/components/video/CulturalRelevanceBadge';
 import { SemanticTagBadge } from '@/components/video/SemanticTagBadge';
 import { Eye, Clock, Folder, ArrowLeft, Heart as HeartIcon, Loader2, Edit, Trash2, Languages, ListVideo } from 'lucide-react';
@@ -425,6 +425,22 @@ const VideoDetails = () => {
                           ))}
                         </div>
                       )}
+                    </div>
+                  </div>
+                </Card>
+              )}
+
+              {video.transcriptStatus === 'completed' && video.transcriptSummary && (
+                <Card className="p-6 border border-border bg-card">
+                  <div className="flex items-start gap-3">
+                    <div className="bg-muted p-2 flex-shrink-0">
+                      <FileText className="w-5 h-5 text-primary" />
+                    </div>
+                    <div className="flex-1 space-y-2">
+                      <h3 className="text-lg font-semibold">{t('videoDetails.transcriptSummaryTitle')}</h3>
+                      <p className="text-sm text-muted-foreground leading-relaxed">
+                        {video.transcriptSummary}
+                      </p>
                     </div>
                   </div>
                 </Card>

@@ -1,6 +1,7 @@
 ﻿import { serve } from "https://deno.land/std@0.190.0/http/server.ts"
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.45.0'
 import { createOpenAIClient, type VideoEnrichmentParams } from '../_shared/openai-client.ts'
+import { createGeminiClient, type GeminiError } from '../_shared/gemini-client.ts'
 import { assignPlaylist, type PlaylistAssignmentResult } from '../_shared/playlist-assignment.ts'
 
 const corsHeaders = {
@@ -50,11 +51,135 @@ type EnhancedAssignmentResult = {
 
 class HttpError extends Error {
   status: number;
+  code: string;
+  stage: string;
+  recoverable: boolean;
 
-  constructor(message: string, status: number) {
+  constructor(message: string, status: number, options: { code?: string; stage?: string; recoverable?: boolean } = {}) {
     super(message);
     this.status = status;
+    this.code = options.code ?? 'HTTP_ERROR';
+    this.stage = options.stage ?? 'request';
+    this.recoverable = options.recoverable ?? false;
   }
+}
+
+type ProcessingErrorPayload = {
+  code: string;
+  message: string;
+  stage: string;
+  recoverable: boolean;
+  requestId: string;
+};
+
+type TranscriptProcessingResult = {
+  id: string | null;
+  provider: 'gemini';
+  providerModel: string;
+  status: 'completed' | 'unavailable' | 'failed';
+  language: string | null;
+  summary: string | null;
+  confidence: number;
+  errorMessage: string | null;
+};
+
+function createRequestId() {
+  return crypto.randomUUID();
+}
+
+function logProcessing(requestId: string, stage: string, message: string, details: Record<string, unknown> = {}) {
+  console.log(JSON.stringify({
+    source: 'enrich-video',
+    requestId,
+    stage,
+    message,
+    ...details,
+  }));
+}
+
+function logProcessingError(requestId: string, stage: string, message: string, details: Record<string, unknown> = {}) {
+  console.error(JSON.stringify({
+    source: 'enrich-video',
+    requestId,
+    stage,
+    message,
+    ...details,
+  }));
+}
+
+function extractYouTubeId(url: string): string | null {
+  const patterns = [
+    /(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/|youtube\.com\/shorts\/|youtube\.com\/live\/)([a-zA-Z0-9_-]{11})/,
+    /youtube\.com\/watch\?.*v=([a-zA-Z0-9_-]{11})/,
+  ];
+
+  for (const pattern of patterns) {
+    const match = url.match(pattern);
+    if (match?.[1]) {
+      return match[1];
+    }
+  }
+
+  return null;
+}
+
+function isRecoverableExternalError(error: unknown) {
+  if (!(error instanceof Error)) return true;
+  const message = error.message.toLowerCase();
+  return (
+    message.includes('timeout') ||
+    message.includes('aborted') ||
+    message.includes('rate limit') ||
+    message.includes('429') ||
+    message.includes('500') ||
+    message.includes('502') ||
+    message.includes('503') ||
+    message.includes('504') ||
+    message.includes('network') ||
+    message.includes('fetch')
+  );
+}
+
+function toProcessingErrorPayload(error: unknown, requestId: string, fallbackStage = 'processing'): ProcessingErrorPayload {
+  if (error instanceof HttpError) {
+    return {
+      code: error.code,
+      message: error.message,
+      stage: error.stage,
+      recoverable: error.recoverable,
+      requestId,
+    };
+  }
+
+  const maybeGeminiError = error as Partial<GeminiError>;
+  if (maybeGeminiError.code && error instanceof Error) {
+    return {
+      code: maybeGeminiError.code,
+      message: error.message,
+      stage: fallbackStage,
+      recoverable: maybeGeminiError.recoverable ?? isRecoverableExternalError(error),
+      requestId,
+    };
+  }
+
+  if (error instanceof Error) {
+    const recoverable = isRecoverableExternalError(error);
+    return {
+      code: recoverable ? 'EXTERNAL_PROCESSING_ERROR' : 'PROCESSING_ERROR',
+      message: error.message,
+      stage: fallbackStage,
+      recoverable,
+      requestId,
+    };
+  }
+
+  return {
+    code: 'UNKNOWN_PROCESSING_ERROR',
+    message: 'Unknown error occurred',
+    stage: fallbackStage,
+    recoverable: true,
+    requestId,
+  };
 }
 
 function normalizeText(value: string | null | undefined): string {
@@ -193,23 +318,178 @@ async function updateSubmissionStatus(
   }
 }
 
-async function safeUpdateSubmissionStatus(
+async function updateSubmissionStatusWithMetadataPatch(
+  supabaseServiceRole: ReturnType<typeof createClient>,
+  submissionId: string,
+  values: Record<string, unknown>,
+  metadataPatch: Record<string, unknown>,
+) {
+  const { data: current, error: currentError } = await supabaseServiceRole
+    .from('video_submissions')
+    .select('metadata')
+    .eq('id', submissionId)
+    .single();
+
+  if (currentError) {
+    throw new Error(`Failed to load submission metadata: ${currentError.message}`);
+  }
+
+  const currentMetadata =
+    current?.metadata && typeof current.metadata === 'object' && !Array.isArray(current.metadata)
+      ? current.metadata as Record<string, unknown>
+      : {};
+
+  await updateSubmissionStatus(supabaseServiceRole, submissionId, {
+    ...values,
+    metadata: {
+      ...currentMetadata,
+      ...metadataPatch,
+    },
+  });
+}
+
+async function safeUpdateSubmissionStatusWithMetadataPatch(
   supabaseServiceRole: ReturnType<typeof createClient> | null,
   submissionId: string | null,
   values: Record<string, unknown>,
+  metadataPatch: Record<string, unknown>,
 ) {
   if (!supabaseServiceRole || !submissionId) {
     return;
   }
 
   try {
-    await updateSubmissionStatus(supabaseServiceRole, submissionId, values);
+    await updateSubmissionStatusWithMetadataPatch(supabaseServiceRole, submissionId, values, metadataPatch);
   } catch (statusError) {
     const statusErrorMessage = statusError instanceof Error
       ? statusError.message
       : 'Unknown submission status update error';
     console.error(`[enrich-video] ${statusErrorMessage}`);
   }
+}
+
+function processingMetadata(requestId: string, stage: string) {
+  return {
+    processing: {
+      requestId,
+      stage,
+      updatedAt: new Date().toISOString(),
+    },
+  };
+}
+
+async function updateSubmissionStage(
+  supabaseServiceRole: ReturnType<typeof createClient>,
+  submissionId: string,
+  requestId: string,
+  stage: string,
+) {
+  await updateSubmissionStatusWithMetadataPatch(
+    supabaseServiceRole,
+    submissionId,
+    {},
+    processingMetadata(requestId, stage),
+  );
+}
+
+async function insertTranscriptRecord(
+  supabaseServiceRole: ReturnType<typeof createClient>,
+  params: {
+    videoId: string;
+    providerModel: string;
+    status: 'completed' | 'unavailable' | 'failed';
+    language: string | null;
+    transcriptText: string | null;
+    summary: string | null;
+    confidence: number;
+    errorMessage: string | null;
+    metadata: Record<string, unknown>;
+  },
+): Promise<string> {
+  const { data, error } = await supabaseServiceRole
+    .from('video_transcripts')
+    .insert({
+      video_id: params.videoId,
+      provider: 'gemini',
+      provider_model: params.providerModel,
+      language: params.language,
+      transcript_text: params.transcriptText,
+      summary: params.summary,
+      confidence: params.confidence,
+      status: params.status,
+      error_message: params.errorMessage,
+      metadata: params.metadata,
+    })
+    .select('id')
+    .single();
+
+  if (error) {
+    throw new Error(`Failed to save transcript: ${error.message}`);
+  }
+
+  return data.id as string;
+}
+
+async function processTranscript(params: {
+  supabaseServiceRole: ReturnType<typeof createClient>;
+  requestId: string;
+  videoId: string;
+  youtubeUrl: string;
+  videoTitle: string;
+  effectiveLanguage: string;
+}): Promise<TranscriptProcessingResult> {
+  const { supabaseServiceRole, requestId, videoId, youtubeUrl, videoTitle, effectiveLanguage } = params;
+  const geminiClient = createGeminiClient();
+  logProcessing(requestId, 'transcription', 'Starting Gemini transcript extraction', {
+    videoId,
+    model: geminiClient.modelName,
+  });
+
+  const transcript = await geminiClient.transcribeYouTubeVideo({
+    youtubeUrl,
+    title: videoTitle,
+    language: effectiveLanguage,
+  });
+
+  const status: 'completed' | 'unavailable' = transcript.transcriptText || transcript.transcriptSummary
+    ? 'completed'
+    : 'unavailable';
+  const errorMessage = status === 'unavailable'
+    ? transcript.unavailableReason || 'Transcript unavailable from Gemini'
+    : null;
+
+  const transcriptId = await insertTranscriptRecord(supabaseServiceRole, {
+    videoId,
+    providerModel: geminiClient.modelName,
+    status,
+    language: normalizeLanguage(transcript.language) ?? normalizeLanguage(effectiveLanguage),
+    transcriptText: transcript.transcriptText,
+    summary: transcript.transcriptSummary,
+    confidence: transcript.confidence,
+    errorMessage,
+    metadata: {
+      requestId,
+      unavailableReason: transcript.unavailableReason,
+    },
+  });
+
+  logProcessing(requestId, 'transcription', 'Gemini transcript extraction completed', {
+    videoId,
+    transcriptId,
+    status,
+    confidence: transcript.confidence,
+  });
+
+  return {
+    id: transcriptId,
+    provider: 'gemini',
+    providerModel: geminiClient.modelName,
+    status,
+    language: normalizeLanguage(transcript.language) ?? normalizeLanguage(effectiveLanguage),
+    summary: transcript.transcriptSummary,
+    confidence: transcript.confidence,
+    errorMessage,
+  };
 }
 
 async function runEnhancedAssignments(params: {
@@ -320,70 +600,159 @@ async function runEnhancedAssignments(params: {
 }
 
 serve(async (req) => {
+  const requestId = createRequestId();
+
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders })
   }
 
+  const requiredEnv = {
+    SUPABASE_URL: Deno.env.get('SUPABASE_URL'),
+    SUPABASE_ANON_KEY: Deno.env.get('SUPABASE_ANON_KEY'),
+    SUPABASE_SERVICE_ROLE_KEY: Deno.env.get('SUPABASE_SERVICE_ROLE_KEY'),
+    OPENAI_API_KEY: Deno.env.get('OPENAI_API_KEY'),
+    GEMINI_API_KEY: Deno.env.get('GEMINI_API_KEY'),
+  };
+  const missingEnv = Object.entries(requiredEnv)
+    .filter(([, value]) => !value)
+    .map(([key]) => key);
+
+  if (missingEnv.length > 0) {
+    const errorPayload = {
+      error: {
+        code: 'MISSING_ENVIRONMENT',
+        message: `Missing required environment variables: ${missingEnv.join(', ')}`,
+        stage: 'environment',
+        recoverable: false,
+        requestId,
+      },
+    };
+    logProcessingError(requestId, 'environment', errorPayload.error.message);
+    return new Response(JSON.stringify(errorPayload), {
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      status: 500,
+    });
+  }
+
   const authHeader = req.headers.get('Authorization')
   if (!authHeader) {
-    console.error("[enrich-video] Unauthorized: No Authorization header provided.")
-    return new Response('Unauthorized', {
+    const errorPayload = {
+      error: {
+        code: 'UNAUTHORIZED_NO_AUTH_HEADER',
+        message: 'Missing authorization header',
+        stage: 'authentication',
+        recoverable: false,
+        requestId,
+      },
+    };
+    logProcessingError(requestId, 'authentication', errorPayload.error.message);
+    return new Response(JSON.stringify(errorPayload), {
       status: 401,
-      headers: corsHeaders
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     })
   }
 
   const token = authHeader.replace('Bearer ', '')
   const supabase = createClient(
-    Deno.env.get('SUPABASE_URL') ?? '',
-    Deno.env.get('SUPABASE_ANON_KEY') ?? '',
+    requiredEnv.SUPABASE_URL ?? '',
+    requiredEnv.SUPABASE_ANON_KEY ?? '',
     { global: { headers: { Authorization: `Bearer ${token}` } } }
   )
 
   const { data: { user }, error: userError } = await supabase.auth.getUser()
 
   if (userError || !user) {
-    console.error("[enrich-video] User authentication failed:", userError?.message)
-    return new Response('Unauthorized', {
+    const errorPayload = {
+      error: {
+        code: 'UNAUTHORIZED_INVALID_TOKEN',
+        message: 'Invalid or expired authorization token',
+        stage: 'authentication',
+        recoverable: false,
+        requestId,
+      },
+    };
+    logProcessingError(requestId, 'authentication', errorPayload.error.message, {
+      authError: userError?.message,
+    });
+    return new Response(JSON.stringify(errorPayload), {
       status: 401,
-      headers: corsHeaders
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     })
   }
 
   let submissionId: string | null = null;
   let submissionBelongsToUser = false;
   let supabaseServiceRole: ReturnType<typeof createClient> | null = null;
+  let currentStage = 'request';
 
   try {
-    const { videoId, youtubeUrl, submissionId: requestedSubmissionId } = await req.json()
-    submissionId = typeof requestedSubmissionId === 'string' && requestedSubmissionId.trim()
-      ? requestedSubmissionId.trim()
-      : null;
+    currentStage = 'payload_validation';
+    const requestBody = await req.json().catch(() => {
+      throw new HttpError('Request body must be valid JSON', 400, {
+        code: 'INVALID_JSON',
+        stage: currentStage,
+      });
+    });
+
+    const videoId = typeof requestBody?.videoId === 'string' ? requestBody.videoId.trim() : '';
+    const youtubeUrl = typeof requestBody?.youtubeUrl === 'string' ? requestBody.youtubeUrl.trim() : '';
+    const requestedSubmissionId = typeof requestBody?.submissionId === 'string' ? requestBody.submissionId.trim() : '';
+    submissionId = requestedSubmissionId || null;
 
     if (!videoId || !youtubeUrl) {
-      throw new HttpError('videoId and youtubeUrl are required', 400);
+      throw new HttpError('videoId and youtubeUrl are required', 400, {
+        code: 'INVALID_PAYLOAD',
+        stage: currentStage,
+      });
     }
 
-    console.log(`[enrich-video] Received request for videoId: ${videoId}, youtubeUrl: ${youtubeUrl}, submissionId: ${submissionId ?? 'none'} by user: ${user.id}`)
+    const requestYoutubeId = extractYouTubeId(youtubeUrl);
+    if (!requestYoutubeId) {
+      throw new HttpError('youtubeUrl must be a valid YouTube video URL', 400, {
+        code: 'INVALID_YOUTUBE_URL',
+        stage: currentStage,
+      });
+    }
+
+    logProcessing(requestId, currentStage, 'Received processing request', {
+      videoId,
+      youtubeId: requestYoutubeId,
+      submissionId: submissionId ?? 'none',
+      userId: user.id,
+    });
 
     supabaseServiceRole = createClient(
-      Deno.env.get('SUPABASE_URL') ?? '',
-      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
+      requiredEnv.SUPABASE_URL ?? '',
+      requiredEnv.SUPABASE_SERVICE_ROLE_KEY ?? ''
     );
 
+    currentStage = 'submission_validation';
     if (submissionId) {
       const { data: submission, error: submissionError } = await supabaseServiceRole
         .from('video_submissions')
-        .select('id, user_id')
+        .select('id, user_id, youtube_id')
         .eq('id', submissionId)
         .single();
 
       if (submissionError || !submission) {
-        throw new HttpError(`Submission not found: ${submissionError?.message || 'Unknown error'}`, 404);
+        throw new HttpError(`Submission not found: ${submissionError?.message || 'Unknown error'}`, 404, {
+          code: 'SUBMISSION_NOT_FOUND',
+          stage: currentStage,
+        });
       }
 
       if (submission.user_id !== user.id) {
-        throw new HttpError('Submission does not belong to the authenticated user', 403);
+        throw new HttpError('Submission does not belong to the authenticated user', 403, {
+          code: 'SUBMISSION_FORBIDDEN',
+          stage: currentStage,
+        });
+      }
+
+      if (submission.youtube_id && submission.youtube_id !== requestYoutubeId) {
+        throw new HttpError('Submission YouTube ID does not match request URL', 400, {
+          code: 'YOUTUBE_ID_MISMATCH',
+          stage: currentStage,
+        });
       }
 
       submissionBelongsToUser = true;
@@ -394,22 +763,37 @@ serve(async (req) => {
         error_message: null,
         recoverable: false,
         processing_started_at: new Date().toISOString(),
+        completed_at: null,
+        metadata: processingMetadata(requestId, currentStage),
       });
     }
 
+    currentStage = 'video_load';
     const { data: video, error: videoError } = await supabaseServiceRole
       .from('videos')
-      .select('title, description, channel_name, language, category_id')
+      .select('youtube_id, title, description, channel_name, language, category_id')
       .eq('id', videoId)
       .single();
 
     if (videoError || !video) {
-      console.error("[enrich-video] Video not found:", videoError?.message);
-      throw new HttpError(`Video not found: ${videoError?.message || 'Unknown error'}`, 404);
+      throw new HttpError(`Video not found: ${videoError?.message || 'Unknown error'}`, 404, {
+        code: 'VIDEO_NOT_FOUND',
+        stage: currentStage,
+      });
     }
 
-    // Fetch categories and playlists BEFORE calling OpenAI so they can be
-    // embedded in the prompt, enabling the AI to return exact DB UUIDs.
+    if (video.youtube_id !== requestYoutubeId) {
+      throw new HttpError('Request YouTube URL does not match the stored video', 400, {
+        code: 'VIDEO_YOUTUBE_ID_MISMATCH',
+        stage: currentStage,
+      });
+    }
+
+    if (submissionId) {
+      await updateSubmissionStage(supabaseServiceRole, submissionId, requestId, currentStage);
+    }
+
+    currentStage = 'context_load';
     const { data: categoriesData, error: categoryFetchError } = await supabaseServiceRole
       .from('categories')
       .select('id, name, slug');
@@ -441,23 +825,60 @@ serve(async (req) => {
     }
     const playlistRows = (playlistsData ?? []) as PlaylistRow[];
 
-    // Call OpenAI for enrichment -- categories and playlists embedded in prompt
+    currentStage = 'transcription';
+    if (submissionId) {
+      await updateSubmissionStage(supabaseServiceRole, submissionId, requestId, currentStage);
+    }
+    const transcriptResult = await processTranscript({
+      supabaseServiceRole,
+      requestId,
+      videoId,
+      youtubeUrl,
+      videoTitle: video.title || '',
+      effectiveLanguage,
+    });
+
+    currentStage = 'enrichment';
+    if (submissionId) {
+      await updateSubmissionStatusWithMetadataPatch(
+        supabaseServiceRole,
+        submissionId,
+        {},
+        {
+          ...processingMetadata(requestId, currentStage),
+          transcription: {
+            transcriptId: transcriptResult.id,
+            provider: transcriptResult.provider,
+            model: transcriptResult.providerModel,
+            status: transcriptResult.status,
+            summary: transcriptResult.summary,
+            language: transcriptResult.language,
+            confidence: transcriptResult.confidence,
+            errorMessage: transcriptResult.errorMessage,
+          },
+        },
+      );
+    }
     let enrichment: EnrichmentPayload;
     try {
       const openaiClient = createOpenAIClient();
       const enrichmentParams: VideoEnrichmentParams = {
         title: video.title || '',
-        description: video.description || '',
+        description: [video.description || '', transcriptResult.summary || ''].filter(Boolean).join('\n\nTranscript summary: '),
         channelName: video.channel_name || null,
-        language: effectiveLanguage,
+        language: transcriptResult.language || effectiveLanguage,
         categories: categoryRows,
         playlists: playlistRows,
       };
       enrichment = await openaiClient.enrichVideo(enrichmentParams) as EnrichmentPayload;
-      console.log(`[enrich-video] Enriched video ${videoId}: category_id=${enrichment.suggested_category_id}, playlist_id=${enrichment.suggested_playlist_id}`);
+      logProcessing(requestId, currentStage, 'OpenAI enrichment completed', {
+        videoId,
+        suggestedCategoryId: enrichment.suggested_category_id,
+        suggestedPlaylistId: enrichment.suggested_playlist_id,
+      });
     } catch (openaiError) {
       const errorMsg = openaiError instanceof Error ? openaiError.message : 'Unknown OpenAI error';
-      console.error("[enrich-video] OpenAI enrichment failed:", errorMsg);
+      logProcessingError(requestId, currentStage, 'OpenAI enrichment failed', { error: errorMsg });
       throw new Error(`AI enrichment failed: ${errorMsg}`);
     }
 
@@ -471,6 +892,10 @@ serve(async (req) => {
       playlistAssignment: null as PlaylistAssignmentResult | null,
     };
 
+    currentStage = 'assignment';
+    if (submissionId) {
+      await updateSubmissionStage(supabaseServiceRole, submissionId, requestId, currentStage);
+    }
     try {
       const assignment = await runEnhancedAssignments({
         supabaseServiceRole,
@@ -502,7 +927,9 @@ serve(async (req) => {
         ? assignmentError.message
         : 'Unknown enhanced assignment error';
 
-      console.error(`[enrich-video] Enhanced workflow failed, using legacy fallback: ${assignmentErrorMessage}`);
+      logProcessingError(requestId, currentStage, 'Enhanced assignment failed, continuing with enrichment only', {
+        error: assignmentErrorMessage,
+      });
 
       enhancedAssignment = {
         fallbackUsed: true,
@@ -515,6 +942,10 @@ serve(async (req) => {
       };
     }
 
+    currentStage = 'storage';
+    if (submissionId) {
+      await updateSubmissionStage(supabaseServiceRole, submissionId, requestId, currentStage);
+    }
     const { data, error } = await supabaseServiceRole
       .from('ai_enrichments')
       .insert({
@@ -531,7 +962,6 @@ serve(async (req) => {
       .single();
 
     if (error) {
-      console.error("[enrich-video] Error inserting AI enrichment:", error.message);
       throw new Error(`Failed to save AI enrichment: ${error.message}`);
     }
 
@@ -554,8 +984,23 @@ serve(async (req) => {
         recoverable: false,
         completed_at: new Date().toISOString(),
         metadata: {
+          processing: {
+            requestId,
+            stage: 'success',
+            updatedAt: new Date().toISOString(),
+          },
           enrichmentId: data.id,
           detectedLanguage,
+          transcription: {
+            transcriptId: transcriptResult.id,
+            provider: transcriptResult.provider,
+            model: transcriptResult.providerModel,
+            status: transcriptResult.status,
+            summary: transcriptResult.summary,
+            language: transcriptResult.language,
+            confidence: transcriptResult.confidence,
+            errorMessage: transcriptResult.errorMessage,
+          },
           assignment: {
             fallbackUsed: enhancedAssignment.fallbackUsed,
             reliability: enhancedAssignment.reliability,
@@ -572,11 +1017,26 @@ serve(async (req) => {
       });
     }
 
-    console.log(`[enrich-video] AI enrichment processed and saved for videoId: ${videoId}`);
+    logProcessing(requestId, 'success', 'Video processing completed', {
+      videoId,
+      submissionId: submissionId ?? 'none',
+      enrichmentId: data.id,
+      transcriptId: transcriptResult.id,
+      transcriptStatus: transcriptResult.status,
+    });
 
     return new Response(JSON.stringify({
-      message: 'AI enrichment initiated and saved successfully',
+      message: 'Video processing completed successfully',
       data,
+      transcription: {
+        transcript_id: transcriptResult.id,
+        provider: transcriptResult.provider,
+        model: transcriptResult.providerModel,
+        status: transcriptResult.status,
+        summary: transcriptResult.summary,
+        language: transcriptResult.language,
+        confidence: transcriptResult.confidence,
+      },
       assignment: {
         fallback_used: enhancedAssignment.fallbackUsed,
         reliability: enhancedAssignment.reliability,
@@ -589,18 +1049,37 @@ serve(async (req) => {
       status: 200,
     })
   } catch (error) {
-    const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
-    const status = error instanceof HttpError ? error.status : 500;
-    console.error(`[enrich-video] Error processing request: ${errorMessage}`)
+    const errorPayload = toProcessingErrorPayload(error, requestId, currentStage);
+    const status = error instanceof HttpError ? error.status : errorPayload.recoverable ? 503 : 500;
+    logProcessingError(requestId, errorPayload.stage, 'Video processing failed', {
+      code: errorPayload.code,
+      error: errorPayload.message,
+      recoverable: errorPayload.recoverable,
+      submissionId: submissionId ?? 'none',
+    });
     if (submissionBelongsToUser) {
-      await safeUpdateSubmissionStatus(supabaseServiceRole, submissionId, {
-        status: status >= 500 ? 'recoverable_error' : 'failed',
-        error_message: errorMessage,
-        recoverable: status >= 500,
-        completed_at: new Date().toISOString(),
-      });
+      await safeUpdateSubmissionStatusWithMetadataPatch(
+        supabaseServiceRole,
+        submissionId,
+        {
+          status: errorPayload.recoverable ? 'recoverable_error' : 'failed',
+          error_message: errorPayload.message,
+          recoverable: errorPayload.recoverable,
+          completed_at: new Date().toISOString(),
+        },
+        {
+          ...processingMetadata(requestId, errorPayload.stage),
+          error: {
+            code: errorPayload.code,
+            message: errorPayload.message,
+            stage: errorPayload.stage,
+            recoverable: errorPayload.recoverable,
+            requestId,
+          },
+        },
+      );
     }
-    return new Response(JSON.stringify({ error: errorMessage }), {
+    return new Response(JSON.stringify({ error: errorPayload }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       status,
     })

@@ -29,3 +29,24 @@ export async function getVideoSubmissionById(id: string) {
 
   return data as VideoSubmission | null;
 }
+
+export async function markVideoSubmissionClientError(payload: {
+  submissionId: string;
+  errorMessage: string;
+  errorCode?: string | null;
+  stage?: string | null;
+}) {
+  const { data, error } = await supabase
+    .rpc('mark_video_submission_client_error', {
+      p_submission_id: payload.submissionId,
+      p_error_message: payload.errorMessage,
+      p_error_code: payload.errorCode ?? null,
+      p_stage: payload.stage ?? 'start_processing',
+    });
+
+  if (error) {
+    throw new Error(getSupabaseErrorMessage(error));
+  }
+
+  return data as VideoSubmission;
+}

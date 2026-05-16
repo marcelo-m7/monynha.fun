@@ -461,6 +461,7 @@
     "notFoundDescription": "No pudimos encontrar este envío, o no tienes acceso a él.",
     "startErrorTitle": "No se pudo iniciar el procesamiento",
     "processingErrorTitle": "Problema de procesamiento",
+    "requestIdLabel": "ID de solicitud",
     "youtubeIdLabel": "ID de YouTube",
     "processingTitle": "Procesando metadatos del video",
     "processingDescription": "Tube O2 está enriqueciendo este envío y actualizará esta página automáticamente.",
@@ -470,6 +471,23 @@
     "language": {
       "label": "Idioma detectado",
       "pending": "Detectando automáticamente"
+    },
+    "stage": {
+      "label": "Etapa actual",
+      "values": {
+        "submission_validation": "Validando envío",
+        "video_load": "Cargando video",
+        "context_load": "Cargando categorías y playlists",
+        "transcription": "Generando resumen de transcripción",
+        "enrichment": "Enriqueciendo metadatos",
+        "assignment": "Asignando playlists",
+        "storage": "Guardando resultados",
+        "success": "Completado",
+        "start_processing": "Iniciando procesamiento"
+      }
+    },
+    "transcription": {
+      "label": "Resumen de transcripción"
     },
     "assignment": {
       "label": "Playlist asignada"
@@ -540,6 +558,7 @@
     "assignedPlaylistsTitle": "Playlists asignadas",
     "assignedPlaylistsDescription": "Este video forma parte de estos caminos de aprendizaje y colecciones.",
     "aiSummaryTitle": "Resumen generado por IA",
+    "transcriptSummaryTitle": "Resumen de transcripción",
     "readFullSummary": "Leer resumen completo",
     "metaFallbackDescription": "Curaduría colectiva de videos de YouTube.",
     "metaImageAlt": "Portada del video en Tube O2",

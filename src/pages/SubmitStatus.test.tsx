@@ -138,6 +138,40 @@ describe('SubmitStatus page', () => {
     expect(screen.getByText('Best compatible playlist selected by source and enrichment score')).toBeInTheDocument();
   });
 
+  it('shows processing stage, request id, and transcript summary metadata', () => {
+    useVideoSubmissionMock.mockReturnValue({
+      data: {
+        ...baseSubmission,
+        status: 'recoverable_error',
+        error_message: 'Gemini request timeout after 30000ms',
+        recoverable: true,
+        metadata: {
+          processing: {
+            requestId: 'request-123',
+            stage: 'transcription',
+          },
+          transcription: {
+            status: 'completed',
+            summary: 'A concise explanation of polar coordinates.',
+            language: 'pt',
+            confidence: 0.84,
+          },
+        },
+      },
+      isLoading: false,
+      isError: false,
+      refetch: refetchMock,
+    });
+
+    renderWithProviders(<SubmitStatus />, { route: '/submit/status/submission-1' });
+
+    expect(screen.getByText('Current stage')).toBeInTheDocument();
+    expect(screen.getByText('Generating transcript summary')).toBeInTheDocument();
+    expect(screen.getByText(/Request ID: request-123/)).toBeInTheDocument();
+    expect(screen.getByText('Transcript summary')).toBeInTheDocument();
+    expect(screen.getByText('A concise explanation of polar coordinates.')).toBeInTheDocument();
+  });
+
   it('shows duplicate status with link to the existing video', () => {
     useVideoSubmissionMock.mockReturnValue({
       data: {

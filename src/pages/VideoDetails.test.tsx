@@ -218,6 +218,24 @@ describe('VideoDetails owner management', () => {
     );
   });
 
+  it('shows the public transcript summary when available', () => {
+    useVideoByIdMock.mockReturnValue({
+      data: {
+        ...sampleVideo,
+        transcriptStatus: 'completed',
+        transcriptSummary: 'This lesson introduces polar coordinate regions and double integrals.',
+        transcriptLanguage: 'en',
+      },
+      isLoading: false,
+      isError: false,
+    });
+
+    renderVideoDetails();
+
+    expect(screen.getByRole('heading', { name: 'Transcript summary' })).toBeInTheDocument();
+    expect(screen.getByText('This lesson introduces polar coordinate regions and double integrals.')).toBeInTheDocument();
+  });
+
   it('submits edited metadata through the update mutation', async () => {
     const user = userEvent.setup();
     const mutateAsync = vi.fn().mockResolvedValue(sampleVideo);

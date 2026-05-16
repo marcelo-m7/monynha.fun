@@ -35,6 +35,34 @@ export type VideoSubmissionAssignment = {
 export type VideoSubmissionMetadata = {
   enrichmentId?: string | null;
   detectedLanguage?: string | null;
+  processing?: {
+    requestId?: string | null;
+    stage?: string | null;
+    updatedAt?: string | null;
+  };
+  transcription?: {
+    transcriptId?: string | null;
+    provider?: string | null;
+    model?: string | null;
+    status?: 'completed' | 'unavailable' | 'failed' | string | null;
+    summary?: string | null;
+    language?: string | null;
+    confidence?: number | null;
+    errorMessage?: string | null;
+  };
+  error?: {
+    code?: string | null;
+    message?: string | null;
+    stage?: string | null;
+    recoverable?: boolean | null;
+    requestId?: string | null;
+  };
+  clientError?: {
+    code?: string | null;
+    stage?: string | null;
+    message?: string | null;
+    createdAt?: string | null;
+  };
   assignment?: VideoSubmissionAssignment;
 };
 

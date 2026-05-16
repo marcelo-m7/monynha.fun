@@ -16,4 +16,7 @@ export type VideoWithCategory = Video & {
   category?: VideoCategory | null;
   enrichment?: AiEnrichment | null;
   assignedPlaylists?: VideoAssignedPlaylist[];
+  transcriptSummary?: string | null;
+  transcriptLanguage?: string | null;
+  transcriptStatus?: string | null;
 };

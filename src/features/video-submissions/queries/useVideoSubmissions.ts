@@ -1,8 +1,8 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { getVideoSubmissionById } from '@/entities/video_submission/video_submission.api';
+import { getVideoSubmissionById, markVideoSubmissionClientError } from '@/entities/video_submission/video_submission.api';
 import { videoSubmissionKeys } from '@/entities/video_submission/video_submission.keys';
 import type { VideoSubmission, VideoSubmissionStatus } from '@/entities/video_submission/video_submission.types';
-import { invokeEdgeFunction } from '@/shared/api/supabase/edgeFunctions';
+import { getEdgeFunctionErrorDetails, invokeEdgeFunction } from '@/shared/api/supabase/edgeFunctions';
 
 const TERMINAL_STATUSES: VideoSubmissionStatus[] = [
   'success',
@@ -47,7 +47,18 @@ export function useStartSubmissionProcessing() {
       });
 
       if (error) {
-        const message = error instanceof Error ? error.message : 'Could not start video processing';
+        const details = await getEdgeFunctionErrorDetails(error);
+        const message = details.requestId
+          ? `${details.message} (request ${details.requestId})`
+          : details.message;
+
+        await markVideoSubmissionClientError({
+          submissionId: payload.submissionId,
+          errorMessage: message,
+          errorCode: details.code,
+          stage: details.stage ?? 'start_processing',
+        }).catch(() => undefined);
+
         throw new Error(message);
       }
 

@@ -72,6 +72,9 @@ export default function SubmitStatus() {
   const assignedPlaylist = assignedPlaylistId
     ? metadata.assignment?.topCandidates?.find((candidate) => candidate.playlistId === assignedPlaylistId) ?? null
     : null;
+  const processingStage = metadata.processing?.stage ?? metadata.error?.stage ?? metadata.clientError?.stage ?? null;
+  const requestId = metadata.processing?.requestId ?? metadata.error?.requestId ?? null;
+  const transcript = metadata.transcription;
 
   const handleRetry = () => {
     if (!submission?.video_id || !submission.youtube_url) {
@@ -161,7 +164,14 @@ export default function SubmitStatus() {
               <Alert variant={submission.recoverable ? 'default' : 'destructive'}>
                 <AlertCircle className="h-4 w-4" />
                 <AlertTitle>{t('submitStatus.processingErrorTitle')}</AlertTitle>
-                <AlertDescription>{submission.error_message}</AlertDescription>
+                <AlertDescription>
+                  {submission.error_message}
+                  {requestId && (
+                    <span className="mt-1 block text-xs">
+                      {t('submitStatus.requestIdLabel')}: {requestId}
+                    </span>
+                  )}
+                </AlertDescription>
               </Alert>
             )}
 
@@ -176,6 +186,20 @@ export default function SubmitStatus() {
                   {detectedLanguageKey ? t(detectedLanguageKey) : detectedLanguage}
                 </p>
               </div>
+              {processingStage && (
+                <div className="rounded-md border border-border p-4">
+                  <p className="text-xs font-medium uppercase text-muted-foreground">{t('submitStatus.stage.label')}</p>
+                  <p className="mt-1 text-sm">
+                    {t(`submitStatus.stage.values.${processingStage}`, { defaultValue: processingStage })}
+                  </p>
+                </div>
+              )}
+              {transcript?.summary && (
+                <div className="rounded-md border border-border p-4 sm:col-span-2">
+                  <p className="text-xs font-medium uppercase text-muted-foreground">{t('submitStatus.transcription.label')}</p>
+                  <p className="mt-1 text-sm text-muted-foreground">{transcript.summary}</p>
+                </div>
+              )}
               {assignedPlaylist && (
                 <div className="rounded-md border border-border p-4 sm:col-span-2">
                   <div className="flex items-start gap-3">
