@@ -698,13 +698,17 @@
         "notLoggedIn": "Você precisa estar logado para importar playlists.",
         "noPlaylistId": "Não foi possível extrair um ID de playlist da URL fornecida.",
         "generic": "Ocorreu um erro durante a importação da playlist. Por favor, tente novamente.",
+        "importFunctionFailed": "Falha ao executar a importação da playlist no servidor.",
         "maxRetriesReached": "Não foi possível criar a playlist após várias tentativas devido a um conflito de slug. Por favor, tente com um nome de playlist diferente.",
+        "noImportResponse": "A função de importação não retornou dados.",
         "youtubeApiFetchFailed": "Falha ao buscar detalhes da playlist do YouTube. Por favor, verifique a URL ou tente novamente mais tarde.",
         "videoProcessingFailed": "Falha ao processar o vídeo '{{title}}': {{error}}",
         "youtubeApiKeyMissing": "A chave de API do YouTube está faltando ou é inválida no servidor. Por favor, entre em contato com o suporte."
       },
       "success": {
         "playlistCreated": "Playlist '{{name}}' criada com sucesso!",
+        "summaryTitle": "Importação concluída",
+        "summaryDescription": "Encontrados: {{found}} • Adicionados: {{added}} • Duplicados: {{duplicates}} • Enviados para processamento: {{queued}}",
         "videoAdded": "Vídeo '{{title}}' adicionado ao Tube O2.",
         "allVideosProcessed": "Todos os {{count}} vídeos foram importados para a playlist com sucesso."
       },
@@ -712,6 +716,7 @@
         "videoAlreadyExists": "Vídeo '{{title}}' já existe no Tube O2. Ignorando criação."
       },
       "warning": {
+        "enrichPartial": "{{failed}} vídeo(s) não puderam ser enviados para processamento agora.",
         "noVideosFoundInPlaylist": "Nenhum vídeo encontrado na playlist do YouTube. Uma playlist vazia será criada."
       },
       "apiLimitationInfo": "O Tube O2 usa um serviço de backend para buscar vídeos de playlists do YouTube, mas depende da API de Dados do YouTube, que possui cotas e pode nem sempre retornar todos os vídeos para playlists muito grandes. Para resultados ótimos, certifique-se de que a playlist seja pública."

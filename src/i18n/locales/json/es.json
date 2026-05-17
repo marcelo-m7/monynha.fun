@@ -436,13 +436,17 @@
         "notLoggedIn": "Debes iniciar sesión para importar listas de reproducción.",
         "noPlaylistId": "No se pudo extraer un ID de lista de reproducción de la URL proporcionada.",
         "generic": "Ocurrió un error durante la importación de la lista de reproducción. Por favor, inténtalo de nuevo.",
+        "importFunctionFailed": "No se pudo ejecutar la importación de la lista en el servidor.",
         "maxRetriesReached": "No se pudo crear la lista de reproducción después de varios intentos debido a un conflicto de slug. Por favor, intenta con un nombre de playlist diferente.",
+        "noImportResponse": "La función de importación no devolvió datos.",
         "youtubeApiFetchFailed": "Error al obtener los detalles de la lista de reproducción de YouTube. Por favor, verifica la URL o inténtalo de nuevo más tarde.",
         "videoProcessingFailed": "Error al procesar el video '{{title}}': {{error}}",
         "youtubeApiKeyMissing": "La clave de API de YouTube no está configurada o es inválida en el servidor. Por favor, contacta a soporte."
       },
       "success": {
         "playlistCreated": "¡Lista de reproducción '{{name}}' creada con éxito!",
+        "summaryTitle": "Importación completada",
+        "summaryDescription": "Encontrados: {{found}} • Añadidos: {{added}} • Duplicados: {{duplicates}} • Enviados a procesamiento: {{queued}}",
         "videoAdded": "Video '{{title}}' añadido a Tube O2.",
         "allVideosProcessed": "Se importaron {{count}} videos a la lista de reproducción con éxito."
       },
@@ -450,6 +454,7 @@
         "videoAlreadyExists": "El video '{{title}}' ya existe en Tube O2. Se omite la creación."
       },
       "warning": {
+        "enrichPartial": "{{failed}} video(s) no pudieron enviarse a procesamiento por ahora.",
         "noVideosFoundInPlaylist": "No se encontraron videos en la lista de reproducción de YouTube. Se creará una lista de reproducción vacía."
       },
       "apiLimitationInfo": "Tube O2 utiliza un servicio de backend para obtener videos de listas de reproducción de YouTube, pero depende de la API de datos de YouTube, que tiene cuotas y puede que no siempre devuelva todos los videos para listas de reproducción muy grandes. Para obtener resultados óptimos, asegúrate de que la lista de reproducción sea pública."

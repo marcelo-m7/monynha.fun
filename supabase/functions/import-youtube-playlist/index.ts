@@ -233,8 +233,22 @@ Deno.serve(async (req: Request) => {
       error_message: null,
       recoverable: false,
     }));
-    const { error } = await supabase.from("video_submissions").insert(submissions);
-    if (error) return json({ error: "Failed inserting video_submissions", details: error.message }, 500);
+    const { data: insertedSubmissions, error: subErr } = await supabase
+      .from("video_submissions")
+      .insert(submissions)
+      .select("id, video_id, youtube_id, youtube_url, status");
+    if (subErr) return json({ error: "Failed inserting video_submissions", details: subErr.message }, 500);
+
+    return json({
+      playlist_id: playlistId,
+      playlist_list: listParam,
+      fetched_video_count: uniqueIds.length,
+      existing_in_playlist_count: existingSet.size,
+      added_to_playlist_count: toAdd.length,
+      pipeline_enqueued_count: addedYoutubeIds.length,
+      videos: addedYoutubeIds.map((youtubeId) => ({ youtube_id: youtubeId, video_id: byYoutubeId.get(youtubeId), youtube_url: watchUrl(youtubeId) })),
+      submissions: insertedSubmissions ?? [],
+    });
   }
 
   return json({
@@ -245,5 +259,6 @@ Deno.serve(async (req: Request) => {
     added_to_playlist_count: toAdd.length,
     pipeline_enqueued_count: addedYoutubeIds.length,
     videos: addedYoutubeIds.map((youtubeId) => ({ youtube_id: youtubeId, video_id: byYoutubeId.get(youtubeId), youtube_url: watchUrl(youtubeId) })),
+    submissions: [],
   });
 });

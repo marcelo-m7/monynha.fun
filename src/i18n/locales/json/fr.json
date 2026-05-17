@@ -436,13 +436,17 @@
         "notLoggedIn": "Debes iniciar sesión para importar listas de reproducción.",
         "noPlaylistId": "No se pudo extraer un ID de lista de reproducción de la URL proporcionada.",
         "generic": "Ocurrió un error durante la importación de la lista de reproducción. Por favor, inténtalo de nuevo.",
+        "importFunctionFailed": "No se pudo ejecutar la importación de la lista en el servidor.",
         "maxRetriesReached": "No se pudo crear la lista de reproducción después de varios intentos debido a un conflicto de slug. Por favor, intenta con un nombre de playlist diferente.",
+        "noImportResponse": "La función de importación no devolvió datos.",
         "youtubeApiFetchFailed": "Error al obtener los detalles de la lista de reproducción de YouTube. Por favor, verifica la URL o inténtalo de nuevo más tarde.",
         "videoProcessingFailed": "Error al procesar el video '{{title}}': {{error}}",
         "youtubeApiKeyMissing": "La clave de API de YouTube no está configurada o es inválida en el servidor. Por favor, contacta a soporte."
       },
       "success": {
         "playlistCreated": "¡Lista de reproducción '{{name}}' creada con éxito!",
+        "summaryTitle": "Importación completada",
+        "summaryDescription": "Encontrados: {{found}} • Añadidos: {{added}} • Duplicados: {{duplicates}} • Enviados a procesamiento: {{queued}}",
         "videoAdded": "Vidéo '{{title}}' ajoutée à Tube O2.",
         "allVideosProcessed": "Se importaron {{count}} videos a la lista de reproducción con éxito."
       },
@@ -450,6 +454,7 @@
         "videoAlreadyExists": "La vidéo '{{title}}' existe déjà dans Tube O2. Création ignorée."
       },
       "warning": {
+        "enrichPartial": "{{failed}} vídeo(s) no pudieron enviarse a procesamiento por ahora.",
         "noVideosFoundInPlaylist": "No se encontraron videos en la lista de reproducción de YouTube. Se creará una lista de reproducción vacía."
       },
       "apiLimitationInfo": "Tube O2 utilise un service backend pour récupérer les vidéos des playlists YouTube, mais dépend de l'API YouTube Data, qui possède des quotas et peut ne pas toujours renvoyer toutes les vidéos des très grandes playlists. Pour de meilleurs résultats, assurez-vous que la playlist est publique."

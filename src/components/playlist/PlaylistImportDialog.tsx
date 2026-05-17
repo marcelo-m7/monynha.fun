@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -18,11 +18,9 @@ import { Loader2, Youtube, ListVideo, Info, CheckCircle, AlertCircle } from 'luc
 import { toast } from 'sonner';
 import { useAuth } from '@/features/auth/useAuth';
 import { extractYouTubePlaylistId } from '@/shared/lib/youtube';
-import { useCreatePlaylist, useAddVideoToPlaylist } from '@/features/playlists';
-import { createVideo, findVideoByYoutubeId } from '@/entities/video/video.api';
-import { invokeEdgeFunction } from '@/shared/api/supabase/edgeFunctions';
-import type { VideoInsert } from '@/entities/video/video.types';
-import { generateSlug } from '@/shared/lib/slug'; // Import generateSlug
+import { useCreatePlaylist } from '@/features/playlists';
+import { getEdgeFunctionErrorDetails, invokeEdgeFunction } from '@/shared/api/supabase/edgeFunctions';
+import { generateSlug } from '@/shared/lib/slug';
 
 interface PlaylistImportDialogProps {
   children: React.ReactNode;
@@ -38,14 +36,44 @@ const importSchema = z.object({
 
 type ImportFormValues = z.infer<typeof importSchema>;
 
+type ImportedSubmission = {
+  id: string;
+  video_id: string | null;
+  youtube_url: string;
+  status: string;
+};
+
+type ImportYoutubePlaylistResponse = {
+  fetched_video_count: number;
+  added_to_playlist_count: number;
+  existing_in_playlist_count: number;
+  submissions?: ImportedSubmission[];
+};
+
+async function runWithConcurrencyLimit<T>(
+  items: T[],
+  limit: number,
+  worker: (item: T) => Promise<void>,
+) {
+  const queue = [...items];
+  const workerCount = Math.max(1, Math.min(limit, queue.length));
+
+  await Promise.all(
+    Array.from({ length: workerCount }, async () => {
+      while (queue.length > 0) {
+        const item = queue.shift();
+        if (!item) return;
+        await worker(item);
+      }
+    }),
+  );
+}
+
 export const PlaylistImportDialog: React.FC<PlaylistImportDialogProps> = ({ children }) => {
   const { t } = useTranslation();
   const { user } = useAuth();
   const [open, setOpen] = useState(false);
   const createPlaylistMutation = useCreatePlaylist();
-  const addVideoMutation = useAddVideoToPlaylist();
-  const [isFetchingYoutube, setIsFetchingYoutube] = useState(false);
-  const [youtubeFetchError, setYoutubeFetchError] = useState<string | null>(null);
 
   const {
     register,
@@ -68,75 +96,19 @@ export const PlaylistImportDialog: React.FC<PlaylistImportDialogProps> = ({ chil
   useEffect(() => {
     if (!open) {
       reset();
-      setYoutubeFetchError(null);
-      setIsFetchingYoutube(false);
     }
   }, [open, reset]);
 
-  // Effect to pre-fill playlist name based on URL (if possible, though YouTube API is needed for actual name)
   useEffect(() => {
     if (playlistUrl.includes('youtube.com/playlist') && !playlistName) {
-      setValue('playlistName', t('playlists.import.defaultPlaylistName'));
+      setValue('playlistName', t('playlists.import.form.defaultPlaylistName'));
     }
   }, [playlistUrl, playlistName, setValue, t]);
 
-  const handlePlaylistUrlChange = useCallback(async (url: string) => {
-    setYoutubeFetchError(null);
-    if (!url.trim() || errors.playlistUrl) {
-      setIsFetchingYoutube(false);
-      return;
-    }
-
-    const youtubePlaylistId = extractYouTubePlaylistId(url);
-    if (!youtubePlaylistId) {
-      setYoutubeFetchError(t('playlists.import.error.noPlaylistId'));
-      setIsFetchingYoutube(false);
-      return;
-    }
-
-    setIsFetchingYoutube(true);
-    try {
-      // Call the new Edge Function to get playlist details
-      const { data, error } = await invokeEdgeFunction<{ playlistId: string; videos: VideoInsert[] }>('import-youtube-playlist', {
-        body: { playlistUrl: url },
-        headers: { 'Content-Type': 'application/json' },
-      });
-
-      if (error) {
-        // Extract the specific error message from the Edge Function response
-        const errorMessage = error.message || t('playlists.import.error.youtubeApiFetchFailed');
-        throw new Error(errorMessage);
-      }
-
-      if (data && data.videos.length > 0) {
-        // Attempt to use the first video's title as a suggestion for playlist name
-        if (!playlistName) {
-          setValue('playlistName', data.videos[0].title);
-        }
-      } else {
-        // Fallback name if no videos or title found
-        if (!playlistName) {
-          setValue('playlistName', t('playlists.import.defaultPlaylistName'));
-        }
-      }
-      setYoutubeFetchError(null);
-    } catch (err) {
-      setYoutubeFetchError(err instanceof Error ? err.message : t('playlists.import.error.youtubeApiFetchFailed'));
-    } finally {
-      setIsFetchingYoutube(false);
-    }
-  }, [errors.playlistUrl, playlistName, setValue, t]);
-
-  // Watch playlistUrl and trigger metadata fetch
-  useEffect(() => {
-    const subscription = watch((value, { name }) => {
-      if (name === 'playlistUrl') {
-        handlePlaylistUrlChange(value.playlistUrl || '');
-      }
-    });
-    return () => subscription.unsubscribe();
-  }, [watch, handlePlaylistUrlChange]);
-
+  const playlistIdFromUrl = extractYouTubePlaylistId(playlistUrl);
+  const playlistUrlFeedbackError = playlistUrl.trim() && !errors.playlistUrl && !playlistIdFromUrl
+    ? t('playlists.import.error.noPlaylistId')
+    : null;
 
   const onSubmit = async (values: ImportFormValues) => {
     if (!user) {
@@ -157,73 +129,75 @@ export const PlaylistImportDialog: React.FC<PlaylistImportDialogProps> = ({ chil
 
     while (retryCount < MAX_RETRIES) {
       try {
-        // 1. Fetch all videos from the YouTube playlist using the Edge Function
-        const { data: edgeFunctionData, error: edgeFunctionError } = await invokeEdgeFunction<{ playlistId: string; videos: VideoInsert[] }>('import-youtube-playlist', {
-          body: { playlistUrl: values.playlistUrl },
-          headers: { 'Content-Type': 'application/json' },
-        });
-
-        if (edgeFunctionError) {
-          throw new Error(edgeFunctionError.message);
-        }
-        if (!edgeFunctionData || !edgeFunctionData.videos || edgeFunctionData.videos.length === 0) {
-          toast.warning(t('playlists.import.warning.noVideosFoundInPlaylist'));
-          // Proceed to create an empty playlist if no videos are found
-        }
-
-        const videosToImport = edgeFunctionData?.videos || [];
-
-        // 2. Create the playlist
         const newPlaylist = await createPlaylistMutation.mutateAsync({
           name: currentPlaylistName,
           slug: currentSlug,
           description: `Imported from YouTube playlist: ${values.playlistUrl}`,
-          thumbnail_url: videosToImport.length > 0 ? videosToImport[0].thumbnail_url : null,
-          language: 'pt', // Default language, could be made configurable
+          thumbnail_url: null,
+          language: 'und',
           is_public: true,
           is_ordered: true,
           course_code: null,
           unit_code: null,
         });
 
-        toast.success(t('playlists.import.success.playlistCreated', { name: newPlaylist.name }));
+        const { data: edgeFunctionData, error: edgeFunctionError } = await invokeEdgeFunction<ImportYoutubePlaylistResponse>('import-youtube-playlist', {
+          body: {
+            playlist_url: values.playlistUrl,
+            playlist_id: newPlaylist.id,
+            language: 'und',
+            max_videos: 200,
+          },
+          headers: { 'Content-Type': 'application/json' },
+        });
 
-        // 3. Add each video to the video library and then to the playlist
-        for (const videoData of videosToImport) {
-          try {
-            const existingVideo = await findVideoByYoutubeId(videoData.youtube_id);
-            let videoToAddToPlaylist;
-
-            if (existingVideo) {
-              videoToAddToPlaylist = existingVideo;
-              toast.info(t('playlists.import.info.videoAlreadyExists', { title: videoData.title }));
-            } else {
-              // Create video if it doesn't exist
-              videoToAddToPlaylist = await createVideo({
-                youtube_id: videoData.youtube_id,
-                title: videoData.title,
-                description: videoData.description || null,
-                channel_name: videoData.channel_name,
-                thumbnail_url: videoData.thumbnail_url,
-                duration_seconds: videoData.duration_seconds, // Use duration from API if available, otherwise null
-                language: videoData.language || 'pt', // Use language from API if available, otherwise default
-                submitted_by: user.id,
-              });
-              toast.success(t('playlists.import.success.videoAdded', { title: videoData.title }));
-            }
-
-            // Add the video to the new playlist
-            await addVideoMutation.mutateAsync({
-              playlistId: newPlaylist.id,
-              videoId: videoToAddToPlaylist.id,
-            });
-          } catch (videoError) {
-            const errorMessage = videoError instanceof Error ? videoError.message : String(videoError);
-            toast.error(t('playlists.import.error.videoProcessingFailed', { title: videoData.title, error: errorMessage }));
-          }
+        if (edgeFunctionError) {
+          const details = await getEdgeFunctionErrorDetails(edgeFunctionError);
+          throw new Error(details.requestId ? `${details.message} (request ${details.requestId})` : details.message);
         }
 
-        toast.success(t('playlists.import.success.allVideosProcessed', { count: videosToImport.length }));
+        if (!edgeFunctionData) {
+          throw new Error(t('playlists.import.error.noImportResponse'));
+        }
+
+        const submissions = (edgeFunctionData.submissions ?? []).filter(
+          (submission) => !!submission.id && !!submission.video_id && !!submission.youtube_url,
+        ) as Array<Required<Pick<ImportedSubmission, 'id' | 'video_id' | 'youtube_url'>>>;
+
+        let processedForEnrichment = 0;
+        let enrichFailedCount = 0;
+
+        await runWithConcurrencyLimit(submissions, 3, async (submission) => {
+          const { error } = await invokeEdgeFunction('enrich-video', {
+            body: {
+              videoId: submission.video_id,
+              youtubeUrl: submission.youtube_url,
+              submissionId: submission.id,
+            },
+            headers: { 'Content-Type': 'application/json' },
+          });
+
+          if (error) {
+            enrichFailedCount += 1;
+            return;
+          }
+
+          processedForEnrichment += 1;
+        });
+
+        toast.success(t('playlists.import.success.summaryTitle'), {
+          description: t('playlists.import.success.summaryDescription', {
+            found: edgeFunctionData.fetched_video_count,
+            added: edgeFunctionData.added_to_playlist_count,
+            duplicates: edgeFunctionData.existing_in_playlist_count,
+            queued: processedForEnrichment,
+          }),
+        });
+
+        if (enrichFailedCount > 0) {
+          toast.warning(t('playlists.import.warning.enrichPartial', { failed: enrichFailedCount }));
+        }
+
         setOpen(false);
         return; // Exit on success
       } catch (error) {
@@ -234,7 +208,7 @@ export const PlaylistImportDialog: React.FC<PlaylistImportDialogProps> = ({ chil
           // Retry with new slug to avoid duplicate key conflict
         } else {
           toast.error(t('playlists.import.error.generic'), {
-            description: error.message,
+            description: error instanceof Error ? error.message : t('playlists.import.error.importFunctionFailed'),
           });
           setOpen(false);
           return;
@@ -248,7 +222,7 @@ export const PlaylistImportDialog: React.FC<PlaylistImportDialogProps> = ({ chil
     setOpen(false);
   };
 
-  const isFormDisabled = isSubmitting || createPlaylistMutation.isPending || addVideoMutation.isPending || isFetchingYoutube;
+  const isFormDisabled = isSubmitting || createPlaylistMutation.isPending;
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -276,24 +250,21 @@ export const PlaylistImportDialog: React.FC<PlaylistImportDialogProps> = ({ chil
                 placeholder={t('playlists.import.form.urlPlaceholder')}
                 {...register('playlistUrl')}
                 className="pl-10"
-                aria-invalid={errors.playlistUrl || youtubeFetchError ? "true" : "false"}
+                aria-invalid={errors.playlistUrl || playlistUrlFeedbackError ? "true" : "false"}
                 disabled={isFormDisabled}
               />
-              {isFetchingYoutube && (
-                <Loader2 className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 animate-spin text-muted-foreground" />
-              )}
-              {!isFetchingYoutube && !youtubeFetchError && playlistUrl.trim() !== '' && !errors.playlistUrl && (
+              {!playlistUrlFeedbackError && playlistUrl.trim() !== '' && !errors.playlistUrl && (
                 <CheckCircle className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-green-500" />
               )}
-              {(!isFetchingYoutube && (youtubeFetchError || errors.playlistUrl)) && (
+              {(playlistUrlFeedbackError || errors.playlistUrl) && (
                 <AlertCircle className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-destructive" />
               )}
             </div>
             {errors.playlistUrl && (
               <p role="alert" className="text-sm text-destructive">{t(errors.playlistUrl.message as string)}</p>
             )}
-            {youtubeFetchError && !errors.playlistUrl && (
-              <p className="text-sm text-destructive">{youtubeFetchError}</p>
+            {playlistUrlFeedbackError && !errors.playlistUrl && (
+              <p className="text-sm text-destructive">{playlistUrlFeedbackError}</p>
             )}
           </div>
 
@@ -318,7 +289,7 @@ export const PlaylistImportDialog: React.FC<PlaylistImportDialogProps> = ({ chil
             type="submit"
             className="w-full"
             size="lg"
-            disabled={isFormDisabled || !!errors.playlistUrl || !!youtubeFetchError}
+            disabled={isFormDisabled || !!errors.playlistUrl || !!playlistUrlFeedbackError}
           >
             {isFormDisabled ? (
               <>
