@@ -11,6 +11,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { useAuth } from '@/features/auth/useAuth';
 import { useStartSubmissionProcessing, useVideoSubmission } from '@/features/video-submissions/queries/useVideoSubmissions';
 import { getVideoSubmissionMetadata } from '@/entities/video_submission/video_submission.types';
+import { MotionPage, Reveal } from '@/components/premium/Motion';
 
 const terminalStatuses = new Set(['success', 'failed', 'duplicate', 'recoverable_error']);
 
@@ -143,19 +144,20 @@ export default function SubmitStatus() {
 
   return (
     <MainLayout>
-      <div className="container max-w-3xl py-10">
+      <MotionPage className="container max-w-5xl py-10 pb-24 md:pb-10">
         <Button variant="ghost" onClick={() => navigate('/submit')} className="mb-6 text-muted-foreground">
           <ArrowLeft className="mr-2 h-4 w-4" />
           {t('submitStatus.backToSubmit')}
         </Button>
 
-        <Card>
-          <CardHeader className="space-y-4">
+        <Card className="overflow-hidden rounded-3xl">
+          <CardHeader className="relative space-y-4 border-b border-border/60 bg-muted/25">
+            <div className="pointer-events-none absolute inset-x-0 top-0 h-40 bg-gradient-to-r from-primary/10 via-sky-400/10 to-emerald-400/10" />
             <div className="flex items-center justify-between gap-3">
               <div className="flex items-center gap-3">
                 {statusIcon}
                 <div>
-                  <CardTitle>{t(`submitStatus.states.${status}.title`)}</CardTitle>
+                  <CardTitle className="text-2xl font-black">{t(`submitStatus.states.${status}.title`)}</CardTitle>
                   <CardDescription>{t(`submitStatus.states.${status}.description`)}</CardDescription>
                 </div>
               </div>
@@ -202,19 +204,19 @@ export default function SubmitStatus() {
               </Alert>
             )}
 
-            <div className="grid gap-3 sm:grid-cols-2">
-              <div className="rounded-md border border-border p-4">
+            <div className="grid gap-3 sm:grid-cols-3">
+              <div className="premium-glass rounded-2xl p-4">
                 <p className="text-xs font-medium uppercase text-muted-foreground">{t('submitStatus.youtubeIdLabel')}</p>
                 <p className="mt-1 break-all text-sm">{submission.youtube_id}</p>
               </div>
-              <div className="rounded-md border border-border p-4">
+              <div className="premium-glass rounded-2xl p-4">
                 <p className="text-xs font-medium uppercase text-muted-foreground">{t('submitStatus.language.label')}</p>
                 <p className="mt-1 text-sm">
                   {detectedLanguageKey ? t(detectedLanguageKey) : detectedLanguage}
                 </p>
               </div>
               {processingStage && (
-                <div className="rounded-md border border-border p-4">
+                <div className="premium-glass rounded-2xl p-4">
                   <p className="text-xs font-medium uppercase text-muted-foreground">{t('submitStatus.stage.label')}</p>
                   <p className="mt-1 text-sm">
                     {t(`submitStatus.stage.values.${processingStage}`, { defaultValue: processingStage })}
@@ -222,16 +224,18 @@ export default function SubmitStatus() {
                 </div>
               )}
               {(summaryText || semanticTags.length > 0 || optimizedTitle) && (
-                <div className="rounded-md border border-border bg-muted/20 p-4 sm:col-span-2">
+                <Reveal className="premium-surface rounded-3xl p-5 sm:col-span-3">
                   <div className="flex items-start gap-3">
-                    <Sparkles className="mt-0.5 h-5 w-5 shrink-0 text-primary" />
+                    <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-primary/15 text-primary">
+                      <Sparkles className="h-5 w-5" />
+                    </div>
                     <div className="min-w-0 flex-1">
                       <p className="text-xs font-medium uppercase text-muted-foreground">{t('submitStatus.analysis.label')}</p>
                       {optimizedTitle && (
-                        <p className="mt-1 text-sm font-medium">{optimizedTitle}</p>
+                        <p className="mt-1 text-lg font-bold">{optimizedTitle}</p>
                       )}
                       {summaryText && (
-                        <p className="mt-2 text-sm text-muted-foreground">{summaryText}</p>
+                        <p className="mt-2 text-sm leading-6 text-muted-foreground">{summaryText}</p>
                       )}
                     </div>
                   </div>
@@ -245,17 +249,19 @@ export default function SubmitStatus() {
                       ))}
                     </div>
                   )}
-                </div>
+                </Reveal>
               )}
               {assignedPlaylist && (
-                <div className="rounded-md border border-border p-4 sm:col-span-2">
+                <div className="premium-surface rounded-3xl p-5 sm:col-span-3">
                   <div className="flex items-start gap-3">
-                    <ListVideo className="mt-0.5 h-5 w-5 shrink-0 text-primary" />
+                    <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-primary/15 text-primary">
+                      <ListVideo className="h-5 w-5" />
+                    </div>
                     <div>
                       <p className="text-xs font-medium uppercase text-muted-foreground">
                         {t('submitStatus.assignment.label')}
                       </p>
-                      <p className="mt-1 text-sm font-medium">{assignedPlaylist.name}</p>
+                      <p className="mt-1 text-lg font-bold">{assignedPlaylist.name}</p>
                       {metadata.assignment?.reason && (
                         <p className="mt-1 text-xs text-muted-foreground">{metadata.assignment.reason}</p>
                       )}
@@ -269,9 +275,11 @@ export default function SubmitStatus() {
                 </div>
               )}
               {noAssignedPlaylist && (
-                <div className="rounded-md border border-border p-4 sm:col-span-2">
+                <div className="premium-surface rounded-3xl p-5 sm:col-span-3">
                   <div className="flex items-start gap-3">
-                    <ListVideo className="mt-0.5 h-5 w-5 shrink-0 text-muted-foreground" />
+                    <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-muted text-muted-foreground">
+                      <ListVideo className="h-5 w-5" />
+                    </div>
                     <div>
                       <p className="text-xs font-medium uppercase text-muted-foreground">
                         {t('submitStatus.assignment.noneLabel')}
@@ -295,7 +303,7 @@ export default function SubmitStatus() {
                 </div>
               )}
               {topCandidates.length > 0 && (
-                <div className="rounded-md border border-border p-4 sm:col-span-2">
+                <div className="premium-surface rounded-3xl p-5 sm:col-span-3">
                   <div className="mb-3 flex items-center gap-2">
                     <ListChecks className="h-4 w-4 text-primary" />
                     <p className="text-xs font-medium uppercase text-muted-foreground">
@@ -304,7 +312,7 @@ export default function SubmitStatus() {
                   </div>
                   <div className="space-y-2">
                     {topCandidates.slice(0, 3).map((candidate) => (
-                      <div key={candidate.playlistId} className="flex flex-col gap-2 rounded-md bg-muted/30 p-3 sm:flex-row sm:items-center sm:justify-between">
+                      <div key={candidate.playlistId} className="flex flex-col gap-2 rounded-2xl bg-muted/40 p-3 sm:flex-row sm:items-center sm:justify-between">
                         <div className="min-w-0">
                           <p className="truncate text-sm font-medium">{candidate.name}</p>
                           <p className="text-xs text-muted-foreground">
@@ -327,7 +335,7 @@ export default function SubmitStatus() {
             </div>
 
             {!isTerminal && (
-              <div className="rounded-md border border-border bg-muted/30 p-4">
+              <div className="premium-glass rounded-3xl p-5">
                 <div className="flex items-start gap-3">
                   <Wand2 className="mt-0.5 h-5 w-5 shrink-0 text-primary" />
                   <div>
@@ -340,12 +348,12 @@ export default function SubmitStatus() {
 
             <div className="flex flex-col gap-3 sm:flex-row">
               {videoId && (status === 'success' || status === 'duplicate') && (
-                <Button asChild>
+                <Button asChild className="rounded-full">
                   <Link to={`/videos/${videoId}`}>{t('submitStatus.viewVideo')}</Link>
                 </Button>
               )}
               {(status === 'recoverable_error' || startProcessing.isError) && (
-                <Button onClick={handleRetry} disabled={startProcessing.isPending}>
+                <Button onClick={handleRetry} disabled={startProcessing.isPending} className="rounded-full">
                   {startProcessing.isPending ? (
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                   ) : (
@@ -354,13 +362,13 @@ export default function SubmitStatus() {
                   {t('submitStatus.retry')}
                 </Button>
               )}
-              <Button variant="outline" asChild>
+              <Button variant="outline" asChild className="rounded-full">
                 <Link to="/videos">{t('submitStatus.exploreVideos')}</Link>
               </Button>
             </div>
           </CardContent>
         </Card>
-      </div>
+      </MotionPage>
     </MainLayout>
   );
 }

@@ -8,12 +8,14 @@ import ScrollToTop from "./components/ScrollToTop";
 // Fallback component for Suspense
 const PageLoader = () => (
   <div className="container py-8 space-y-6">
-    <Skeleton className="h-10 w-48" />
-    <Skeleton className="h-96 w-full rounded-2xl" />
+    <div className="premium-surface space-y-4 rounded-3xl p-5">
+      <Skeleton className="h-10 w-48 rounded-full" />
+      <Skeleton className="h-96 w-full rounded-2xl" />
+    </div>
     <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-      <Skeleton className="h-48 rounded-xl" />
-      <Skeleton className="h-48 rounded-xl" />
-      <Skeleton className="h-48 rounded-xl" />
+      <Skeleton className="h-48 rounded-2xl" />
+      <Skeleton className="h-48 rounded-2xl" />
+      <Skeleton className="h-48 rounded-2xl" />
     </div>
   </div>
 );

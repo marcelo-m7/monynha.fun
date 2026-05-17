@@ -9,8 +9,10 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
 import { Search, X, Loader2 } from 'lucide-react';
-import { Skeleton } from '@/components/ui/skeleton';
 import { useTranslation } from 'react-i18next'; // Import useTranslation
+import { EmptyState } from '@/components/premium/EmptyState';
+import { VideoSkeleton } from '@/components/premium/Skeletons';
+import { MotionPage, Stagger, StaggerItem } from '@/components/premium/Motion';
 
 const Videos = () => {
   const { t } = useTranslation(); // Initialize useTranslation
@@ -64,16 +66,16 @@ const Videos = () => {
   return (
     <div className="min-h-screen flex flex-col">
       <Header />
-      <main className="flex-1 container py-8">
-        <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold">{t('videos.title')}</h1>
-          <p className="text-muted-foreground mt-2">
+      <main className="flex-1 container py-8 pb-24 md:pb-8">
+        <MotionPage className="mb-8 text-center">
+          <h1 className="text-4xl font-black md:text-6xl">{t('videos.title')}</h1>
+          <p className="mx-auto mt-3 max-w-2xl text-muted-foreground">
             {t('videos.description')}
           </p>
-        </div>
+        </MotionPage>
 
         {/* Search and Filter Controls */}
-        <div className="flex flex-col md:flex-row gap-4 mb-8">
+        <div className="premium-surface mb-8 flex flex-col gap-4 rounded-2xl p-3 md:flex-row">
           <div className="relative flex-1">
             <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
             <Input
@@ -82,7 +84,7 @@ const Videos = () => {
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               disabled={isFeatured}
-              className="w-full pl-10 pr-4 h-10 bg-muted/50 border-0 focus-visible:ring-primary/30"
+              className="w-full pl-10 pr-4 h-11 bg-muted/50 border-0 focus-visible:ring-primary/30"
             />
           </div>
 
@@ -138,57 +140,33 @@ const Videos = () => {
         {isFeatured ? (
           featuredLoading ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-              {Array.from({ length: 8 }).map((_, i) => (
-                <div key={i} className="space-y-3">
-                  <Skeleton className="aspect-video rounded-2xl" />
-                  <Skeleton className="h-4 w-3/4" />
-                  <Skeleton className="h-3 w-1/2" />
-                </div>
-              ))}
+              {Array.from({ length: 8 }).map((_, i) => <VideoSkeleton key={i} />)}
             </div>
           ) : featuredVideos && featuredVideos.length > 0 ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            <Stagger className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
               {featuredVideos.map((video, index) => (
-                <div
-                  key={video.id}
-                  className="animate-fade-up"
-                  style={{ animationDelay: `${index * 0.1}s` }}
-                >
+                <StaggerItem key={video.id}>
                   <VideoCard video={video} variant="default" />
-                </div>
+                </StaggerItem>
               ))}
-            </div>
+            </Stagger>
           ) : (
-            <div className="text-center py-12 text-muted-foreground">
-              {t('index.noFeaturedVideos')}
-            </div>
+            <EmptyState title={t('index.noFeaturedVideos')} />
           )
         ) : videosLoading ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {Array.from({ length: 8 }).map((_, i) => (
-              <div key={i} className="space-y-3">
-                <Skeleton className="aspect-video rounded-2xl" />
-                <Skeleton className="h-4 w-3/4" />
-                <Skeleton className="h-3 w-1/2" />
-              </div>
-            ))}
+            {Array.from({ length: 8 }).map((_, i) => <VideoSkeleton key={i} />)}
           </div>
         ) : videos && videos.length > 0 ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          <Stagger className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {videos.map((video, index) => (
-              <div
-                key={video.id}
-                className="animate-fade-up"
-                style={{ animationDelay: `${index * 0.1}s` }}
-              >
+              <StaggerItem key={video.id}>
                 <VideoCard video={video} variant="default" />
-              </div>
+              </StaggerItem>
             ))}
-          </div>
+          </Stagger>
         ) : (
-          <div className="text-center py-12 text-muted-foreground">
-            {t('videos.noVideosFound')}
-          </div>
+          <EmptyState icon={Search} title={t('videos.noVideosFound')} />
         )}
       </main>
       <Footer />

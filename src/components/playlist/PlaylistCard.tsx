@@ -21,11 +21,11 @@ export function PlaylistCard({ playlist, index = 0 }: PlaylistCardProps) {
   return (
     <Link
       to={`/playlists/${playlist.id}`}
-      className="group bg-card border border-border overflow-hidden transition-colors hover:border-primary flex flex-col"
+      className="group premium-surface flex flex-col overflow-hidden transition-all duration-300 hover:-translate-y-1 hover:border-primary/60 hover:shadow-ambient"
       style={{ animationDelay: `${index * 0.05}s` }}
     >
       {/* Thumbnail / Header */}
-      <div className="relative h-32 bg-muted/30 overflow-hidden">
+      <div className="relative h-36 overflow-hidden bg-muted/30">
         {thumbnailUrl ? (
           <img 
             src={thumbnailUrl} 
@@ -45,7 +45,7 @@ export function PlaylistCard({ playlist, index = 0 }: PlaylistCardProps) {
         
         {/* Type badge */}
         <div className="absolute top-2 left-2">
-          <span className={`inline-flex items-center gap-1 px-2 py-1 rounded-sm text-[0.65rem] font-bold uppercase tracking-widest ${
+          <span className={`inline-flex items-center gap-1 rounded-full px-2 py-1 text-[0.65rem] font-bold ${
             playlist.is_ordered 
               ? 'bg-primary/90 text-primary-foreground' 
               : 'bg-secondary/90 text-secondary-foreground'
@@ -76,7 +76,7 @@ export function PlaylistCard({ playlist, index = 0 }: PlaylistCardProps) {
 
       {/* Content */}
       <div className="p-4 flex flex-col flex-1">
-        <h2 className="font-semibold text-lg group-hover:opacity-75 transition-opacity line-clamp-1 mb-1 uppercase tracking-[0.08em]">
+        <h2 className="mb-1 line-clamp-1 text-lg font-bold transition-colors group-hover:text-primary">
           {playlist.name}
         </h2>
         
@@ -85,7 +85,7 @@ export function PlaylistCard({ playlist, index = 0 }: PlaylistCardProps) {
           {playlist.author?.username && ` • ${playlist.author.username}`}
         </p>
 
-        <div className="flex items-center gap-3 text-xs text-muted-foreground mb-3 uppercase tracking-widest">
+        <div className="mb-3 flex items-center gap-3 text-xs text-muted-foreground">
           {totalDuration > 0 && (
             <span className="inline-flex items-center gap-1">
               <Clock3 className="w-3 h-3" /> {formatDuration(totalDuration)}
@@ -105,16 +105,16 @@ export function PlaylistCard({ playlist, index = 0 }: PlaylistCardProps) {
         {/* Metadata tags */}
         <div className="flex flex-wrap gap-2 text-[0.65rem] text-muted-foreground mt-auto uppercase tracking-widest">
           {playlist.course_code && (
-            <span className="flex items-center gap-1 px-2 py-1 rounded-sm bg-muted/50">
+            <span className="flex items-center gap-1 rounded-full bg-muted/60 px-2 py-1">
               <BookOpen className="w-3 h-3" /> {playlist.course_code}
             </span>
           )}
           {playlist.unit_code && (
-            <span className="flex items-center gap-1 px-2 py-1 rounded-sm bg-muted/50">
+            <span className="flex items-center gap-1 rounded-full bg-muted/60 px-2 py-1">
               <Code className="w-3 h-3" /> {playlist.unit_code}
             </span>
           )}
-          <span className="flex items-center gap-1 px-2 py-1 rounded-sm bg-muted/50 uppercase">
+          <span className="flex items-center gap-1 rounded-full bg-muted/60 px-2 py-1 uppercase">
             <Globe className="w-3 h-3" /> {playlist.language}
           </span>
         </div>

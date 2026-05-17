@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { cn } from '@/lib/utils';
 import { Skeleton } from '@/components/ui/skeleton';
+import { useTranslation } from 'react-i18next';
 
 interface LazyImageProps extends React.ImgHTMLAttributes<HTMLImageElement> {
   fallbackClassName?: string;
@@ -43,6 +44,7 @@ export const LazyImage: React.FC<LazyImageProps> = ({
   decoding = 'async',
   ...props
 }) => {
+  const { t } = useTranslation();
   const [isLoaded, setIsLoaded] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [imageSrc, setImageSrc] = useState<string | null>(null);
@@ -141,7 +143,7 @@ export const LazyImage: React.FC<LazyImageProps> = ({
         <div className="absolute inset-0 flex items-center justify-center bg-muted text-muted-foreground text-sm p-4 text-center">
           <div className="space-y-2">
             <div>⚠️</div>
-            <div>Falha ao carregar imagem</div>
+            <div>{t('common.imageLoadError', { defaultValue: 'Falha ao carregar imagem' })}</div>
             <div className="text-xs opacity-50">{alt}</div>
           </div>
         </div>

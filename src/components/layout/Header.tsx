@@ -1,5 +1,5 @@
 import { Link, useNavigate } from "react-router-dom";
-import { Plus, Menu, Heart, Globe, User as UserIcon, Settings, KeyRound, LogOut, Bell, MessageCircle, ShieldCheck } from "lucide-react";
+import { Plus, Menu, Heart, Globe, User as UserIcon, Settings, KeyRound, LogOut, Bell, MessageCircle, ShieldCheck, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import { useAuth } from "@/features/auth/useAuth";
@@ -46,16 +46,16 @@ export const Header = () => {
   };
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+    <header className="sticky top-0 z-50 w-full border-b border-white/10 bg-background/78 backdrop-blur-2xl supports-[backdrop-filter]:bg-background/70">
       <Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>
-      <div className="container flex h-16 items-center gap-6">
+      <div className="container flex h-16 items-center gap-4">
 
         {/* Logo */}
         <Link to="/" className="flex items-center gap-2 group shrink-0">
-          <div className="flex h-8 w-8 items-center justify-center bg-primary text-primary-foreground transition-transform group-hover:scale-105">
+          <div className="flex h-9 w-9 items-center justify-center rounded-2xl bg-primary text-primary-foreground shadow-glow transition-transform group-hover:scale-105">
             <span className="text-sm font-bold tracking-tighter">O2</span>
           </div>
-          <span className="hidden font-bold text-lg tracking-[0.2em] uppercase sm:inline-block">
+          <span className="hidden font-bold text-lg tracking-tight sm:inline-block">
             Tube<span className="text-primary font-black">O2</span>
           </span>
         </Link>
@@ -89,7 +89,18 @@ export const Header = () => {
         </nav>
 
         {/* Spacer */}
-        <div className="flex-1" />
+        <form onSubmit={handleSearchSubmit} className="relative hidden max-w-md flex-1 lg:block">
+          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+          <input
+            type="search"
+            value={searchQuery}
+            onChange={(event) => setSearchQuery(event.target.value)}
+            placeholder={t('header.searchPlaceholder')}
+            className="h-10 w-full rounded-full border border-border/60 bg-muted/55 pl-10 pr-4 text-sm outline-none transition-all placeholder:text-muted-foreground focus:border-primary/60 focus:bg-background/80 focus:ring-2 focus:ring-primary/20"
+          />
+        </form>
+
+        <div className="flex-1 lg:hidden" />
 
         {/* Desktop Actions */}
         <div className="hidden md:flex items-center gap-1">
@@ -160,7 +171,7 @@ export const Header = () => {
                     </Avatar>
                   </button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent className="w-60 mt-2 rounded-2xl p-1.5" align="end" forceMount>
+                  <DropdownMenuContent className="premium-surface w-60 mt-2 rounded-2xl p-1.5" align="end" forceMount>
                   <DropdownMenuLabel className="font-normal py-2 px-2">
                     <div className="flex items-center gap-3">
                       <Avatar className="h-9 w-9">
@@ -275,11 +286,11 @@ export const Header = () => {
           </SheetTrigger>
         </div>
 
-        <SheetContent side="right" className="w-full sm:w-[400px] md:w-[420px] flex flex-col p-6 rounded-l-3xl border-none elevation-dialog">
+        <SheetContent side="right" className="premium-surface w-full sm:w-[400px] md:w-[420px] flex flex-col p-6 rounded-l-3xl border-none">
           <SheetHeader className="mb-4">
             <SheetTitle className="text-left">
               <Link to="/" className="flex items-center gap-2" onClick={() => setIsSheetOpen(false)}>
-                <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-primary text-primary-foreground shadow-md">
+                <div className="flex h-9 w-9 items-center justify-center rounded-2xl bg-primary text-primary-foreground shadow-glow">
                   <span className="text-sm font-bold tracking-tighter">O2</span>
                 </div>
                 <span className="font-bold text-xl tracking-tight">

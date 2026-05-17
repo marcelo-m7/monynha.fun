@@ -16,7 +16,8 @@
     "delete": "Excluir",
     "anonymous": "Anônimo",
     "loading": "Carregando...",
-    "none": "Nenhum"
+    "none": "Nenhum",
+    "imageLoadError": "Falha ao carregar imagem"
   },
   "header": {
     "searchPlaceholder": "Buscar vídeos, canais...",
@@ -38,7 +39,8 @@
     "switchToDark": "Mudar para modo escuro",
     "switchToLight": "Mudar para modo claro",
     "community": "Comunidade",
-    "editorialPortal": "Portal Editorial"
+    "editorialPortal": "Portal Editorial",
+    "mobileNavigation": "Navegação principal mobile"
   },
   "footer": {
     "description": "O Tube O2 enriquece vídeos do YouTube e organiza-os em playlists educacionais para acelerar a aprendizagem.",
@@ -66,6 +68,21 @@
     "submitUrlPlaceholder": "Cole uma URL de vídeo do YouTube aqui...",
     "submitVideoButton": "Enviar um Vídeo",
     "exploreVideosButton": "Explorar Vídeos",
+    "stats": {
+      "videos": "vídeos curados",
+      "tags": "tags úteis",
+      "community": "comunidade ativa"
+    },
+    "preview": {
+      "label": "Preview do produto",
+      "title": "Um vídeo vira conhecimento organizado",
+      "summary": "Resumo, tags e playlist sugerida aparecem em segundos para acelerar curadoria e descoberta.",
+      "tags": "Tags geradas",
+      "playlist": "Playlist sugerida",
+      "reason": "Aderência por tema e nível curricular",
+      "ai": "Análise IA pronta",
+      "aiDescription": "Resumo, tags e justificativa auditável sem travar o envio."
+    },
     "error": {
       "invalidUrl": "Formato de URL inválido.",
       "notYoutubeUrl": "Apenas URLs de vídeos do YouTube são aceitas.",

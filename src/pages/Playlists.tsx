@@ -15,6 +15,9 @@ import { PlaylistImportDialog } from '@/components/playlist/PlaylistImportDialog
 import { useCoursePlaylistSummary } from '@/features/courses/queries/useCoursePlaylists';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { EmptyState } from '@/components/premium/EmptyState';
+import { PlaylistSkeleton } from '@/components/premium/Skeletons';
+import { MotionPage, Stagger, StaggerItem } from '@/components/premium/Motion';
 
 function extractSemesterLabel(name: string): string | null {
   const match = name.match(/(\d+[ºo]\s*Ano\s*\d+[ºo]\s*Semestre)/i);
@@ -253,9 +256,7 @@ const Playlists = () => {
             </div>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {Array.from({ length: 6 }).map((_, i) => (
-              <Skeleton key={i} className="h-64 rounded-2xl" />
-            ))}
+            {Array.from({ length: 6 }).map((_, i) => <PlaylistSkeleton key={i} />)}
           </div>
         </main>
         <Footer />
@@ -282,13 +283,13 @@ const Playlists = () => {
   return (
     <div className="min-h-screen flex flex-col">
       <Header />
-      <main className="flex-1 container py-8">
-        <div className="flex flex-col md:flex-row md:items-start justify-between mb-8 gap-4">
+      <main className="flex-1 container py-8 pb-24 md:pb-8">
+        <MotionPage className="mb-8 flex flex-col justify-between gap-4 md:flex-row md:items-start">
           <div>
-            <h1 className="text-3xl font-bold">{t('playlists.title')}</h1>
-            <p className="text-muted-foreground mt-2">{t('playlists.description')}</p>
+            <h1 className="text-4xl font-black md:text-6xl">{t('playlists.title')}</h1>
+            <p className="mt-3 max-w-2xl text-muted-foreground">{t('playlists.description')}</p>
           </div>
-          <div className="w-full md:flex-1 md:max-w-5xl space-y-2">
+          <div className="premium-surface w-full space-y-3 rounded-2xl p-3 md:flex-1 md:max-w-5xl">
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-2">
               <div className="relative sm:col-span-2 lg:col-span-3 xl:col-span-2 2xl:col-span-2">
                 <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
@@ -401,24 +402,24 @@ const Playlists = () => {
 
             <div className="flex flex-col sm:flex-row sm:flex-wrap gap-2 md:justify-end">
               {(searchQuery || filter !== 'all' || hasAdvancedFilters) && (
-                <Button variant="outline" className="gap-2 w-full sm:w-auto" onClick={handleClearFilters}>
+                <Button variant="outline" className="gap-2 w-full rounded-full sm:w-auto" onClick={handleClearFilters}>
                   <X className="w-4 h-4" />
                   {t('common.clear')}
                 </Button>
               )}
               <PlaylistImportDialog>
-                <Button variant="outline" className="gap-2 w-full sm:w-auto">
+                <Button variant="outline" className="gap-2 w-full rounded-full sm:w-auto">
                   <Youtube className="w-4 h-4" />
                   {t('playlists.import.button')}
                 </Button>
               </PlaylistImportDialog>
-              <Button onClick={() => navigate('/playlists/new')} className="gap-2 w-full sm:w-auto">
+              <Button onClick={() => navigate('/playlists/new')} className="gap-2 w-full rounded-full sm:w-auto">
                 <Plus className="w-4 h-4" />
                 {t('playlists.createPlaylist')}
               </Button>
             </div>
           </div>
-        </div>
+        </MotionPage>
 
         {!isCourseSummaryLoading && courseSummaryCards.length > 0 && (
           <div className="mb-8 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
@@ -479,18 +480,20 @@ const Playlists = () => {
         )}
 
         {filteredPlaylists.length > 0 ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          <Stagger className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {filteredPlaylists.map((playlist, index) => (
-              <PlaylistCard key={playlist.id} playlist={playlist} index={index} />
+              <StaggerItem key={playlist.id}>
+                <PlaylistCard playlist={playlist} index={index} />
+              </StaggerItem>
             ))}
-          </div>
+          </Stagger>
         ) : (
-          <div className="text-center py-12 text-muted-foreground">
-            <ListVideo className="w-16 h-16 mb-4 opacity-50 mx-auto" />
-            <p className="text-lg font-medium mb-2">{t('playlists.noPlaylistsTitle')}</p>
-            <p className="mb-6">{t('playlists.noPlaylistsDescription')}</p>
-            <Button onClick={() => navigate('/playlists/new')}>{t('playlists.createFirstPlaylist')}</Button>
-          </div>
+          <EmptyState
+            icon={ListVideo}
+            title={t('playlists.noPlaylistsTitle')}
+            description={t('playlists.noPlaylistsDescription')}
+            action={<Button onClick={() => navigate('/playlists/new')}>{t('playlists.createFirstPlaylist')}</Button>}
+          />
         )}
       </main>
       <Footer />

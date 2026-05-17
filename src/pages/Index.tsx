@@ -16,6 +16,9 @@ import { HowItWorksSection } from "@/components/layout/HowItWorksSection";
 import { IntelligentSystemSection } from "@/components/layout/IntelligentSystemSection";
 import { UseCasesSection } from "@/components/layout/UseCasesSection";
 import { EditorApplicationCTA } from "@/features/editor-applications";
+import { EmptyState } from "@/components/premium/EmptyState";
+import { PremiumSection, Reveal, Stagger, StaggerItem } from "@/components/premium/Motion";
+import { PlaylistSkeleton, VideoSkeleton } from "@/components/premium/Skeletons";
 
 const Index = () => {
   const { t } = useTranslation();
@@ -33,57 +36,56 @@ const Index = () => {
       <UseCasesSection />
       <CategorySection />
 
-      <section className="py-20 bg-background border-t border-primary/20">
+      <PremiumSection className="border-t border-white/10">
         <div className="container">
-          <div className="flex items-center justify-between mb-8">
+          <Reveal className="mb-8 flex items-center justify-between">
             <div className="flex items-center gap-3">
               <div>
-                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-sm border border-primary/40 text-primary text-[0.65rem] font-bold uppercase tracking-[0.25em]">
+                <div className="inline-flex items-center gap-2 rounded-full border border-primary/30 bg-primary/10 px-3 py-1 text-xs font-bold text-primary">
                   <Clock className="w-3 h-3" />
                   {t('index.recentTitle')}
                 </div>
-                <h2 className="text-2xl md:text-3xl font-bold uppercase tracking-[0.1em] mt-3 font-mono">{t('index.recentTitle')}</h2>
-                <p className="text-muted-foreground mt-2 text-sm uppercase tracking-widest">{t('index.recentDescription')}</p>
+                <h2 className="mt-3 text-2xl font-black md:text-4xl">{t('index.recentTitle')}</h2>
+                <p className="mt-2 text-sm text-muted-foreground">{t('index.recentDescription')}</p>
               </div>
             </div>
             <Button variant="ghost" className="gap-2 group" onClick={() => navigate('/videos?recent=true')}>
               {t('index.viewAll')}
               <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
             </Button>
-          </div>
+          </Reveal>
 
           {recentLoading ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
               {Array.from({ length: 4 }).map((_, i) => (
-                <div key={i} className="space-y-3">
-                  <Skeleton className="aspect-video rounded-2xl" />
-                  <Skeleton className="h-4 w-3/4" />
-                </div>
+                <VideoSkeleton key={i} />
               ))}
             </div>
           ) : recentVideos && recentVideos.length > 0 ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            <Stagger className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
               {recentVideos.map((video, index) => (
-                <VideoCard key={video.id} video={video} />
+                <StaggerItem key={video.id}>
+                  <VideoCard video={video} />
+                </StaggerItem>
               ))}
-            </div>
+            </Stagger>
           ) : (
-            <div className="text-center py-12 text-muted-foreground">{t('index.noRecentVideos')}</div>
+            <EmptyState title={t('index.noRecentVideos')} />
           )}
         </div>
-      </section>
+      </PremiumSection>
 
-      <section className="py-20 bg-background border-t border-primary/20">
+      <PremiumSection className="border-t border-white/10 bg-muted/20">
         <div className="container">
           <div className="flex items-center justify-between mb-8">
             <div className="flex items-center gap-3">
               <div>
-                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-sm border border-secondary/40 text-secondary text-[0.65rem] font-bold uppercase tracking-[0.25em]">
+                <div className="inline-flex items-center gap-2 rounded-full border border-primary/30 bg-primary/10 px-3 py-1 text-xs font-bold text-primary">
                   <TrendingUp className="w-3 h-3" />
                   {t('index.featuredTitle')}
                 </div>
-                <h2 className="text-2xl md:text-3xl font-bold uppercase tracking-[0.1em] mt-3 font-mono">{t('index.featuredTitle')}</h2>
-                <p className="text-muted-foreground mt-2 text-sm uppercase tracking-widest">{t('index.featuredDescription')}</p>
+                <h2 className="mt-3 text-2xl font-black md:text-4xl">{t('index.featuredTitle')}</h2>
+                <p className="mt-2 text-sm text-muted-foreground">{t('index.featuredDescription')}</p>
               </div>
             </div>
             <Button variant="ghost" className="gap-2 group" onClick={() => navigate('/videos')}>
@@ -111,24 +113,24 @@ const Index = () => {
               </div>
             </div>
           ) : (
-            <div className="text-center py-12 text-muted-foreground">{t('index.noFeaturedVideos')}</div>
+            <EmptyState title={t('index.noFeaturedVideos')} />
           )}
         </div>
-      </section>
+      </PremiumSection>
 
       <CommunitySpotlightSection />
 
-      <section className="py-20 bg-background border-t border-primary/20">
+      <PremiumSection className="border-t border-white/10">
         <div className="container">
           <div className="flex items-center justify-between mb-8">
             <div className="flex items-center gap-3">
               <div>
-                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-sm border border-accent/40 text-accent text-[0.65rem] font-bold uppercase tracking-[0.25em]">
+                <div className="inline-flex items-center gap-2 rounded-full border border-primary/30 bg-primary/10 px-3 py-1 text-xs font-bold text-primary">
                   <ListVideo className="w-3 h-3" />
                   {t('index.playlistsTitle')}
                 </div>
-                <h2 className="text-2xl md:text-3xl font-bold uppercase tracking-[0.1em] mt-3 font-mono">{t('index.playlistsTitle')}</h2>
-                <p className="text-muted-foreground mt-2 text-sm uppercase tracking-widest">{t('index.playlistsDescription')}</p>
+                <h2 className="mt-3 text-2xl font-black md:text-4xl">{t('index.playlistsTitle')}</h2>
+                <p className="mt-2 text-sm text-muted-foreground">{t('index.playlistsDescription')}</p>
               </div>
             </div>
             <Button variant="ghost" className="gap-2 group" onClick={() => navigate('/playlists')}>
@@ -140,7 +142,7 @@ const Index = () => {
           {playlistsLoading ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
               {Array.from({ length: 3 }).map((_, i) => (
-                <Skeleton key={i} className="h-64 rounded-2xl" />
+                <PlaylistSkeleton key={i} />
               ))}
             </div>
           ) : recentPlaylists && recentPlaylists.length > 0 ? (
@@ -150,16 +152,17 @@ const Index = () => {
               ))}
             </div>
           ) : (
-            <div className="text-center py-12 text-muted-foreground">{t('index.noPlaylistsTitle')}</div>
+            <EmptyState title={t('index.noPlaylistsTitle')} />
           )}
         </div>
-      </section>
+      </PremiumSection>
 
-      <section className="py-24 bg-background border-t border-primary/20">
+      <section className="relative overflow-hidden border-t border-white/10 py-24">
+        <div className="pointer-events-none absolute inset-x-0 top-0 mx-auto h-64 max-w-5xl rounded-full bg-primary/10 blur-3xl" />
         <div className="container text-center space-y-6">
-          <h2 className="text-3xl md:text-4xl font-bold uppercase tracking-[0.12em] font-mono">{t('index.ctaTitle')}</h2>
-          <p className="text-sm uppercase tracking-widest text-muted-foreground max-w-2xl mx-auto">{t('index.ctaDescription')}</p>
-          <Button variant="hero" size="xl" className="gap-2" onClick={() => navigate('/submit')}>
+          <h2 className="mx-auto max-w-3xl text-3xl font-black text-balance md:text-5xl">{t('index.ctaTitle')}</h2>
+          <p className="mx-auto max-w-2xl text-sm leading-6 text-muted-foreground">{t('index.ctaDescription')}</p>
+          <Button variant="hero" size="xl" className="gap-2 rounded-full" onClick={() => navigate('/submit')}>
             {t('index.ctaButton')}
             <ArrowRight className="w-5 h-5" />
           </Button>

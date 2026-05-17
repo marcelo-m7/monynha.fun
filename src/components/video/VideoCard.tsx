@@ -50,9 +50,9 @@ export const VideoCard = ({ video, onClick, variant = 'default' }: VideoCardProp
       role="link"
       aria-label={video.title}
       className={cn(
-        "group cursor-pointer bg-card overflow-hidden transition-colors border border-border hover:border-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background",
+        "group premium-surface cursor-pointer overflow-hidden transition-all duration-300 hover:-translate-y-1 hover:border-primary/60 hover:shadow-ambient focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background",
         variant === 'default' && "flex h-full min-h-[320px] flex-col",
-        variant === 'compact' && "flex items-center gap-3 p-2 rounded-md hover:bg-muted/30 hover:shadow-none border border-border/40"
+        variant === 'compact' && "flex items-center gap-3 rounded-xl p-2 hover:bg-muted/30 hover:shadow-md"
       )}
     >
       {/* Thumbnail */}
@@ -85,7 +85,7 @@ export const VideoCard = ({ video, onClick, variant = 'default' }: VideoCardProp
         {/* Overlay on hover */}
         <div className="absolute inset-0 bg-foreground/0 group-hover:bg-foreground/15 transition-colors duration-300 flex items-center justify-center">
           <div className={cn(
-            "bg-primary flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 scale-75 group-hover:scale-100",
+            "flex items-center justify-center rounded-full bg-primary shadow-glow opacity-0 group-hover:opacity-100 transition-all duration-300 scale-75 group-hover:scale-100",
             variant === 'default' ? "w-14 h-14" : "w-10 h-10"
           )}>
             <Play className={cn(
@@ -97,7 +97,7 @@ export const VideoCard = ({ video, onClick, variant = 'default' }: VideoCardProp
 
         {/* Duration badge */}
         {variant === 'default' && video.duration_seconds && video.duration_seconds > 0 && (
-          <div className="absolute bottom-2 right-2 px-2 py-1 bg-foreground/80 text-background text-xs font-medium">
+          <div className="absolute bottom-2 right-2 rounded-full bg-black/75 px-2 py-1 text-xs font-medium text-white backdrop-blur">
             {formatDuration(video.duration_seconds)}
           </div>
         )}
@@ -106,7 +106,7 @@ export const VideoCard = ({ video, onClick, variant = 'default' }: VideoCardProp
         <Badge
           variant="secondary"
           className={cn(
-            "absolute top-2 left-2 text-[0.65rem] font-bold bg-background/90 uppercase tracking-widest",
+            "absolute top-2 left-2 bg-background/85 text-[0.65rem] font-bold uppercase tracking-widest backdrop-blur",
             variant === 'compact' && "hidden"
           )}
         >
@@ -123,8 +123,8 @@ export const VideoCard = ({ video, onClick, variant = 'default' }: VideoCardProp
             <Tooltip delayDuration={300}>
               <TooltipTrigger asChild>
                 <h3 className={cn(
-                  "font-semibold leading-snug line-clamp-2 group-hover:opacity-75 transition-opacity uppercase tracking-[0.05em]",
-                  variant === 'default' ? "text-sm" : "text-xs"
+                  "font-semibold leading-snug line-clamp-2 transition-colors group-hover:text-primary",
+                  variant === 'default' ? "text-base" : "text-xs"
                 )}>
                   {video.title}
                 </h3>
@@ -155,7 +155,7 @@ export const VideoCard = ({ video, onClick, variant = 'default' }: VideoCardProp
           )}
 
         <div className={cn(
-          "flex min-h-[24px] items-center justify-between text-xs text-muted-foreground",
+            "flex min-h-[24px] items-center justify-between gap-3 text-xs text-muted-foreground",
           variant === 'compact' && "hidden",
           variant === 'default' && "mt-auto"
         )}>

@@ -6,16 +6,16 @@ export const Footer = () => {
   const { t } = useTranslation();
 
   return (
-    <footer className="border-t border-primary/30 bg-background">
+    <footer className="border-t border-white/10 bg-background/80 pb-20 backdrop-blur md:pb-0">
       <div className="container py-12">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           {/* Brand */}
           <div className="md:col-span-2 space-y-4">
             <Link to="/" className="flex items-center gap-2">
-              <div className="flex h-9 w-9 items-center justify-center bg-primary text-primary-foreground">
+              <div className="flex h-9 w-9 items-center justify-center rounded-2xl bg-primary text-primary-foreground shadow-glow">
                 <span className="text-sm font-bold tracking-tighter">O2</span>
               </div>
-              <span className="font-bold text-xl tracking-[0.2em] uppercase">
+              <span className="font-bold text-xl tracking-tight">
                 Tube<span className="text-primary">O2</span>
               </span>
             </Link>
@@ -26,8 +26,8 @@ export const Footer = () => {
 
           {/* Links */}
           <div className="space-y-4">
-            <h4 className="font-semibold text-xs uppercase tracking-widest text-muted-foreground">{t('footer.navigation')}</h4>
-            <ul className="space-y-2 text-xs uppercase tracking-widest text-muted-foreground">
+            <h4 className="text-xs font-semibold text-muted-foreground">{t('footer.navigation')}</h4>
+            <ul className="space-y-2 text-sm text-muted-foreground">
               <li><Link to="/videos" className="hover:opacity-75 transition-opacity">{t('footer.categories')}</Link></li>
               <li><Link to="/videos?recent=true" className="hover:opacity-75 transition-opacity">{t('footer.recent')}</Link></li>
               <li><Link to="/videos?featured=true" className="hover:opacity-75 transition-opacity">{t('footer.featured')}</Link></li>
@@ -37,8 +37,8 @@ export const Footer = () => {
 
           {/* Community */}
           <div className="space-y-4">
-            <h4 className="font-semibold text-xs uppercase tracking-widest text-muted-foreground">{t('footer.community')}</h4>
-            <ul className="space-y-2 text-xs uppercase tracking-widest text-muted-foreground">
+            <h4 className="text-xs font-semibold text-muted-foreground">{t('footer.community')}</h4>
+            <ul className="space-y-2 text-sm text-muted-foreground">
               <li><Link to="/community" className="hover:opacity-75 transition-opacity">{t('footer.community')}</Link></li>
               <li><Link to="/about" className="hover:opacity-75 transition-opacity">{t('footer.about')}</Link></li>
               <li><Link to="/rules" className="hover:opacity-75 transition-opacity">{t('footer.rules')}</Link></li>

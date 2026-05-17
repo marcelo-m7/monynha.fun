@@ -5,26 +5,26 @@ import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "@/lib/utils";
 
 const buttonVariants = cva(
-  "inline-flex items-center justify-center gap-2 whitespace-nowrap text-xs font-black ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 uppercase tracking-[0.1em] border-[1.5px] outline outline-1 outline-offset-0 outline-black/20 dark:outline-white/10",
+  "inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-bold ring-offset-background transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0",
   {
     variants: {
       variant: {
         default:
-          "bg-primary text-primary-foreground border-foreground hover:bg-primary-hover active:brightness-95 shadow-sm hover:shadow-md focus-visible:shadow-md",
+          "border border-primary/80 bg-primary text-primary-foreground shadow-glow hover:bg-primary-hover active:brightness-95",
         destructive:
-          "bg-transparent border-destructive text-destructive hover:bg-destructive hover:text-destructive-foreground shadow-sm hover:shadow-md",
+          "border border-destructive/40 bg-destructive text-destructive-foreground shadow-sm hover:brightness-105",
         outline:
-          "border-foreground bg-transparent text-foreground hover:border-primary hover:bg-primary hover:text-primary-foreground shadow-sm hover:shadow-md",
+          "border border-border/80 bg-background/55 text-foreground backdrop-blur hover:border-primary/60 hover:bg-primary/10",
         secondary:
-          "border-foreground bg-secondary text-foreground hover:bg-muted shadow-sm hover:shadow-md",
+          "border border-border/60 bg-secondary/80 text-foreground hover:bg-muted shadow-sm",
         ghost:
-          "bg-transparent hover:bg-muted text-muted-foreground hover:text-foreground border-transparent hover:shadow-sm",
+          "border border-transparent bg-transparent text-muted-foreground hover:bg-muted/70 hover:text-foreground",
         link:
           "text-primary underline-offset-4 hover:underline bg-transparent border-none normal-case tracking-normal",
         hero:
-          "bg-primary text-primary-foreground border-foreground font-black hover:bg-primary-hover active:brightness-95 text-xs shadow-md hover:shadow-lg focus-visible:shadow-lg",
+          "border border-primary/80 bg-primary text-primary-foreground font-black shadow-glow hover:bg-primary-hover active:brightness-95",
         accent:
-          "bg-primary text-primary-foreground border-foreground font-black hover:bg-primary-hover active:brightness-95 shadow-md hover:shadow-lg",
+          "border border-primary/80 bg-primary text-primary-foreground font-black shadow-glow hover:bg-primary-hover active:brightness-95",
       },
       size: {
         default: "h-10 px-5 py-2",

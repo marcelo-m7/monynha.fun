@@ -16,7 +16,8 @@
     "delete": "Delete",
     "anonymous": "Anonymous",
     "loading": "Loading...",
-    "none": "None"
+    "none": "None",
+    "imageLoadError": "Failed to load image"
   },
   "header": {
     "searchPlaceholder": "Search videos, channels...",
@@ -38,7 +39,8 @@
     "switchToDark": "Switch to dark mode",
     "switchToLight": "Switch to light mode",
     "community": "Community",
-    "editorialPortal": "Editorial Portal"
+    "editorialPortal": "Editorial Portal",
+    "mobileNavigation": "Primary mobile navigation"
   },
   "footer": {
     "description": "Tube O2 enriches YouTube videos and organizes them into educational playlists for faster learning.",
@@ -66,6 +68,21 @@
     "submitUrlPlaceholder": "Paste a YouTube video URL here...",
     "submitVideoButton": "Submit a Video",
     "exploreVideosButton": "Explore Videos",
+    "stats": {
+      "videos": "curated videos",
+      "tags": "useful tags",
+      "community": "active community"
+    },
+    "preview": {
+      "label": "Product preview",
+      "title": "A video becomes organized knowledge",
+      "summary": "Summary, tags and suggested playlist appear in seconds to speed up curation and discovery.",
+      "tags": "Generated tags",
+      "playlist": "Suggested playlist",
+      "reason": "Matched by topic and curriculum level",
+      "ai": "AI analysis ready",
+      "aiDescription": "Summary, tags and auditable reasoning without blocking submission."
+    },
     "error": {
       "invalidUrl": "Invalid URL format.",
       "notYoutubeUrl": "Only YouTube video URLs are accepted.",

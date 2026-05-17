@@ -16,7 +16,8 @@
     "delete": "Eliminar",
     "anonymous": "Anónimo",
     "none": "Ninguno",
-    "loading": "Cargando..."
+    "loading": "Cargando...",
+    "imageLoadError": "Error al cargar la imagen"
   },
   "header": {
     "searchPlaceholder": "Buscar videos, canales...",
@@ -37,6 +38,7 @@
     "switchToLight": "Cambiar al modo claro",
     "community": "Comunidad",
     "editorialPortal": "Portal Editorial",
+    "mobileNavigation": "Navegación principal móvil",
     "messages": "Mensajes",
     "notifications": "Notificaciones"
   },
@@ -66,6 +68,21 @@
     "submitUrlPlaceholder": "Pega una URL de video de YouTube aquí...",
     "submitVideoButton": "Enviar un Video",
     "exploreVideosButton": "Explorar Videos",
+    "stats": {
+      "videos": "videos curados",
+      "tags": "tags útiles",
+      "community": "comunidad activa"
+    },
+    "preview": {
+      "label": "Vista previa del producto",
+      "title": "Un video se convierte en conocimiento organizado",
+      "summary": "Resumen, tags y playlist sugerida aparecen en segundos para acelerar curaduría y descubrimiento.",
+      "tags": "Tags generados",
+      "playlist": "Playlist sugerida",
+      "reason": "Coincidencia por tema y nivel curricular",
+      "ai": "Análisis IA listo",
+      "aiDescription": "Resumen, tags y justificación auditable sin bloquear el envío."
+    },
     "error": {
       "invalidUrl": "Formato de URL inválido.",
       "notYoutubeUrl": "Solo se aceptan URLs de videos de YouTube.",
