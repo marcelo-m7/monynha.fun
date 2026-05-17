@@ -41,7 +41,7 @@
     "editorialPortal": "Portal Editorial"
   },
   "footer": {
-    "description": "Uma plataforma de curadoria coletiva de vídeos do YouTube. Preservando e descobrindo conteúdos valiosos juntos.",
+    "description": "O Tube O2 enriquece vídeos do YouTube e organiza-os em playlists educacionais para acelerar a aprendizagem.",
     "navigation": "Navegação",
     "categories": "Categorias",
     "recent": "Recentes",
@@ -53,16 +53,16 @@
     "contact": "Contato",
     "faq": "FAQ",
     "madeWithLove": "Feito com",
-    "byMonynhaSoftwares": "pela Open 2 Technology"
+    "byOpen2Technology": "pela Open 2 Technology"
   },
   "labels": {
     "featured": "Destaque"
   },
   "hero": {
-    "badge": "Curadoria coletiva de vídeos",
+    "badge": "Inteligência para vídeos educacionais",
     "headingPart1": "Descubra vídeos que",
-    "headingPart2": "merecem ser lembrados",
-    "description": "Uma comunidade dedicada a preservar e compartilhar os melhores vídeos do YouTube. Tutoriais antigos, receitas tradicionais, memes icônicos e muito mais.",
+    "headingPart2": "entram na trilha certa",
+    "description": "Cole uma URL do YouTube, deixe o Tube O2 extrair metadados, transcrever o que for possível, enriquecer o conteúdo e atribuí-lo à playlist educacional mais relevante.",
     "submitUrlPlaceholder": "Cole uma URL de vídeo do YouTube aqui...",
     "submitVideoButton": "Enviar um Vídeo",
     "exploreVideosButton": "Explorar Vídeos",
@@ -75,33 +75,33 @@
   "home": {
     "onboarding": {
       "title": "Comece em menos de 1 minuto",
-      "subtitle": "Cole um link, revise os dados e publique para a comunidade."
+      "subtitle": "Cole um link e acompanhe o status enquanto o Tube O2 enriquece o vídeo."
     },
     "howItWorks": {
       "title": "Como funciona",
       "steps": {
         "step1": {
           "title": "Cole a URL",
-          "description": "Adicione um link do YouTube para iniciar."
+          "description": "Adicione um link do YouTube para criar uma submissão rápida."
         },
         "step2": {
-          "title": "Revise os metadados",
-          "description": "Confira título, idioma e categoria sugerida."
+          "title": "Acompanhe o processamento",
+          "description": "Siga a página de status enquanto metadados, idioma e sinais de transcrição são coletados."
         },
         "step3": {
-          "title": "Publique com contexto",
-          "description": "Inclua uma descrição curta para ajudar outros curadores."
+          "title": "Receba enriquecimento",
+          "description": "A IA gera resumos, tags e contexto sem bloquear a submissão inicial."
         },
         "step4": {
-          "title": "Descubra com a comunidade",
-          "description": "Navegue por coleções humanas, não por algoritmo."
+          "title": "Entre na playlist certa",
+          "description": "Vídeos educacionais são associados a playlists curriculares para facilitar a descoberta."
         }
       }
     },
     "intelligence": {
       "badge": "Movido por IA",
       "title": "Inteligência embutida",
-      "description": "Todo vídeo enviado passa automaticamente por um pipeline de IA que o enriquece com dados semânticos — antes de chegar à comunidade.",
+      "description": "Todo vídeo enviado é processado em segundo plano. O utilizador vê um status claro enquanto o Tube O2 enriquece metadados e atribui playlists educacionais.",
       "features": {
         "tags": {
           "title": "Tagueamento semântico",
@@ -117,7 +117,7 @@
         },
         "category": {
           "title": "Correspondência de categoria",
-          "description": "A categoria certa é sugerida automaticamente, revisável antes da publicação."
+          "description": "A melhor playlist educacional é escolhida entre candidatas curriculares com score auditável."
         }
       },
       "preview": {
@@ -488,7 +488,9 @@
       }
     },
     "transcription": {
-      "label": "Resumo da transcrição"
+      "label": "Resumo da transcrição",
+      "partialTitle": "Vídeo pronto sem transcrição completa",
+      "partialDescription": "O processamento terminou e a playlist foi atribuída, mas a transcrição não ficou disponível. O vídeo continua publicado."
     },
     "assignment": {
       "label": "Playlist atribuída"
@@ -591,10 +593,10 @@
     "recentDescription": "Últimos vídeos enviados",
     "noRecentVideos": "Nenhum vídeo recente ainda. Seja o primeiro a enviar!",
     "ctaTitle": "Conhece um vídeo que merece ser preservado?",
-    "ctaDescription": "Compartilhe com a comunidade e ajude a construir o maior acervo de vídeos valiosos da internet.",
+    "ctaDescription": "Compartilhe com o Tube O2 para enriquecer, classificar e adicionar à playlist educacional certa.",
     "ctaButton": "Enviar Vídeo",
     "playlistsTitle": "Playlists Recentes",
-    "playlistsDescription": "Caminhos de aprendizado e coleções criadas pela comunidade",
+    "playlistsDescription": "Trilhas educacionais e coleções curadas pela Open 2 Technology e pela comunidade",
     "noPlaylistsTitle": "Nenhuma playlist pública encontrada.",
     "noPlaylistsDescription": "Seja o primeiro a criar uma playlist e organizar o conhecimento!",
     "createFirstPlaylist": "Criar sua primeira playlist",

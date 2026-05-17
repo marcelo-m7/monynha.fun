@@ -58,7 +58,7 @@ export const Footer = () => {
               rel="noopener noreferrer" 
               className="hover:opacity-75 transition-opacity"
             >
-              {t('footer.byMonynhaSoftwares')}
+              {t('footer.byOpen2Technology')}
             </a>
           </p>
           <div className="flex items-center gap-4">

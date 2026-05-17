@@ -49,6 +49,7 @@ export type VideoSubmissionMetadata = {
     language?: string | null;
     confidence?: number | null;
     errorMessage?: string | null;
+    error?: string | null;
   };
   error?: {
     code?: string | null;

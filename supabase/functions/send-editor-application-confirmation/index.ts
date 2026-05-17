@@ -1,10 +1,8 @@
 import { serve } from 'https://deno.land/std@0.190.0/http/server.ts';
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.45.0';
-
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-};
+import { errorResponse, jsonResponse, optionsResponse } from '../_shared/http.ts';
+import { renderEditorApplicationConfirmation } from '../_shared/email-renderer.ts';
+import { sendResendEmail } from '../_shared/resend-client.ts';
 
 interface RequestBody {
   applicationId: string;
@@ -16,59 +14,48 @@ function isValidEmail(value: string) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
 }
 
+function readRequestBody(value: unknown): RequestBody | null {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) {
+    return null;
+  }
+
+  const candidate = value as Record<string, unknown>;
+  const applicationId = typeof candidate.applicationId === 'string' ? candidate.applicationId.trim() : '';
+  const fullName = typeof candidate.fullName === 'string' ? candidate.fullName.trim() : '';
+  const email = typeof candidate.email === 'string' ? candidate.email.trim().toLowerCase() : '';
+
+  if (!applicationId || !fullName || !email || !isValidEmail(email)) {
+    return null;
+  }
+
+  return { applicationId, fullName, email };
+}
+
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
-    return new Response(null, { headers: corsHeaders });
+    return optionsResponse(req);
   }
 
   if (req.method !== 'POST') {
-    return new Response(JSON.stringify({ error: 'Method not allowed' }), {
-      status: 405,
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-    });
+    return errorResponse(req, 405, 'METHOD_NOT_ALLOWED', 'Method not allowed');
   }
 
   const supabaseUrl = Deno.env.get('SUPABASE_URL');
   const supabaseServiceRoleKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
-  const resendApiKey = Deno.env.get('RESEND_API_KEY');
-  const resendFromEmail = Deno.env.get('RESEND_FROM_EMAIL') || 'Tube O2 <noreply@open2.tech>';
 
   if (!supabaseUrl || !supabaseServiceRoleKey) {
-    return new Response(JSON.stringify({ error: 'Missing Supabase environment variables' }), {
-      status: 500,
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-    });
+    return errorResponse(req, 500, 'MISSING_SUPABASE_ENV', 'Missing Supabase environment variables');
   }
 
-  if (!resendApiKey) {
-    return new Response(JSON.stringify({ error: 'Missing RESEND_API_KEY' }), {
-      status: 500,
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-    });
-  }
-
-  let body: RequestBody;
+  let body: RequestBody | null = null;
   try {
-    body = (await req.json()) as RequestBody;
+    body = readRequestBody(await req.json());
   } catch {
-    return new Response(JSON.stringify({ error: 'Invalid JSON body' }), {
-      status: 400,
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-    });
+    return errorResponse(req, 400, 'INVALID_JSON', 'Invalid JSON body');
   }
 
-  if (!body.applicationId || !body.fullName || !body.email) {
-    return new Response(JSON.stringify({ error: 'Missing required fields' }), {
-      status: 400,
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-    });
-  }
-
-  if (!isValidEmail(body.email)) {
-    return new Response(JSON.stringify({ error: 'Invalid email' }), {
-      status: 400,
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-    });
+  if (!body) {
+    return errorResponse(req, 400, 'INVALID_PAYLOAD', 'applicationId, fullName and a valid email are required');
   }
 
   const supabase = createClient(supabaseUrl, supabaseServiceRoleKey);
@@ -81,17 +68,11 @@ serve(async (req) => {
     .gte('created_at', tenMinutesAgo);
 
   if (recentCountError) {
-    return new Response(JSON.stringify({ error: recentCountError.message }), {
-      status: 500,
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-    });
+    return errorResponse(req, 500, 'RECENT_APPLICATION_CHECK_FAILED', recentCountError.message);
   }
 
   if ((recentCount || 0) > 5) {
-    return new Response(JSON.stringify({ error: 'Too many requests for this email' }), {
-      status: 429,
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-    });
+    return errorResponse(req, 429, 'RATE_LIMITED', 'Too many requests for this email');
   }
 
   const { data: application, error: applicationError } = await supabase
@@ -101,62 +82,53 @@ serve(async (req) => {
     .maybeSingle();
 
   if (applicationError) {
-    return new Response(JSON.stringify({ error: applicationError.message }), {
-      status: 500,
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-    });
+    return errorResponse(req, 500, 'APPLICATION_LOAD_FAILED', applicationError.message);
   }
 
   if (!application) {
-    return new Response(JSON.stringify({ error: 'Application not found' }), {
-      status: 404,
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-    });
+    return errorResponse(req, 404, 'APPLICATION_NOT_FOUND', 'Application not found');
   }
 
   if (
-    application.email.toLowerCase() !== body.email.toLowerCase() ||
+    application.email.toLowerCase() !== body.email ||
     application.full_name !== body.fullName
   ) {
-    return new Response(JSON.stringify({ error: 'Payload does not match application record' }), {
-      status: 409,
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-    });
+    return errorResponse(req, 409, 'APPLICATION_PAYLOAD_MISMATCH', 'Payload does not match application record');
   }
 
-  const emailResponse = await fetch('https://api.resend.com/emails', {
-    method: 'POST',
-    headers: {
-      Authorization: `Bearer ${resendApiKey}`,
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({
-      from: resendFromEmail,
-      to: [body.email],
-      subject: 'Recebemos sua candidatura para Editora no Tube O2',
-      html: `
-        <div style="font-family: Arial, sans-serif; line-height: 1.6; color: #111;">
-          <h2>Oi, ${body.fullName}!</h2>
-          <p>Sua candidatura para atuar como editora no Tube O2 foi recebida com sucesso.</p>
-          <p><strong>ID da candidatura:</strong> ${body.applicationId}</p>
-          <p>Nossa equipe editorial vai analisar sua candidatura e entrar em contato em breve.</p>
-          <p>Obrigada por contribuir com a comunidade Tube O2.</p>
-          <p>Open 2 Technology</p>
-        </div>
-      `,
-    }),
-  });
-
-  if (!emailResponse.ok) {
-    const errorText = await emailResponse.text();
-    return new Response(JSON.stringify({ error: `Resend error: ${errorText}` }), {
-      status: 502,
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+  try {
+    const emailResult = await sendResendEmail({
+      to: body.email,
+      subject: 'Recebemos sua candidatura para editor no Tube O2',
+      html: renderEditorApplicationConfirmation({
+        fullName: body.fullName,
+        applicationId: body.applicationId,
+      }),
     });
-  }
 
-  return new Response(JSON.stringify({ success: true }), {
-    status: 200,
-    headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-  });
+    await supabase
+      .from('editor_applications')
+      .update({
+        confirmation_sent_at: new Date().toISOString(),
+        confirmation_error: null,
+        confirmation_provider_id: emailResult.id,
+      })
+      .eq('id', body.applicationId);
+
+    return jsonResponse(req, {
+      success: true,
+      providerId: emailResult.id,
+    });
+  } catch (error) {
+    const message = error instanceof Error ? error.message : 'Unknown email provider error';
+
+    await supabase
+      .from('editor_applications')
+      .update({
+        confirmation_error: message.slice(0, 1000),
+      })
+      .eq('id', body.applicationId);
+
+    return errorResponse(req, 502, 'EMAIL_SEND_FAILED', message);
+  }
 });
