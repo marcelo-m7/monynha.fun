@@ -1,10 +1,14 @@
 # Odoo eLearning -> Supabase FACODI Playlist Sync
 
+> Status: historical design note. The current repository no longer contains the `backend/` FastAPI/Odoo sync implementation described below. The remaining live artifact is the playlist external-identity schema support in `supabase/migrations/20260502142000_add_odoo_external_identity_to_playlists.sql`.
+
 ## Objective
 
 Create missing FACODI playlists in Supabase from Odoo eLearning data without touching existing portal/editor flows.
 
 ## Implemented Components
+
+These components existed in the previous backend design and are not present in the current tree:
 
 - `backend/services/odoo_elearning.py`
   - XML-RPC read-only client for `slide.channel` and `slide.slide`
@@ -34,7 +38,7 @@ Create missing FACODI playlists in Supabase from Odoo eLearning data without tou
 
 ## Supabase Schema Changes
 
-Migration added:
+Migration still present:
 
 - `supabase/migrations/20260502142000_add_odoo_external_identity_to_playlists.sql`
 
@@ -46,6 +50,8 @@ Changes:
 - Add index `idx_playlists_external_source` if missing
 
 ## API Contract
+
+Historical only; the route is not available in the current tree because `backend/main.py` is not present.
 
 `POST /sync_odoo_playlists`
 

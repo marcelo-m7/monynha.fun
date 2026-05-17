@@ -16,6 +16,24 @@ This document records the local implementation contract for issues DB-02, DB-03,
   - `duplicate`
   - `recoverable_error`
 - `metadata` is reserved for small worker/frontend coordination payloads such as `enrichmentId`, `detectedLanguage`, and assignment data.
+- YouTube playlist imports also queue work in `video_submissions`; playlist-import metadata should include the source and YouTube playlist list id.
+
+## YouTube Playlist Import Contract
+
+- UI entrypoint: `src/components/playlist/PlaylistImportDialog.tsx`.
+- Edge Function: `supabase/functions/import-youtube-playlist/index.ts`.
+- Request payload uses snake_case:
+  - `playlist_url`
+  - `language`
+  - `max_videos`
+- The import function:
+  - extracts the YouTube `list` parameter from public playlist/watch URLs,
+  - upserts missing `videos` rows using fetched oEmbed metadata when available,
+  - skips videos that already have enrichments,
+  - reuses recent active submissions from the same user and playlist,
+  - inserts new `pending` `video_submissions` rows for remaining videos.
+- The frontend may call `enrich-video` for returned queued submissions with `{ videoId, youtubeUrl, submissionId }`.
+- The import function must not require a client-provided Tube O2 playlist id; assignment remains part of enrichment/playlist-assignment logic.
 
 ## DB-03: Enrichment And Detected Language
 
@@ -40,4 +58,4 @@ This document records the local implementation contract for issues DB-02, DB-03,
 
 ## Local Validation Notes
 
-The Supabase CLI was not available in this environment, so migrations were authored locally and require application with the project Supabase migration flow before remote deployment.
+Use the project Supabase migration flow before remote deployment. When the CLI is available, prefer `supabase migration up` locally and targeted Edge Function serving (`supabase functions serve <name> --env-file .env`) for runtime checks.

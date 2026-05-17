@@ -9,6 +9,26 @@
 - This file includes **current guidance + historical change logs**.
 - Current architectural source of truth is: `AGENTS.md` + `.github/instructions/*.md`.
 - If you see older examples referencing `src/hooks/*` or previous naming snapshots, treat them as historical context unless they match the live tree.
+- There is no active `backend/` FastAPI service. Backend code currently means Supabase migrations, Supabase Edge Functions, and the Bun runtime server.
+
+---
+
+## Recent Changes & Improvements (May 17, 2026 - Async Video Pipeline + Docs)
+
+### Async Video Submission Pipeline
+- Added/standardized `public.video_submissions` as the source of truth for manual submit and playlist-import status.
+- `/submit/status/:submissionId` uses `video_submissions.id`, not a video id.
+- `enrich-video` updates submission states and stores enrichment/assignment metadata.
+- Contract notes live in `docs/features/supabase-db-02-03-04.md`.
+
+### YouTube Playlist Import
+- `src/components/playlist/PlaylistImportDialog.tsx` calls `import-youtube-playlist` with `playlist_url`, `language`, and `max_videos`.
+- `supabase/functions/import-youtube-playlist/index.ts` fetches public playlist HTML, extracts video ids, upserts video shells, skips already enriched videos, reuses recent active submissions, and returns new queued submissions.
+- The dialog dispatches `enrich-video` for returned submissions with a small concurrency limit.
+
+### Agent/Docs Alignment
+- Repository instructions now describe the current Supabase backend instead of the old FastAPI backend.
+- The generic site/social preview image is `public/placeholder.png`; `dist/` remains generated output.
 
 ---
 
@@ -190,84 +210,45 @@ CREATE POLICY "Anyone can view all comments"
 - **Frontend**: React 18 + TypeScript + Vite
 - **Styling**: Tailwind CSS + shadcn/ui components
 - **State Management**: React Query (TanStack Query)
-- **Backend**: Supabase (Postgres, Auth, Edge Functions)
+- **Backend**: Supabase (Postgres, Auth, Edge Functions) plus a Bun runtime server for dynamic social metadata
 - **Routing**: React Router DOM
 - **Forms**: React Hook Form + Zod validation
 - **UI Patterns**: Lucide icons, Sonner toasts, date-fns
-- **i18n**: i18next with Portuguese/English locales
+- **i18n**: i18next with Portuguese, English, Spanish, and French locales
 
 ---
 
 ## Codebase Structure
 
 ```
-video-vault/
+tube-o2/
 ├── src/
-│   ├── App.tsx                 # Main app with route definitions
-│   ├── main.tsx               # Entry point with i18next + providers
-│   ├── components/
-│   │   ├── ui/               # shadcn/ui primitives
-│   │   ├── layout/           # **Layout components (Header, Footer, HeroSection, FeaturedHero, CategorySection)**
-│   │   ├── video/            # **Video domain components (VideoCard, CategoryCard)**
-│   │   ├── playlist/         # Playlist-specific components
-│   │   ├── auth/             # Authentication forms
-│   │   ├── comment/          # Comment components
-│   │   ├── profile/          # Profile components
-│   │   └── account/          # Account settings components
-│   ├── hooks/
-│   │   ├── useAuth.tsx       # Auth context & hooks
-│   │   ├── useVideos.ts      # Videos data fetching (TanStack Query)
-│   │   ├── usePlaylists.ts   # Playlists CRUD operations
-│   │   ├── useFavorites.ts   # Favorites management
-│   │   ├── useProfile.ts     # Profile data
-│   │   └── ...other data hooks
-│   ├── pages/
-│   │   ├── Index.tsx
-│   │   ├── Videos.tsx
-│   │   ├── VideoDetails.tsx
-│   │   ├── Playlists.tsx
-│   │   ├── PlaylistDetails.tsx
-│   │   ├── Profile.tsx
-│   │   ├── EditProfile.tsx
-│   │   ├── Auth.tsx          # Custom Login/Signup/Forgot Password forms
-│   │   └── ...other pages
-│   ├── integrations/
-│   │   └── supabase/
-│   │       ├── client.ts     # Supabase client initialization
-│   │       └── types.ts      # TypeScript types from schema
-│   ├── lib/
-│   │   └── utils.ts          # Core UI utility (cn for Tailwind - shadcn/ui convention)
-│   ├── shared/
-│   │   ├── lib/
-│   │   │   ├── validation.ts # **Shared Zod validation schemas (DRY principle)**
-│   │   │   ├── format.ts     # Formatting utilities
-│   │   │   ├── youtube.ts    # YouTube helpers (URL parsing, oEmbed)
-│   │   │   ├── slug.ts       # Slug generation
-│   │   │   └── image.ts      # **Image cropping utilities**
-│   │   ├── api/
-│   │   │   └── supabase/
-│   │   ├── config/
-│   │   └── hooks/
-│   ├── i18n/
-│   │   ├── config.ts         # i18next configuration
-│   │   └── locales/          # JSON translation files
+│   ├── app/providers/        # Global providers
+│   ├── App.tsx               # Lazy route definitions
+│   ├── main.tsx              # React entry point
+│   ├── components/           # UI by domain: ui, layout, video, playlist, comment, auth, profile, account
+│   ├── pages/                # Route-level pages
+│   ├── entities/             # Domain API, types, and query-key factories
+│   ├── features/             # Query/mutation hooks and feature orchestration
+│   ├── shared/               # Cross-domain API clients, hooks, validation, utilities, tests
+│   ├── integrations/supabase/# Generated Supabase client/types
+│   ├── lib/utils.ts          # shadcn cn() helper only
+│   └── i18n/locales/         # PT, EN, ES, FR resources
 ├── supabase/
-│   ├── config.toml           # Supabase local dev config
-│   ├── functions/
-│   │   ├── enrich-video/     # AI enrichment Edge Function
-│   │   └── mark-top-featured/# Feature marking Edge Function
-│   └── migrations/           # Database schema & data migrations
-├── package.json
-├── vite.config.ts
-├── tailwind.config.ts
-├── tsconfig.json
-└── ...config files
+│   ├── functions/            # Edge Functions
+│   ├── functions/_shared/    # Shared Deno helpers
+│   └── migrations/           # Postgres schema, RLS, functions, and data fixes
+├── server/server.ts          # Bun runtime static/metadata server
+├── public/placeholder.png    # Generic site/social preview image
+└── dist/                     # Generated build output; do not edit by hand
 ```
 
 ### Key Routes
 - `/` - Index/Home
 - `/auth` - Login/Signup (Custom forms with react-hook-form + Zod)
 - `/submit` - Video submission with YouTube metadata extraction
+- `/submit/status/:submissionId` - Async submission status for `video_submissions.id`
+- `/watch`, `/shorts/:id`, `/live/:id`, `/embed/:id`, `/v/:id` - YouTube route bridges
 - `/videos` - Video listing with search, category, and language filters
 - `/videos/:videoId` - Video details with comments and related videos
 - `/favorites` - User's favorite videos
@@ -279,6 +260,10 @@ video-vault/
 - `/profile/:username` - View user profile and their curated content
 - `/profile/edit` - Edit own profile with avatar upload
 - `/account/settings` - Account security settings
+- `/messages` - Direct messages
+- `/notifications` - Notifications center
+- `/editorial`, `/editor/apply`, `/editor/applications` - Editorial portal and application flow
+- `/:username` - Smart profile slug fallback
 - `/about`, `/rules`, `/contact`, `/faq` - Static info pages
 
 ---
@@ -330,7 +315,7 @@ const loginSchema = z.object({
 
 ## Database Schema
 
-### Core Tables (9 tables)
+### Core Tables
 
 #### 1. **profiles** (User Profiles)
 - Extends auth.users with display metadata
@@ -388,6 +373,28 @@ const loginSchema = z.object({
 - RLS Enabled: Yes
 - Supports: Video resume playback, watch tracking, course progress
 
+#### 10. **video_submissions** (Async Submission Status)
+- Tracks manual submissions and playlist imports through the enrichment pipeline
+- `/submit/status/:submissionId` reads this table by `video_submissions.id`
+- Status values include `pending`, `processing`, `success`, `failed`, `duplicate`, and `recoverable_error`
+- RLS lets authenticated users insert/select their own submissions; Edge Functions update with service-role privileges
+
+#### 11. **playlist_follows** (Playlist Follow State)
+- Tracks authenticated users following public playlists
+- Used by playlist/community discovery flows
+
+#### 12. **editor_applications** (Editorial Access Requests)
+- Stores applications for editor privileges and review pipeline state
+- Related UI lives under `src/features/editor-applications` and editor pages
+
+#### 13. **contact_messages** (Contact Form Messages)
+- Stores contact form submissions and delivery metadata for transactional email handling
+
+### Views And Exhibition Contracts
+- `v_course_playlist_summary` aggregates course-level playlist discovery data.
+- `v_video_exhibition` exposes enriched/effective language and listing-friendly fields.
+- `v_playlist_exhibition` exposes playlist discovery fields used by public pages.
+
 ### RLS Policies & Security
 All tables have RLS enabled with policies following these patterns:
 - **Public reads**: Non-sensitive data readable by all (videos, categories)
@@ -426,22 +433,21 @@ All tables have RLS enabled with policies following these patterns:
   - **Semantic** (numbered + descriptive): `000X_description_of_changes.sql`
   - **Timestamped** (Supabase auto-generated): `20260116HHMMSS_uuid.sql`
 
-### Recent Migrations (10 Applied)
+### Recent Migrations Snapshot
 
 | Version | Name | Purpose |
 |---------|------|---------|
-| 20260106115236 | (unnamed) | Early setup |
-| 20260106115928 | (unnamed) | Early setup |
-| 20260116212558 | (unnamed) | Core tables |
-| 20260116221302 | Seed Marcelo Playlist | Sample data |
-| 20260116222441 | Seed More Marcelo Videos | Additional sample videos |
-| 20260116225527 | Increment Video View Count Function | Create atomic view count increment |
-| 20260116230635 | Update Increment Video View Count to Set Featured | Modify function for featured flagging |
-| 20260116230725 | Backfill Featured by View Count | Initialize featured status |
-| 20260116231035 | Mark Top Videos as Featured | Create feature-marking function |
-| 20260116232300 | Fix Mark Top Videos Function | Bug fix for feature logic |
-| 0015 | add_avatar_path_column_to_the_public_profiles_table | Add `avatar_path` column to `profiles` table |
-| 0016 | update_handle_new_user_function_to_initialize_avatar_path_for_new_profiles_ | Update `handle_new_user` to set `avatar_path` |
+| 20260502123000 | add_profiles_global_role | Adds profile role support |
+| 20260502125500 | add_facodi_editor_policies | Adds FACODI/editor policies |
+| 20260502142000 | add_odoo_external_identity_to_playlists | Adds external identity fields to playlists |
+| 20260502153000 | add_editor_applications_pipeline | Adds editor application workflow |
+| 20260513170000 | create_exhibition_views_for_videos_and_playlists | Adds public exhibition views |
+| 20260516172736 | add_video_submissions_async_status | Adds async submission table/status flow |
+| 20260516215640 | add_video_transcripts_and_submission_client_errors | Adds transcript and client error support |
+| 20260517123000 | harden_education_playlist_assignment_contract | Hardens playlist assignment contract |
+| 20260517123634 | add_contact_messages_and_email_tracking | Adds contact message/email tracking |
+| 20260517124500 | add_playlist_follows_and_editor_requests | Adds playlist follows/editor request support |
+| 20260517215626 | repair_youtube_playlist_import | Repairs queued YouTube playlist import submissions |
 
 ### Migration File Pattern Example
 ```sql
@@ -465,43 +471,22 @@ GRANT EXECUTE ON FUNCTION public.increment_video_view_count(uuid) TO authenticat
 
 ---
 
-## The `mcp_supabase_apply_migration` Tool
+## Supabase Migration Workflow
 
-### Purpose
-Apply new database schema or data migrations to a Supabase project. This tool executes SQL DDL (Data Definition Language) operations.
+### Preferred Flow
+1. Inspect current schema and constraints before editing.
+2. Create migrations with `supabase migration new <descriptive-name>`.
+3. Author SQL in `supabase/migrations/`.
+4. Apply locally with `supabase migration up` when the CLI/local stack is available.
+5. Regenerate Supabase types when schema shape changes.
+6. Keep docs and `.env.example` aligned when behavior or required secrets change.
 
-### When to Use
-- **Schema Changes**: Creating/altering/dropping tables, columns, indexes
-- **Function Creation**: Adding stored procedures or triggers
-- **Data Seeding**: Populating test or reference data
-- **RLS Setup**: Creating row-level security policies
-- **Complex Operations**: Anything requiring transactional DDL
-
-### When NOT to Use
-- **Simple Queries**: Use `mcp_supabase_execute_sql` for SELECT, INSERT, UPDATE, DELETE without schema changes
-- **Data Migrations with IDs**: Avoid hardcoding generated IDs in data migrations (let the database generate them)
-
-### Tool Signature
-```javascript
-await mcp_supabase_apply_migration({
-  name: "create_videos_enrichment_index",
-  query: `
-    CREATE INDEX idx_ai_enrichments_video_id 
-    ON public.ai_enrichments(video_id);
-    
-    CREATE INDEX idx_videos_is_featured 
-    ON public.videos(is_featured) 
-    WHERE is_featured = true;
-  `
-})
-```
-
-### Key Implementation Details
-1. **Idempotent Migrations**: Use `CREATE TABLE IF NOT EXISTS` or `CREATE OR REPLACE` for functions to avoid errors on re-runs
-2. **Transactional**: Entire migration runs in a single transaction; if any statement fails, entire migration rolls back
-3. **Version Tracking**: Supabase automatically tracks applied migrations with timestamps
-4. **No Hardcoded IDs**: Never hardcode UUID/serial values; use `DEFAULT gen_random_uuid()` or `DEFAULT nextval()`
-5. **RLS-First Approach**: Always enable RLS on new tables and define policies immediately
+### Implementation Details
+1. **Idempotent DDL**: Use `CREATE TABLE IF NOT EXISTS`, `CREATE INDEX IF NOT EXISTS`, and `CREATE OR REPLACE FUNCTION` where appropriate.
+2. **RLS-first approach**: Enable RLS and write policies in the same migration that exposes a table.
+3. **No hardcoded generated IDs**: Use `gen_random_uuid()`, defaults, or lookups instead.
+4. **Service-role boundaries**: Privileged writes belong in Edge Functions or server-only runtime code.
+5. **MCP usage**: If a Supabase MCP is available, use direct SQL/advisory tools for inspection and verification. Do not create migration-history noise while iterating.
 
 ### Common Migration Patterns in This Project
 
@@ -550,12 +535,20 @@ CREATE INDEX idx_videos_featured_created ON public.videos(is_featured, created_a
 ## Data Flow Architecture
 
 ### Video Submission Flow
-1. **User submits** video URL → `/submit` page (Submit.tsx)
-2. **YouTube metadata extracted** → `lib/youtube.ts` helper functions
-3. **Video saved** → `videos` table (via hook mutation)
-4. **AI enrichment triggered** → Edge Function `enrich-video` called
-5. **Enriched data stored** → `ai_enrichments` table
-6. **Video appears** in Videos list
+1. **User submits** video URL → `/submit` page.
+2. **Frontend creates async record** → `video_submissions` stores pending status.
+3. **Video shell is created/upserted** → `videos` table.
+4. **AI enrichment triggered** → Edge Function `enrich-video`.
+5. **Enriched data stored** → `ai_enrichments`, `videos.language`, and assignment metadata.
+6. **Status page updates** → `/submit/status/:submissionId` reads `video_submissions`.
+7. **Video appears** in Videos list and any assigned playlist flow.
+
+### YouTube Playlist Import Flow
+1. **User enters playlist URL** → `PlaylistImportDialog`.
+2. **Import function reads public playlist** → `import-youtube-playlist`.
+3. **Videos are deduped/upserted** → existing enriched videos are skipped.
+4. **New work is queued** → `video_submissions` rows with playlist metadata.
+5. **Frontend starts enrichment** → returned submissions are sent to `enrich-video` with limited concurrency.
 
 ### Playlist Management Flow
 1. **Create playlist** → `playlists` table, `handle_new_user` trigger
@@ -576,20 +569,15 @@ CREATE INDEX idx_videos_featured_created ON public.videos(is_featured, created_a
 
 ### Hook Pattern (Data Fetching)
 ```typescript
-// hooks/useVideos.ts
+// src/features/videos/queries/useVideos.ts
 import { useQuery } from '@tanstack/react-query';
+import { videoKeys } from '@/entities/video/video.keys';
+import { listVideos } from '@/entities/video/video.api';
 
 export const useVideos = (filters?: { category?: string }) => {
   return useQuery({
-    queryKey: ['videos', filters],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from('videos')
-        .select('*')
-        // ... filtering logic
-      if (error) throw error;
-      return data;
-    }
+    queryKey: videoKeys.list(filters),
+    queryFn: () => listVideos(filters),
   });
 };
 ```
@@ -611,7 +599,7 @@ export const VideoCard = ({ video }) => (
 ### Form Pattern (react-hook-form + Zod)
 ```typescript
 import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/dist/zod.mjs';
+import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 
 const schema = z.object({
@@ -653,7 +641,7 @@ git clone https://github.com/marcelo-m7/tube-o2
 cd tube-o2
 pnpm install
 
-# Environment variables (.env.local)
+# Client environment variables (.env or .env.local)
 VITE_SUPABASE_URL=https://your-project.supabase.co
 VITE_SUPABASE_PUBLISHABLE_KEY=your-publishable-key
 
@@ -682,19 +670,22 @@ supabase db push
 **Add a new page**:
 1. Create component in `src/pages/NewPage.tsx`
 2. Add route in `src/App.tsx` (before catch-all `*`)
-3. Create hook if needed in `src/hooks/useNewData.ts`
+3. Create feature query/mutation hooks under `src/features/<domain>/queries` when server state is needed
 4. Add i18n keys to `src/i18n/locales/*.json`
 
 **Add new database table**:
-1. Create migration: `mcp_supabase_apply_migration` with CREATE TABLE DDL
-2. Enable RLS and create policies
-3. Run `mcp_supabase_generate_typescript_types` to update `src/integrations/supabase/types.ts`
-4. Create corresponding hook in `src/hooks/`
+1. Create migration with `supabase migration new <name>`
+2. Add CREATE/ALTER statements, indexes, RLS, grants, and policies in that migration
+3. Regenerate `src/integrations/supabase/types.ts` when schema shape changes
+4. Add entity API/types/keys in `src/entities/<domain>/`
+5. Add feature hooks in `src/features/<domain>/queries`
 
 **Add new Edge Function**:
 1. Create `supabase/functions/my-function/index.ts`
-2. Deploy via: `mcp_supabase_deploy_edge_function`
-3. Call from frontend with proper auth headers
+2. Put shared helpers in `supabase/functions/_shared` if reused
+3. Validate CORS, method, auth, payload, and server-only env access
+4. Call from frontend through `invokeEdgeFunction()`
+5. Document new env requirements in `.env.example`
 
 ---
 
@@ -702,12 +693,12 @@ supabase db push
 
 ### Deployed Functions
 
-#### 1. **enrich-video** (Active - v30)
+#### 1. **enrich-video**
 - **Purpose**: AI enrichment of video metadata (OpenAI-powered)
 - **Authentication**: Manual Bearer token validation (verify_jwt disabled)
-- **Input**: `{ videoId: uuid, youtubeUrl: string }`
-- **Output**: Saves to `ai_enrichments` table
-- **Triggered by**: Video submission flow
+- **Input**: `{ videoId: uuid, youtubeUrl: string, submissionId?: uuid }`
+- **Output**: Saves to `ai_enrichments`, updates `video_submissions`, and records playlist assignment metadata
+- **Triggered by**: Manual video submission and playlist import flow
 
 **File**: `supabase/functions/enrich-video/index.ts`
 
@@ -718,10 +709,22 @@ supabase db push
 // Writes enriched data to ai_enrichments table
 ```
 
-#### 2. **mark-top-featured** (Active - v3)
+#### 2. **import-youtube-playlist**
+- **Purpose**: Import public YouTube playlist videos into the async submission pipeline
+- **Authentication**: Authenticated user required
+- **Input**: `{ playlist_url: string, language?: string, max_videos?: number }`
+- **Output**: Counts, skipped/reused statuses, and queued submissions
+
+#### 3. **mark-top-featured**
 - **Purpose**: Mark top videos as featured based on view count
 - **Triggered by**: Background process or manual trigger
 - **Logic**: Identifies top N videos, sets is_featured flag
+
+#### 4. **send-contact-message**
+- **Purpose**: Store contact messages and send transactional email through Resend
+
+#### 5. **send-editor-application-confirmation**
+- **Purpose**: Send editor application confirmation email
 
 ---
 
@@ -763,7 +766,7 @@ FOR UPDATE USING (auth.uid() = id);
 
 ### API Keys
 - **Public key** (`VITE_SUPABASE_PUBLISHABLE_KEY`): Exposed in frontend, restricted by RLS
-- **Service role key**: Kept in backend/Edge Functions only
+- **Service role key**: Kept in Supabase Edge Functions or server-only runtime code only
 - **Edge Functions**: Manual auth validation when `verify_jwt: false`
 
 ---
@@ -797,20 +800,17 @@ Always use the package's public entry points (check `package.json` exports). Dir
 - Locale files: `src/i18n/locales/` (en.json, pt.json, es.json, fr.json)
 - Usage: `const { t } = useTranslation()` then `t('header.videos')`
 - Language switching: Available in header via globe icon selector
-- **New in this update**: `header.videos` key added for Videos nav label
+- Keep all four locale files aligned when adding or renaming user-facing keys.
 
 ### Future Enhancements
 
-1. **Code-splitting**: Reduce main bundle size (currently 1.1MB) using dynamic imports
-2. **Batch AI Enrichment**: Enrich existing videos in bulk with OpenAI
-3. **Video Search**: Full-text search on titles, descriptions, semantic tags
-4. **Recommendations**: Algorithm for suggesting videos based on user history
-5. **Social Features**: Comments, ratings, user follows
-6. **Analytics**: Track user engagement, popular videos, community growth
-7. **Offline Support**: Service workers for offline video playback
-8. **Mobile App**: React Native version of Tube O2
-9. **Performance**: Implement image optimization and lazy loading
-10. **Accessibility**: WCAG 2.1 AA compliance audit and improvements
+1. **Batch AI Enrichment**: Reprocess existing videos in bulk.
+2. **Video Search**: Full-text search on titles, descriptions, transcripts, and semantic tags.
+3. **Recommendations**: Curator-friendly recommendations without dark-pattern engagement loops.
+4. **Analytics**: Privacy-conscious insight into popular videos, playlists, and community growth.
+5. **Offline/PWA polish**: Improve install and offline behavior.
+6. **Accessibility**: Keep moving toward WCAG 2.1 AA coverage.
+7. **Mobile experience**: Tighten key flows on smaller screens.
 
 ---
 

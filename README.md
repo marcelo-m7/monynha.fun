@@ -31,7 +31,7 @@ To keep onboarding and AI-assisted edits consistent, treat these as the primary 
 - Architecture and boundaries: [`docs/CODEBASE.md`](docs/CODEBASE.md)
 - Team/agent rules: [`AGENTS.md`](AGENTS.md) and [`AI_RULES.md`](AI_RULES.md)
 - Frontend instruction profile: [`.github/instructions/frontend.instructions.md`](.github/instructions/frontend.instructions.md)
-- Backend instruction profile: [`.github/instructions/backend.instructions.md`](.github/instructions/backend.instructions.md)
+- Supabase/backend instruction profile: [`.github/instructions/backend.instructions.md`](.github/instructions/backend.instructions.md)
 - i18n consistency rules: [`.github/instructions/i18n.instructions.md`](.github/instructions/i18n.instructions.md)
 - Testing rules: [`.github/instructions/testing.instructions.md`](.github/instructions/testing.instructions.md)
 
@@ -96,6 +96,7 @@ I chose a stack that's modern, scalable, and – honestly – a joy to work with
 - **Supabase** – PostgreSQL, Auth, and Edge Functions in one place
 - **Supabase RLS** – Row-level security, properly implemented
 - **Edge Functions** – AI enrichment and smart automations
+- **Bun runtime server** – Serves production `dist/` and injects dynamic OG/Twitter tags for video pages
 
 ### UX Polish 🎨
 - **Lucide React** – Clean icons
@@ -118,6 +119,9 @@ Browse intelligently organized content. Search, filter by category, see what rea
 
 ### 📋 Build Playlists
 Create learning paths, collections, whatever makes sense to you. Share with the community or keep it personal. Invite friends to collaborate – yeah, we support that.
+
+### ▶️ Import YouTube Playlists
+Paste a public YouTube playlist URL and Tube O2 queues the videos through Supabase Edge Functions. Existing enriched videos are skipped, recently queued videos are reused, and new submissions flow through the same async enrichment/status pipeline as manual submissions.
 
 ### 👥 User System
 Sign up securely. Create a profile that represents *you*. Show everyone your curated taste. Your contribution matters here.
@@ -163,12 +167,14 @@ Open **http://localhost:8080** and boom – you're in.
 
 ### Environment Setup
 
-Create a `.env.local` file (ask Marcelo for the keys, or set up your own Supabase project):
+Create a `.env` or `.env.local` file (ask Marcelo for the keys, or set up your own Supabase project):
 
 ```env
 VITE_SUPABASE_URL=your_supabase_url_here
 VITE_SUPABASE_PUBLISHABLE_KEY=your_publishable_key_here
 ```
+
+Server-only values such as `SUPABASE_SERVICE_ROLE_KEY`, `OPENAI_API_KEY`, `GEMINI_API_KEY`, and `RESEND_API_KEY` belong in Supabase secrets or runtime server env, not in client-exposed `VITE_*` variables. See [`.env.example`](.env.example) for the full local template.
 
 ---
 
@@ -178,53 +184,44 @@ The structure is clean and logical – I hate messy codebases:
 
 ```
 src/
-├── components/              # Reusable UI pieces
-│   ├── ui/                 # shadcn/ui components (don't touch upstream)
-│   ├── playlist/           # Playlist-specific components
-│   ├── Header.tsx
-│   ├── Footer.tsx
+├── app/providers/           # Global providers (QueryClient, Auth, i18n, theme, Helmet, toasts)
+├── components/              # Reusable UI by domain
+│   ├── ui/                  # shadcn/ui primitives
+│   ├── layout/              # Header, Footer, hero/category layout
+│   ├── playlist/            # Playlist UI, including YouTube import dialog
+│   ├── comment/             # Comment forms, mentions, display
+│   ├── video/               # Video cards and video-specific UI
 │   └── ...
-├── pages/                   # Page-level components (one per route)
-│   ├── Index.tsx           # Homepage
-│   ├── Auth.tsx            # Login/Signup
-│   ├── Videos.tsx          # Video browse
-│   ├── VideoDetails.tsx    # Single video view
-│   ├── Playlists.tsx       # Playlist manager
-│   ├── PlaylistDetails.tsx
-│   ├── Profile.tsx         # User profiles
-│   ├── EditProfile.tsx
-│   ├── Favorites.tsx
-│   ├── Community.tsx
-│   ├── Submit.tsx          # Add videos
-│   └── ...more pages
-├── features/                # Feature modules (organized by domain)
-│   ├── auth/               # Authentication
-│   ├── videos/             # Video management
-│   ├── playlists/          # Playlist management
+├── pages/                   # Lazy route-level pages registered in App.tsx
+├── features/                # Feature orchestration hooks and mutations
+│   ├── videos/
+│   ├── playlists/
+│   ├── video-submissions/
+│   ├── editor-applications/
 │   └── ...
-├── entities/                # Domain entities
-│   ├── video/              # Video entity & API
-│   ├── playlist/           # Playlist entity & API
+├── entities/                # Domain API, types, and query-key factories
+│   ├── video/
+│   ├── playlist/
+│   ├── video_submission/
 │   └── ...
-├── shared/                  # Shared utilities and hooks
-│   ├── hooks/              # Reusable React hooks
-│   │   ├── use-mobile.tsx        # Mobile detection
-│   │   ├── useVideoViewIncrement.tsx  # Video view tracking
-│   │   └── useRequireAuth.tsx    # Authentication guard
-│   ├── lib/                # Helper functions
-│   │   ├── format.ts       # Data formatting utilities
-│   │   └── youtube.ts      # YouTube URL parsing
-│   └── test/               # Testing utilities
-├── integrations/            # External services
-│   └── supabase/           # Supabase client setup
-├── lib/                     # Utilities
-│   ├── utils.ts            # Helpers (cn, etc)
-│   └── youtube.ts          # YouTube URL parsing, oEmbed
-├── i18n/                    # Translations
-│   ├── config.ts           # i18next setup
-│   └── locales/            # PT, EN, etc
-├── App.tsx                  # Main app & routes
+├── shared/                  # Cross-domain hooks, API clients, validation, tests
+│   ├── api/supabase/        # Shared Supabase client + Edge Function wrapper
+│   ├── hooks/               # Reusable React hooks
+│   ├── lib/                 # validation, format, youtube, slug, image
+│   └── test/                # Vitest/MSW utilities
+├── integrations/supabase/   # Generated Supabase client/types
+├── lib/utils.ts             # shadcn cn() helper only
+├── i18n/locales/            # PT, EN, ES, FR locale resources
+├── App.tsx                  # Lazy routes
 └── main.tsx                 # Entry point
+
+supabase/
+├── functions/               # Edge Functions: enrich-video, import-youtube-playlist, email flows
+├── functions/_shared/       # Shared Deno helpers and enrichment clients
+└── migrations/              # Postgres schema, RLS, functions, and data fixes
+
+server/
+└── server.ts                # Bun runtime server for static assets + dynamic social metadata
 ```
 
 ### Custom Hooks
@@ -341,173 +338,62 @@ These are used by `server/server.ts` at request time to fetch video metadata and
 
 ---
 
-## ⚙️ Backend FastAPI (Supabase + YouTube)
+## ⚙️ Supabase Backend & Edge Functions
 
-Production-grade backend for syncing YouTube channels to Supabase with optional scheduled jobs.
+There is no active `backend/` FastAPI service in this repository. The backend surface is:
 
-### Quick Start
+- **Postgres + RLS** in Supabase, versioned through `supabase/migrations/`
+- **Edge Functions** in `supabase/functions/`
+- **Bun runtime server** in `server/server.ts` for production static serving and dynamic social metadata
 
-**1. Create environment file:**
+### Edge Functions
 
-```bash
-cd backend
-cp .env.example .env
-```
+| Function | Purpose |
+|---|---|
+| `enrich-video` | Enriches video metadata, updates `video_submissions`, and assigns eligible playlists |
+| `import-youtube-playlist` | Reads a public YouTube playlist, upserts missing video shells, and queues pending submissions |
+| `mark-top-featured` | Marks top videos as featured based on database logic |
+| `send-contact-message` | Stores contact messages and sends transactional email |
+| `send-editor-application-confirmation` | Sends editor-application confirmation email |
 
-Edit `backend/.env` with your credentials:
+Frontend code invokes Edge Functions through [`src/shared/api/supabase/edgeFunctions.ts`](src/shared/api/supabase/edgeFunctions.ts). Do not call `supabase.functions.invoke` directly in components or feature hooks.
 
-```env
-SUPABASE_URL=https://your-project.supabase.co
-SUPABASE_SERVICE_ROLE_KEY=your_service_role_key
-YOUTUBE_API_KEY=your_youtube_api_key
+### Async Submission Pipeline
 
-# Optional: Enable scheduled syncs
-SCHEDULED_SYNCS=UCBR8-60-B28hp2BmDPdntcQ:videos
-SYNC_INTERVAL_HOURS=6
-SYNC_TIME=02:00
-```
+Manual submissions and YouTube playlist imports both flow through `public.video_submissions`:
 
-**2. Run locally:**
+1. The frontend creates or receives a `video_submissions.id`.
+2. `/submit/status/:submissionId` reads status by submission id.
+3. `enrich-video` moves submissions through `pending`, `processing`, `success`, `failed`, `duplicate`, or `recoverable_error`.
+4. Playlist assignment metadata is stored in the submission/enrichment flow for education/course playlists.
 
-```bash
-python -m venv .venv
-source .venv/bin/activate  # or .\.venv\Scripts\Activate.ps1 on Windows
-pip install -r requirements.txt
-uvicorn main:app --host 0.0.0.0 --port 8000 --reload
-```
+The local contract is documented in [`docs/features/supabase-db-02-03-04.md`](docs/features/supabase-db-02-03-04.md).
 
-**3. Test the endpoints:**
+### YouTube Playlist Import
 
-```bash
-# Health check
-curl http://localhost:8000/health
+[`PlaylistImportDialog`](src/components/playlist/PlaylistImportDialog.tsx) accepts a public YouTube playlist URL and sends this payload to `import-youtube-playlist`:
 
-# Sync videos from a YouTube channel
-curl -X POST http://localhost:8000/sync_videos \
-  -H "Content-Type: application/json" \
-  -d '{"channel_id":"UCBR8-60-B28hp2BmDPdntcQ"}'
-
-# Check scheduler status
-curl http://localhost:8000/status
-```
-
-### API Endpoints
-
-See [backend/API_REFERENCE.md](backend/API_REFERENCE.md) for complete endpoint documentation.
-
-**GET /health**
-```json
-{"status": "ok"}
-```
-
-**GET /status**
 ```json
 {
-  "status": "ok",
-  "scheduler_running": true,
-  "scheduled_jobs": [
-    {
-      "id": "sync_UCBR8-60-B28hp2BmDPdntcQ",
-      "name": "Sync videos from UCBR8-60-B28hp2BmDPdntcQ",
-      "next_run": "2024-05-02T08:00:00"
-    }
-  ]
+  "playlist_url": "https://www.youtube.com/playlist?list=...",
+  "language": "und",
+  "max_videos": 200
 }
 ```
 
-**POST /sync_videos**
-```json
-{
-  "channel_id": "UCBR8-60-B28hp2BmDPdntcQ",
-  "table_name": "videos"
-}
-```
+The Edge Function returns counts plus new queued submissions. The dialog dispatches `enrich-video` for returned submissions with a small concurrency limit, while already enriched or recently queued videos are skipped/reused.
 
-Response:
-```json
-{
-  "inserted_count": 5,
-  "new_videos": [
-    {
-      "video_id": "dQw4w9WgXcQ",
-      "youtube_id": "dQw4w9WgXcQ",
-      "title": "Video Title",
-      "description": "Video description",
-      "channel_name": "Channel Name",
-      "thumbnail_url": "https://...",
-      "video_url": "https://youtube.com/watch?v=dQw4w9WgXcQ",
-      "language": "pt"
-    }
-  ]
-}
-```
+### Local Edge Function Work
 
-### Scheduled Syncs
-
-Enable automatic periodic syncing by setting `SCHEDULED_SYNCS` in `.env`:
-
-```env
-# Single channel - daily at 2 AM UTC
-SCHEDULED_SYNCS=UCBR8-60-B28hp2BmDPdntcQ:videos
-SYNC_TIME=02:00
-
-# Multiple channels - every 6 hours
-SCHEDULED_SYNCS=UCBR8-60-B28hp2BmDPdntcQ:videos,UCHANNELID2:custom_videos
-SYNC_INTERVAL_HOURS=6
-```
-
-Check job status:
-```bash
-curl http://localhost:8000/status
-```
-
-### Run Tests
+Use the Supabase CLI and discover flags with help before assuming them:
 
 ```bash
-cd backend
-pytest tests/ -v                      # all tests
-pytest tests/test_youtube_api.py -v  # YouTube API tests (16 tests)
-pytest tests/test_video_sync.py -v   # sync logic tests (14 tests)
-pytest tests/test_integration.py -v  # endpoint tests (5 tests)
+supabase --help
+supabase functions --help
+supabase functions serve import-youtube-playlist --env-file .env
 ```
 
-All tests use mocked APIs (no live YouTube/Supabase calls). **Test coverage: 35/35 passing ✅**
-
-### Docker Compose
-
-```bash
-docker-compose up backend
-```
-
-In another terminal:
-
-```bash
-curl http://localhost:8000/health
-```
-
-### Features
-
-- ✅ **Supabase Integration** - Authenticated writes via service role key
-- ✅ **YouTube API** - Channel uploads with pagination (50 videos/page)
-- ✅ **Deduplication** - Avoids re-inserting existing videos
-- ✅ **Error Handling** - Custom exceptions for API failures, rate limits, auth errors
-- ✅ **Scheduled Jobs** - Optional APScheduler for background syncs
-- ✅ **Structured Logging** - Debug visibility into sync operations
-- ✅ **Input Validation** - Pydantic models for request validation
-- ✅ **Status Monitoring** - Check scheduler status and next job times
-
-### Coverage report:
-
-```bash
-pytest tests/ --cov=services --cov=main
-```
-
-#### Test Structure
-- `tests/test_youtube_api.py` – YouTube API integration, error handling, pagination
-- `tests/test_video_sync.py` – Core sync logic, deduplication, fallback behavior
-- `tests/test_endpoints.py` – FastAPI endpoint validation, error responses, request/response shapes
-
-Tests use `unittest.mock` to avoid live API calls and database access. Safe to run anytime. ✅
+Server-only values such as `SUPABASE_SERVICE_ROLE_KEY`, `OPENAI_API_KEY`, `GEMINI_API_KEY`, and `RESEND_API_KEY` should be configured as Supabase secrets for deployed Edge Functions.
 
 ---
 
@@ -523,8 +409,12 @@ I designed the database with security and simplicity in mind:
 - **playlists** – Your collections
 - **playlist_videos** – Links videos to playlists (with ordering!)
 - **ai_enrichments** – AI-generated metadata for each video
+- **video_submissions** – Async submission/import status tracking
 - **playlist_collaborators** – Share playlists with friends
 - **playlist_progress** – Track watched videos in learning playlists
+- **playlist_follows** – Follow public playlists
+- **editor_applications** – Editorial access requests
+- **contact_messages** – Contact form messages and delivery tracking
 
 ### Security First 🔒
 Every table has Row-Level Security (RLS) enabled. Users can only see/edit their own data. Period.
@@ -551,8 +441,10 @@ Simple, beautiful, consistent. Covers almost everything.
 Built with i18next so we can add languages super easily. Right now:
 - 🇧🇷 **Portuguese (PT-BR)**
 - 🇺🇸 **English (EN-US)**
+- 🇪🇸 **Spanish (ES)**
+- 🇫🇷 **French (FR)**
 
-More languages? Easy. Just ask or add translations to `src/i18n/locales/`.
+Locale files must stay aligned across `src/i18n/locales`.
 
 ---
 
@@ -648,7 +540,6 @@ We're constantly improving. On the roadmap:
 - Batch AI enrichment for existing videos
 - Video search with full-text indexing
 - Smart recommendations
-- Community comments & ratings
 - Better mobile experience
 - Maybe a mobile app someday
 

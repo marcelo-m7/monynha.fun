@@ -6,6 +6,27 @@
 
 ---
 
+## [v0.3.2] - May 17, 2026 🧭 **Docs + Async Pipeline Alignment**
+
+### Documentation Refresh
+
+- Updated README, `AGENTS.md`, `AI_RULES.md`, and scoped agent instructions to reflect the current Supabase Edge Function backend.
+- Removed/marked stale FastAPI backend guidance where that code no longer exists in the tree.
+- Refreshed `docs/CODEBASE.md` with current route, Feature-Sliced, Edge Function, migration, and async submission details.
+- Replaced the old TODO/recent-updates note with current backlog and release checklist guidance.
+
+### Async Submission / Playlist Import Contracts
+
+- Documented `video_submissions` as the source of truth for `/submit/status/:submissionId`.
+- Documented the `import-youtube-playlist` request/response contract and its relationship to `enrich-video`.
+- Marked the Odoo eLearning sync note as historical because the referenced `backend/` implementation is no longer present.
+
+### Site Preview Asset
+
+- Refreshed `public/placeholder.png` for Tube O2 branding so generic OG/Twitter previews no longer show Monynha Fun.
+
+---
+
 ## [v0.3.1] - May 2, 2026 ⚡ **Playlists UX + Build Performance**
 
 ### 🎓 Course-Centric Playlists Discovery

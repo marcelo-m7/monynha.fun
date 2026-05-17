@@ -69,6 +69,13 @@ const subjectKeywords: Record<SubjectSignal, string[]> = {
     'derivada',
     'limite',
     'equacao',
+    'equacoes',
+    'logaritmo',
+    'logaritmica',
+    'logaritmicas',
+    'trigonometria',
+    'trigonometrica',
+    'trigonometricas',
     'algebra',
     'matriz',
     'vetor',
@@ -254,6 +261,29 @@ function isDatabasePlaylist(playlist: PlaylistAssignmentPlaylist): boolean {
   return text.includes('base de dados') || text.includes('sql') || text.includes('database');
 }
 
+function isCalculusOnePlaylist(playlist: PlaylistAssignmentPlaylist): boolean {
+  const text = normalizeText(playlistText(playlist));
+  return text.includes('analise matematica i') || text.includes('calculo i') || text.includes('calculo 1');
+}
+
+function hasCalculusOneSignals(sourceText: string): boolean {
+  const text = normalizeText(sourceText);
+  return (
+    text.includes('calculo 1') ||
+    text.includes('calculo i') ||
+    text.includes('derivada') ||
+    text.includes('derivadas') ||
+    text.includes('equacao') ||
+    text.includes('equacoes') ||
+    text.includes('logaritm') ||
+    text.includes('trigonometr') ||
+    text.includes('limite') ||
+    text.includes('limites') ||
+    text.includes('funcoes') ||
+    text.includes('funcao')
+  );
+}
+
 function playlistSubjectScore(playlist: PlaylistAssignmentPlaylist, subject: SubjectSignal): number {
   return subjectSignalScore(playlistText(playlist), subject);
 }
@@ -398,8 +428,22 @@ export function assignPlaylist(params: {
       !!bestPlaylist &&
       isDatabasePlaylist(bestPlaylist) &&
       best.score >= MIN_DETERMINISTIC_PLAYLIST_SCORE;
+    const calculusOneCandidate = scoredCandidates.find((candidate) => {
+      const playlist = playlists.find((item) => item.id === candidate.playlistId);
+      return !!playlist && isCalculusOnePlaylist(playlist);
+    }) ?? null;
+    const strongCalculusOneMatch =
+      signals.math >= 1 &&
+      hasCalculusOneSignals(sourceText) &&
+      !!calculusOneCandidate &&
+      calculusOneCandidate.score >= 6;
 
-    if (strongDatabaseMatch || (best.score >= MIN_DETERMINISTIC_PLAYLIST_SCORE && margin >= 4)) {
+    if (strongCalculusOneMatch) {
+      assignedPlaylistId = calculusOneCandidate.playlistId;
+      score = calculusOneCandidate.score;
+      reason = 'Deterministic scoring selected Análise Matemática I for Cálculo 1 signals.';
+      decisionSource = 'deterministic';
+    } else if (strongDatabaseMatch || (best.score >= MIN_DETERMINISTIC_PLAYLIST_SCORE && margin >= 4)) {
       assignedPlaylistId = best.playlistId;
       score = best.score;
       reason = strongDatabaseMatch

@@ -21,20 +21,23 @@ Run from repository root:
 | Tests | `pnpm test` |
 | Coverage | `pnpm test:coverage` |
 
-Backend commands:
+Supabase/backend commands:
 
 | Goal | Command |
 |---|---|
-| Development | `cd backend && uvicorn main:app --reload` |
-| Tests | `cd backend && pytest tests/ -v` |
+| Discover Supabase CLI commands | `supabase --help` |
+| Serve an Edge Function locally | `supabase functions serve <function-name> --env-file .env` |
+| Create a migration | `supabase migration new <descriptive-name>` |
+| Apply local migrations | `supabase migration up` |
 
-Backend setup details: [backend/QUICK_START.md](backend/QUICK_START.md) and [backend/API_REFERENCE.md](backend/API_REFERENCE.md).
+There is currently no `backend/` FastAPI service in this tree. Backend work lives in [supabase/functions](supabase/functions), [supabase/migrations](supabase/migrations), and the Bun SSR preview server in [server/server.ts](server/server.ts).
 
 ## Runtime & Ports
 
 - Frontend dev server runs on port `8080` (see [vite.config.ts](vite.config.ts)).
 - SSR preview server runs on port `3000` by default (see [server/server.ts](server/server.ts)); override with `PORT`.
 - Production preview flow: run `pnpm build` then `pnpm preview`.
+- Supabase Edge Functions run through the Supabase CLI. Check `supabase functions --help` before assuming command flags.
 
 ## Test Runner Notes
 
@@ -46,7 +49,7 @@ Backend setup details: [backend/QUICK_START.md](backend/QUICK_START.md) and [bac
 ## Instruction Files
 
 - Frontend code rules: [.github/instructions/frontend.instructions.md](.github/instructions/frontend.instructions.md)
-- Backend code rules: [.github/instructions/backend.instructions.md](.github/instructions/backend.instructions.md)
+- Supabase/backend code rules: [.github/instructions/backend.instructions.md](.github/instructions/backend.instructions.md)
 - i18n rules (keep locales aligned): [.github/instructions/i18n.instructions.md](.github/instructions/i18n.instructions.md)
 - Test rules: [.github/instructions/testing.instructions.md](.github/instructions/testing.instructions.md)
 
@@ -60,6 +63,9 @@ Use these boundaries when deciding where code belongs:
 - `src/shared/*`: cross-domain utilities, validation, shared API clients, shared hooks
 - `src/pages/*`: route-level pages
 - `src/i18n/*`: localization setup and translation resources
+- `supabase/functions/*`: Supabase Edge Functions and shared Deno helpers
+- `supabase/migrations/*`: Postgres schema, RLS, functions, triggers, and data fixes
+- `server/*`: Bun runtime server for serving `dist/` and injecting dynamic OG/Twitter tags
 
 Reference architecture details in [docs/CODEBASE.md](docs/CODEBASE.md).
 
@@ -86,6 +92,7 @@ Reference architecture details in [docs/CODEBASE.md](docs/CODEBASE.md).
 - Throw or handle errors explicitly.
 - Use `getSupabaseErrorMessage()` from [src/shared/api/supabase/supabaseErrors.ts](src/shared/api/supabase/supabaseErrors.ts) to extract readable error strings.
 - Invoke Supabase Edge Functions via `invokeEdgeFunction()` from [src/shared/api/supabase/edgeFunctions.ts](src/shared/api/supabase/edgeFunctions.ts) — do not call `supabase.functions.invoke` directly.
+- Keep service-role operations inside Edge Functions or server-only runtime code. Never expose service-role keys through `VITE_*` variables.
 
 ### 4. UI And Styling Standards
 
@@ -145,8 +152,16 @@ All global context providers (QueryClient, Auth, i18n, ThemeProvider, Helmet, To
 - API pattern: [src/entities/video/video.api.ts](src/entities/video/video.api.ts)
 - Form pattern: [src/components/comment/CommentForm.tsx](src/components/comment/CommentForm.tsx)
 - Mention UX pattern: [src/components/comment/MentionAutocomplete.tsx](src/components/comment/MentionAutocomplete.tsx)
+- YouTube playlist import UI: [src/components/playlist/PlaylistImportDialog.tsx](src/components/playlist/PlaylistImportDialog.tsx)
+- Async submission status API: [src/entities/video_submission/video_submission.api.ts](src/entities/video_submission/video_submission.api.ts)
 - SSR preview server: [server/server.ts](server/server.ts)
-- Supabase functions: [supabase/functions](supabase/functions)
+- Supabase functions: [supabase/functions](supabase/functions), especially [supabase/functions/enrich-video/index.ts](supabase/functions/enrich-video/index.ts) and [supabase/functions/import-youtube-playlist/index.ts](supabase/functions/import-youtube-playlist/index.ts)
+- Supabase contract notes: [docs/features/supabase-db-02-03-04.md](docs/features/supabase-db-02-03-04.md)
+
+## Generated Artifacts
+
+- Do not edit [dist](dist) by hand; it is build output.
+- The canonical generic social preview image is [public/placeholder.png](public/placeholder.png). Documentation copies may be refreshed from it when needed.
 
 ## Branding Migration Notes
 
