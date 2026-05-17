@@ -16,7 +16,7 @@
     "delete": "Eliminar",
     "anonymous": "Anónimo",
     "none": "Ninguno",
-    "loading": "Loading..."
+    "loading": "Cargando..."
   },
   "header": {
     "searchPlaceholder": "Buscar videos, canales...",
@@ -37,12 +37,12 @@
     "switchToLight": "Cambiar al modo claro",
     "community": "Comunidad",
     "editorialPortal": "Portal Editorial",
-    "messages": "Messages",
-    "notifications": "Notifications"
+    "messages": "Mensajes",
+    "notifications": "Notificaciones"
   },
   "footer": {
-    "description": "Una plataforma de curación colectiva de videos de YouTube. Preservando y descubriendo contenido valioso juntos.",
-    "navigation": "Navegação",
+    "description": "Tube O2 enriquece videos de YouTube y los organiza en playlists educativas para aprender más rápido.",
+    "navigation": "Navegación",
     "categories": "Categorías",
     "recent": "Recientes",
     "featured": "Destacados",
@@ -53,16 +53,16 @@
     "contact": "Contacto",
     "faq": "Preguntas Frecuentes",
     "madeWithLove": "Hecho con",
-    "byMonynhaSoftwares": "por Open 2 Technology"
+    "byOpen2Technology": "por Open 2 Technology"
   },
   "labels": {
     "featured": "Destacado"
   },
   "hero": {
-    "badge": "Curación colectiva de videos",
+    "badge": "Inteligencia para videos educativos",
     "headingPart1": "Descubre videos que",
-    "headingPart2": "merecen ser recordados",
-    "description": "Una comunidad dedicada a preservar y compartir los mejores videos de YouTube. Tutoriales antiguos, recetas tradicionales, memes icónicos y mucho más.",
+    "headingPart2": "encajan en la ruta correcta",
+    "description": "Pega una URL de YouTube, deja que Tube O2 extraiga metadatos, transcriba lo posible, enriquezca el contenido y lo asigne a la playlist educativa más relevante.",
     "submitUrlPlaceholder": "Pega una URL de video de YouTube aquí...",
     "submitVideoButton": "Enviar un Video",
     "exploreVideosButton": "Explorar Videos",
@@ -75,33 +75,33 @@
   "home": {
     "onboarding": {
       "title": "Empieza en menos de un minuto",
-      "subtitle": "Pega un enlace, revisa los datos y publícalo para la comunidad."
+      "subtitle": "Pega un enlace y sigue el estado mientras Tube O2 enriquece el video."
     },
     "howItWorks": {
       "title": "Cómo funciona",
       "steps": {
         "step1": {
           "title": "Pega la URL",
-          "description": "Añade un enlace de YouTube para comenzar."
+          "description": "Añade un enlace de YouTube para crear un envío rápido."
         },
         "step2": {
-          "title": "Revisa los metadatos",
-          "description": "Verifica título, idioma y categoría sugerida."
+          "title": "Sigue el procesamiento",
+          "description": "Consulta la página de estado mientras se recopilan metadatos, idioma y señales de transcripción."
         },
         "step3": {
-          "title": "Publica con contexto",
-          "description": "Agrega una nota breve para ayudar a otros curadores."
+          "title": "Recibe enriquecimiento",
+          "description": "La IA genera resúmenes, etiquetas y contexto sin bloquear el envío inicial."
         },
         "step4": {
-          "title": "Descubre con personas",
-          "description": "Explora colecciones humanas, no feeds algorítmicos."
+          "title": "Llega a la playlist correcta",
+          "description": "Los videos educativos se asignan a playlists curriculares para que sean fáciles de encontrar."
         }
       }
     },
     "intelligence": {
       "badge": "Potenciado por IA",
       "title": "Inteligencia incorporada",
-      "description": "Cada video enviado es procesado automáticamente por un pipeline de IA que lo enriquece con datos semánticos — antes de llegar a la comunidad.",
+      "description": "Cada video enviado se procesa en segundo plano. El usuario ve un estado claro mientras Tube O2 enriquece metadatos y asigna playlists educativas.",
       "features": {
         "tags": {
           "title": "Etiquetado semántico",
@@ -117,7 +117,7 @@
         },
         "category": {
           "title": "Categorización automática",
-          "description": "La categoría correcta se sugiere automáticamente, revisable antes de publicar."
+          "description": "La mejor playlist educativa se elige entre candidatas curriculares con una puntuación auditable."
         }
       },
       "preview": {
@@ -281,35 +281,35 @@
         "description": "Acciones irreversibles que afectan permanentemente tu cuenta."
       },
       "deleteAccount": {
-        "title": "Delete Account",
-        "description": "Permanently delete your account and all associated data.",
-        "button": "Delete My Account",
-        "warning": "This action cannot be undone. All your data will be permanently deleted.",
+        "title": "Eliminar cuenta",
+        "description": "Elimina permanentemente tu cuenta y todos los datos asociados.",
+        "button": "Eliminar mi cuenta",
+        "warning": "Esta acción no se puede deshacer. Todos tus datos se eliminarán permanentemente.",
         "consequences": {
-          "title": "What will be deleted:",
-          "data": "Your profile and account information",
-          "videos": "All videos you've submitted",
-          "playlists": "All your playlists",
-          "favorites": "Your favorites and preferences",
-          "irreversible": "This action is permanent and irreversible"
+          "title": "Qué se eliminará:",
+          "data": "Tu perfil y la información de tu cuenta",
+          "videos": "Todos los videos que enviaste",
+          "playlists": "Todas tus playlists",
+          "favorites": "Tus favoritos y preferencias",
+          "irreversible": "Esta acción es permanente e irreversible"
         },
         "dialog": {
-          "title": "Wait! Are you really sure? 🥺",
-          "playfulMessage": "We're sad to see you go! Are you sure you want to delete your account? There's no coming back from this... 💔",
-          "reallyConfirm": "If you're absolutely certain, type DELETE below to confirm:",
-          "typeToConfirm": "Type \"{{text}}\" to confirm",
-          "finalWarning": "Last chance! This will permanently delete everything.",
-          "confirm": "Yes, Delete Forever",
-          "deleting": "Deleting...",
-          "cancel": "No, Keep My Account"
+          "title": "Espera, ¿seguro que quieres continuar?",
+          "playfulMessage": "Sentimos verte partir. Si eliminas tu cuenta, no habrá vuelta atrás.",
+          "reallyConfirm": "Si tienes certeza absoluta, escribe DELETE abajo para confirmar:",
+          "typeToConfirm": "Escribe \"{{text}}\" para confirmar",
+          "finalWarning": "Última oportunidad. Esto eliminará todo permanentemente.",
+          "confirm": "Sí, eliminar definitivamente",
+          "deleting": "Eliminando...",
+          "cancel": "No, conservar mi cuenta"
         },
         "success": {
-          "deleted": "Account deleted successfully",
-          "goodbye": "We're sorry to see you go. Goodbye! 👋"
+          "deleted": "Cuenta eliminada correctamente",
+          "goodbye": "Sentimos verte partir. Hasta pronto."
         },
         "error": {
-          "failed": "Failed to delete account",
-          "confirmationMismatch": "Please type DELETE to confirm"
+          "failed": "No se pudo eliminar la cuenta",
+          "confirmationMismatch": "Escribe DELETE para confirmar"
         }
       }
     }
@@ -488,7 +488,9 @@
       }
     },
     "transcription": {
-      "label": "Resumen de transcripción"
+      "label": "Resumen de transcripción",
+      "partialTitle": "Video listo sin transcripción completa",
+      "partialDescription": "El procesamiento terminó y la playlist fue asignada, pero la transcripción no estuvo disponible. El video sigue publicado."
     },
     "assignment": {
       "label": "Playlist asignada"
@@ -600,10 +602,10 @@
     "recentDescription": "Últimos videos enviados",
     "noRecentVideos": "Aún no hay videos recientes. ¡Sé el primero en enviar uno!",
     "ctaTitle": "¿Conoces un video que merece ser preservado?",
-    "ctaDescription": "Comparte con la comunidad y ayuda a construir el archivo más grande de videos valiosos en internet.",
+    "ctaDescription": "Compártelo con Tube O2 para enriquecerlo, clasificarlo y añadirlo a la playlist educativa correcta.",
     "ctaButton": "Enviar Video",
     "playlistsTitle": "Listas de Reproducción Recientes",
-    "playlistsDescription": "Rutas de aprendizaje y colecciones creadas por la comunidad",
+    "playlistsDescription": "Rutas educativas y colecciones curadas por Open 2 Technology y la comunidad",
     "noPlaylistsTitle": "No se encontraron listas de reproducción públicas.",
     "noPlaylistsDescription": "¡Sé el primero en crear una lista de reproducción y organizar el conocimiento!",
     "createFirstPlaylist": "Crear tu primera lista de reproducción",
@@ -943,23 +945,23 @@
     }
   },
   "messages": {
-    "title": "Messages",
-    "description": "Your direct conversations with other curators.",
-    "inbox": "Inbox",
-    "emptyInbox": "No conversations yet.",
-    "selectConversation": "Select a conversation to start chatting.",
-    "emptyConversation": "No messages yet. Say hello!",
-    "inputPlaceholder": "Write a message...",
-    "tipPrefix": "Tip:",
-    "tipLink": "visit community profiles"
+    "title": "Mensajes",
+    "description": "Tus conversaciones directas con otros curadores.",
+    "inbox": "Bandeja de entrada",
+    "emptyInbox": "Aún no hay conversaciones.",
+    "selectConversation": "Selecciona una conversación para empezar.",
+    "emptyConversation": "Aún no hay mensajes. Saluda.",
+    "inputPlaceholder": "Escribe un mensaje...",
+    "tipPrefix": "Consejo:",
+    "tipLink": "visita perfiles de la comunidad"
   },
   "notifications": {
-    "title": "Notifications",
-    "description": "Follow updates, new messages, and account activity.",
-    "inbox": "Recent notifications",
-    "empty": "You have no notifications yet.",
-    "markAsRead": "Mark read",
-    "markAllAsRead": "Mark all as read"
+    "title": "Notificaciones",
+    "description": "Actualizaciones de seguidores, mensajes nuevos y actividad de la cuenta.",
+    "inbox": "Notificaciones recientes",
+    "empty": "Aún no tienes notificaciones.",
+    "markAsRead": "Marcar como leída",
+    "markAllAsRead": "Marcar todo como leído"
   },
   "socialProfile": {
     "followers": "followers",

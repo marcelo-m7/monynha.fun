@@ -1,4 +1,4 @@
-import { invokeEdgeFunction } from '@/shared/api/supabase/edgeFunctions';
+import { getEdgeFunctionErrorDetails, invokeEdgeFunction } from '@/shared/api/supabase/edgeFunctions';
 
 export interface ContactFormData {
   name: string;
@@ -13,10 +13,15 @@ export interface ContactFormData {
  */
 export async function submitContactForm(data: ContactFormData): Promise<void> {
   try {
-    await invokeEdgeFunction('send-contact-message', {
-      method: 'POST',
+    const { error } = await invokeEdgeFunction('send-contact-message', {
       body: data,
+      headers: { 'Content-Type': 'application/json' },
     });
+
+    if (error) {
+      const details = await getEdgeFunctionErrorDetails(error);
+      throw new Error(details.message);
+    }
   } catch (error) {
     throw new Error(`Failed to submit contact form: ${error instanceof Error ? error.message : 'Unknown error'}`);
   }

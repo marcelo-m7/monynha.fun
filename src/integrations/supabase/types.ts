@@ -185,8 +185,47 @@ export type Database = {
           },
         ]
       }
+      contact_messages: {
+        Row: {
+          created_at: string
+          email: string
+          id: string
+          message: string
+          metadata: Json
+          name: string
+          status: string
+          subject: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          id?: string
+          message: string
+          metadata?: Json
+          name: string
+          status?: string
+          subject: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          id?: string
+          message?: string
+          metadata?: Json
+          name?: string
+          status?: string
+          subject?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       editor_applications: {
         Row: {
+          confirmation_error: string | null
+          confirmation_provider_id: string | null
+          confirmation_sent_at: string | null
           consent_privacy: boolean
           created_at: string
           email: string
@@ -202,6 +241,9 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          confirmation_error?: string | null
+          confirmation_provider_id?: string | null
+          confirmation_sent_at?: string | null
           consent_privacy: boolean
           created_at?: string
           email: string
@@ -217,6 +259,9 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          confirmation_error?: string | null
+          confirmation_provider_id?: string | null
+          confirmation_sent_at?: string | null
           consent_privacy?: boolean
           created_at?: string
           email?: string

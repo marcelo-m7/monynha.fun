@@ -75,6 +75,7 @@ export default function SubmitStatus() {
   const processingStage = metadata.processing?.stage ?? metadata.error?.stage ?? metadata.clientError?.stage ?? null;
   const requestId = metadata.processing?.requestId ?? metadata.error?.requestId ?? null;
   const transcript = metadata.transcription;
+  const transcriptError = transcript?.errorMessage ?? transcript?.error ?? null;
 
   const handleRetry = () => {
     if (!submission?.video_id || !submission.youtube_url) {
@@ -170,6 +171,19 @@ export default function SubmitStatus() {
                     <span className="mt-1 block text-xs">
                       {t('submitStatus.requestIdLabel')}: {requestId}
                     </span>
+                  )}
+                </AlertDescription>
+              </Alert>
+            )}
+
+            {status === 'success' && transcript?.status === 'failed' && (
+              <Alert>
+                <AlertCircle className="h-4 w-4" />
+                <AlertTitle>{t('submitStatus.transcription.partialTitle')}</AlertTitle>
+                <AlertDescription>
+                  {t('submitStatus.transcription.partialDescription')}
+                  {transcriptError && (
+                    <span className="mt-1 block text-xs">{transcriptError}</span>
                   )}
                 </AlertDescription>
               </Alert>

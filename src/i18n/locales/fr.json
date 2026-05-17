@@ -16,7 +16,7 @@
     "delete": "Supprimer",
     "anonymous": "Anonyme",
     "none": "Aucun",
-    "loading": "Loading..."
+    "loading": "Chargement..."
   },
   "header": {
     "searchPlaceholder": "Rechercher des vidéos, des chaînes...",
@@ -41,7 +41,7 @@
     "notifications": "Notifications"
   },
   "footer": {
-    "description": "Une plateforme de curation collective de vidéos YouTube. Préserver et découvrir du contenu précieux ensemble.",
+    "description": "Tube O2 enrichit les vidéos YouTube et les organise dans des playlists éducatives pour apprendre plus vite.",
     "navigation": "Navigation",
     "categories": "Catégories",
     "recent": "Récents",
@@ -53,16 +53,16 @@
     "contact": "Contact",
     "faq": "FAQ",
     "madeWithLove": "Fait avec",
-    "byMonynhaSoftwares": "par Open 2 Technology"
+    "byOpen2Technology": "par Open 2 Technology"
   },
   "labels": {
     "featured": "En Vedette"
   },
   "hero": {
-    "badge": "Curation collective de vidéos",
+    "badge": "Intelligence pour vidéos éducatives",
     "headingPart1": "Découvrez des vidéos qui",
-    "headingPart2": "méritent d'être mémorisées",
-    "description": "Une communauté dédiée à la préservation et au partage des meilleures vidéos YouTube. Vieux tutoriels, recettes traditionnelles, mèmes emblématiques et bien plus encore.",
+    "headingPart2": "trouvent le bon parcours",
+    "description": "Collez une URL YouTube, laissez Tube O2 extraire les métadonnées, transcrire ce qui est possible, enrichir le contenu et l'attribuer à la playlist éducative la plus pertinente.",
     "submitUrlPlaceholder": "Collez une URL de vidéo YouTube ici...",
     "submitVideoButton": "Soumettre une Vidéo",
     "exploreVideosButton": "Explorer les Vidéos",
@@ -75,33 +75,33 @@
   "home": {
     "onboarding": {
       "title": "Commencez en moins d'une minute",
-      "subtitle": "Collez un lien, vérifiez les infos, puis publiez pour la communauté."
+      "subtitle": "Collez un lien et suivez le statut pendant que Tube O2 enrichit la vidéo."
     },
     "howItWorks": {
       "title": "Comment ça marche",
       "steps": {
         "step1": {
           "title": "Collez l'URL",
-          "description": "Ajoutez un lien YouTube pour démarrer."
+          "description": "Ajoutez un lien YouTube pour créer une soumission rapide."
         },
         "step2": {
-          "title": "Vérifiez les métadonnées",
-          "description": "Confirmez le titre, la langue et la catégorie suggérée."
+          "title": "Suivez le traitement",
+          "description": "Consultez la page de statut pendant la collecte des métadonnées, de la langue et des signaux de transcription."
         },
         "step3": {
-          "title": "Publiez avec contexte",
-          "description": "Ajoutez une note courte pour aider les autres curateurs."
+          "title": "Recevez l'enrichissement",
+          "description": "L'IA génère des résumés, tags et contexte sans bloquer la soumission initiale."
         },
         "step4": {
-          "title": "Explorez avec des humains",
-          "description": "Parcourez des collections humaines, pas des flux algorithmiques."
+          "title": "Arrivez dans la bonne playlist",
+          "description": "Les vidéos éducatives sont associées à des playlists curriculaires pour faciliter la découverte."
         }
       }
     },
     "intelligence": {
       "badge": "Propulsé par l'IA",
       "title": "Intelligence intégrée",
-      "description": "Chaque vidéo soumise est automatiquement traitée par un pipeline IA qui l'enrichit avec des données sémantiques — avant d'atteindre la communauté.",
+      "description": "Chaque vidéo soumise est traitée en arrière-plan. L'utilisateur voit un statut clair pendant que Tube O2 enrichit les métadonnées et attribue les playlists éducatives.",
       "features": {
         "tags": {
           "title": "Balisage sémantique",
@@ -117,7 +117,7 @@
         },
         "category": {
           "title": "Catégorisation automatique",
-          "description": "La bonne catégorie est suggérée automatiquement, vérifiable avant publication."
+          "description": "La meilleure playlist éducative est choisie parmi les candidates curriculaires avec un score auditable."
         }
       },
       "preview": {
@@ -233,7 +233,7 @@
         "current": "E-mail actuel",
         "newEmail": "Nouvelle adresse e-mail",
         "confirmChange": "Mettre à Jour l'E-mail",
-        "changeInfo": "Usted recibirá un enlace de confirmación en su nueva dirección de correo electrónico. El cambio se hará efectivo después de la confirmación."
+        "changeInfo": "Vous recevrez un lien de confirmation à votre nouvelle adresse e-mail. Le changement prendra effet après confirmation."
       },
       "passwordSection": {
         "title": "Mot de Passe",
@@ -281,35 +281,35 @@
         "description": "Actions irréversibles qui affectent définitivement votre compte."
       },
       "deleteAccount": {
-        "title": "Delete Account",
-        "description": "Permanently delete your account and all associated data.",
-        "button": "Delete My Account",
-        "warning": "This action cannot be undone. All your data will be permanently deleted.",
+        "title": "Supprimer le compte",
+        "description": "Supprimez définitivement votre compte et toutes les données associées.",
+        "button": "Supprimer mon compte",
+        "warning": "Cette action est irréversible. Toutes vos données seront supprimées définitivement.",
         "consequences": {
-          "title": "What will be deleted:",
-          "data": "Your profile and account information",
-          "videos": "All videos you've submitted",
-          "playlists": "All your playlists",
-          "favorites": "Your favorites and preferences",
-          "irreversible": "This action is permanent and irreversible"
+          "title": "Ce qui sera supprimé :",
+          "data": "Votre profil et les informations de votre compte",
+          "videos": "Toutes les vidéos que vous avez soumises",
+          "playlists": "Toutes vos playlists",
+          "favorites": "Vos favoris et préférences",
+          "irreversible": "Cette action est permanente et irréversible"
         },
         "dialog": {
-          "title": "Wait! Are you really sure? 🥺",
-          "playfulMessage": "We're sad to see you go! Are you sure you want to delete your account? There's no coming back from this... 💔",
-          "reallyConfirm": "If you're absolutely certain, type DELETE below to confirm:",
-          "typeToConfirm": "Type \"{{text}}\" to confirm",
-          "finalWarning": "Last chance! This will permanently delete everything.",
-          "confirm": "Yes, Delete Forever",
-          "deleting": "Deleting...",
-          "cancel": "No, Keep My Account"
+          "title": "Attendez, êtes-vous sûr de vouloir continuer ?",
+          "playfulMessage": "Nous sommes désolés de vous voir partir. Si vous supprimez votre compte, il n'y aura pas de retour possible.",
+          "reallyConfirm": "Si vous êtes absolument sûr, saisissez DELETE ci-dessous pour confirmer :",
+          "typeToConfirm": "Saisissez \"{{text}}\" pour confirmer",
+          "finalWarning": "Dernière chance. Tout sera supprimé définitivement.",
+          "confirm": "Oui, supprimer définitivement",
+          "deleting": "Suppression...",
+          "cancel": "Non, conserver mon compte"
         },
         "success": {
-          "deleted": "Account deleted successfully",
-          "goodbye": "We're sorry to see you go. Goodbye! 👋"
+          "deleted": "Compte supprimé avec succès",
+          "goodbye": "Nous sommes désolés de vous voir partir. À bientôt."
         },
         "error": {
-          "failed": "Failed to delete account",
-          "confirmationMismatch": "Please type DELETE to confirm"
+          "failed": "Impossible de supprimer le compte",
+          "confirmationMismatch": "Veuillez saisir DELETE pour confirmer"
         }
       }
     }
@@ -488,7 +488,9 @@
       }
     },
     "transcription": {
-      "label": "Résumé de transcription"
+      "label": "Résumé de transcription",
+      "partialTitle": "Vidéo prête sans transcription complète",
+      "partialDescription": "Le traitement est terminé et la playlist a été attribuée, mais la transcription n'était pas disponible. La vidéo reste publiée."
     },
     "assignment": {
       "label": "Playlist attribuée"
@@ -600,10 +602,10 @@
     "recentDescription": "Dernières vidéos soumises",
     "noRecentVideos": "Aucune vidéo récente pour l'instant. Soyez le premier à en soumettre une !",
     "ctaTitle": "Connaissez-vous une vidéo que mérite d'être préservée ?",
-    "ctaDescription": "Partagez avec la communauté et aidez à construire la plus grande archive de vidéos précieuses sur Internet.",
+    "ctaDescription": "Partagez-la avec Tube O2 pour l'enrichir, la classer et l'ajouter à la bonne playlist éducative.",
     "ctaButton": "Soumettre une Vidéo",
     "playlistsTitle": "Playlists Récentes",
-    "playlistsDescription": "Parcours d'apprentissage et collections créés par la communauté",
+    "playlistsDescription": "Parcours éducatifs et collections curés par Open 2 Technology et la communauté",
     "noPlaylistsTitle": "Aucune playlist publique trouvée.",
     "noPlaylistsDescription": "Soyez le premier à créer une playlist et à organiser les connaissances !",
     "createFirstPlaylist": "Créer votre première playlist",
@@ -944,22 +946,22 @@
   },
   "messages": {
     "title": "Messages",
-    "description": "Your direct conversations with other curators.",
-    "inbox": "Inbox",
-    "emptyInbox": "No conversations yet.",
-    "selectConversation": "Select a conversation to start chatting.",
-    "emptyConversation": "No messages yet. Say hello!",
-    "inputPlaceholder": "Write a message...",
-    "tipPrefix": "Tip:",
-    "tipLink": "visit community profiles"
+    "description": "Vos conversations directes avec d'autres curateurs.",
+    "inbox": "Boîte de réception",
+    "emptyInbox": "Aucune conversation pour le moment.",
+    "selectConversation": "Sélectionnez une conversation pour commencer.",
+    "emptyConversation": "Aucun message pour le moment. Dites bonjour.",
+    "inputPlaceholder": "Écrire un message...",
+    "tipPrefix": "Astuce :",
+    "tipLink": "visitez les profils de la communauté"
   },
   "notifications": {
     "title": "Notifications",
-    "description": "Follow updates, new messages, and account activity.",
-    "inbox": "Recent notifications",
-    "empty": "You have no notifications yet.",
-    "markAsRead": "Mark read",
-    "markAllAsRead": "Mark all as read"
+    "description": "Suivez les mises à jour, les nouveaux messages et l'activité du compte.",
+    "inbox": "Notifications récentes",
+    "empty": "Vous n'avez pas encore de notifications.",
+    "markAsRead": "Marquer comme lue",
+    "markAllAsRead": "Tout marquer comme lu"
   },
   "socialProfile": {
     "followers": "followers",

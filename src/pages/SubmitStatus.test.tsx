@@ -172,6 +172,43 @@ describe('SubmitStatus page', () => {
     expect(screen.getByText('A concise explanation of polar coordinates.')).toBeInTheDocument();
   });
 
+  it('keeps success clear when transcription failed but assignment completed', () => {
+    useVideoSubmissionMock.mockReturnValue({
+      data: {
+        ...baseSubmission,
+        status: 'success',
+        metadata: {
+          detectedLanguage: 'en',
+          transcription: {
+            status: 'failed',
+            error: 'Transcript fetch timed out',
+          },
+          assignment: {
+            assignedPlaylistId: 'playlist-education',
+            topCandidates: [
+              {
+                playlistId: 'playlist-education',
+                name: 'Educacao',
+                score: 12,
+              },
+            ],
+          },
+        },
+      },
+      isLoading: false,
+      isError: false,
+      refetch: refetchMock,
+    });
+
+    renderWithProviders(<SubmitStatus />, { route: '/submit/status/submission-1' });
+
+    expect(screen.getByText('Video ready')).toBeInTheDocument();
+    expect(screen.getByText('Video ready without a full transcript')).toBeInTheDocument();
+    expect(screen.getByText(/Processing finished and the playlist was assigned/)).toBeInTheDocument();
+    expect(screen.getByText('Transcript fetch timed out')).toBeInTheDocument();
+    expect(screen.getByText('Educacao')).toBeInTheDocument();
+  });
+
   it('shows duplicate status with link to the existing video', () => {
     useVideoSubmissionMock.mockReturnValue({
       data: {

@@ -41,7 +41,7 @@
     "editorialPortal": "Editorial Portal"
   },
   "footer": {
-    "description": "A collective curation platform for YouTube videos. Preserving and discovering valuable content together.",
+    "description": "Tube O2 enriches YouTube videos and organizes them into educational playlists for faster learning.",
     "navigation": "Navigation",
     "categories": "Categories",
     "recent": "Recent",
@@ -53,16 +53,16 @@
     "contact": "Contact",
     "faq": "FAQ",
     "madeWithLove": "Made with",
-    "byMonynhaSoftwares": "by Open 2 Technology"
+    "byOpen2Technology": "by Open 2 Technology"
   },
   "labels": {
     "featured": "Featured"
   },
   "hero": {
-    "badge": "Collective video curation",
+    "badge": "Educational video intelligence",
     "headingPart1": "Discover videos that",
-    "headingPart2": "deserve to be remembered",
-    "description": "A community dedicated to preserving and sharing the best YouTube videos. Old tutorials, traditional recipes, iconic memes, and more.",
+    "headingPart2": "fit the right learning path",
+    "description": "Paste a YouTube URL, let Tube O2 extract metadata, transcribe what it can, enrich the content, and assign it to the most relevant educational playlist.",
     "submitUrlPlaceholder": "Paste a YouTube video URL here...",
     "submitVideoButton": "Submit a Video",
     "exploreVideosButton": "Explore Videos",
@@ -75,33 +75,33 @@
   "home": {
     "onboarding": {
       "title": "Start in under a minute",
-      "subtitle": "Paste a link, review details, and publish for the community."
+      "subtitle": "Paste a link and follow the processing status while Tube O2 enriches the video."
     },
     "howItWorks": {
       "title": "How it works",
       "steps": {
         "step1": {
           "title": "Paste the URL",
-          "description": "Drop a YouTube link to begin."
+          "description": "Drop a YouTube link to create a fast submission."
         },
         "step2": {
-          "title": "Review metadata",
-          "description": "Check title, language, and suggested category."
+          "title": "Track processing",
+          "description": "Follow the status page while metadata, language and transcript signals are collected."
         },
         "step3": {
-          "title": "Publish with context",
-          "description": "Add a short note so other curators understand why it matters."
+          "title": "Get enrichment",
+          "description": "AI generates summaries, tags and context without blocking the initial submission."
         },
         "step4": {
-          "title": "Explore with people",
-          "description": "Browse human collections instead of algorithmic feeds."
+          "title": "Land in the right playlist",
+          "description": "Educational videos are matched to curricular playlists so learners can find them later."
         }
       }
     },
     "intelligence": {
       "badge": "AI-powered",
       "title": "Intelligence inside",
-      "description": "Every submitted video is automatically processed by an AI pipeline that enriches it with semantic data — before it reaches the community.",
+      "description": "Every submitted video is processed in the background. Users see a clear status while Tube O2 enriches metadata and assigns educational playlists.",
       "features": {
         "tags": {
           "title": "Semantic tagging",
@@ -117,7 +117,7 @@
         },
         "category": {
           "title": "Category matching",
-          "description": "The right category is suggested automatically, reviewable before publishing."
+          "description": "The best educational playlist is selected from curricular candidates with auditable scoring."
         }
       },
       "preview": {
@@ -395,7 +395,9 @@
       }
     },
     "transcription": {
-      "label": "Transcript summary"
+      "label": "Transcript summary",
+      "partialTitle": "Video ready without a full transcript",
+      "partialDescription": "Processing finished and the playlist was assigned, but the transcript was not available. The video is still published."
     },
     "assignment": {
       "label": "Assigned playlist"
@@ -507,10 +509,10 @@
     "recentDescription": "Latest videos submitted",
     "noRecentVideos": "No recent videos yet. Be the first to submit!",
     "ctaTitle": "Know a video that deserves to be preserved?",
-    "ctaDescription": "Share with the community and help build the largest archive of valuable videos on the internet.",
+    "ctaDescription": "Share it with Tube O2 so it can be enriched, classified and added to the right educational playlist.",
     "ctaButton": "Submit Video",
     "playlistsTitle": "Recent Playlists",
-    "playlistsDescription": "Learning paths and collections created by the community",
+    "playlistsDescription": "Educational paths and collections curated by Open 2 Technology and the community",
     "noPlaylistsTitle": "No public playlists found.",
     "noPlaylistsDescription": "Be the first to create a playlist and organize knowledge!",
     "createFirstPlaylist": "Create your first playlist",
