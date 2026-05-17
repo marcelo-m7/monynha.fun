@@ -23,6 +23,22 @@ We're creating a space where **human taste matters**. A place where curators (li
 
 ---
 
+## 📌 Documentation & Instructions (Updated May 17, 2026)
+
+To keep onboarding and AI-assisted edits consistent, treat these as the primary references:
+
+- Project guide: [`README.md`](README.md)
+- Architecture and boundaries: [`docs/CODEBASE.md`](docs/CODEBASE.md)
+- Team/agent rules: [`AGENTS.md`](AGENTS.md) and [`AI_RULES.md`](AI_RULES.md)
+- Frontend instruction profile: [`.github/instructions/frontend.instructions.md`](.github/instructions/frontend.instructions.md)
+- Backend instruction profile: [`.github/instructions/backend.instructions.md`](.github/instructions/backend.instructions.md)
+- i18n consistency rules: [`.github/instructions/i18n.instructions.md`](.github/instructions/i18n.instructions.md)
+- Testing rules: [`.github/instructions/testing.instructions.md`](.github/instructions/testing.instructions.md)
+
+> Note: when guidance conflicts, follow `AGENTS.md` + `.github/instructions/*` first, then use older historical notes as context.
+
+---
+
 ## 📸 See It In Action
 
 ### Homepage – Where Magic Happens ✨

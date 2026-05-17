@@ -2,7 +2,7 @@
 
 ## Tech Stack (Bullet Points)
 - **React 18** with **TypeScript** as the primary frontend framework
-- **React Router v6** for client-side routing (routes defined in `src/App.tsx`)
+- **React Router** for client-side routing (routes defined in `src/App.tsx`)
 - **Tailwind CSS** for utility‑first styling and responsive design
 - **shadcn/ui** component library (built on Radix UI) for accessible, pre‑styled UI components
 - **lucide-react** for consistent, lightweight icon set
@@ -15,7 +15,7 @@
 ## Library Usage Rules
 | Concern / Feature | Allowed Library / Approach | Reason / Note |
 |-------------------|----------------------------|---------------|
-| **Routing** | React Router v6 only (`src/App.tsx`) | Centralized routing; do not create custom history solutions |
+| **Routing** | React Router routing declared in `src/App.tsx` | Centralized routing; do not create custom history solutions |
 | **Styling** | Tailwind CSS utility classes; optionally extend via `tailwind.config.ts` | Avoid writing custom CSS or CSS-in-JS unless absolutely necessary; keep styling in JSX via className |
 | **UI Components** | shadcn/ui primitives (buttons, inputs, dialogs, etc.) | Use these as the base; if a component needs modification, create a wrapper component in `src/components/` rather than editing the shadcn files directly |
 | **Icons** | lucide-react only | Import icons as named exports; do not use other icon libraries |
@@ -23,11 +23,11 @@
 | **Data Fetching** | React Query (`useQuery`, `useMutation`) | Handles caching, deduplication, background updates; do not use raw `fetch`/`axios` in components without wrapping in a query/mutation |
 | **Forms** | React Hook Form + Zod schema validation | Centralizes validation logic; avoid uncontrolled form inputs or manual state for form fields |
 | **Icons & Images** | lucide-react for icons; import static images via Vite (`import img from './image.png'`) | Keep assets in `src/assets/` |
-| **Utilities / Helpers** | Create pure functions in `src/lib/` or `src/utils/` | Keep them testable and free of side effects |
+| **Utilities / Helpers** | Keep `src/lib/utils.ts` for `cn()` only; place business/shared utilities in `src/shared/lib/` | Matches project architecture conventions |
 | **Testing** | If tests are added: Vitest + React Testing Library + user-event | Follow React Testing Library guidelines; avoid testing implementation details |
 | **Code Formatting** | ESLint with Prettier plugin | Run `npm run lint` and `npm run format` as needed; do not disable rules without justification |
 | **Absolute Imports** | Configured via `tsconfig.json` (`@/*`) | Use `@/` alias for imports from `src/`; avoid relative paths like `../../../components` |
-| **File Organization** | - Pages: `src/pages/` <br> - Components: `src/components/` (shared) or `src/components/[page]` (page‑specific) <br> - Styles: Tailwind only (no CSS files) <br> - Hooks: `src/hooks/` <br> - Utils/Lib: `src/lib/` or `src/utils/` <br> - Assets: `src/assets/` | Maintain consistency; new files must follow this structure |
+| **File Organization** | - Entities: `src/entities/` (types/api/query keys) <br> - Features: `src/features/` (query/mutation orchestration) <br> - Components: `src/components/` (UI by domain) <br> - Pages: `src/pages/` (routes) <br> - Shared: `src/shared/` (cross-domain code, validation, API clients) <br> - `src/lib/utils.ts`: shadcn `cn()` utility only | Follow Feature-Sliced conventions used by the current codebase |
 
 ## General Principles
 - **Prefer composition over configuration**: Build UI by composing shadcn/ui primitives and Tailwind classes.
@@ -37,5 +37,11 @@
 - **Environment variables**: Prefix with `VITE_` for Vite; store in `.env` (not committed).
 - **Commit messages**: Follow conventional style (`feat:`, `fix:`, `docs:`, etc.).
 - **Branch naming**: `feature/...`, `bugfix/...`, `chore/...`.
+
+## Source of Truth for Agent Instructions
+
+- Always consult [`AGENTS.md`](AGENTS.md) first for repository-wide constraints.
+- Follow scoped instruction files in [`.github/instructions/`](.github/instructions/) for frontend, backend, i18n, and testing behavior.
+- Treat historical sections in long-form docs as contextual background when they diverge from current architecture.
 
 These rules ensure a maintainable, consistent codebase that leverages the chosen libraries effectively.
