@@ -4,6 +4,12 @@
 
 > **Pro Tip**: If you're reading this because you broke something, take a deep breath. We've all been there. Check git history, run the tests, and remember: `pnpm run build` is your friend. 🧘
 
+## Documentation Status (Updated May 17, 2026)
+
+- This file includes **current guidance + historical change logs**.
+- Current architectural source of truth is: `AGENTS.md` + `.github/instructions/*.md`.
+- If you see older examples referencing `src/hooks/*` or previous naming snapshots, treat them as historical context unless they match the live tree.
+
 ---
 
 ## Recent Changes & Improvements (May 2, 2026 - Playlists + Performance)
