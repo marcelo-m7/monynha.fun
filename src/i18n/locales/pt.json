@@ -493,11 +493,16 @@
       "partialTitle": "Vídeo pronto sem transcrição completa",
       "partialDescription": "O processamento terminou, mas a transcrição completa não ficou disponível. O vídeo continua publicado."
     },
+    "analysis": {
+      "label": "Resumo e tags do vídeo"
+    },
     "assignment": {
       "label": "Playlist atribuída",
       "noneLabel": "Playlist curricular",
       "noneTitle": "Sem playlist atribuída",
-      "noneDescription": "Não houve aderência suficiente a uma playlist educacional existente."
+      "noneDescription": "Não houve aderência suficiente a uma playlist educacional existente.",
+      "decisionSource": "Fonte da decisão",
+      "providerError": "Detalhe do classificador"
     },
     "statusLabels": {
       "pending": "Pendente",

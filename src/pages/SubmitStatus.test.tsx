@@ -113,8 +113,14 @@ describe('SubmitStatus page', () => {
         metadata: {
           detectedLanguage: 'pt',
           enrichmentId: 'enrichment-1',
+          analysis: {
+            status: 'completed',
+            summary: 'Aula sobre integrais e calculo vetorial.',
+            semanticTags: ['integral', 'calculo'],
+          },
           assignment: {
             assignedPlaylistId: 'playlist-math',
+            decisionSource: 'deterministic',
             reason: 'Best compatible playlist selected by source and enrichment score',
             topCandidates: [
               {
@@ -136,6 +142,10 @@ describe('SubmitStatus page', () => {
     expect(screen.getByText('Assigned playlist')).toBeInTheDocument();
     expect(screen.getByText('Analise Matematica II - 1º Ano 2º Semestre - LESTI')).toBeInTheDocument();
     expect(screen.getByText('Best compatible playlist selected by source and enrichment score')).toBeInTheDocument();
+    expect(screen.getByText('Video summary and tags')).toBeInTheDocument();
+    expect(screen.getByText('Aula sobre integrais e calculo vetorial.')).toBeInTheDocument();
+    expect(screen.getByText('integral')).toBeInTheDocument();
+    expect(screen.getByText('Decision source: deterministic')).toBeInTheDocument();
   });
 
   it('shows when no playlist was assigned after processing', () => {
@@ -149,6 +159,7 @@ describe('SubmitStatus page', () => {
           assignment: {
             assignedPlaylistId: null,
             reason: 'No playlist met the content adherence threshold',
+            providerError: 'OpenAI quota exceeded',
             topCandidates: [],
           },
         },
@@ -162,6 +173,7 @@ describe('SubmitStatus page', () => {
 
     expect(screen.getByText('No playlist assigned')).toBeInTheDocument();
     expect(screen.getByText('No playlist met the content adherence threshold')).toBeInTheDocument();
+    expect(screen.getByText('Classifier detail: OpenAI quota exceeded')).toBeInTheDocument();
   });
 
 
@@ -195,7 +207,7 @@ describe('SubmitStatus page', () => {
     expect(screen.getByText('Current stage')).toBeInTheDocument();
     expect(screen.getByText('Generating transcript summary')).toBeInTheDocument();
     expect(screen.getByText(/Request ID: request-123/)).toBeInTheDocument();
-    expect(screen.getByText('Transcript summary')).toBeInTheDocument();
+    expect(screen.getByText('Video summary and tags')).toBeInTheDocument();
     expect(screen.getByText('A concise explanation of polar coordinates.')).toBeInTheDocument();
   });
 

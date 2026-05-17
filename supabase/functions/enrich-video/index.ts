@@ -49,6 +49,8 @@ type PlaylistAssignmentResult = {
   reason: string;
   provider: Provider | null;
   providerConfidence: number | null;
+  decisionSource: 'deterministic' | 'openai' | 'gemini' | 'none';
+  providerError: string | null;
   signals: Record<string, number>;
   topCandidates: Array<{
     playlistId: string;
@@ -62,7 +64,7 @@ type PlaylistAssignmentResult = {
 
 type TranscriptProcessingResult = {
   id: string | null;
-  provider: Provider;
+  provider: 'gemini';
   providerModel: string;
   status: TranscriptStatus;
   language: string | null;
@@ -70,9 +72,6 @@ type TranscriptProcessingResult = {
   confidence: number;
   errorMessage: string | null;
   analysis: VideoAnalysis;
-  fallbackUsed: boolean;
-  fallbackFrom: Provider | null;
-  fallbackError: string | null;
 };
 
 type VideoProcessingVideo = {
@@ -203,13 +202,12 @@ function parseJsonObject(content: string): Record<string, unknown> {
 
 function parseVideoAnalysis(content: string, fallbackLanguage: string): VideoAnalysis {
   const parsed = parseJsonObject(content);
-  const transcriptSummary = optionalString(parsed.transcriptSummary, 900);
-  const summaryDescription = optionalString(parsed.summaryDescription, 320) ?? transcriptSummary;
+  const summaryDescription = optionalString(parsed.summaryDescription, 320);
   const shortSummary = optionalString(parsed.shortSummary, 180) ?? summaryDescription;
 
   return {
-    transcriptText: optionalString(parsed.transcriptText, 1600),
-    transcriptSummary,
+    transcriptText: null,
+    transcriptSummary: null,
     summaryDescription,
     shortSummary,
     semanticTags: optionalStringArray(parsed.semanticTags ?? parsed.semantic_tags),
@@ -234,19 +232,17 @@ YouTube URL: ${params.youtubeUrl}
 
 Respond ONLY with valid JSON:
 {
-  "transcriptText": "short faithful transcript excerpt only if immediately available, otherwise null",
-  "transcriptSummary": "2-4 sentence summary of the spoken or visible educational content",
   "summaryDescription": "2-3 sentence user-facing summary under 280 characters",
   "shortSummary": "single sentence summary under 140 characters",
   "semanticTags": ["specific subject tag", "concept tag", "course topic tag"],
   "language": "ISO 639-1 language code if detected, otherwise null",
   "confidence": 0.0,
-  "unavailableReason": "short reason when transcriptText is unavailable, otherwise null"
+  "unavailableReason": "short reason when analysis is unavailable, otherwise null"
 }
 
 Rules:
-- Do not invent a full transcript.
-- If captions/audio are unavailable, use title and description honestly and set transcriptText to null.
+- Do not generate or return a transcript.
+- Use the video content when Gemini can inspect it; otherwise use title and description honestly.
 - semanticTags must describe the subject matter, not clickbait wording.
 - Consider all educational areas, not only programming.
 - Keep summaries compact and public-safe.`;
@@ -268,7 +264,6 @@ Video analysis:
 ${JSON.stringify({
     summaryDescription: analysis.summaryDescription,
     shortSummary: analysis.shortSummary,
-    transcriptSummary: analysis.transcriptSummary,
     semanticTags: analysis.semanticTags,
     language: analysis.language,
     confidence: analysis.confidence,
@@ -432,7 +427,7 @@ async function callOpenAI(params: {
 }
 
 async function callProviderAnalysis(params: {
-  provider: Provider;
+  provider: 'gemini';
   apiKey: string;
   model: string;
   youtubeUrl: string;
@@ -447,20 +442,13 @@ async function callProviderAnalysis(params: {
     youtubeUrl: params.youtubeUrl,
   });
 
-  const content = params.provider === 'gemini'
-    ? await callGemini({
+  const content = await callGemini({
       apiKey: params.apiKey,
       model: params.model,
       prompt,
       youtubeUrl: params.youtubeUrl,
       maxOutputTokens: 1600,
       timeoutMs: Number(Deno.env.get('GEMINI_TIMEOUT_MS') || 90000),
-    })
-    : await callOpenAI({
-      apiKey: params.apiKey,
-      model: params.model,
-      prompt,
-      timeoutMs: Number(Deno.env.get('OPENAI_TIMEOUT_MS') || 60000),
     });
 
   return parseVideoAnalysis(content, params.language);
@@ -637,123 +625,78 @@ async function processVideoAnalysis(params: {
   effectiveLanguage: string;
 }): Promise<TranscriptProcessingResult> {
   const geminiApiKey = Deno.env.get('GEMINI_API_KEY');
-  const openaiApiKey = Deno.env.get('OPENAI_API_KEY');
   const geminiModel = Deno.env.get('GEMINI_MODEL') || 'gemini-2.5-flash';
-  const openaiModel = Deno.env.get('OPENAI_MODEL') || 'gpt-4o-mini';
 
-  let provider: Provider = 'gemini';
-  let providerModel = geminiModel;
-  let analysis: VideoAnalysis;
-  let fallbackUsed = false;
-  let fallbackFrom: Provider | null = null;
-  let fallbackError: string | null = null;
-
-  try {
-    if (!geminiApiKey) {
-      throw new HttpError('GEMINI_API_KEY is not configured', 503, {
-        code: 'GEMINI_API_KEY_MISSING',
-        stage: 'analysis',
-        recoverable: true,
-      });
-    }
-
-    logProcessing(params.requestId, 'analysis', 'Starting Gemini video analysis', {
-      videoId: params.videoId,
-      model: geminiModel,
-    });
-
-    analysis = await callProviderAnalysis({
-      provider: 'gemini',
-      apiKey: geminiApiKey,
-      model: geminiModel,
-      youtubeUrl: params.youtubeUrl,
-      title: params.videoTitle,
-      description: params.videoDescription,
-      language: params.effectiveLanguage,
-    });
-  } catch (error) {
-    fallbackUsed = true;
-    fallbackFrom = 'gemini';
-    fallbackError = error instanceof Error ? error.message : 'Unknown Gemini analysis error';
-
-    logProcessingError(params.requestId, 'analysis', 'Gemini analysis failed; trying OpenAI fallback', {
-      videoId: params.videoId,
-      error: fallbackError,
-    });
-
-    if (!openaiApiKey) {
-      throw new HttpError(`Gemini failed and OPENAI_API_KEY is not configured: ${fallbackError}`, 503, {
-        code: 'AI_PROVIDER_UNAVAILABLE',
-        stage: 'analysis',
-        recoverable: true,
-      });
-    }
-
-    provider = 'openai';
-    providerModel = openaiModel;
-    analysis = await callProviderAnalysis({
-      provider: 'openai',
-      apiKey: openaiApiKey,
-      model: openaiModel,
-      youtubeUrl: params.youtubeUrl,
-      title: params.videoTitle,
-      description: params.videoDescription,
-      language: params.effectiveLanguage,
+  if (!geminiApiKey) {
+    throw new HttpError('GEMINI_API_KEY is not configured', 503, {
+      code: 'GEMINI_API_KEY_MISSING',
+      stage: 'analysis',
+      recoverable: true,
     });
   }
 
-  const status: TranscriptStatus = analysis.transcriptText || analysis.transcriptSummary || analysis.summaryDescription
+  logProcessing(params.requestId, 'analysis', 'Starting Gemini compact video analysis', {
+    videoId: params.videoId,
+    model: geminiModel,
+  });
+
+  const analysis = await callProviderAnalysis({
+    provider: 'gemini',
+    apiKey: geminiApiKey,
+    model: geminiModel,
+    youtubeUrl: params.youtubeUrl,
+    title: params.videoTitle,
+    description: params.videoDescription,
+    language: params.effectiveLanguage,
+  });
+
+  const status: TranscriptStatus = analysis.summaryDescription || analysis.shortSummary || analysis.semanticTags.length > 0
     ? 'completed'
     : 'unavailable';
   const errorMessage = status === 'unavailable'
-    ? analysis.unavailableReason || `Transcript unavailable from ${provider}`
+    ? analysis.unavailableReason || 'Gemini compact analysis unavailable'
     : null;
 
   const transcriptId = await insertTranscriptRecord(params.supabaseServiceRole, {
     videoId: params.videoId,
-    provider,
-    providerModel,
+    provider: 'gemini',
+    providerModel: geminiModel,
     status,
     language: normalizeLanguage(analysis.language) ?? normalizeLanguage(params.effectiveLanguage),
-    transcriptText: analysis.transcriptText,
-    summary: analysis.transcriptSummary ?? analysis.summaryDescription,
+    transcriptText: null,
+    summary: analysis.summaryDescription ?? analysis.shortSummary,
     confidence: analysis.confidence,
     errorMessage,
     metadata: {
       requestId: params.requestId,
-      provider,
-      providerModel,
-      fallbackUsed,
-      fallbackFrom,
-      fallbackError,
+      provider: 'gemini',
+      providerModel: geminiModel,
+      analysisOnly: true,
       unavailableReason: analysis.unavailableReason,
       semanticTags: analysis.semanticTags,
+      shortSummary: analysis.shortSummary,
     },
   });
 
-  logProcessing(params.requestId, 'analysis', 'Video analysis completed', {
+  logProcessing(params.requestId, 'analysis', 'Gemini compact video analysis completed', {
     videoId: params.videoId,
     transcriptId,
-    provider,
-    model: providerModel,
-    fallbackUsed,
+    provider: 'gemini',
+    model: geminiModel,
     status,
     confidence: analysis.confidence,
   });
 
   return {
     id: transcriptId,
-    provider,
-    providerModel,
+    provider: 'gemini',
+    providerModel: geminiModel,
     status,
     language: normalizeLanguage(analysis.language) ?? normalizeLanguage(params.effectiveLanguage),
-    summary: analysis.transcriptSummary ?? analysis.summaryDescription,
+    summary: analysis.summaryDescription ?? analysis.shortSummary,
     confidence: analysis.confidence,
     errorMessage,
     analysis,
-    fallbackUsed,
-    fallbackFrom,
-    fallbackError,
   };
 }
 
@@ -766,7 +709,6 @@ function analysisText(analysis: VideoAnalysis) {
     analysis.semanticTags.join(' '),
     analysis.summaryDescription ?? '',
     analysis.shortSummary ?? '',
-    analysis.transcriptSummary ?? '',
   ].join(' ');
 }
 
@@ -774,6 +716,16 @@ function tokenOverlapScore(left: string, right: string): number {
   const leftTokens = new Set(tokenize(left));
   if (leftTokens.size === 0) return 0;
   return tokenize(right).reduce((score, token) => score + (leftTokens.has(token) ? 1 : 0), 0);
+}
+
+function readNumberEnv(name: string, fallback: number): number {
+  const value = Number.parseFloat(Deno.env.get(name) || '');
+  return Number.isFinite(value) ? value : fallback;
+}
+
+function readProviderEnv(name: string, fallback: Provider): Provider {
+  const value = (Deno.env.get(name) || '').trim().toLowerCase();
+  return value === 'gemini' || value === 'openai' ? value : fallback;
 }
 
 const subjectKeywords: Record<string, string[]> = {
@@ -817,19 +769,42 @@ function deterministicPlaylistScore(playlist: PlaylistRow, analysis: VideoAnalys
 
   if (normalizeLanguage(playlist.language) === normalizeLanguage(analysis.language)) score += 1;
   if (playlist.course_code || playlist.unit_code) score += 1;
+  if (!playlist.course_code && !playlist.unit_code && /educacao|education/i.test(normalizeText(`${playlist.name} ${playlist.description ?? ''}`))) {
+    score -= 6;
+  }
 
   return score;
 }
 
+function hasStrongSubjectConflict(playlist: PlaylistRow, signals: Record<string, number>): boolean {
+  const strongest = Object.entries(signals).sort((left, right) => right[1] - left[1])[0];
+  if (!strongest || strongest[1] < 2) return false;
+  return subjectHitCount(playlistText(playlist), strongest[0]) === 0;
+}
+
+function providerModel(provider: Provider): string {
+  if (provider === 'openai') {
+    return Deno.env.get('OPENAI_PLAYLIST_MODEL') || Deno.env.get('OPENAI_MODEL') || 'gpt-4o-mini';
+  }
+
+  return Deno.env.get('GEMINI_MODEL') || 'gemini-2.5-flash';
+}
+
+function providerApiKey(provider: Provider): string | null {
+  return provider === 'openai'
+    ? Deno.env.get('OPENAI_API_KEY')
+    : Deno.env.get('GEMINI_API_KEY');
+}
+
 async function runPlaylistAssignment(params: {
-  provider: Provider;
-  providerModel: string;
   analysis: VideoAnalysis;
   playlistRows: PlaylistRow[];
   requestId: string;
 }): Promise<PlaylistAssignmentResult> {
   const sourceText = analysisText(params.analysis);
   const signals = subjectSignals(sourceText);
+  const minScore = readNumberEnv('PLAYLIST_ASSIGNMENT_MIN_SCORE', 8);
+  const minConfidence = readNumberEnv('PLAYLIST_ASSIGNMENT_MIN_CONFIDENCE', 0.7);
   const scoredCandidates = params.playlistRows
     .map((playlist) => {
       const score = deterministicPlaylistScore(playlist, params.analysis, sourceText, signals);
@@ -837,34 +812,66 @@ async function runPlaylistAssignment(params: {
         playlistId: playlist.id,
         name: playlist.name,
         score,
-        compatible: score >= 4,
+        compatible: score >= minScore && !hasStrongSubjectConflict(playlist, signals),
         aiSuggested: false,
       };
     })
     .sort((left, right) => right.score - left.score);
 
+  const best = scoredCandidates[0] ?? null;
+  const runnerUp = scoredCandidates[1] ?? null;
+  if (best?.compatible && best.score - (runnerUp?.score ?? 0) >= 3) {
+    return {
+      algorithmVersion: 'playlist-assignment-v4-deterministic-openai-fallback',
+      assignedPlaylistId: best.playlistId,
+      score: best.score,
+      reliability: 'high',
+      reason: 'Deterministic score selected a strong curricular playlist match',
+      provider: null,
+      providerConfidence: null,
+      decisionSource: 'deterministic',
+      providerError: null,
+      signals,
+      topCandidates: scoredCandidates.slice(0, 5),
+      rejectedAiPlaylistId: null,
+    };
+  }
+
   let aiChoice: AiPlaylistChoice | null = null;
   let rejectedAiPlaylistId: string | null = null;
+  let provider: Provider | null = null;
+  let providerError: string | null = null;
+  const providers = Array.from(new Set([
+    readProviderEnv('PLAYLIST_ASSIGNMENT_PRIMARY_PROVIDER', 'openai'),
+    readProviderEnv('PLAYLIST_ASSIGNMENT_FALLBACK_PROVIDER', 'gemini'),
+  ]));
 
-  try {
-    const apiKey = params.provider === 'gemini'
-      ? Deno.env.get('GEMINI_API_KEY')
-      : Deno.env.get('OPENAI_API_KEY');
-
+  for (const candidateProvider of providers) {
+    const apiKey = providerApiKey(candidateProvider);
     if (apiKey) {
-      aiChoice = await choosePlaylistWithProvider({
-        provider: params.provider,
-        apiKey,
-        model: params.providerModel,
-        analysis: params.analysis,
-        playlists: params.playlistRows,
+      try {
+        aiChoice = await choosePlaylistWithProvider({
+          provider: candidateProvider,
+          apiKey,
+          model: providerModel(candidateProvider),
+          analysis: params.analysis,
+          playlists: params.playlistRows,
+        });
+        provider = candidateProvider;
+        break;
+      } catch (error) {
+        providerError = error instanceof Error ? error.message : 'Unknown playlist provider error';
+        logProcessingError(params.requestId, 'assignment', 'AI playlist choice failed; trying next provider', {
+          provider: candidateProvider,
+          error: providerError,
+        });
+      }
+    } else {
+      providerError = `${candidateProvider.toUpperCase()} API key is not configured`;
+      logProcessing(params.requestId, 'assignment', 'Skipping playlist provider without API key', {
+        provider: candidateProvider,
       });
     }
-  } catch (error) {
-    logProcessingError(params.requestId, 'assignment', 'AI playlist choice failed; using deterministic fallback', {
-      provider: params.provider,
-      error: error instanceof Error ? error.message : 'Unknown playlist choice error',
-    });
   }
 
   const aiCandidate = aiChoice?.assignedPlaylistId
@@ -879,34 +886,31 @@ async function runPlaylistAssignment(params: {
   let score = 0;
   let reason = 'No educational playlist met the adherence threshold';
 
-  if (aiCandidate && aiChoice && aiChoice.confidence >= 0.65 && aiCandidate.compatible) {
+  if (aiCandidate && aiChoice && aiChoice.confidence >= minConfidence && aiCandidate.compatible) {
     assignedPlaylistId = aiCandidate.playlistId;
     score = aiCandidate.score;
     reason = aiChoice.reason || 'AI playlist suggestion accepted after deterministic adherence check';
   } else if (aiCandidate && aiChoice) {
     rejectedAiPlaylistId = aiCandidate.playlistId;
-    reason = aiChoice.confidence < 0.65
+    reason = aiChoice.confidence < minConfidence
       ? 'AI playlist suggestion rejected because confidence is below threshold'
       : 'AI playlist suggestion rejected by deterministic adherence check';
   }
 
-  if (!assignedPlaylistId) {
-    const best = scoredCandidates.find((candidate) => candidate.compatible) ?? null;
-    if (best) {
-      assignedPlaylistId = best.playlistId;
-      score = best.score;
-      reason = 'Deterministic fallback selected the strongest educational playlist candidate';
-    }
+  if (!assignedPlaylistId && !aiChoice && providerError) {
+    reason = `No playlist assigned because playlist AI providers failed: ${providerError}`;
   }
 
   return {
-    algorithmVersion: 'playlist-assignment-v3-provider-fallback',
+    algorithmVersion: 'playlist-assignment-v4-deterministic-openai-fallback',
     assignedPlaylistId,
     score,
     reliability: assignedPlaylistId ? 'high' : 'low',
     reason,
-    provider: aiChoice ? params.provider : null,
+    provider: aiChoice ? provider : null,
     providerConfidence: aiChoice?.confidence ?? null,
+    decisionSource: assignedPlaylistId && provider ? provider : 'none',
+    providerError,
     signals,
     topCandidates: scoredCandidates.slice(0, 5),
     rejectedAiPlaylistId,
@@ -958,8 +962,7 @@ async function assignVideoToPlaylist(
 function hasProcessedAnalysisContent(analysis: VideoAnalysis): boolean {
   return analysis.semanticTags.length > 0
     || !!analysis.summaryDescription
-    || !!analysis.shortSummary
-    || !!analysis.transcriptSummary;
+    || !!analysis.shortSummary;
 }
 
 async function runVideoProcessingTask(params: {
@@ -1022,6 +1025,17 @@ async function runVideoProcessingTask(params: {
         {},
         {
           ...processingMetadata(requestId, currentStage),
+          analysis: {
+            transcriptId: transcriptResult.id,
+            provider: transcriptResult.provider,
+            model: transcriptResult.providerModel,
+            status: transcriptResult.status,
+            summary: transcriptResult.summary,
+            language: transcriptResult.language,
+            confidence: transcriptResult.confidence,
+            errorMessage: transcriptResult.errorMessage,
+            semanticTags: transcriptResult.analysis.semanticTags,
+          },
           transcription: {
             transcriptId: transcriptResult.id,
             provider: transcriptResult.provider,
@@ -1031,22 +1045,21 @@ async function runVideoProcessingTask(params: {
             language: transcriptResult.language,
             confidence: transcriptResult.confidence,
             errorMessage: transcriptResult.errorMessage,
-            fallbackUsed: transcriptResult.fallbackUsed,
-            fallbackFrom: transcriptResult.fallbackFrom,
-            fallbackError: transcriptResult.fallbackError,
           },
         },
       );
     }
 
     let assignment: PlaylistAssignmentResult = {
-      algorithmVersion: 'playlist-assignment-v3-provider-fallback',
+      algorithmVersion: 'playlist-assignment-v4-deterministic-openai-fallback',
       assignedPlaylistId: null,
       score: 0,
       reliability: 'low',
       reason: 'No playlist assigned because the video analysis did not provide enough educational signals',
       provider: null,
       providerConfidence: null,
+      decisionSource: 'none',
+      providerError: null,
       signals: {},
       topCandidates: [],
       rejectedAiPlaylistId: null,
@@ -1054,8 +1067,6 @@ async function runVideoProcessingTask(params: {
 
     if (playlistRows.length > 0 && hasProcessedAnalysisContent(transcriptResult.analysis)) {
       assignment = await runPlaylistAssignment({
-        provider: transcriptResult.provider,
-        providerModel: transcriptResult.providerModel,
         analysis: transcriptResult.analysis,
         playlistRows,
         requestId,
@@ -1081,12 +1092,12 @@ async function runVideoProcessingTask(params: {
       .insert({
         video_id: videoId,
         optimized_title: null,
-        summary_description: transcriptResult.analysis.summaryDescription ?? transcriptResult.analysis.transcriptSummary,
+        summary_description: transcriptResult.analysis.summaryDescription ?? transcriptResult.analysis.shortSummary,
         semantic_tags: transcriptResult.analysis.semanticTags,
         suggested_category_id: null,
         language: detectedLanguage,
         cultural_relevance: null,
-        short_summary: transcriptResult.analysis.shortSummary ?? transcriptResult.analysis.summaryDescription ?? transcriptResult.analysis.transcriptSummary,
+        short_summary: transcriptResult.analysis.shortSummary ?? transcriptResult.analysis.summaryDescription,
       })
       .select()
       .single();
@@ -1116,6 +1127,17 @@ async function runVideoProcessingTask(params: {
           },
           enrichmentId: data.id,
           detectedLanguage,
+          analysis: {
+            transcriptId: transcriptResult.id,
+            provider: transcriptResult.provider,
+            model: transcriptResult.providerModel,
+            status: transcriptResult.status,
+            summary: transcriptResult.summary,
+            language: transcriptResult.language,
+            confidence: transcriptResult.confidence,
+            errorMessage: transcriptResult.errorMessage,
+            semanticTags: transcriptResult.analysis.semanticTags,
+          },
           transcription: {
             transcriptId: transcriptResult.id,
             provider: transcriptResult.provider,
@@ -1125,9 +1147,6 @@ async function runVideoProcessingTask(params: {
             language: transcriptResult.language,
             confidence: transcriptResult.confidence,
             errorMessage: transcriptResult.errorMessage,
-            fallbackUsed: transcriptResult.fallbackUsed,
-            fallbackFrom: transcriptResult.fallbackFrom,
-            fallbackError: transcriptResult.fallbackError,
           },
           assignment: {
             fallbackUsed: assignment.reliability === 'low',
@@ -1139,6 +1158,8 @@ async function runVideoProcessingTask(params: {
             score: assignment.score,
             provider: assignment.provider,
             providerConfidence: assignment.providerConfidence,
+            decisionSource: assignment.decisionSource,
+            providerError: assignment.providerError,
             signals: assignment.signals,
             topCandidates: assignment.topCandidates,
             rejectedPlaylistId: assignment.rejectedAiPlaylistId,
@@ -1155,8 +1176,8 @@ async function runVideoProcessingTask(params: {
       transcriptId: transcriptResult.id,
       transcriptStatus: transcriptResult.status,
       provider: transcriptResult.provider,
-      fallbackUsed: transcriptResult.fallbackUsed,
       assignedPlaylistId: assignment.assignedPlaylistId,
+      decisionSource: assignment.decisionSource,
     });
   } catch (error) {
     const errorPayload = toProcessingErrorPayload(error, requestId, currentStage);
@@ -1195,13 +1216,11 @@ serve(async (req) => {
     SUPABASE_URL: Deno.env.get('SUPABASE_URL'),
     SUPABASE_ANON_KEY: Deno.env.get('SUPABASE_ANON_KEY'),
     SUPABASE_SERVICE_ROLE_KEY: Deno.env.get('SUPABASE_SERVICE_ROLE_KEY'),
+    GEMINI_API_KEY: Deno.env.get('GEMINI_API_KEY'),
   };
-  const hasAiProvider = !!Deno.env.get('GEMINI_API_KEY') || !!Deno.env.get('OPENAI_API_KEY');
   const missingEnv = Object.entries(requiredEnv)
     .filter(([, value]) => !value)
     .map(([key]) => key);
-
-  if (!hasAiProvider) missingEnv.push('GEMINI_API_KEY or OPENAI_API_KEY');
 
   if (missingEnv.length > 0) {
     const errorPayload = {

@@ -400,11 +400,16 @@
       "partialTitle": "Video ready without a full transcript",
       "partialDescription": "Processing finished, but the full transcript was not available. The video is still published."
     },
+    "analysis": {
+      "label": "Video summary and tags"
+    },
     "assignment": {
       "label": "Assigned playlist",
       "noneLabel": "Curricular playlist",
       "noneTitle": "No playlist assigned",
-      "noneDescription": "There was not enough adherence to an existing educational playlist."
+      "noneDescription": "There was not enough adherence to an existing educational playlist.",
+      "decisionSource": "Decision source",
+      "providerError": "Classifier detail"
     },
     "statusLabels": {
       "pending": "Pending",

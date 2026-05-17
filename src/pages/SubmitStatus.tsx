@@ -75,8 +75,10 @@ export default function SubmitStatus() {
   const noAssignedPlaylist = status === 'success' && !!metadata.assignment && !assignedPlaylistId;
   const processingStage = metadata.processing?.stage ?? metadata.error?.stage ?? metadata.clientError?.stage ?? null;
   const requestId = metadata.processing?.requestId ?? metadata.error?.requestId ?? null;
+  const analysis = metadata.analysis ?? metadata.transcription ?? null;
   const transcript = metadata.transcription;
-  const transcriptError = transcript?.errorMessage ?? transcript?.error ?? null;
+  const transcriptError = analysis?.errorMessage ?? transcript?.error ?? null;
+  const semanticTags = metadata.analysis?.semanticTags ?? [];
 
   const handleRetry = () => {
     if (!submission?.video_id || !submission.youtube_url) {
@@ -177,7 +179,7 @@ export default function SubmitStatus() {
               </Alert>
             )}
 
-            {status === 'success' && transcript?.status === 'failed' && (
+            {status === 'success' && analysis?.status === 'failed' && (
               <Alert>
                 <AlertCircle className="h-4 w-4" />
                 <AlertTitle>{t('submitStatus.transcription.partialTitle')}</AlertTitle>
@@ -209,10 +211,17 @@ export default function SubmitStatus() {
                   </p>
                 </div>
               )}
-              {transcript?.summary && (
+              {analysis?.summary && (
                 <div className="rounded-md border border-border p-4 sm:col-span-2">
-                  <p className="text-xs font-medium uppercase text-muted-foreground">{t('submitStatus.transcription.label')}</p>
-                  <p className="mt-1 text-sm text-muted-foreground">{transcript.summary}</p>
+                  <p className="text-xs font-medium uppercase text-muted-foreground">{t('submitStatus.analysis.label')}</p>
+                  <p className="mt-1 text-sm text-muted-foreground">{analysis.summary}</p>
+                  {semanticTags.length > 0 && (
+                    <div className="mt-3 flex flex-wrap gap-2">
+                      {semanticTags.map((tag) => (
+                        <Badge key={tag} variant="secondary">{tag}</Badge>
+                      ))}
+                    </div>
+                  )}
                 </div>
               )}
               {assignedPlaylist && (
@@ -226,6 +235,11 @@ export default function SubmitStatus() {
                       <p className="mt-1 text-sm font-medium">{assignedPlaylist.name}</p>
                       {metadata.assignment?.reason && (
                         <p className="mt-1 text-xs text-muted-foreground">{metadata.assignment.reason}</p>
+                      )}
+                      {metadata.assignment?.decisionSource && (
+                        <p className="mt-1 text-xs text-muted-foreground">
+                          {t('submitStatus.assignment.decisionSource')}: {metadata.assignment.decisionSource}
+                        </p>
                       )}
                     </div>
                   </div>
@@ -243,6 +257,11 @@ export default function SubmitStatus() {
                       <p className="mt-1 text-xs text-muted-foreground">
                         {metadata.assignment?.reason || t('submitStatus.assignment.noneDescription')}
                       </p>
+                      {metadata.assignment?.providerError && (
+                        <p className="mt-1 text-xs text-muted-foreground">
+                          {t('submitStatus.assignment.providerError')}: {metadata.assignment.providerError}
+                        </p>
+                      )}
                     </div>
                   </div>
                 </div>
