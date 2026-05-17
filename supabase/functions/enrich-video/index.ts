@@ -393,6 +393,7 @@ async function processVideoAnalysis(params: {
   } catch (error) {
     const geminiError = error as Partial<GeminiError>;
     const errorMessage = error instanceof Error ? error.message : 'Unknown Gemini analysis error';
+    const recoverable = geminiError.recoverable ?? isRecoverableExternalError(error);
     const transcriptId = await insertTranscriptRecord(supabaseServiceRole, {
       videoId,
       providerModel: geminiClient.modelName,
@@ -405,7 +406,7 @@ async function processVideoAnalysis(params: {
       metadata: {
         requestId,
         code: geminiError.code ?? 'GEMINI_ANALYSIS_FAILED',
-        recoverable: geminiError.recoverable ?? isRecoverableExternalError(error),
+        recoverable,
       },
     });
 
@@ -415,6 +416,14 @@ async function processVideoAnalysis(params: {
       code: geminiError.code ?? 'GEMINI_ANALYSIS_FAILED',
       error: errorMessage,
     });
+
+    if (recoverable) {
+      throw new HttpError(`Gemini video analysis failed: ${errorMessage}`, 503, {
+        code: geminiError.code ?? 'GEMINI_ANALYSIS_FAILED',
+        stage: 'analysis',
+        recoverable: true,
+      });
+    }
 
     return {
       id: transcriptId,
@@ -665,10 +674,21 @@ async function runVideoProcessingTask(params: {
       const assignmentErrorMessage = assignmentError instanceof Error
         ? assignmentError.message
         : 'Unknown playlist assignment error';
+      const geminiError = assignmentError as Partial<GeminiError>;
+      const recoverable = geminiError.recoverable ?? isRecoverableExternalError(assignmentError);
 
-      logProcessingError(requestId, currentStage, 'Playlist assignment failed, continuing without playlist insertion', {
+      logProcessingError(requestId, currentStage, 'Playlist assignment failed', {
         error: assignmentErrorMessage,
+        recoverable,
       });
+
+      if (recoverable) {
+        throw new HttpError(`Playlist assignment failed: ${assignmentErrorMessage}`, 503, {
+          code: geminiError.code ?? 'PLAYLIST_ASSIGNMENT_FAILED',
+          stage: currentStage,
+          recoverable: true,
+        });
+      }
 
       enhancedAssignment = {
         assignedPlaylistId: null,
