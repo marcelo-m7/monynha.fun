@@ -5,14 +5,53 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
-type VideoRow = { id: string; youtube_id: string };
+type VideoRow = {
+  id: string;
+  youtube_id: string;
+  title: string;
+  description: string | null;
+  channel_name: string;
+  thumbnail_url: string;
+};
 
 type ImportBody = {
   playlist_url?: unknown;
-  playlist_id?: unknown;
   language?: unknown;
-  submitted_by_user_id?: unknown;
   max_videos?: unknown;
+};
+
+type SubmissionRow = {
+  id: string;
+  video_id: string | null;
+  youtube_id: string;
+  youtube_url: string;
+  status: string;
+  metadata: Record<string, unknown> | null;
+  updated_at?: string;
+  created_at?: string;
+};
+
+type ImportResultStatus = "queued" | "already_queued" | "skipped_existing_enriched";
+
+type ImportResult = {
+  youtube_id: string;
+  video_id: string | null;
+  youtube_url: string;
+  status: ImportResultStatus;
+  submission_id: string | null;
+};
+
+type YouTubeOEmbedResponse = {
+  title?: string;
+  author_name?: string;
+  thumbnail_url?: string;
+};
+
+type VideoMetadata = {
+  youtubeId: string;
+  title: string;
+  channelName: string;
+  thumbnailUrl: string;
 };
 
 function json(payload: Record<string, unknown>, status = 200) {
@@ -20,10 +59,6 @@ function json(payload: Record<string, unknown>, status = 200) {
     status,
     headers: { ...corsHeaders, "Content-Type": "application/json" },
   });
-}
-
-function isUuid(value: string) {
-  return /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(value);
 }
 
 function extractPlaylistListParam(inputUrl: string): string | null {
@@ -74,6 +109,95 @@ function thumbnailUrl(youtubeId: string) {
   return `https://i.ytimg.com/vi/${encodeURIComponent(youtubeId)}/hqdefault.jpg`;
 }
 
+function fallbackMetadata(youtubeId: string): VideoMetadata {
+  return {
+    youtubeId,
+    title: youtubeId,
+    channelName: "YouTube",
+    thumbnailUrl: thumbnailUrl(youtubeId),
+  };
+}
+
+function shouldRefreshVideoMetadata(video: Pick<VideoRow, "youtube_id" | "title" | "channel_name" | "description">) {
+  return video.title === video.youtube_id || (video.channel_name === "YouTube" && !video.description);
+}
+
+async function fetchVideoMetadata(youtubeId: string): Promise<VideoMetadata> {
+  const fallback = fallbackMetadata(youtubeId);
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 6000);
+
+  try {
+    const response = await fetch(
+      `https://www.youtube.com/oembed?format=json&url=${encodeURIComponent(watchUrl(youtubeId))}`,
+      {
+        headers: {
+          "user-agent": "Mozilla/5.0 (compatible; TubeO2PlaylistImporter/1.0)",
+          "accept-language": "en-US,en;q=0.9,pt;q=0.8",
+        },
+        signal: controller.signal,
+      },
+    );
+
+    if (!response.ok) return fallback;
+
+    const payload = await response.json().catch(() => null) as YouTubeOEmbedResponse | null;
+    return {
+      youtubeId,
+      title: typeof payload?.title === "string" && payload.title.trim() ? payload.title.trim().slice(0, 300) : fallback.title,
+      channelName: typeof payload?.author_name === "string" && payload.author_name.trim() ? payload.author_name.trim().slice(0, 200) : fallback.channelName,
+      thumbnailUrl: typeof payload?.thumbnail_url === "string" && payload.thumbnail_url.trim() ? payload.thumbnail_url.trim() : fallback.thumbnailUrl,
+    };
+  } catch {
+    return fallback;
+  } finally {
+    clearTimeout(timeout);
+  }
+}
+
+async function mapWithConcurrency<T, R>(
+  items: T[],
+  limit: number,
+  worker: (item: T) => Promise<R>,
+): Promise<R[]> {
+  const results: R[] = new Array(items.length);
+  let nextIndex = 0;
+  const workerCount = Math.max(1, Math.min(limit, items.length));
+
+  await Promise.all(Array.from({ length: workerCount }, async () => {
+    while (nextIndex < items.length) {
+      const currentIndex = nextIndex;
+      nextIndex += 1;
+      results[currentIndex] = await worker(items[currentIndex]);
+    }
+  }));
+
+  return results;
+}
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === "object" && value !== null && !Array.isArray(value);
+}
+
+function isSameImportSubmission(submission: SubmissionRow, listParam: string) {
+  const metadata = isRecord(submission.metadata) ? submission.metadata : {};
+  const source = metadata.source;
+  const playlistList = metadata.youtube_playlist_list ?? metadata.playlist_list;
+
+  return (
+    (source === "youtube_playlist_import" || source === "youtube_playlist_import_repair" || source === "youtube_playlist") &&
+    playlistList === listParam
+  );
+}
+
+function isRecentActiveSubmission(submission: SubmissionRow) {
+  const timestamp = submission.updated_at ?? submission.created_at;
+  if (!timestamp) return true;
+
+  const ageMs = Date.now() - new Date(timestamp).getTime();
+  return Number.isFinite(ageMs) && ageMs < 24 * 60 * 60 * 1000;
+}
+
 async function getAuthenticatedUser(req: Request, supabaseUrl: string, anonKey: string) {
   const authHeader = req.headers.get("Authorization");
   if (!authHeader) return { user: null, error: "Missing authorization header" };
@@ -110,37 +234,13 @@ Deno.serve(async (req: Request) => {
   }
 
   const playlistUrl = typeof body.playlist_url === "string" ? body.playlist_url.trim() : "";
-  const playlistId = typeof body.playlist_id === "string" ? body.playlist_id.trim() : "";
-  const submittedBy = typeof body.submitted_by_user_id === "string" && isUuid(body.submitted_by_user_id)
-    ? body.submitted_by_user_id
-    : user.id;
-
   if (!playlistUrl) return json({ error: "playlist_url is required" }, 400);
-  if (!playlistId || !isUuid(playlistId)) return json({ error: "playlist_id is required and must be a playlist UUID" }, 400);
-  if (submittedBy !== user.id) return json({ error: "submitted_by_user_id must match the authenticated user" }, 403);
 
   const listParam = extractPlaylistListParam(playlistUrl);
   const canonicalUrl = normalizeYoutubePlaylistUrl(playlistUrl);
   if (!listParam || !canonicalUrl) return json({ error: "Invalid YouTube playlist_url" }, 400);
 
   const supabase = createClient(supabaseUrl, serviceRoleKey, { auth: { persistSession: false } });
-
-  const { data: playlist, error: playlistError } = await supabase
-    .from("playlists")
-    .select("id,author_id")
-    .eq("id", playlistId)
-    .single();
-  if (playlistError || !playlist) return json({ error: "Playlist not found", details: playlistError?.message }, 404);
-
-  const { data: collaborator } = await supabase
-    .from("playlist_collaborators")
-    .select("id")
-    .eq("playlist_id", playlistId)
-    .eq("user_id", user.id)
-    .maybeSingle();
-  if (playlist.author_id !== user.id && !collaborator) {
-    return json({ error: "Only the playlist owner or collaborators can import YouTube playlists" }, 403);
-  }
 
   const htmlRes = await fetch(canonicalUrl, {
     headers: {
@@ -156,15 +256,17 @@ Deno.serve(async (req: Request) => {
   if (uniqueIds.length === 0) return json({ error: "No videos found in playlist HTML", playlist_list: listParam }, 404);
 
   const language = safeLanguage(body.language);
+  const metadataRows = await mapWithConcurrency(uniqueIds, 6, fetchVideoMetadata);
+  const metadataByYoutubeId = new Map(metadataRows.map((metadata) => [metadata.youtubeId, metadata]));
   const videoRowsToUpsert = uniqueIds.map((youtubeId) => ({
     youtube_id: youtubeId,
-    title: youtubeId,
+    title: metadataByYoutubeId.get(youtubeId)?.title ?? youtubeId,
     description: null,
-    channel_name: "YouTube",
+    channel_name: metadataByYoutubeId.get(youtubeId)?.channelName ?? "YouTube",
     duration_seconds: null,
-    thumbnail_url: thumbnailUrl(youtubeId),
+    thumbnail_url: metadataByYoutubeId.get(youtubeId)?.thumbnailUrl ?? thumbnailUrl(youtubeId),
     language,
-    submitted_by: submittedBy,
+    submitted_by: user.id,
     view_count: 0,
     is_featured: false,
   }));
@@ -172,93 +274,162 @@ Deno.serve(async (req: Request) => {
   for (let i = 0; i < videoRowsToUpsert.length; i += 100) {
     const { error } = await supabase
       .from("videos")
-      .upsert(videoRowsToUpsert.slice(i, i + 100), { onConflict: "youtube_id", ignoreDuplicates: false });
+      .upsert(videoRowsToUpsert.slice(i, i + 100), { onConflict: "youtube_id", ignoreDuplicates: true });
     if (error) return json({ error: "Failed upserting videos", details: error.message }, 500);
   }
 
   const { data: videoRows, error: videoRowsError } = await supabase
     .from("videos")
-    .select("id,youtube_id")
+    .select("id,youtube_id,title,description,channel_name,thumbnail_url")
     .in("youtube_id", uniqueIds);
   if (videoRowsError) return json({ error: "Failed fetching video ids", details: videoRowsError.message }, 500);
 
   const rows = (videoRows ?? []) as VideoRow[];
-  const byYoutubeId = new Map(rows.map((row) => [row.youtube_id, row.id]));
-  const videoIds = rows.map((row) => row.id);
 
-  const { data: existing, error: existingError } = await supabase
-    .from("playlist_videos")
-    .select("video_id")
-    .eq("playlist_id", playlistId)
-    .in("video_id", videoIds);
-  if (existingError) return json({ error: "Failed checking existing playlist_videos", details: existingError.message }, 500);
-
-  const existingSet = new Set((existing ?? []).map((row: { video_id: string }) => row.video_id));
-  const { data: lastPositionRows, error: lastPositionError } = await supabase
-    .from("playlist_videos")
-    .select("position")
-    .eq("playlist_id", playlistId)
-    .order("position", { ascending: false })
-    .limit(1);
-  if (lastPositionError) return json({ error: "Failed calculating playlist positions", details: lastPositionError.message }, 500);
-
-  const startPosition = lastPositionRows && lastPositionRows.length > 0 ? Number(lastPositionRows[0].position ?? 0) + 1 : 0;
-  const toAdd = uniqueIds
-    .map((youtubeId, idx) => {
-      const videoId = byYoutubeId.get(youtubeId);
-      if (!videoId || existingSet.has(videoId)) return null;
-      return { playlist_id: playlistId, video_id: videoId, position: startPosition + idx, added_by: submittedBy, notes: null };
+  const metadataRefreshRows = rows
+    .filter(shouldRefreshVideoMetadata)
+    .map((row) => {
+      const metadata = metadataByYoutubeId.get(row.youtube_id);
+      if (!metadata || metadata.title === row.youtube_id) return null;
+      return {
+        id: row.id,
+        title: metadata.title,
+        channel_name: metadata.channelName,
+        thumbnail_url: metadata.thumbnailUrl,
+      };
     })
     .filter((row): row is NonNullable<typeof row> => !!row);
 
-  if (toAdd.length > 0) {
-    const { error } = await supabase.from("playlist_videos").insert(toAdd);
-    if (error) return json({ error: "Failed inserting playlist_videos", details: error.message }, 500);
+  for (const row of metadataRefreshRows) {
+    const { error } = await supabase
+      .from("videos")
+      .update({
+        title: row.title,
+        channel_name: row.channel_name,
+        thumbnail_url: row.thumbnail_url,
+      })
+      .eq("id", row.id);
+    if (error) return json({ error: "Failed refreshing video metadata", details: error.message }, 500);
   }
 
-  const addedVideoIds = new Set(toAdd.map((row) => row.video_id));
-  const addedYoutubeIds = uniqueIds.filter((youtubeId) => {
-    const videoId = byYoutubeId.get(youtubeId);
-    return videoId ? addedVideoIds.has(videoId) : false;
-  });
+  const byYoutubeId = new Map(rows.map((row) => [row.youtube_id, row.id]));
+  const videoIds = rows.map((row) => row.id);
 
-  if (addedYoutubeIds.length > 0) {
-    const submissions = addedYoutubeIds.map((youtubeId) => ({
-      user_id: submittedBy,
+  const { data: enrichments, error: enrichmentsError } = await supabase
+    .from("ai_enrichments")
+    .select("video_id")
+    .in("video_id", videoIds);
+  if (enrichmentsError) return json({ error: "Failed checking existing enrichments", details: enrichmentsError.message }, 500);
+
+  const enrichedVideoIds = new Set((enrichments ?? []).map((row: { video_id: string }) => row.video_id));
+
+  const { data: existingSubmissions, error: existingSubmissionsError } = await supabase
+    .from("video_submissions")
+    .select("id, video_id, youtube_id, youtube_url, status, metadata, created_at, updated_at")
+    .eq("user_id", user.id)
+    .in("youtube_id", uniqueIds)
+    .in("status", ["pending", "processing", "recoverable_error"]);
+  if (existingSubmissionsError) {
+    return json({ error: "Failed checking existing video_submissions", details: existingSubmissionsError.message }, 500);
+  }
+
+  const existingImportSubmissionByYoutubeId = new Map<string, SubmissionRow>();
+  for (const submission of (existingSubmissions ?? []) as SubmissionRow[]) {
+    if (!isSameImportSubmission(submission, listParam)) continue;
+    if (!isRecentActiveSubmission(submission)) continue;
+    if (!existingImportSubmissionByYoutubeId.has(submission.youtube_id)) {
+      existingImportSubmissionByYoutubeId.set(submission.youtube_id, submission);
+    }
+  }
+
+  const results: ImportResult[] = [];
+  const youtubeIdsToQueue: string[] = [];
+
+  for (const youtubeId of uniqueIds) {
+    const videoId = byYoutubeId.get(youtubeId) ?? null;
+    const youtubeUrl = watchUrl(youtubeId);
+
+    if (videoId && enrichedVideoIds.has(videoId)) {
+      results.push({ youtube_id: youtubeId, video_id: videoId, youtube_url: youtubeUrl, status: "skipped_existing_enriched", submission_id: null });
+      continue;
+    }
+
+    const existingSubmission = existingImportSubmissionByYoutubeId.get(youtubeId);
+    if (existingSubmission) {
+      results.push({
+        youtube_id: youtubeId,
+        video_id: existingSubmission.video_id ?? videoId,
+        youtube_url: existingSubmission.youtube_url || youtubeUrl,
+        status: "already_queued",
+        submission_id: existingSubmission.id,
+      });
+      continue;
+    }
+
+    youtubeIdsToQueue.push(youtubeId);
+  }
+
+  let insertedSubmissions: Array<Pick<SubmissionRow, "id" | "video_id" | "youtube_id" | "youtube_url" | "status">> = [];
+
+  if (youtubeIdsToQueue.length > 0) {
+    const importedAt = new Date().toISOString();
+    const submissions = youtubeIdsToQueue.map((youtubeId) => ({
+      user_id: user.id,
       video_id: byYoutubeId.get(youtubeId) ?? null,
       youtube_id: youtubeId,
       youtube_url: watchUrl(youtubeId),
       status: "pending",
-      metadata: { source: "youtube_playlist", playlist_id: playlistId, playlist_list: listParam, playlist_url: canonicalUrl },
+      metadata: {
+        source: "youtube_playlist_import",
+        youtube_playlist_list: listParam,
+        youtube_playlist_url: canonicalUrl,
+        imported_at: importedAt,
+      },
       error_message: null,
       recoverable: false,
     }));
-    const { data: insertedSubmissions, error: subErr } = await supabase
+
+    const { data: insertedSubmissionRows, error: subErr } = await supabase
       .from("video_submissions")
       .insert(submissions)
       .select("id, video_id, youtube_id, youtube_url, status");
     if (subErr) return json({ error: "Failed inserting video_submissions", details: subErr.message }, 500);
 
-    return json({
-      playlist_id: playlistId,
-      playlist_list: listParam,
-      fetched_video_count: uniqueIds.length,
-      existing_in_playlist_count: existingSet.size,
-      added_to_playlist_count: toAdd.length,
-      pipeline_enqueued_count: addedYoutubeIds.length,
-      videos: addedYoutubeIds.map((youtubeId) => ({ youtube_id: youtubeId, video_id: byYoutubeId.get(youtubeId), youtube_url: watchUrl(youtubeId) })),
-      submissions: insertedSubmissions ?? [],
-    });
+    insertedSubmissions = insertedSubmissionRows ?? [];
+    for (const submission of insertedSubmissions) {
+      results.push({
+        youtube_id: submission.youtube_id,
+        video_id: submission.video_id,
+        youtube_url: submission.youtube_url,
+        status: "queued",
+        submission_id: submission.id,
+      });
+    }
   }
 
+  const queuedSubmissions = insertedSubmissions.map((submission) => ({
+    id: submission.id,
+    video_id: submission.video_id,
+    youtube_url: submission.youtube_url,
+    status: submission.status,
+  }));
+
   return json({
-    playlist_id: playlistId,
     playlist_list: listParam,
+    youtube_playlist_url: canonicalUrl,
     fetched_video_count: uniqueIds.length,
-    existing_in_playlist_count: existingSet.size,
-    added_to_playlist_count: toAdd.length,
-    pipeline_enqueued_count: addedYoutubeIds.length,
-    videos: addedYoutubeIds.map((youtubeId) => ({ youtube_id: youtubeId, video_id: byYoutubeId.get(youtubeId), youtube_url: watchUrl(youtubeId) })),
-    submissions: [],
+    created_video_count: rows.length,
+    skipped_existing_enriched_count: results.filter((result) => result.status === "skipped_existing_enriched").length,
+    already_queued_count: results.filter((result) => result.status === "already_queued").length,
+    created_submission_count: queuedSubmissions.length,
+    pipeline_enqueued_count: queuedSubmissions.length,
+    videos: results.map((result) => ({
+      youtube_id: result.youtube_id,
+      video_id: result.video_id,
+      youtube_url: result.youtube_url,
+      import_status: result.status,
+      submission_id: result.submission_id,
+    })),
+    submissions: queuedSubmissions,
   });
 });

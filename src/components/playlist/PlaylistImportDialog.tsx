@@ -18,9 +18,7 @@ import { Loader2, Youtube, ListVideo, Info, CheckCircle, AlertCircle } from 'luc
 import { toast } from 'sonner';
 import { useAuth } from '@/features/auth/useAuth';
 import { extractYouTubePlaylistId } from '@/shared/lib/youtube';
-import { useCreatePlaylist } from '@/features/playlists';
 import { getEdgeFunctionErrorDetails, invokeEdgeFunction } from '@/shared/api/supabase/edgeFunctions';
-import { generateSlug } from '@/shared/lib/slug';
 
 interface PlaylistImportDialogProps {
   children: React.ReactNode;
@@ -31,7 +29,6 @@ const importSchema = z.object({
     (url) => url.includes('youtube.com/playlist') || (url.includes('youtube.com/watch') && url.includes('list=')),
     'playlists.import.error.notYoutubePlaylistUrl'
   ),
-  playlistName: z.string().min(3, 'playlists.import.error.nameMinLength').max(100, 'playlists.import.error.nameMaxLength'),
 });
 
 type ImportFormValues = z.infer<typeof importSchema>;
@@ -45,8 +42,9 @@ type ImportedSubmission = {
 
 type ImportYoutubePlaylistResponse = {
   fetched_video_count: number;
-  added_to_playlist_count: number;
-  existing_in_playlist_count: number;
+  skipped_existing_enriched_count?: number;
+  already_queued_count?: number;
+  created_submission_count?: number;
   submissions?: ImportedSubmission[];
 };
 
@@ -83,37 +81,27 @@ export const PlaylistImportDialog: React.FC<PlaylistImportDialogProps> = ({ chil
   const { t } = useTranslation();
   const { user } = useAuth();
   const [open, setOpen] = useState(false);
-  const createPlaylistMutation = useCreatePlaylist();
 
   const {
     register,
     handleSubmit,
     reset,
-    setValue,
     watch,
     formState: { errors, isSubmitting },
   } = useForm<ImportFormValues>({
     resolver: zodResolver(importSchema),
     defaultValues: {
       playlistUrl: '',
-      playlistName: '',
     },
   });
 
   const playlistUrl = watch('playlistUrl');
-  const playlistName = watch('playlistName');
 
   useEffect(() => {
     if (!open) {
       reset();
     }
   }, [open, reset]);
-
-  useEffect(() => {
-    if (playlistUrl.includes('youtube.com/playlist') && !playlistName) {
-      setValue('playlistName', t('playlists.import.form.defaultPlaylistName'));
-    }
-  }, [playlistUrl, playlistName, setValue, t]);
 
   const playlistIdFromUrl = extractYouTubePlaylistId(playlistUrl);
   const playlistUrlFeedbackError = playlistUrl.trim() && !errors.playlistUrl && !playlistIdFromUrl
@@ -132,105 +120,71 @@ export const PlaylistImportDialog: React.FC<PlaylistImportDialogProps> = ({ chil
       return;
     }
 
-    const currentPlaylistName = values.playlistName;
-    let currentSlug = generateSlug(currentPlaylistName);
-    let retryCount = 0;
-    const MAX_RETRIES = 3;
-
-    while (retryCount < MAX_RETRIES) {
-      try {
-        const newPlaylist = await createPlaylistMutation.mutateAsync({
-          name: currentPlaylistName,
-          slug: currentSlug,
-          description: `Imported from YouTube playlist: ${values.playlistUrl}`,
-          thumbnail_url: null,
+    try {
+      const { data: edgeFunctionData, error: edgeFunctionError } = await invokeEdgeFunction<ImportYoutubePlaylistResponse>('import-youtube-playlist', {
+        body: {
+          playlist_url: values.playlistUrl,
           language: 'und',
-          is_public: true,
-          is_ordered: true,
-          course_code: null,
-          unit_code: null,
-        });
+          max_videos: 200,
+        },
+        headers: { 'Content-Type': 'application/json' },
+      });
 
-        const { data: edgeFunctionData, error: edgeFunctionError } = await invokeEdgeFunction<ImportYoutubePlaylistResponse>('import-youtube-playlist', {
+      if (edgeFunctionError) {
+        const details = await getEdgeFunctionErrorDetails(edgeFunctionError);
+        throw new Error(details.requestId ? `${details.message} (request ${details.requestId})` : details.message);
+      }
+
+      if (!edgeFunctionData) {
+        throw new Error(t('playlists.import.error.noImportResponse'));
+      }
+
+      const submissions = (edgeFunctionData.submissions ?? []).filter(isEnrichableSubmission);
+
+      let processedForEnrichment = 0;
+      let enrichFailedCount = 0;
+
+      await runWithConcurrencyLimit(submissions, 3, async (submission) => {
+        const { error } = await invokeEdgeFunction('enrich-video', {
           body: {
-            playlist_url: values.playlistUrl,
-            playlist_id: newPlaylist.id,
-            language: 'und',
-            max_videos: 200,
+            videoId: submission.video_id,
+            youtubeUrl: submission.youtube_url,
+            submissionId: submission.id,
           },
           headers: { 'Content-Type': 'application/json' },
         });
 
-        if (edgeFunctionError) {
-          const details = await getEdgeFunctionErrorDetails(edgeFunctionError);
-          throw new Error(details.requestId ? `${details.message} (request ${details.requestId})` : details.message);
-        }
-
-        if (!edgeFunctionData) {
-          throw new Error(t('playlists.import.error.noImportResponse'));
-        }
-
-        const submissions = (edgeFunctionData.submissions ?? []).filter(isEnrichableSubmission);
-
-        let processedForEnrichment = 0;
-        let enrichFailedCount = 0;
-
-        await runWithConcurrencyLimit(submissions, 3, async (submission) => {
-          const { error } = await invokeEdgeFunction('enrich-video', {
-            body: {
-              videoId: submission.video_id,
-              youtubeUrl: submission.youtube_url,
-              submissionId: submission.id,
-            },
-            headers: { 'Content-Type': 'application/json' },
-          });
-
-          if (error) {
-            enrichFailedCount += 1;
-            return;
-          }
-
-          processedForEnrichment += 1;
-        });
-
-        toast.success(t('playlists.import.success.summaryTitle'), {
-          description: t('playlists.import.success.summaryDescription', {
-            found: edgeFunctionData.fetched_video_count,
-            added: edgeFunctionData.added_to_playlist_count,
-            duplicates: edgeFunctionData.existing_in_playlist_count,
-            queued: processedForEnrichment,
-          }),
-        });
-
-        if (enrichFailedCount > 0) {
-          toast.warning(t('playlists.import.warning.enrichPartial', { failed: enrichFailedCount }));
-        }
-
-        setOpen(false);
-        return; // Exit on success
-      } catch (error) {
-        if (error && typeof error === 'object' && 'code' in error && error.code === '23505' && 'message' in error && typeof error.message === 'string' && error.message.includes('playlists_slug_key')) {
-          retryCount++;
-          const randomSuffix = Math.random().toString(36).substring(2, 8);
-          currentSlug = generateSlug(currentPlaylistName, randomSuffix);
-          // Retry with new slug to avoid duplicate key conflict
-        } else {
-          toast.error(t('playlists.import.error.generic'), {
-            description: error instanceof Error ? error.message : t('playlists.import.error.importFunctionFailed'),
-          });
-          setOpen(false);
+        if (error) {
+          enrichFailedCount += 1;
           return;
         }
-      }
-    }
 
-    toast.error(t('playlists.import.error.generic'), {
-      description: t('playlists.import.error.maxRetriesReached'),
-    });
-    setOpen(false);
+        processedForEnrichment += 1;
+      });
+
+      toast.success(t('playlists.import.success.summaryTitle'), {
+        description: t('playlists.import.success.summaryDescription', {
+          found: edgeFunctionData.fetched_video_count,
+          created: edgeFunctionData.created_submission_count ?? submissions.length,
+          existing: (edgeFunctionData.skipped_existing_enriched_count ?? 0) + (edgeFunctionData.already_queued_count ?? 0),
+          queued: processedForEnrichment,
+        }),
+      });
+
+      if (enrichFailedCount > 0) {
+        toast.warning(t('playlists.import.warning.enrichPartial', { failed: enrichFailedCount }));
+      }
+
+      setOpen(false);
+    } catch (error) {
+      toast.error(t('playlists.import.error.generic'), {
+        description: error instanceof Error ? error.message : t('playlists.import.error.importFunctionFailed'),
+      });
+      setOpen(false);
+    }
   };
 
-  const isFormDisabled = isSubmitting || createPlaylistMutation.isPending;
+  const isFormDisabled = isSubmitting;
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -273,22 +227,6 @@ export const PlaylistImportDialog: React.FC<PlaylistImportDialogProps> = ({ chil
             )}
             {playlistUrlFeedbackError && !errors.playlistUrl && (
               <p className="text-sm text-destructive">{playlistUrlFeedbackError}</p>
-            )}
-          </div>
-
-          {/* Playlist Name */}
-          <div className="space-y-2">
-            <Label htmlFor="playlistName">{t('playlists.import.form.nameLabel')} *</Label>
-            <Input
-              id="playlistName"
-              type="text"
-              placeholder={t('playlists.import.form.namePlaceholder')}
-              {...register('playlistName')}
-              aria-invalid={errors.playlistName ? "true" : "false"}
-              disabled={isFormDisabled}
-            />
-            {errors.playlistName && (
-              <p role="alert" className="text-sm text-destructive">{t(errors.playlistName.message as string)}</p>
             )}
           </div>
 

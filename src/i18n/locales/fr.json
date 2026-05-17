@@ -676,48 +676,41 @@
       "videos10plus": "10+ vidéos"
     },
     "import": {
-      "button": "Importer depuis YouTube",
-      "title": "Importer une playlist YouTube",
-      "description": "Collez l'URL d'une playlist YouTube pour l'importer comme nouvelle playlist, avec toutes ses vidéos.",
+      "button": "Importer des vidéos YouTube",
+      "title": "Importer les vidéos d'une playlist YouTube",
+      "description": "Collez l'URL d'une playlist YouTube pour envoyer ses vidéos dans le flux normal d'enrichissement et d'affectation éducative de Tube O2.",
       "form": {
         "urlLabel": "URL de la playlist YouTube",
         "urlPlaceholder": "https://www.youtube.com/playlist?list=...",
-        "nameLabel": "Nom de la playlist",
-        "namePlaceholder": "Nom de votre nouvelle playlist",
-        "defaultPlaylistName": "Playlist YouTube importée",
-        "importButton": "Importer la playlist",
+        "importButton": "Importer les vidéos",
         "importingButton": "Importation..."
       },
       "error": {
         "invalidUrl": "Veuillez entrer une URL de playlist YouTube valide.",
         "notYoutubePlaylistUrl": "Seules les URLs de playlists YouTube sont acceptées.",
-        "nameMinLength": "Le nom de la playlist doit comporter au moins 3 caractères.",
-        "nameMaxLength": "Le nom de la playlist ne peut pas dépasser 100 caractères.",
         "notLoggedIn": "Vous devez être connecté pour importer des playlists.",
         "noPlaylistId": "Impossible d'extraire un identifiant de playlist depuis l'URL fournie.",
         "generic": "Une erreur est survenue lors de l'importation de la playlist. Veuillez réessayer.",
         "importFunctionFailed": "Impossible d'exécuter l'importation de la playlist côté serveur.",
-        "maxRetriesReached": "Impossible de créer la playlist après plusieurs tentatives à cause d'un conflit de slug. Essayez avec un autre nom de playlist.",
         "noImportResponse": "La fonction d'importation n'a renvoyé aucune donnée.",
         "youtubeApiFetchFailed": "Échec de la récupération des détails de la playlist YouTube. Vérifiez l'URL ou réessayez plus tard.",
         "videoProcessingFailed": "Échec du traitement de la vidéo '{{title}}' : {{error}}",
         "youtubeApiKeyMissing": "La clé API YouTube est absente ou invalide sur le serveur. Veuillez contacter le support."
       },
       "success": {
-        "playlistCreated": "Playlist '{{name}}' créée avec succès !",
         "summaryTitle": "Importation terminée",
-        "summaryDescription": "Trouvées : {{found}} • Ajoutées : {{added}} • Doublons : {{duplicates}} • Envoyées au traitement : {{queued}}",
+        "summaryDescription": "Trouvées : {{found}} • Nouvelles soumissions : {{created}} • Déjà traitées : {{existing}} • Envoyées au traitement : {{queued}}",
         "videoAdded": "Vidéo '{{title}}' ajoutée à Tube O2.",
-        "allVideosProcessed": "{{count}} vidéos ont été importées dans la playlist avec succès."
+        "allVideosProcessed": "{{count}} vidéos ont été envoyées au traitement."
       },
       "info": {
         "videoAlreadyExists": "La vidéo '{{title}}' existe déjà dans Tube O2. Création ignorée."
       },
       "warning": {
         "enrichPartial": "{{failed}} vidéo(s) n'ont pas pu être envoyées au traitement pour le moment.",
-        "noVideosFoundInPlaylist": "Aucune vidéo trouvée dans la playlist YouTube. Une playlist vide sera créée."
+        "noVideosFoundInPlaylist": "Aucune vidéo n'a été trouvée dans la playlist YouTube."
       },
-      "apiLimitationInfo": "Tube O2 utilise un service backend pour récupérer les vidéos des playlists YouTube, mais dépend de l'API YouTube Data, qui possède des quotas et peut ne pas toujours renvoyer toutes les vidéos des très grandes playlists. Pour de meilleurs résultats, assurez-vous que la playlist est publique."
+      "apiLimitationInfo": "Tube O2 envoie les vidéos de playlists YouTube publiques dans le même flux d'enrichissement que les soumissions individuelles. Les vidéos ne sont ajoutées aux playlists éducatives qu'après confirmation d'une correspondance réelle."
     },
     "feedback": {
       "createSuccess": "Playlist créée avec succès !",

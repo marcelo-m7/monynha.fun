@@ -4,18 +4,10 @@ import userEvent from '@testing-library/user-event';
 import { renderWithProviders } from '@/shared/test/renderWithProviders';
 import { PlaylistImportDialog } from './PlaylistImportDialog';
 
-const mutateAsyncMock = vi.fn();
 const invokeEdgeFunctionMock = vi.fn();
 
 vi.mock('@/features/auth/useAuth', () => ({
   useAuth: () => ({ user: { id: 'user-1' } }),
-}));
-
-vi.mock('@/features/playlists', () => ({
-  useCreatePlaylist: () => ({
-    mutateAsync: mutateAsyncMock,
-    isPending: false,
-  }),
 }));
 
 vi.mock('@/shared/api/supabase/edgeFunctions', () => ({
@@ -33,20 +25,15 @@ vi.mock('sonner', () => ({
 
 describe('PlaylistImportDialog', () => {
   beforeEach(() => {
-    mutateAsyncMock.mockReset();
     invokeEdgeFunctionMock.mockReset();
-
-    mutateAsyncMock.mockResolvedValue({
-      id: '11111111-1111-4111-8111-111111111111',
-      name: 'Imported YouTube Playlist',
-    });
 
     invokeEdgeFunctionMock
       .mockResolvedValueOnce({
         data: {
           fetched_video_count: 5,
-          added_to_playlist_count: 3,
-          existing_in_playlist_count: 2,
+          created_submission_count: 3,
+          skipped_existing_enriched_count: 1,
+          already_queued_count: 1,
           submissions: [
             {
               id: 'sub-1',
@@ -76,11 +63,9 @@ describe('PlaylistImportDialog', () => {
       'https://youtube.com/playlist?list=PL7iAT8C5wumpQWB8AFW7CwK2nlzh8ZdP9',
     );
 
-    await waitFor(() => {
-      expect(screen.getByLabelText('Playlist Name *')).toHaveValue('Imported YouTube Playlist');
-    });
+    expect(screen.queryByLabelText('Playlist Name *')).not.toBeInTheDocument();
 
-    await user.click(screen.getByRole('button', { name: 'Import Playlist' }));
+    await user.click(screen.getByRole('button', { name: 'Import videos' }));
 
     await waitFor(() => {
       expect(invokeEdgeFunctionMock).toHaveBeenCalledWith(
@@ -88,13 +73,14 @@ describe('PlaylistImportDialog', () => {
         expect.objectContaining({
           body: expect.objectContaining({
             playlist_url: 'https://youtube.com/playlist?list=PL7iAT8C5wumpQWB8AFW7CwK2nlzh8ZdP9',
-            playlist_id: '11111111-1111-4111-8111-111111111111',
             language: 'und',
             max_videos: 200,
           }),
         }),
       );
     });
+
+    expect(invokeEdgeFunctionMock.mock.calls[0]?.[1]?.body).not.toHaveProperty('playlist_id');
 
     expect(invokeEdgeFunctionMock).toHaveBeenCalledWith(
       'enrich-video',
