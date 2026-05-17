@@ -483,6 +483,7 @@
         "assignment": "Atribuindo playlists",
         "storage": "Salvando resultados",
         "success": "Concluído",
+        "queued": "Na fila para processamento em segundo plano",
         "start_processing": "Iniciando processamento"
       }
     },

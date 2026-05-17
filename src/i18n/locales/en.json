@@ -390,6 +390,7 @@
         "assignment": "Assigning playlists",
         "storage": "Saving results",
         "success": "Completed",
+        "queued": "Queued for background processing",
         "start_processing": "Starting processing"
       }
     },

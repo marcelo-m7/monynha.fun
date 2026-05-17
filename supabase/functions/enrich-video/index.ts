@@ -9,6 +9,10 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 }
 
+declare const EdgeRuntime: {
+  waitUntil: (promise: Promise<unknown>) => void;
+};
+
 type CategoryRow = {
   id: string;
   name: string;
@@ -81,6 +85,15 @@ type TranscriptProcessingResult = {
   summary: string | null;
   confidence: number;
   errorMessage: string | null;
+};
+
+type VideoProcessingVideo = {
+  youtube_id: string;
+  title: string | null;
+  description: string | null;
+  channel_name: string | null;
+  language: string | null;
+  category_id: string | null;
 };
 
 function createRequestId() {
@@ -638,6 +651,296 @@ async function runEnhancedAssignments(params: {
   };
 }
 
+async function runVideoProcessingTask(params: {
+  supabaseServiceRole: ReturnType<typeof createClient>;
+  requestId: string;
+  submissionId: string | null;
+  videoId: string;
+  youtubeUrl: string;
+  userId: string;
+  video: VideoProcessingVideo;
+}) {
+  const {
+    supabaseServiceRole,
+    requestId,
+    submissionId,
+    videoId,
+    youtubeUrl,
+    userId,
+    video,
+  } = params;
+  let currentStage = 'background_start';
+
+  try {
+    currentStage = 'context_load';
+    if (submissionId) {
+      await updateSubmissionStage(supabaseServiceRole, submissionId, requestId, currentStage);
+    }
+
+    const { data: categoriesData, error: categoryFetchError } = await supabaseServiceRole
+      .from('categories')
+      .select('id, name, slug');
+    if (categoryFetchError) {
+      throw new Error(`Failed to load categories: ${categoryFetchError.message}`);
+    }
+    const categoryRows = (categoriesData ?? []) as CategoryRow[];
+
+    const effectiveLanguage = video.language && video.language !== 'und' ? video.language : 'pt';
+    const { data: playlistsByLanguage, error: playlistFetchError } = await supabaseServiceRole
+      .rpc('list_education_playlists_for_assignment', {
+        p_language: effectiveLanguage,
+        p_limit: 120,
+      });
+    if (playlistFetchError) {
+      throw new Error(`Failed to load playlists: ${playlistFetchError.message}`);
+    }
+
+    let playlistsData = playlistsByLanguage;
+    if (!playlistsData || playlistsData.length === 0) {
+      const { data: fallbackData, error: fallbackError } = await supabaseServiceRole
+        .rpc('list_education_playlists_for_assignment', {
+          p_language: null,
+          p_limit: 120,
+        });
+      if (fallbackError) {
+        throw new Error(`Failed to load fallback playlists: ${fallbackError.message}`);
+      }
+      playlistsData = fallbackData;
+    }
+    const playlistRows = (playlistsData ?? []) as PlaylistRow[];
+
+    currentStage = 'transcription';
+    if (submissionId) {
+      await updateSubmissionStage(supabaseServiceRole, submissionId, requestId, currentStage);
+    }
+    const transcriptResult = await processTranscript({
+      supabaseServiceRole,
+      requestId,
+      videoId,
+      youtubeUrl,
+      videoTitle: video.title || '',
+      effectiveLanguage,
+    });
+
+    currentStage = 'enrichment';
+    if (submissionId) {
+      await updateSubmissionStatusWithMetadataPatch(
+        supabaseServiceRole,
+        submissionId,
+        {},
+        {
+          ...processingMetadata(requestId, currentStage),
+          transcription: {
+            transcriptId: transcriptResult.id,
+            provider: transcriptResult.provider,
+            model: transcriptResult.providerModel,
+            status: transcriptResult.status,
+            summary: transcriptResult.summary,
+            language: transcriptResult.language,
+            confidence: transcriptResult.confidence,
+            errorMessage: transcriptResult.errorMessage,
+          },
+        },
+      );
+    }
+
+    let enrichment: EnrichmentPayload;
+    try {
+      const openaiClient = createOpenAIClient();
+      const enrichmentParams: VideoEnrichmentParams = {
+        title: video.title || '',
+        description: [video.description || '', transcriptResult.summary || ''].filter(Boolean).join('\n\nTranscript summary: '),
+        channelName: video.channel_name || null,
+        language: transcriptResult.language || effectiveLanguage,
+        categories: categoryRows,
+        playlists: playlistRows,
+      };
+      enrichment = await openaiClient.enrichVideo(enrichmentParams) as EnrichmentPayload;
+      logProcessing(requestId, currentStage, 'OpenAI enrichment completed', {
+        videoId,
+        suggestedCategoryId: enrichment.suggested_category_id,
+        suggestedPlaylistId: enrichment.suggested_playlist_id,
+      });
+    } catch (openaiError) {
+      const errorMsg = openaiError instanceof Error ? openaiError.message : 'Unknown OpenAI error';
+      logProcessingError(requestId, currentStage, 'OpenAI enrichment failed', { error: errorMsg });
+      throw new Error(`AI enrichment failed: ${errorMsg}`);
+    }
+
+    let enhancedAssignment = {
+      fallbackUsed: false,
+      reliability: 'low' as 'low' | 'high',
+      reason: 'Enhanced assignment not evaluated',
+      suggestedCategoryId: null as string | null,
+      assignedCategoryId: null as string | null,
+      assignedPlaylistId: null as string | null,
+      playlistAssignment: null as PlaylistAssignmentResult | null,
+    };
+
+    currentStage = 'assignment';
+    if (submissionId) {
+      await updateSubmissionStage(supabaseServiceRole, submissionId, requestId, currentStage);
+    }
+    try {
+      const assignment = await runEnhancedAssignments({
+        supabaseServiceRole,
+        enrichment,
+        categoryRows,
+        playlistRows,
+        videoId,
+        currentVideoCategoryId: video.category_id ?? null,
+        videoLanguage: effectiveLanguage,
+        videoTitle: video.title ?? null,
+        videoDescription: video.description ?? null,
+        channelName: video.channel_name ?? null,
+        userId,
+      });
+
+      enhancedAssignment = {
+        fallbackUsed: assignment.reliability === 'low',
+        reliability: assignment.reliability,
+        reason: assignment.reason,
+        suggestedCategoryId: assignment.reliability === 'high'
+          ? assignment.suggestedCategoryId
+          : null,
+        assignedCategoryId: assignment.assignedCategoryId,
+        assignedPlaylistId: assignment.assignedPlaylistId,
+        playlistAssignment: assignment.playlistAssignment,
+      };
+    } catch (assignmentError) {
+      const assignmentErrorMessage = assignmentError instanceof Error
+        ? assignmentError.message
+        : 'Unknown enhanced assignment error';
+
+      logProcessingError(requestId, currentStage, 'Enhanced assignment failed, continuing with enrichment only', {
+        error: assignmentErrorMessage,
+      });
+
+      enhancedAssignment = {
+        fallbackUsed: true,
+        reliability: 'low',
+        reason: `Fallback to legacy enrichment: ${assignmentErrorMessage}`,
+        suggestedCategoryId: null,
+        assignedCategoryId: null,
+        assignedPlaylistId: null,
+        playlistAssignment: null,
+      };
+    }
+
+    currentStage = 'storage';
+    if (submissionId) {
+      await updateSubmissionStage(supabaseServiceRole, submissionId, requestId, currentStage);
+    }
+    const { data, error } = await supabaseServiceRole
+      .from('ai_enrichments')
+      .insert({
+        video_id: videoId,
+        optimized_title: enrichment.optimized_title,
+        summary_description: enrichment.summary_description,
+        semantic_tags: enrichment.semantic_tags,
+        suggested_category_id: enhancedAssignment.suggestedCategoryId,
+        language: enrichment.language,
+        cultural_relevance: enrichment.cultural_relevance,
+        short_summary: enrichment.short_summary,
+      })
+      .select()
+      .single();
+
+    if (error) {
+      throw new Error(`Failed to save AI enrichment: ${error.message}`);
+    }
+
+    const detectedLanguage = normalizeLanguage(enrichment.language);
+    if (detectedLanguage && detectedLanguage !== 'und') {
+      const { error: updateLanguageError } = await supabaseServiceRole
+        .from('videos')
+        .update({ language: detectedLanguage })
+        .eq('id', videoId);
+
+      if (updateLanguageError) {
+        throw new Error(`Failed to update detected language: ${updateLanguageError.message}`);
+      }
+    }
+
+    if (submissionId) {
+      await updateSubmissionStatus(supabaseServiceRole, submissionId, {
+        status: 'success',
+        error_message: null,
+        recoverable: false,
+        completed_at: new Date().toISOString(),
+        metadata: {
+          processing: {
+            requestId,
+            stage: 'success',
+            updatedAt: new Date().toISOString(),
+          },
+          enrichmentId: data.id,
+          detectedLanguage,
+          transcription: {
+            transcriptId: transcriptResult.id,
+            provider: transcriptResult.provider,
+            model: transcriptResult.providerModel,
+            status: transcriptResult.status,
+            summary: transcriptResult.summary,
+            language: transcriptResult.language,
+            confidence: transcriptResult.confidence,
+            errorMessage: transcriptResult.errorMessage,
+          },
+          assignment: {
+            fallbackUsed: enhancedAssignment.fallbackUsed,
+            reliability: enhancedAssignment.reliability,
+            reason: enhancedAssignment.reason,
+            assignedCategoryId: enhancedAssignment.assignedCategoryId,
+            assignedPlaylistId: enhancedAssignment.assignedPlaylistId,
+            algorithmVersion: enhancedAssignment.playlistAssignment?.algorithmVersion ?? null,
+            score: enhancedAssignment.playlistAssignment?.score ?? null,
+            signals: enhancedAssignment.playlistAssignment?.signals ?? null,
+            topCandidates: enhancedAssignment.playlistAssignment?.topCandidates ?? [],
+            rejectedAiPlaylistId: enhancedAssignment.playlistAssignment?.rejectedAiPlaylistId ?? null,
+          },
+        },
+      });
+    }
+
+    logProcessing(requestId, 'success', 'Video processing completed', {
+      videoId,
+      submissionId: submissionId ?? 'none',
+      enrichmentId: data.id,
+      transcriptId: transcriptResult.id,
+      transcriptStatus: transcriptResult.status,
+    });
+  } catch (error) {
+    const errorPayload = toProcessingErrorPayload(error, requestId, currentStage);
+    logProcessingError(requestId, errorPayload.stage, 'Background video processing failed', {
+      code: errorPayload.code,
+      error: errorPayload.message,
+      recoverable: errorPayload.recoverable,
+      submissionId: submissionId ?? 'none',
+    });
+
+    await safeUpdateSubmissionStatusWithMetadataPatch(
+      supabaseServiceRole,
+      submissionId,
+      {
+        status: errorPayload.recoverable ? 'recoverable_error' : 'failed',
+        error_message: errorPayload.message,
+        recoverable: errorPayload.recoverable,
+        completed_at: new Date().toISOString(),
+      },
+      {
+        ...processingMetadata(requestId, errorPayload.stage),
+        error: {
+          code: errorPayload.code,
+          message: errorPayload.message,
+          stage: errorPayload.stage,
+          recoverable: errorPayload.recoverable,
+          requestId,
+        },
+      },
+    );
+  }
+}
+
 serve(async (req) => {
   const requestId = createRequestId();
 
@@ -832,260 +1135,43 @@ serve(async (req) => {
       await updateSubmissionStage(supabaseServiceRole, submissionId, requestId, currentStage);
     }
 
-    currentStage = 'context_load';
-    const { data: categoriesData, error: categoryFetchError } = await supabaseServiceRole
-      .from('categories')
-      .select('id, name, slug');
-    if (categoryFetchError) {
-      throw new Error(`Failed to load categories: ${categoryFetchError.message}`);
-    }
-    const categoryRows = (categoriesData ?? []) as CategoryRow[];
-
-    const effectiveLanguage = video.language && video.language !== 'und' ? video.language : 'pt';
-    const { data: playlistsByLanguage, error: playlistFetchError } = await supabaseServiceRole
-      .rpc('list_education_playlists_for_assignment', {
-        p_language: effectiveLanguage,
-        p_limit: 120,
+    if (typeof EdgeRuntime === 'undefined' || typeof EdgeRuntime.waitUntil !== 'function') {
+      throw new HttpError('Edge background processing is unavailable', 500, {
+        code: 'BACKGROUND_RUNTIME_UNAVAILABLE',
+        stage: currentStage,
+        recoverable: true,
       });
-    if (playlistFetchError) {
-      throw new Error(`Failed to load playlists: ${playlistFetchError.message}`);
     }
-    let playlistsData = playlistsByLanguage;
-    if (!playlistsData || playlistsData.length === 0) {
-      const { data: fallbackData, error: fallbackError } = await supabaseServiceRole
-        .rpc('list_education_playlists_for_assignment', {
-          p_language: null,
-          p_limit: 120,
-        });
-      if (fallbackError) {
-        throw new Error(`Failed to load fallback playlists: ${fallbackError.message}`);
-      }
-      playlistsData = fallbackData;
-    }
-    const playlistRows = (playlistsData ?? []) as PlaylistRow[];
 
-    currentStage = 'transcription';
+    currentStage = 'queued';
     if (submissionId) {
       await updateSubmissionStage(supabaseServiceRole, submissionId, requestId, currentStage);
     }
-    const transcriptResult = await processTranscript({
+
+    EdgeRuntime.waitUntil(runVideoProcessingTask({
       supabaseServiceRole,
       requestId,
+      submissionId,
       videoId,
       youtubeUrl,
-      videoTitle: video.title || '',
-      effectiveLanguage,
-    });
+      userId: user.id,
+      video: video as VideoProcessingVideo,
+    }));
 
-    currentStage = 'enrichment';
-    if (submissionId) {
-      await updateSubmissionStatusWithMetadataPatch(
-        supabaseServiceRole,
-        submissionId,
-        {},
-        {
-          ...processingMetadata(requestId, currentStage),
-          transcription: {
-            transcriptId: transcriptResult.id,
-            provider: transcriptResult.provider,
-            model: transcriptResult.providerModel,
-            status: transcriptResult.status,
-            summary: transcriptResult.summary,
-            language: transcriptResult.language,
-            confidence: transcriptResult.confidence,
-            errorMessage: transcriptResult.errorMessage,
-          },
-        },
-      );
-    }
-    let enrichment: EnrichmentPayload;
-    try {
-      const openaiClient = createOpenAIClient();
-      const enrichmentParams: VideoEnrichmentParams = {
-        title: video.title || '',
-        description: [video.description || '', transcriptResult.summary || ''].filter(Boolean).join('\n\nTranscript summary: '),
-        channelName: video.channel_name || null,
-        language: transcriptResult.language || effectiveLanguage,
-        categories: categoryRows,
-        playlists: playlistRows,
-      };
-      enrichment = await openaiClient.enrichVideo(enrichmentParams) as EnrichmentPayload;
-      logProcessing(requestId, currentStage, 'OpenAI enrichment completed', {
-        videoId,
-        suggestedCategoryId: enrichment.suggested_category_id,
-        suggestedPlaylistId: enrichment.suggested_playlist_id,
-      });
-    } catch (openaiError) {
-      const errorMsg = openaiError instanceof Error ? openaiError.message : 'Unknown OpenAI error';
-      logProcessingError(requestId, currentStage, 'OpenAI enrichment failed', { error: errorMsg });
-      throw new Error(`AI enrichment failed: ${errorMsg}`);
-    }
-
-    let enhancedAssignment = {
-      fallbackUsed: false,
-      reliability: 'low' as 'low' | 'high',
-      reason: 'Enhanced assignment not evaluated',
-      suggestedCategoryId: null as string | null,
-      assignedCategoryId: null as string | null,
-      assignedPlaylistId: null as string | null,
-      playlistAssignment: null as PlaylistAssignmentResult | null,
-    };
-
-    currentStage = 'assignment';
-    if (submissionId) {
-      await updateSubmissionStage(supabaseServiceRole, submissionId, requestId, currentStage);
-    }
-    try {
-      const assignment = await runEnhancedAssignments({
-        supabaseServiceRole,
-        enrichment,
-        categoryRows,
-        playlistRows,
-        videoId,
-        currentVideoCategoryId: video.category_id ?? null,
-        videoLanguage: effectiveLanguage,
-        videoTitle: video.title ?? null,
-        videoDescription: video.description ?? null,
-        channelName: video.channel_name ?? null,
-        userId: user.id,
-      });
-
-      enhancedAssignment = {
-        fallbackUsed: assignment.reliability === 'low',
-        reliability: assignment.reliability,
-        reason: assignment.reason,
-        suggestedCategoryId: assignment.reliability === 'high'
-          ? assignment.suggestedCategoryId
-          : null,
-        assignedCategoryId: assignment.assignedCategoryId,
-        assignedPlaylistId: assignment.assignedPlaylistId,
-        playlistAssignment: assignment.playlistAssignment,
-      };
-    } catch (assignmentError) {
-      const assignmentErrorMessage = assignmentError instanceof Error
-        ? assignmentError.message
-        : 'Unknown enhanced assignment error';
-
-      logProcessingError(requestId, currentStage, 'Enhanced assignment failed, continuing with enrichment only', {
-        error: assignmentErrorMessage,
-      });
-
-      enhancedAssignment = {
-        fallbackUsed: true,
-        reliability: 'low',
-        reason: `Fallback to legacy enrichment: ${assignmentErrorMessage}`,
-        suggestedCategoryId: null,
-        assignedCategoryId: null,
-        assignedPlaylistId: null,
-        playlistAssignment: null,
-      };
-    }
-
-    currentStage = 'storage';
-    if (submissionId) {
-      await updateSubmissionStage(supabaseServiceRole, submissionId, requestId, currentStage);
-    }
-    const { data, error } = await supabaseServiceRole
-      .from('ai_enrichments')
-      .insert({
-        video_id: videoId,
-        optimized_title: enrichment.optimized_title,
-        summary_description: enrichment.summary_description,
-        semantic_tags: enrichment.semantic_tags,
-        suggested_category_id: enhancedAssignment.suggestedCategoryId,
-        language: enrichment.language,
-        cultural_relevance: enrichment.cultural_relevance,
-        short_summary: enrichment.short_summary,
-      })
-      .select()
-      .single();
-
-    if (error) {
-      throw new Error(`Failed to save AI enrichment: ${error.message}`);
-    }
-
-    const detectedLanguage = normalizeLanguage(enrichment.language);
-    if (detectedLanguage && detectedLanguage !== 'und') {
-      const { error: updateLanguageError } = await supabaseServiceRole
-        .from('videos')
-        .update({ language: detectedLanguage })
-        .eq('id', videoId);
-
-      if (updateLanguageError) {
-        throw new Error(`Failed to update detected language: ${updateLanguageError.message}`);
-      }
-    }
-
-    if (submissionId) {
-      await updateSubmissionStatus(supabaseServiceRole, submissionId, {
-        status: 'success',
-        error_message: null,
-        recoverable: false,
-        completed_at: new Date().toISOString(),
-        metadata: {
-          processing: {
-            requestId,
-            stage: 'success',
-            updatedAt: new Date().toISOString(),
-          },
-          enrichmentId: data.id,
-          detectedLanguage,
-          transcription: {
-            transcriptId: transcriptResult.id,
-            provider: transcriptResult.provider,
-            model: transcriptResult.providerModel,
-            status: transcriptResult.status,
-            summary: transcriptResult.summary,
-            language: transcriptResult.language,
-            confidence: transcriptResult.confidence,
-            errorMessage: transcriptResult.errorMessage,
-          },
-          assignment: {
-            fallbackUsed: enhancedAssignment.fallbackUsed,
-            reliability: enhancedAssignment.reliability,
-            reason: enhancedAssignment.reason,
-            assignedCategoryId: enhancedAssignment.assignedCategoryId,
-            assignedPlaylistId: enhancedAssignment.assignedPlaylistId,
-            algorithmVersion: enhancedAssignment.playlistAssignment?.algorithmVersion ?? null,
-            score: enhancedAssignment.playlistAssignment?.score ?? null,
-            signals: enhancedAssignment.playlistAssignment?.signals ?? null,
-            topCandidates: enhancedAssignment.playlistAssignment?.topCandidates ?? [],
-            rejectedAiPlaylistId: enhancedAssignment.playlistAssignment?.rejectedAiPlaylistId ?? null,
-          },
-        },
-      });
-    }
-
-    logProcessing(requestId, 'success', 'Video processing completed', {
+    logProcessing(requestId, currentStage, 'Video processing accepted for background execution', {
       videoId,
       submissionId: submissionId ?? 'none',
-      enrichmentId: data.id,
-      transcriptId: transcriptResult.id,
-      transcriptStatus: transcriptResult.status,
+      userId: user.id,
     });
 
     return new Response(JSON.stringify({
-      message: 'Video processing completed successfully',
-      data,
-      transcription: {
-        transcript_id: transcriptResult.id,
-        provider: transcriptResult.provider,
-        model: transcriptResult.providerModel,
-        status: transcriptResult.status,
-        summary: transcriptResult.summary,
-        language: transcriptResult.language,
-        confidence: transcriptResult.confidence,
-      },
-      assignment: {
-        fallback_used: enhancedAssignment.fallbackUsed,
-        reliability: enhancedAssignment.reliability,
-        reason: enhancedAssignment.reason,
-        assigned_category_id: enhancedAssignment.assignedCategoryId,
-        assigned_playlist_id: enhancedAssignment.assignedPlaylistId,
-      },
+      message: 'Video processing started',
+      requestId,
+      submissionId,
+      status: 'processing',
     }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      status: 200,
+      status: 202,
     })
   } catch (error) {
     const errorPayload = toProcessingErrorPayload(error, requestId, currentStage);
