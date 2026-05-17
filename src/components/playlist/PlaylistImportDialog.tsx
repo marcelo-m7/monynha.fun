@@ -50,6 +50,16 @@ type ImportYoutubePlaylistResponse = {
   submissions?: ImportedSubmission[];
 };
 
+type EnrichableSubmission = {
+  id: string;
+  video_id: string;
+  youtube_url: string;
+};
+
+function isEnrichableSubmission(submission: ImportedSubmission): submission is EnrichableSubmission {
+  return !!submission.id && !!submission.video_id && !!submission.youtube_url;
+}
+
 async function runWithConcurrencyLimit<T>(
   items: T[],
   limit: number,
@@ -160,9 +170,7 @@ export const PlaylistImportDialog: React.FC<PlaylistImportDialogProps> = ({ chil
           throw new Error(t('playlists.import.error.noImportResponse'));
         }
 
-        const submissions = (edgeFunctionData.submissions ?? []).filter(
-          (submission) => !!submission.id && !!submission.video_id && !!submission.youtube_url,
-        ) as Array<Required<Pick<ImportedSubmission, 'id' | 'video_id' | 'youtube_url'>>>;
+        const submissions = (edgeFunctionData.submissions ?? []).filter(isEnrichableSubmission);
 
         let processedForEnrichment = 0;
         let enrichFailedCount = 0;
