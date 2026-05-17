@@ -335,6 +335,7 @@ function createDefaultAssignment(reason: string, providerError: string | null = 
       math: 0,
       design: 0,
       programming: 0,
+      database: 0,
       business: 0,
       language: 0,
       science: 0,
@@ -546,12 +547,16 @@ async function runVideoProcessingTask(params: {
     }
 
     if (submissionId) {
-      await updateSubmissionStatus(supabaseServiceRole, submissionId, {
-        status: 'success',
-        error_message: null,
-        recoverable: false,
-        completed_at: new Date().toISOString(),
-        metadata: {
+      await updateSubmissionStatusWithMetadataPatch(
+        supabaseServiceRole,
+        submissionId,
+        {
+          status: 'success',
+          error_message: null,
+          recoverable: false,
+          completed_at: new Date().toISOString(),
+        },
+        {
           processing: {
             requestId,
             stage: 'success',
@@ -601,7 +606,7 @@ async function runVideoProcessingTask(params: {
             rejectedAiPlaylistId: assignment.rejectedPlaylistId,
           },
         },
-      });
+      );
     }
 
     logProcessing(requestId, 'success', 'Video processing completed', {
@@ -796,15 +801,19 @@ serve(async (req) => {
 
       submissionBelongsToUser = true;
 
-      await updateSubmissionStatus(supabaseServiceRole, submissionId, {
-        video_id: videoId,
-        status: 'processing',
-        error_message: null,
-        recoverable: false,
-        processing_started_at: new Date().toISOString(),
-        completed_at: null,
-        metadata: processingMetadata(requestId, currentStage),
-      });
+      await updateSubmissionStatusWithMetadataPatch(
+        supabaseServiceRole,
+        submissionId,
+        {
+          video_id: videoId,
+          status: 'processing',
+          error_message: null,
+          recoverable: false,
+          processing_started_at: new Date().toISOString(),
+          completed_at: null,
+        },
+        processingMetadata(requestId, currentStage),
+      );
     }
 
     currentStage = 'video_load';

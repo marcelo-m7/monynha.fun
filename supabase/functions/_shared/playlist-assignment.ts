@@ -2,6 +2,7 @@ export type SubjectSignal =
   | 'math'
   | 'design'
   | 'programming'
+  | 'database'
   | 'business'
   | 'language'
   | 'science'
@@ -101,12 +102,36 @@ const subjectKeywords: Record<SubjectSignal, string[]> = {
     'node',
     'codigo',
     'algoritmo',
-    'dados',
     'software',
     'linux',
     'windows',
     'ciberseguranca',
     'seguranca',
+  ],
+  database: [
+    'sql',
+    'sql server',
+    't-sql',
+    'database',
+    'banco',
+    'banco de dados',
+    'base de dados',
+    'dados',
+    'tabela',
+    'tabelas',
+    'consulta',
+    'consultas',
+    'query',
+    'queries',
+    'procedure',
+    'procedures',
+    'trigger',
+    'triggers',
+    'view',
+    'views',
+    'stored procedure',
+    'sequencia',
+    'sequence',
   ],
   business: [
     'negocio',
@@ -188,6 +213,7 @@ function getSubjectSignals(sourceText: string): Record<SubjectSignal, number> {
     math: subjectSignalScore(sourceText, 'math'),
     design: subjectSignalScore(sourceText, 'design'),
     programming: subjectSignalScore(sourceText, 'programming'),
+    database: subjectSignalScore(sourceText, 'database'),
     business: subjectSignalScore(sourceText, 'business'),
     language: subjectSignalScore(sourceText, 'language'),
     science: subjectSignalScore(sourceText, 'science'),
@@ -221,6 +247,11 @@ function isGeneralEducationPlaylist(playlist: PlaylistAssignmentPlaylist): boole
     text.includes('educacao') ||
     text.includes('education')
   );
+}
+
+function isDatabasePlaylist(playlist: PlaylistAssignmentPlaylist): boolean {
+  const text = normalizeText(playlistText(playlist));
+  return text.includes('base de dados') || text.includes('sql') || text.includes('database');
 }
 
 function playlistSubjectScore(playlist: PlaylistAssignmentPlaylist, subject: SubjectSignal): number {
@@ -258,6 +289,14 @@ function scorePlaylist(params: {
   for (const subject of Object.keys(signals) as SubjectSignal[]) {
     if (signals[subject] > 0) {
       score += Math.min(12, signals[subject] * playlistSubjectScore(playlist, subject) * 2);
+    }
+  }
+
+  if (signals.database >= 2) {
+    if (isDatabasePlaylist(playlist)) {
+      score += 8;
+    } else if (normalizeText(playlistText(playlist)).includes('algoritmos')) {
+      score -= 4;
     }
   }
 
@@ -352,11 +391,20 @@ export function assignPlaylist(params: {
   const best = scoredCandidates[0] ?? null;
   const runnerUp = scoredCandidates[1] ?? null;
   if (!assignedPlaylistId && !suggestedCandidate && best?.compatible) {
+    const bestPlaylist = playlists.find((playlist) => playlist.id === best.playlistId) ?? null;
     const margin = best.score - (runnerUp?.score ?? 0);
-    if (best.score >= MIN_DETERMINISTIC_PLAYLIST_SCORE && margin >= 4) {
+    const strongDatabaseMatch =
+      signals.database >= 2 &&
+      !!bestPlaylist &&
+      isDatabasePlaylist(bestPlaylist) &&
+      best.score >= MIN_DETERMINISTIC_PLAYLIST_SCORE;
+
+    if (strongDatabaseMatch || (best.score >= MIN_DETERMINISTIC_PLAYLIST_SCORE && margin >= 4)) {
       assignedPlaylistId = best.playlistId;
       score = best.score;
-      reason = 'Deterministic scoring selected a strong curricular playlist match.';
+      reason = strongDatabaseMatch
+        ? 'Deterministic scoring selected a strong database playlist match.'
+        : 'Deterministic scoring selected a strong curricular playlist match.';
       decisionSource = 'deterministic';
     }
   }

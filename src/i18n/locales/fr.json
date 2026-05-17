@@ -676,43 +676,41 @@
       "videos10plus": "10+ vidéos"
     },
     "import": {
-      "button": "Importar de YouTube",
-      "title": "Importar Lista de Reproducción de YouTube",
-      "description": "Pega una URL de una lista de reproducción de YouTube para importarla como una nueva lista de reproducción, incluyendo todos sus videos.",
+      "button": "Importer des vidéos YouTube",
+      "title": "Importer les vidéos d'une playlist YouTube",
+      "description": "Collez l'URL d'une playlist YouTube pour envoyer ses vidéos dans le flux normal d'enrichissement et d'affectation éducative de Tube O2.",
       "form": {
-        "urlLabel": "URL de la Lista de Reproducción de YouTube",
+        "urlLabel": "URL de la playlist YouTube",
         "urlPlaceholder": "https://www.youtube.com/playlist?list=...",
-        "nameLabel": "Nombre de la Lista de Reproducción",
-        "namePlaceholder": "Nombre para tu nueva lista de reproducción",
-        "defaultPlaylistName": "Lista de Reproducción Importada de YouTube",
-        "importButton": "Importar Lista de Reproducción",
-        "importingButton": "Importando..."
+        "importButton": "Importer les vidéos",
+        "importingButton": "Importation..."
       },
       "error": {
-        "invalidUrl": "Por favor, introduce una URL de lista de reproducción de YouTube válida.",
-        "notYoutubePlaylistUrl": "Solo se aceptan URLs de listas de reproducción de YouTube.",
-        "nameMinLength": "El nombre de la lista de reproducción debe tener al menos 3 caracteres.",
-        "nameMaxLength": "El nombre de la lista de reproducción no puede exceder los 100 caracteres.",
-        "notLoggedIn": "Debes iniciar sesión para importar listas de reproducción.",
-        "noPlaylistId": "No se pudo extraer un ID de lista de reproducción de la URL proporcionada.",
-        "generic": "Ocurrió un error durante la importación de la lista de reproducción. Por favor, inténtalo de nuevo.",
-        "maxRetriesReached": "No se pudo crear la lista de reproducción después de varios intentos debido a un conflicto de slug. Por favor, intenta con un nombre de playlist diferente.",
-        "youtubeApiFetchFailed": "Error al obtener los detalles de la lista de reproducción de YouTube. Por favor, verifica la URL o inténtalo de nuevo más tarde.",
-        "videoProcessingFailed": "Error al procesar el video '{{title}}': {{error}}",
-        "youtubeApiKeyMissing": "La clave de API de YouTube no está configurada ou est invalide sur le serveur. Veuillez contacter le support."
+        "invalidUrl": "Veuillez entrer une URL de playlist YouTube valide.",
+        "notYoutubePlaylistUrl": "Seules les URLs de playlists YouTube sont acceptées.",
+        "notLoggedIn": "Vous devez être connecté pour importer des playlists.",
+        "noPlaylistId": "Impossible d'extraire un identifiant de playlist depuis l'URL fournie.",
+        "generic": "Une erreur est survenue lors de l'importation de la playlist. Veuillez réessayer.",
+        "importFunctionFailed": "Impossible d'exécuter l'importation de la playlist côté serveur.",
+        "noImportResponse": "La fonction d'importation n'a renvoyé aucune donnée.",
+        "youtubeApiFetchFailed": "Échec de la récupération des détails de la playlist YouTube. Vérifiez l'URL ou réessayez plus tard.",
+        "videoProcessingFailed": "Échec du traitement de la vidéo '{{title}}' : {{error}}",
+        "youtubeApiKeyMissing": "La clé API YouTube est absente ou invalide sur le serveur. Veuillez contacter le support."
       },
       "success": {
-        "playlistCreated": "¡Lista de reproducción '{{name}}' creada con éxito!",
+        "summaryTitle": "Importation terminée",
+        "summaryDescription": "Trouvées : {{found}} • Nouvelles soumissions : {{created}} • Déjà traitées : {{existing}} • Envoyées au traitement : {{queued}}",
         "videoAdded": "Vidéo '{{title}}' ajoutée à Tube O2.",
-        "allVideosProcessed": "Se importaron {{count}} videos a la lista de reproducción con éxito."
+        "allVideosProcessed": "{{count}} vidéos ont été envoyées au traitement."
       },
       "info": {
         "videoAlreadyExists": "La vidéo '{{title}}' existe déjà dans Tube O2. Création ignorée."
       },
       "warning": {
-        "noVideosFoundInPlaylist": "No se encontraron videos en la lista de reproducción de YouTube. Se creará una lista de reproducción vacía."
+        "enrichPartial": "{{failed}} vidéo(s) n'ont pas pu être envoyées au traitement pour le moment.",
+        "noVideosFoundInPlaylist": "Aucune vidéo n'a été trouvée dans la playlist YouTube."
       },
-      "apiLimitationInfo": "Tube O2 utilise un service backend pour récupérer les vidéos des playlists YouTube, mais dépend de l'API YouTube Data, qui possède des quotas et peut ne pas toujours renvoyer toutes les vidéos des très grandes playlists. Pour de meilleurs résultats, assurez-vous que la playlist est publique."
+      "apiLimitationInfo": "Tube O2 envoie les vidéos de playlists YouTube publiques dans le même flux d'enrichissement que les soumissions individuelles. Les vidéos ne sont ajoutées aux playlists éducatives qu'après confirmation d'une correspondance réelle."
     },
     "feedback": {
       "createSuccess": "Playlist créée avec succès !",

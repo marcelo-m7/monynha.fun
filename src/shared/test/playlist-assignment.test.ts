@@ -46,6 +46,16 @@ const playlists: PlaylistAssignmentPlaylist[] = [
     course_code: 'LESTI',
     unit_code: '19411001',
   },
+  {
+    id: 'database-i',
+    name: 'Base de Dados I - 2º Ano 1º Semestre - LESTI',
+    description: 'Modelacao, SQL, consultas, tabelas, procedures e fundamentos de sistemas de bases de dados.',
+    language: 'pt',
+    is_public: true,
+    is_ordered: true,
+    course_code: 'LESTI',
+    unit_code: '19411010',
+  },
 ];
 
 const baseAnalysis: PlaylistAssignmentAnalysis = {
@@ -178,5 +188,25 @@ describe('playlist assignment', () => {
     expect(result.assignedPlaylistId).toBeNull();
     expect(result.rejectedPlaylistId).toBe('programming');
     expect(result.reason).toContain('confidence');
+  });
+
+  it('prioritizes database playlists for SQL Server lessons', () => {
+    const result = assignPlaylist({
+      playlists,
+      analysis: {
+        ...baseAnalysis,
+        title: 'SQL SERVER - PROCEDURES - Como criar, executar e apagar',
+        semanticTags: ['sql server', 'procedures', 'base de dados', 'consultas sql'],
+        summaryDescription: 'Aula sobre criacao e execucao de procedures em SQL Server.',
+        shortSummary: 'Procedures em SQL Server.',
+        suggestedPlaylistId: null,
+        suggestedPlaylistQuery: 'sql server base de dados',
+        classificationConfidence: 0.9,
+      },
+    });
+
+    expect(result.assignedPlaylistId).toBe('database-i');
+    expect(result.decisionSource).toBe('deterministic');
+    expect(result.topCandidates[0].playlistId).toBe('database-i');
   });
 });
