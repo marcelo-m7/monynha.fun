@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { AlertCircle, ArrowLeft, CheckCircle2, CopyCheck, ListVideo, Loader2, RefreshCw, Wand2 } from 'lucide-react';
+import { AlertCircle, ArrowLeft, CheckCircle2, CopyCheck, ListChecks, ListVideo, Loader2, RefreshCw, Sparkles, Tag, Wand2 } from 'lucide-react';
 import { MainLayout } from '@/components/layout/MainLayout';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
@@ -78,7 +78,17 @@ export default function SubmitStatus() {
   const analysis = metadata.analysis ?? metadata.transcription ?? null;
   const transcript = metadata.transcription;
   const transcriptError = analysis?.errorMessage ?? transcript?.error ?? null;
-  const semanticTags = metadata.analysis?.semanticTags ?? [];
+  const semanticTags = metadata.analysis?.semanticTags ?? metadata.enrichment?.semanticTags ?? [];
+  const summaryText = metadata.analysis?.summary
+    ?? metadata.enrichment?.summaryDescription
+    ?? metadata.enrichment?.shortSummary
+    ?? metadata.transcription?.summary
+    ?? null;
+  const optimizedTitle = metadata.analysis?.optimizedTitle ?? metadata.enrichment?.optimizedTitle ?? null;
+  const topCandidates = metadata.assignment?.topCandidates ?? [];
+  const rejectedPlaylist = metadata.assignment?.rejectedPlaylistId
+    ? topCandidates.find((candidate) => candidate.playlistId === metadata.assignment?.rejectedPlaylistId) ?? null
+    : null;
 
   const handleRetry = () => {
     if (!submission?.video_id || !submission.youtube_url) {
@@ -211,14 +221,27 @@ export default function SubmitStatus() {
                   </p>
                 </div>
               )}
-              {analysis?.summary && (
-                <div className="rounded-md border border-border p-4 sm:col-span-2">
-                  <p className="text-xs font-medium uppercase text-muted-foreground">{t('submitStatus.analysis.label')}</p>
-                  <p className="mt-1 text-sm text-muted-foreground">{analysis.summary}</p>
+              {(summaryText || semanticTags.length > 0 || optimizedTitle) && (
+                <div className="rounded-md border border-border bg-muted/20 p-4 sm:col-span-2">
+                  <div className="flex items-start gap-3">
+                    <Sparkles className="mt-0.5 h-5 w-5 shrink-0 text-primary" />
+                    <div className="min-w-0 flex-1">
+                      <p className="text-xs font-medium uppercase text-muted-foreground">{t('submitStatus.analysis.label')}</p>
+                      {optimizedTitle && (
+                        <p className="mt-1 text-sm font-medium">{optimizedTitle}</p>
+                      )}
+                      {summaryText && (
+                        <p className="mt-2 text-sm text-muted-foreground">{summaryText}</p>
+                      )}
+                    </div>
+                  </div>
                   {semanticTags.length > 0 && (
                     <div className="mt-3 flex flex-wrap gap-2">
                       {semanticTags.map((tag) => (
-                        <Badge key={tag} variant="secondary">{tag}</Badge>
+                        <Badge key={tag} variant="secondary" className="gap-1">
+                          <Tag className="h-3 w-3" />
+                          {tag}
+                        </Badge>
                       ))}
                     </div>
                   )}
@@ -262,7 +285,42 @@ export default function SubmitStatus() {
                           {t('submitStatus.assignment.providerError')}: {metadata.assignment.providerError}
                         </p>
                       )}
+                      {rejectedPlaylist && (
+                        <p className="mt-1 text-xs text-muted-foreground">
+                          {t('submitStatus.assignment.rejectedLabel')}: {rejectedPlaylist.name}
+                        </p>
+                      )}
                     </div>
+                  </div>
+                </div>
+              )}
+              {topCandidates.length > 0 && (
+                <div className="rounded-md border border-border p-4 sm:col-span-2">
+                  <div className="mb-3 flex items-center gap-2">
+                    <ListChecks className="h-4 w-4 text-primary" />
+                    <p className="text-xs font-medium uppercase text-muted-foreground">
+                      {t('submitStatus.assignment.candidatesLabel')}
+                    </p>
+                  </div>
+                  <div className="space-y-2">
+                    {topCandidates.slice(0, 3).map((candidate) => (
+                      <div key={candidate.playlistId} className="flex flex-col gap-2 rounded-md bg-muted/30 p-3 sm:flex-row sm:items-center sm:justify-between">
+                        <div className="min-w-0">
+                          <p className="truncate text-sm font-medium">{candidate.name}</p>
+                          <p className="text-xs text-muted-foreground">
+                            {t('submitStatus.assignment.scoreLabel')}: {candidate.score ?? 0}
+                          </p>
+                        </div>
+                        <div className="flex flex-wrap gap-2">
+                          {candidate.isAiSuggested || candidate.aiSuggested ? (
+                            <Badge variant="secondary">{t('submitStatus.assignment.openaiSuggested')}</Badge>
+                          ) : null}
+                          {candidate.compatible ? (
+                            <Badge variant="outline">{t('submitStatus.assignment.compatible')}</Badge>
+                          ) : null}
+                        </div>
+                      </div>
+                    ))}
                   </div>
                 </div>
               )}

@@ -49,46 +49,51 @@ const playlists: PlaylistAssignmentPlaylist[] = [
 ];
 
 const baseAnalysis: PlaylistAssignmentAnalysis = {
+  title: 'Aula introdutoria',
+  description: 'Conteudo educacional.',
   semanticTags: ['educacao'],
   summaryDescription: 'Aula introdutoria com conteudo educacional.',
   shortSummary: 'Aula introdutoria.',
   language: 'pt',
-  geminiAssignedPlaylistId: null,
-  geminiConfidence: null,
-  geminiReason: null,
+  suggestedPlaylistId: null,
+  suggestedPlaylistQuery: null,
+  classificationConfidence: null,
 };
 
 describe('playlist assignment', () => {
-  it('assigns Integral de Linha videos to Analise Matematica II when Gemini and local signals agree', () => {
+  it('accepts an OpenAI playlist suggestion when local signals agree', () => {
     const result = assignPlaylist({
       playlists,
       analysis: {
         ...baseAnalysis,
+        title: 'Integral de linha em calculo vetorial',
         semanticTags: ['integral de linha', 'calculo', 'matematica'],
         summaryDescription: 'Aula sobre integrais de linha, calculo vetorial e aplicacoes em matematica.',
         shortSummary: 'Integral de linha em calculo vetorial.',
-        geminiAssignedPlaylistId: 'math-ii',
-        geminiConfidence: 0.88,
-        geminiReason: 'O conteudo trata de calculo e analise matematica.',
+        suggestedPlaylistId: 'math-ii',
+        suggestedPlaylistQuery: 'integral de linha calculo vetorial',
+        classificationConfidence: 0.88,
       },
     });
 
     expect(result.assignedPlaylistId).toBe('math-ii');
     expect(result.reliability).toBe('high');
+    expect(result.decisionSource).toBe('openai');
     expect(result.topCandidates[0].playlistId).toBe('math-ii');
   });
 
-  it('rejects a Gemini design suggestion when processed analysis strongly indicates math', () => {
+  it('rejects an OpenAI design suggestion when processed analysis strongly indicates math', () => {
     const result = assignPlaylist({
       playlists,
       analysis: {
         ...baseAnalysis,
+        title: 'Integral de linha em calculo vetorial',
         semanticTags: ['integral de linha', 'calculo', 'matematica'],
         summaryDescription: 'Aula de calculo sobre integrais e coordenadas.',
         shortSummary: 'Exercicios de calculo integral.',
-        geminiAssignedPlaylistId: 'design-i',
-        geminiConfidence: 0.92,
-        geminiReason: 'Sugestao incorreta para design.',
+        suggestedPlaylistId: 'design-i',
+        suggestedPlaylistQuery: 'design de comunicacao',
+        classificationConfidence: 0.92,
       },
     });
 
@@ -102,11 +107,13 @@ describe('playlist assignment', () => {
       playlists,
       analysis: {
         ...baseAnalysis,
+        title: 'Tipografia em design de comunicacao',
         semanticTags: ['design de comunicacao', 'tipografia', 'comunicacao visual'],
         summaryDescription: 'Aula de design de comunicacao sobre tipografia e composicao visual.',
         shortSummary: 'Fundamentos de design de comunicacao.',
-        geminiAssignedPlaylistId: 'design-i',
-        geminiConfidence: 0.83,
+        suggestedPlaylistId: 'design-i',
+        suggestedPlaylistQuery: 'tipografia comunicacao visual',
+        classificationConfidence: 0.83,
       },
     });
 
@@ -114,7 +121,7 @@ describe('playlist assignment', () => {
     expect(result.rejectedPlaylistId).toBeNull();
   });
 
-  it('returns null when Gemini does not choose a playlist even if broad tokens exist', () => {
+  it('returns null when OpenAI does not choose a playlist and signals are broad', () => {
     const result = assignPlaylist({
       playlists,
       analysis: {
@@ -122,30 +129,54 @@ describe('playlist assignment', () => {
         semanticTags: ['aula', 'educacao', 'estudo'],
         summaryDescription: 'Video de estudo com conteudo generico sem unidade curricular clara.',
         shortSummary: 'Conteudo educacional generico.',
-        geminiAssignedPlaylistId: null,
-        geminiConfidence: 0.25,
+        suggestedPlaylistId: null,
+        suggestedPlaylistQuery: 'conteudo educacional generico',
+        classificationConfidence: 0.25,
       },
     });
 
     expect(result.assignedPlaylistId).toBeNull();
   });
 
-  it('does not let the general education playlist beat a strong curricular match', () => {
+  it('uses deterministic assignment only for a strong curricular match', () => {
     const result = assignPlaylist({
       playlists,
       analysis: {
         ...baseAnalysis,
+        title: 'Integracao por partes em analise matematica',
         semanticTags: ['integracao', 'calculo', 'matematica'],
         summaryDescription: 'Aula de matematica sobre integracao por partes e calculo integral.',
         shortSummary: 'Integracao por partes passo a passo.',
-        geminiAssignedPlaylistId: 'math-ii',
-        geminiConfidence: 0.9,
+        suggestedPlaylistId: null,
+        suggestedPlaylistQuery: 'calculo integral analise matematica',
+        classificationConfidence: 0.9,
       },
     });
 
     expect(result.assignedPlaylistId).toBe('math-ii');
+    expect(result.decisionSource).toBe('deterministic');
     expect(result.topCandidates.find((candidate) => candidate.playlistId === 'educacao')?.score).toBeLessThan(
       result.topCandidates[0].score,
     );
+  });
+
+  it('rejects a low-confidence OpenAI playlist suggestion', () => {
+    const result = assignPlaylist({
+      playlists,
+      analysis: {
+        ...baseAnalysis,
+        title: 'Programacao introdutoria',
+        semanticTags: ['programacao', 'algoritmo'],
+        summaryDescription: 'Aula sobre fundamentos de programacao e algoritmos.',
+        shortSummary: 'Fundamentos de programacao.',
+        suggestedPlaylistId: 'programming',
+        suggestedPlaylistQuery: 'programacao algoritmos',
+        classificationConfidence: 0.42,
+      },
+    });
+
+    expect(result.assignedPlaylistId).toBeNull();
+    expect(result.rejectedPlaylistId).toBe('programming');
+    expect(result.reason).toContain('confidence');
   });
 });

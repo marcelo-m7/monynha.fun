@@ -62,7 +62,7 @@
     "badge": "Educational video intelligence",
     "headingPart1": "Discover videos that",
     "headingPart2": "fit the right learning path",
-    "description": "Paste a YouTube URL, let Tube O2 extract metadata, transcribe what it can, enrich the content, and assign it to the most relevant educational playlist.",
+    "description": "Paste a YouTube URL, let Tube O2 extract metadata, generate a summary and tags, and assign it to the most relevant educational playlist.",
     "submitUrlPlaceholder": "Paste a YouTube video URL here...",
     "submitVideoButton": "Submit a Video",
     "exploreVideosButton": "Explore Videos",
@@ -86,7 +86,7 @@
         },
         "step2": {
           "title": "Track processing",
-          "description": "Follow the status page while metadata, language and transcript signals are collected."
+          "description": "Follow the status page while metadata, language, summary, tags and playlist signals are generated."
         },
         "step3": {
           "title": "Get enrichment",
@@ -385,7 +385,7 @@
         "submission_validation": "Validating submission",
         "video_load": "Loading video",
         "context_load": "Loading educational playlists",
-        "analysis": "Analyzing video with Gemini",
+        "analysis": "Analyzing video metadata",
         "transcription": "Generating transcript summary",
         "enrichment": "Enriching metadata",
         "assignment": "Assigning playlists",
@@ -401,7 +401,10 @@
       "partialDescription": "Processing finished, but the full transcript was not available. The video is still published."
     },
     "analysis": {
-      "label": "Video summary and tags"
+      "label": "Video summary and tags",
+      "generatedTitle": "Enriched title",
+      "summary": "Summary",
+      "tags": "Tags"
     },
     "assignment": {
       "label": "Assigned playlist",
@@ -409,7 +412,12 @@
       "noneTitle": "No playlist assigned",
       "noneDescription": "There was not enough adherence to an existing educational playlist.",
       "decisionSource": "Decision source",
-      "providerError": "Classifier detail"
+      "providerError": "Classifier detail",
+      "candidatesLabel": "Evaluated candidates",
+      "scoreLabel": "Score",
+      "rejectedLabel": "Rejected playlist",
+      "openaiSuggested": "AI suggested",
+      "compatible": "Compatible"
     },
     "statusLabels": {
       "pending": "Pending",

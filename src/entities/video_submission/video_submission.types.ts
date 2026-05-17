@@ -16,7 +16,6 @@ export type VideoSubmissionAssignmentCandidate = {
   name: string;
   score?: number | null;
   compatible?: boolean | null;
-  isGeminiSuggested?: boolean | null;
   isAiSuggested?: boolean | null;
   aiSuggested?: boolean | null;
 };
@@ -29,7 +28,6 @@ export type VideoSubmissionAssignment = {
   assignedPlaylistId?: string | null;
   algorithmVersion?: string | null;
   score?: number | null;
-  geminiConfidence?: number | null;
   provider?: 'gemini' | 'openai' | string | null;
   providerConfidence?: number | null;
   decisionSource?: 'deterministic' | 'openai' | 'gemini' | 'none' | string | null;
@@ -58,6 +56,21 @@ export type VideoSubmissionMetadata = {
     confidence?: number | null;
     errorMessage?: string | null;
     semanticTags?: string[] | null;
+    optimizedTitle?: string | null;
+  };
+  enrichment?: {
+    provider?: string | null;
+    model?: string | null;
+    optimizedTitle?: string | null;
+    summaryDescription?: string | null;
+    shortSummary?: string | null;
+    semanticTags?: string[] | null;
+    classificationConfidence?: number | null;
+    suggestedCategoryId?: string | null;
+    suggestedCategory?: string | null;
+    suggestedPlaylistId?: string | null;
+    suggestedPlaylistQuery?: string | null;
+    culturalRelevance?: string | null;
   };
   transcription?: {
     transcriptId?: string | null;

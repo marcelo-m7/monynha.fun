@@ -62,7 +62,7 @@
     "badge": "Inteligencia para videos educativos",
     "headingPart1": "Descubre videos que",
     "headingPart2": "encajan en la ruta correcta",
-    "description": "Pega una URL de YouTube, deja que Tube O2 extraiga metadatos, transcriba lo posible, enriquezca el contenido y lo asigne a la playlist educativa más relevante.",
+    "description": "Pega una URL de YouTube, deja que Tube O2 extraiga metadatos, genere resumen y tags, y lo asigne a la playlist educativa más relevante.",
     "submitUrlPlaceholder": "Pega una URL de video de YouTube aquí...",
     "submitVideoButton": "Enviar un Video",
     "exploreVideosButton": "Explorar Videos",
@@ -86,7 +86,7 @@
         },
         "step2": {
           "title": "Sigue el procesamiento",
-          "description": "Consulta la página de estado mientras se recopilan metadatos, idioma y señales de transcripción."
+          "description": "Consulta la página de estado mientras se generan metadatos, idioma, resumen, tags y señales de playlist."
         },
         "step3": {
           "title": "Recibe enriquecimiento",
@@ -478,7 +478,7 @@
         "submission_validation": "Validando envío",
         "video_load": "Cargando video",
         "context_load": "Cargando playlists educativas",
-        "analysis": "Analizando video con Gemini",
+        "analysis": "Analizando metadatos del video",
         "transcription": "Generando resumen de transcripción",
         "enrichment": "Enriqueciendo metadatos",
         "assignment": "Asignando playlists",
@@ -494,7 +494,10 @@
       "partialDescription": "El procesamiento terminó, pero la transcripción completa no estuvo disponible. El video sigue publicado."
     },
     "analysis": {
-      "label": "Resumen y tags del video"
+      "label": "Resumen y tags del video",
+      "generatedTitle": "Titulo enriquecido",
+      "summary": "Resumen",
+      "tags": "Tags"
     },
     "assignment": {
       "label": "Playlist asignada",
@@ -502,7 +505,12 @@
       "noneTitle": "Sin playlist asignada",
       "noneDescription": "No hubo suficiente afinidad con una playlist educativa existente.",
       "decisionSource": "Fuente de decisión",
-      "providerError": "Detalle del clasificador"
+      "providerError": "Detalle del clasificador",
+      "candidatesLabel": "Candidatas evaluadas",
+      "scoreLabel": "Puntuación",
+      "rejectedLabel": "Playlist rechazada",
+      "openaiSuggested": "Sugerida por IA",
+      "compatible": "Compatible"
     },
     "statusLabels": {
       "pending": "Pendiente",

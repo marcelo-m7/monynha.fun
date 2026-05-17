@@ -1,5 +1,12 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts"
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.45.0'
+import { createOpenAIClient, type VideoEnrichmentParams, type VideoEnrichmentResult } from '../_shared/openai-client.ts'
+import {
+  assignPlaylist,
+  PLAYLIST_ASSIGNMENT_ALGORITHM_VERSION,
+  type PlaylistAssignmentPlaylist,
+  type PlaylistAssignmentResult,
+} from '../_shared/playlist-assignment.ts'
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -10,69 +17,13 @@ declare const EdgeRuntime: {
   waitUntil: (promise: Promise<unknown>) => void;
 };
 
-type Provider = 'gemini' | 'openai';
-type TranscriptStatus = 'completed' | 'unavailable' | 'failed';
-
-type PlaylistRow = {
+type CategoryRow = {
   id: string;
   name: string;
-  description: string | null;
-  language: string;
-  is_public: boolean;
-  is_ordered: boolean;
-  course_code: string | null;
-  unit_code: string | null;
+  slug: string;
 };
 
-type VideoAnalysis = {
-  transcriptText: string | null;
-  transcriptSummary: string | null;
-  summaryDescription: string | null;
-  shortSummary: string | null;
-  semanticTags: string[];
-  language: string | null;
-  confidence: number;
-  unavailableReason: string | null;
-};
-
-type AiPlaylistChoice = {
-  assignedPlaylistId: string | null;
-  confidence: number;
-  reason: string | null;
-};
-
-type PlaylistAssignmentResult = {
-  algorithmVersion: string;
-  assignedPlaylistId: string | null;
-  score: number;
-  reliability: 'high' | 'low';
-  reason: string;
-  provider: Provider | null;
-  providerConfidence: number | null;
-  decisionSource: 'deterministic' | 'openai' | 'gemini' | 'none';
-  providerError: string | null;
-  signals: Record<string, number>;
-  topCandidates: Array<{
-    playlistId: string;
-    name: string;
-    score: number;
-    compatible: boolean;
-    aiSuggested: boolean;
-  }>;
-  rejectedAiPlaylistId: string | null;
-};
-
-type TranscriptProcessingResult = {
-  id: string | null;
-  provider: 'gemini';
-  providerModel: string;
-  status: TranscriptStatus;
-  language: string | null;
-  summary: string | null;
-  confidence: number;
-  errorMessage: string | null;
-  analysis: VideoAnalysis;
-};
+type PlaylistRow = PlaylistAssignmentPlaylist;
 
 type VideoProcessingVideo = {
   youtube_id: string;
@@ -81,6 +32,10 @@ type VideoProcessingVideo = {
   channel_name: string | null;
   language: string | null;
   category_id: string | null;
+};
+
+type AssignmentWithError = PlaylistAssignmentResult & {
+  providerError: string | null;
 };
 
 class HttpError extends Error {
@@ -165,339 +120,14 @@ function normalizeText(value: string | null | undefined): string {
     .trim();
 }
 
-function tokenize(value: string | null | undefined): string[] {
-  return normalizeText(value)
-    .split(/[^a-z0-9]+/)
-    .filter((token) => token.length > 2);
-}
-
-function normalizeConfidence(value: unknown): number {
-  if (typeof value === 'number' && Number.isFinite(value)) return Math.min(1, Math.max(0, value));
-  if (typeof value === 'string') {
-    const parsed = Number.parseFloat(value);
-    if (Number.isFinite(parsed)) return Math.min(1, Math.max(0, parsed));
-  }
-  return 0;
-}
-
-function optionalString(value: unknown, maxLength = 4000): string | null {
-  return typeof value === 'string' && value.trim() ? value.trim().slice(0, maxLength) : null;
-}
-
-function optionalStringArray(value: unknown): string[] {
-  if (!Array.isArray(value)) return [];
-  return value
-    .filter((item): item is string => typeof item === 'string' && !!item.trim())
-    .map((item) => item.trim().slice(0, 80))
-    .filter(Boolean)
-    .slice(0, 12);
-}
-
-function parseJsonObject(content: string): Record<string, unknown> {
-  const cleaned = content.replace(/```(?:json)?/gi, '').replace(/```/g, '').trim();
-  const jsonMatch = cleaned.match(/\{[\s\S]*\}/);
-  if (!jsonMatch) throw new Error('No JSON object found in AI response');
-  return JSON.parse(jsonMatch[0]) as Record<string, unknown>;
-}
-
-function parseVideoAnalysis(content: string, fallbackLanguage: string): VideoAnalysis {
-  const parsed = parseJsonObject(content);
-  const summaryDescription = optionalString(parsed.summaryDescription, 320);
-  const shortSummary = optionalString(parsed.shortSummary, 180) ?? summaryDescription;
-
+function processingMetadata(requestId: string, stage: string) {
   return {
-    transcriptText: null,
-    transcriptSummary: null,
-    summaryDescription,
-    shortSummary,
-    semanticTags: optionalStringArray(parsed.semanticTags ?? parsed.semantic_tags),
-    language: normalizeLanguage(optionalString(parsed.language, 12)) ?? normalizeLanguage(fallbackLanguage),
-    confidence: normalizeConfidence(parsed.confidence),
-    unavailableReason: optionalString(parsed.unavailableReason, 400),
+    processing: {
+      requestId,
+      stage,
+      updatedAt: new Date().toISOString(),
+    },
   };
-}
-
-function analysisPrompt(params: {
-  title: string;
-  description: string | null;
-  language: string;
-  youtubeUrl: string;
-}) {
-  return `Analyze this public educational YouTube video and return compact educational metadata.
-
-Title: "${params.title}"
-Description: "${params.description ?? ''}"
-Preferred language: ${params.language || 'auto'}
-YouTube URL: ${params.youtubeUrl}
-
-Respond ONLY with valid JSON:
-{
-  "summaryDescription": "2-3 sentence user-facing summary under 280 characters",
-  "shortSummary": "single sentence summary under 140 characters",
-  "semanticTags": ["specific subject tag", "concept tag", "course topic tag"],
-  "language": "ISO 639-1 language code if detected, otherwise null",
-  "confidence": 0.0,
-  "unavailableReason": "short reason when analysis is unavailable, otherwise null"
-}
-
-Rules:
-- Do not generate or return a transcript.
-- Use the video content when Gemini can inspect it; otherwise use title and description honestly.
-- semanticTags must describe the subject matter, not clickbait wording.
-- Consider all educational areas, not only programming.
-- Keep summaries compact and public-safe.`;
-}
-
-function playlistChoicePrompt(analysis: VideoAnalysis, playlists: PlaylistRow[]) {
-  const candidates = playlists.map((playlist) => ({
-    id: playlist.id,
-    name: playlist.name,
-    description: playlist.description,
-    language: playlist.language,
-    course_code: playlist.course_code,
-    unit_code: playlist.unit_code,
-  }));
-
-  return `Choose the single best educational playlist for this video analysis.
-
-Video analysis:
-${JSON.stringify({
-    summaryDescription: analysis.summaryDescription,
-    shortSummary: analysis.shortSummary,
-    semanticTags: analysis.semanticTags,
-    language: analysis.language,
-    confidence: analysis.confidence,
-  })}
-
-Candidate playlists:
-${JSON.stringify(candidates)}
-
-Respond ONLY with valid JSON:
-{
-  "assignedPlaylistId": "exact playlist id or null",
-  "confidence": 0.0,
-  "reason": "short decision reason"
-}
-
-Rules:
-- Use only one of the candidate ids above.
-- Return null unless there is clear subject adherence.
-- Prefer curricular playlists with matching course/unit subject matter.
-- Do not bias toward programming; consider every educational area.
-- confidence must be between 0 and 1.`;
-}
-
-async function callGemini(params: {
-  apiKey: string;
-  model: string;
-  prompt: string;
-  youtubeUrl?: string;
-  temperature?: number;
-  maxOutputTokens?: number;
-  timeoutMs?: number;
-}): Promise<string> {
-  const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(), params.timeoutMs ?? 90000);
-  const parts: Array<Record<string, unknown>> = [{ text: params.prompt }];
-
-  if (params.youtubeUrl) {
-    parts.push({ file_data: { file_uri: params.youtubeUrl } });
-  }
-
-  try {
-    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${params.model}:generateContent`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'x-goog-api-key': params.apiKey,
-      },
-      body: JSON.stringify({
-        contents: [{ parts }],
-        generationConfig: {
-          temperature: params.temperature ?? 0.2,
-          maxOutputTokens: params.maxOutputTokens ?? 1400,
-          responseMimeType: 'application/json',
-        },
-      }),
-      signal: controller.signal,
-    });
-
-    clearTimeout(timeoutId);
-    const payload = await response.json().catch(() => null) as {
-      candidates?: Array<{ content?: { parts?: Array<{ text?: string }> } }>;
-      error?: { message?: string; status?: string };
-    } | null;
-
-    if (!response.ok) {
-      throw new HttpError(payload?.error?.message || `Gemini API error: ${response.status}`, response.status, {
-        code: payload?.error?.status || 'GEMINI_API_ERROR',
-        stage: 'analysis',
-        recoverable: [408, 409, 429, 500, 502, 503, 504].includes(response.status),
-      });
-    }
-
-    const text = payload?.candidates?.[0]?.content?.parts
-      ?.map((part) => part.text)
-      .filter((part): part is string => !!part)
-      .join('\n')
-      .trim();
-
-    if (!text) {
-      throw new HttpError('No content in Gemini response', 503, {
-        code: 'GEMINI_EMPTY_RESPONSE',
-        stage: 'analysis',
-        recoverable: true,
-      });
-    }
-
-    return text;
-  } catch (error) {
-    clearTimeout(timeoutId);
-    if (error instanceof HttpError) throw error;
-    throw new HttpError(error instanceof Error ? error.message : 'Unknown Gemini error', 503, {
-      code: 'GEMINI_REQUEST_FAILED',
-      stage: 'analysis',
-      recoverable: true,
-    });
-  }
-}
-
-async function callOpenAI(params: {
-  apiKey: string;
-  model: string;
-  prompt: string;
-  temperature?: number;
-  timeoutMs?: number;
-}): Promise<string> {
-  const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(), params.timeoutMs ?? 60000);
-
-  try {
-    const response = await fetch('https://api.openai.com/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${params.apiKey}`,
-      },
-      body: JSON.stringify({
-        model: params.model,
-        temperature: params.temperature ?? 0.2,
-        response_format: { type: 'json_object' },
-        messages: [
-          { role: 'system', content: 'You enrich educational YouTube metadata. Return only compact valid JSON.' },
-          { role: 'user', content: params.prompt },
-        ],
-      }),
-      signal: controller.signal,
-    });
-
-    clearTimeout(timeoutId);
-    const payload = await response.json().catch(() => null) as {
-      choices?: Array<{ message?: { content?: string } }>;
-      error?: { message?: string; type?: string };
-    } | null;
-
-    if (!response.ok) {
-      throw new HttpError(payload?.error?.message || `OpenAI API error: ${response.status}`, response.status, {
-        code: payload?.error?.type || 'OPENAI_API_ERROR',
-        stage: 'analysis_fallback',
-        recoverable: [408, 409, 429, 500, 502, 503, 504].includes(response.status),
-      });
-    }
-
-    const text = payload?.choices?.[0]?.message?.content?.trim();
-    if (!text) {
-      throw new HttpError('No content in OpenAI response', 503, {
-        code: 'OPENAI_EMPTY_RESPONSE',
-        stage: 'analysis_fallback',
-        recoverable: true,
-      });
-    }
-
-    return text;
-  } catch (error) {
-    clearTimeout(timeoutId);
-    if (error instanceof HttpError) throw error;
-    throw new HttpError(error instanceof Error ? error.message : 'Unknown OpenAI error', 503, {
-      code: 'OPENAI_REQUEST_FAILED',
-      stage: 'analysis_fallback',
-      recoverable: true,
-    });
-  }
-}
-
-async function callProviderAnalysis(params: {
-  provider: 'gemini';
-  apiKey: string;
-  model: string;
-  youtubeUrl: string;
-  title: string;
-  description: string | null;
-  language: string;
-}): Promise<VideoAnalysis> {
-  const prompt = analysisPrompt({
-    title: params.title,
-    description: params.description,
-    language: params.language,
-    youtubeUrl: params.youtubeUrl,
-  });
-
-  const content = await callGemini({
-      apiKey: params.apiKey,
-      model: params.model,
-      prompt,
-      youtubeUrl: params.youtubeUrl,
-      maxOutputTokens: 1600,
-      timeoutMs: Number(Deno.env.get('GEMINI_TIMEOUT_MS') || 90000),
-    });
-
-  return parseVideoAnalysis(content, params.language);
-}
-
-function parsePlaylistChoice(content: string, playlists: PlaylistRow[]): AiPlaylistChoice {
-  const parsed = parseJsonObject(content);
-  const candidateId = optionalString(parsed.assignedPlaylistId ?? parsed.assigned_playlist_id, 64);
-  const assignedPlaylistId = candidateId && playlists.some((playlist) => playlist.id === candidateId)
-    ? candidateId
-    : null;
-
-  return {
-    assignedPlaylistId,
-    confidence: normalizeConfidence(parsed.confidence),
-    reason: optionalString(parsed.reason, 300),
-  };
-}
-
-async function choosePlaylistWithProvider(params: {
-  provider: Provider;
-  apiKey: string;
-  model: string;
-  analysis: VideoAnalysis;
-  playlists: PlaylistRow[];
-}): Promise<AiPlaylistChoice> {
-  if (params.playlists.length === 0) {
-    return { assignedPlaylistId: null, confidence: 0, reason: 'No playlists available' };
-  }
-
-  const prompt = playlistChoicePrompt(params.analysis, params.playlists.slice(0, 160));
-  const content = params.provider === 'gemini'
-    ? await callGemini({
-      apiKey: params.apiKey,
-      model: params.model,
-      prompt,
-      temperature: 0,
-      maxOutputTokens: 700,
-      timeoutMs: Number(Deno.env.get('GEMINI_TIMEOUT_MS') || 90000),
-    })
-    : await callOpenAI({
-      apiKey: params.apiKey,
-      model: params.model,
-      prompt,
-      temperature: 0,
-      timeoutMs: Number(Deno.env.get('OPENAI_TIMEOUT_MS') || 60000),
-    });
-
-  return parsePlaylistChoice(content, params.playlists);
 }
 
 async function updateSubmissionStatus(
@@ -555,16 +185,6 @@ async function safeUpdateSubmissionStatusWithMetadataPatch(
   }
 }
 
-function processingMetadata(requestId: string, stage: string) {
-  return {
-    processing: {
-      requestId,
-      stage,
-      updatedAt: new Date().toISOString(),
-    },
-  };
-}
-
 async function updateSubmissionStage(
   supabaseServiceRole: ReturnType<typeof createClient>,
   submissionId: string,
@@ -577,344 +197,6 @@ async function updateSubmissionStage(
     {},
     processingMetadata(requestId, stage),
   );
-}
-
-async function insertTranscriptRecord(
-  supabaseServiceRole: ReturnType<typeof createClient>,
-  params: {
-    videoId: string;
-    provider: Provider;
-    providerModel: string;
-    status: TranscriptStatus;
-    language: string | null;
-    transcriptText: string | null;
-    summary: string | null;
-    confidence: number;
-    errorMessage: string | null;
-    metadata: Record<string, unknown>;
-  },
-): Promise<string> {
-  const { data, error } = await supabaseServiceRole
-    .from('video_transcripts')
-    .insert({
-      video_id: params.videoId,
-      provider: params.provider,
-      provider_model: params.providerModel,
-      language: params.language,
-      transcript_text: params.transcriptText,
-      summary: params.summary,
-      confidence: params.confidence,
-      status: params.status,
-      error_message: params.errorMessage,
-      metadata: params.metadata,
-    })
-    .select('id')
-    .single();
-
-  if (error) throw new Error(`Failed to save transcript: ${error.message}`);
-  return data.id as string;
-}
-
-async function processVideoAnalysis(params: {
-  supabaseServiceRole: ReturnType<typeof createClient>;
-  requestId: string;
-  videoId: string;
-  youtubeUrl: string;
-  videoTitle: string;
-  videoDescription: string | null;
-  effectiveLanguage: string;
-}): Promise<TranscriptProcessingResult> {
-  const geminiApiKey = Deno.env.get('GEMINI_API_KEY');
-  const geminiModel = Deno.env.get('GEMINI_MODEL') || 'gemini-2.5-flash';
-
-  if (!geminiApiKey) {
-    throw new HttpError('GEMINI_API_KEY is not configured', 503, {
-      code: 'GEMINI_API_KEY_MISSING',
-      stage: 'analysis',
-      recoverable: true,
-    });
-  }
-
-  logProcessing(params.requestId, 'analysis', 'Starting Gemini compact video analysis', {
-    videoId: params.videoId,
-    model: geminiModel,
-  });
-
-  const analysis = await callProviderAnalysis({
-    provider: 'gemini',
-    apiKey: geminiApiKey,
-    model: geminiModel,
-    youtubeUrl: params.youtubeUrl,
-    title: params.videoTitle,
-    description: params.videoDescription,
-    language: params.effectiveLanguage,
-  });
-
-  const status: TranscriptStatus = analysis.summaryDescription || analysis.shortSummary || analysis.semanticTags.length > 0
-    ? 'completed'
-    : 'unavailable';
-  const errorMessage = status === 'unavailable'
-    ? analysis.unavailableReason || 'Gemini compact analysis unavailable'
-    : null;
-
-  const transcriptId = await insertTranscriptRecord(params.supabaseServiceRole, {
-    videoId: params.videoId,
-    provider: 'gemini',
-    providerModel: geminiModel,
-    status,
-    language: normalizeLanguage(analysis.language) ?? normalizeLanguage(params.effectiveLanguage),
-    transcriptText: null,
-    summary: analysis.summaryDescription ?? analysis.shortSummary,
-    confidence: analysis.confidence,
-    errorMessage,
-    metadata: {
-      requestId: params.requestId,
-      provider: 'gemini',
-      providerModel: geminiModel,
-      analysisOnly: true,
-      unavailableReason: analysis.unavailableReason,
-      semanticTags: analysis.semanticTags,
-      shortSummary: analysis.shortSummary,
-    },
-  });
-
-  logProcessing(params.requestId, 'analysis', 'Gemini compact video analysis completed', {
-    videoId: params.videoId,
-    transcriptId,
-    provider: 'gemini',
-    model: geminiModel,
-    status,
-    confidence: analysis.confidence,
-  });
-
-  return {
-    id: transcriptId,
-    provider: 'gemini',
-    providerModel: geminiModel,
-    status,
-    language: normalizeLanguage(analysis.language) ?? normalizeLanguage(params.effectiveLanguage),
-    summary: analysis.summaryDescription ?? analysis.shortSummary,
-    confidence: analysis.confidence,
-    errorMessage,
-    analysis,
-  };
-}
-
-function playlistText(playlist: PlaylistRow) {
-  return [playlist.name, playlist.description ?? '', playlist.course_code ?? '', playlist.unit_code ?? ''].join(' ');
-}
-
-function analysisText(analysis: VideoAnalysis) {
-  return [
-    analysis.semanticTags.join(' '),
-    analysis.summaryDescription ?? '',
-    analysis.shortSummary ?? '',
-  ].join(' ');
-}
-
-function tokenOverlapScore(left: string, right: string): number {
-  const leftTokens = new Set(tokenize(left));
-  if (leftTokens.size === 0) return 0;
-  return tokenize(right).reduce((score, token) => score + (leftTokens.has(token) ? 1 : 0), 0);
-}
-
-function readNumberEnv(name: string, fallback: number): number {
-  const value = Number.parseFloat(Deno.env.get(name) || '');
-  return Number.isFinite(value) ? value : fallback;
-}
-
-function readProviderEnv(name: string, fallback: Provider): Provider {
-  const value = (Deno.env.get(name) || '').trim().toLowerCase();
-  return value === 'gemini' || value === 'openai' ? value : fallback;
-}
-
-const subjectKeywords: Record<string, string[]> = {
-  math: ['matematica', 'calculo', 'integral', 'derivada', 'limite', 'algebra', 'equacao', 'matriz', 'vetor', 'estatistica'],
-  design: ['design', 'comunicacao', 'grafico', 'visual', 'tipografia', 'ilustracao', 'multimedia', 'interacao', 'cultura visual'],
-  programming: ['programacao', 'programming', 'javascript', 'typescript', 'python', 'java', 'react', 'node', 'codigo', 'algoritmo', 'software'],
-  business: ['negocio', 'business', 'marketing', 'empreendedorismo', 'gestao', 'vendas', 'financeiro', 'produto'],
-  language: ['ingles', 'portugues', 'espanhol', 'lingua', 'idioma', 'grammar', 'vocabulary'],
-  science: ['fisica', 'quimica', 'biologia', 'ciencia', 'laboratorio', 'energia', 'molecula'],
-  humanities: ['historia', 'filosofia', 'sociologia', 'literatura', 'cultura', 'arte'],
-};
-
-function subjectSignals(sourceText: string): Record<string, number> {
-  const normalized = normalizeText(sourceText);
-  return Object.fromEntries(
-    Object.entries(subjectKeywords).map(([subject, keywords]) => [
-      subject,
-      keywords.reduce((score, keyword) => score + (normalized.includes(keyword) ? 1 : 0), 0),
-    ]),
-  );
-}
-
-function subjectHitCount(text: string, subject: string): number {
-  const normalized = normalizeText(text);
-  return (subjectKeywords[subject] ?? []).reduce(
-    (hits, keyword) => hits + (normalized.includes(keyword) ? 1 : 0),
-    0,
-  );
-}
-
-function deterministicPlaylistScore(playlist: PlaylistRow, analysis: VideoAnalysis, sourceText: string, signals: Record<string, number>) {
-  const text = playlistText(playlist);
-  let score = 0;
-
-  score += Math.min(10, tokenOverlapScore(sourceText, text));
-  score += Math.min(6, tokenOverlapScore(analysis.semanticTags.join(' '), text));
-
-  for (const [subject, signal] of Object.entries(signals)) {
-    if (signal > 0) score += Math.min(12, signal * subjectHitCount(text, subject) * 2);
-  }
-
-  if (normalizeLanguage(playlist.language) === normalizeLanguage(analysis.language)) score += 1;
-  if (playlist.course_code || playlist.unit_code) score += 1;
-  if (!playlist.course_code && !playlist.unit_code && /educacao|education/i.test(normalizeText(`${playlist.name} ${playlist.description ?? ''}`))) {
-    score -= 6;
-  }
-
-  return score;
-}
-
-function hasStrongSubjectConflict(playlist: PlaylistRow, signals: Record<string, number>): boolean {
-  const strongest = Object.entries(signals).sort((left, right) => right[1] - left[1])[0];
-  if (!strongest || strongest[1] < 2) return false;
-  return subjectHitCount(playlistText(playlist), strongest[0]) === 0;
-}
-
-function providerModel(provider: Provider): string {
-  if (provider === 'openai') {
-    return Deno.env.get('OPENAI_PLAYLIST_MODEL') || Deno.env.get('OPENAI_MODEL') || 'gpt-4o-mini';
-  }
-
-  return Deno.env.get('GEMINI_MODEL') || 'gemini-2.5-flash';
-}
-
-function providerApiKey(provider: Provider): string | null {
-  return provider === 'openai'
-    ? Deno.env.get('OPENAI_API_KEY')
-    : Deno.env.get('GEMINI_API_KEY');
-}
-
-async function runPlaylistAssignment(params: {
-  analysis: VideoAnalysis;
-  playlistRows: PlaylistRow[];
-  requestId: string;
-}): Promise<PlaylistAssignmentResult> {
-  const sourceText = analysisText(params.analysis);
-  const signals = subjectSignals(sourceText);
-  const minScore = readNumberEnv('PLAYLIST_ASSIGNMENT_MIN_SCORE', 8);
-  const minConfidence = readNumberEnv('PLAYLIST_ASSIGNMENT_MIN_CONFIDENCE', 0.7);
-  const scoredCandidates = params.playlistRows
-    .map((playlist) => {
-      const score = deterministicPlaylistScore(playlist, params.analysis, sourceText, signals);
-      return {
-        playlistId: playlist.id,
-        name: playlist.name,
-        score,
-        compatible: score >= minScore && !hasStrongSubjectConflict(playlist, signals),
-        aiSuggested: false,
-      };
-    })
-    .sort((left, right) => right.score - left.score);
-
-  const best = scoredCandidates[0] ?? null;
-  const runnerUp = scoredCandidates[1] ?? null;
-  if (best?.compatible && best.score - (runnerUp?.score ?? 0) >= 3) {
-    return {
-      algorithmVersion: 'playlist-assignment-v4-deterministic-openai-fallback',
-      assignedPlaylistId: best.playlistId,
-      score: best.score,
-      reliability: 'high',
-      reason: 'Deterministic score selected a strong curricular playlist match',
-      provider: null,
-      providerConfidence: null,
-      decisionSource: 'deterministic',
-      providerError: null,
-      signals,
-      topCandidates: scoredCandidates.slice(0, 5),
-      rejectedAiPlaylistId: null,
-    };
-  }
-
-  let aiChoice: AiPlaylistChoice | null = null;
-  let rejectedAiPlaylistId: string | null = null;
-  let provider: Provider | null = null;
-  let providerError: string | null = null;
-  const providers = Array.from(new Set([
-    readProviderEnv('PLAYLIST_ASSIGNMENT_PRIMARY_PROVIDER', 'openai'),
-    readProviderEnv('PLAYLIST_ASSIGNMENT_FALLBACK_PROVIDER', 'gemini'),
-  ]));
-
-  for (const candidateProvider of providers) {
-    const apiKey = providerApiKey(candidateProvider);
-    if (apiKey) {
-      try {
-        aiChoice = await choosePlaylistWithProvider({
-          provider: candidateProvider,
-          apiKey,
-          model: providerModel(candidateProvider),
-          analysis: params.analysis,
-          playlists: params.playlistRows,
-        });
-        provider = candidateProvider;
-        break;
-      } catch (error) {
-        providerError = error instanceof Error ? error.message : 'Unknown playlist provider error';
-        logProcessingError(params.requestId, 'assignment', 'AI playlist choice failed; trying next provider', {
-          provider: candidateProvider,
-          error: providerError,
-        });
-      }
-    } else {
-      providerError = `${candidateProvider.toUpperCase()} API key is not configured`;
-      logProcessing(params.requestId, 'assignment', 'Skipping playlist provider without API key', {
-        provider: candidateProvider,
-      });
-    }
-  }
-
-  const aiCandidate = aiChoice?.assignedPlaylistId
-    ? scoredCandidates.find((candidate) => candidate.playlistId === aiChoice?.assignedPlaylistId) ?? null
-    : null;
-
-  for (const candidate of scoredCandidates) {
-    if (candidate.playlistId === aiChoice?.assignedPlaylistId) candidate.aiSuggested = true;
-  }
-
-  let assignedPlaylistId: string | null = null;
-  let score = 0;
-  let reason = 'No educational playlist met the adherence threshold';
-
-  if (aiCandidate && aiChoice && aiChoice.confidence >= minConfidence && aiCandidate.compatible) {
-    assignedPlaylistId = aiCandidate.playlistId;
-    score = aiCandidate.score;
-    reason = aiChoice.reason || 'AI playlist suggestion accepted after deterministic adherence check';
-  } else if (aiCandidate && aiChoice) {
-    rejectedAiPlaylistId = aiCandidate.playlistId;
-    reason = aiChoice.confidence < minConfidence
-      ? 'AI playlist suggestion rejected because confidence is below threshold'
-      : 'AI playlist suggestion rejected by deterministic adherence check';
-  }
-
-  if (!assignedPlaylistId && !aiChoice && providerError) {
-    reason = `No playlist assigned because playlist AI providers failed: ${providerError}`;
-  }
-
-  return {
-    algorithmVersion: 'playlist-assignment-v4-deterministic-openai-fallback',
-    assignedPlaylistId,
-    score,
-    reliability: assignedPlaylistId ? 'high' : 'low',
-    reason,
-    provider: aiChoice ? provider : null,
-    providerConfidence: aiChoice?.confidence ?? null,
-    decisionSource: assignedPlaylistId && provider ? provider : 'none',
-    providerError,
-    signals,
-    topCandidates: scoredCandidates.slice(0, 5),
-    rejectedAiPlaylistId,
-  };
 }
 
 async function assignVideoToPlaylist(
@@ -959,10 +241,177 @@ async function assignVideoToPlaylist(
   if (insertError) throw new Error(`Failed to add video to playlist: ${insertError.message}`);
 }
 
-function hasProcessedAnalysisContent(analysis: VideoAnalysis): boolean {
-  return analysis.semanticTags.length > 0
-    || !!analysis.summaryDescription
-    || !!analysis.shortSummary;
+async function loadCategories(
+  supabaseServiceRole: ReturnType<typeof createClient>,
+  requestId: string,
+): Promise<CategoryRow[]> {
+  const { data, error } = await supabaseServiceRole
+    .from('categories')
+    .select('id, name, slug');
+
+  if (error) {
+    logProcessingError(requestId, 'context_load', 'Failed to load categories; continuing without category context', {
+      error: error.message,
+    });
+    return [];
+  }
+
+  return (data ?? []) as CategoryRow[];
+}
+
+async function loadAssignmentPlaylists(
+  supabaseServiceRole: ReturnType<typeof createClient>,
+  language: string,
+): Promise<PlaylistRow[]> {
+  const { data: playlistsByLanguage, error: playlistFetchError } = await supabaseServiceRole
+    .rpc('list_education_playlists_for_assignment', {
+      p_language: language,
+      p_limit: 160,
+    });
+
+  if (playlistFetchError) throw new Error(`Failed to load playlists: ${playlistFetchError.message}`);
+
+  let playlistsData = Array.isArray(playlistsByLanguage) ? playlistsByLanguage : [];
+  if (playlistsData.length === 0) {
+    const { data: fallbackData, error: fallbackError } = await supabaseServiceRole
+      .rpc('list_education_playlists_for_assignment', {
+        p_language: null,
+        p_limit: 160,
+      });
+
+    if (fallbackError) throw new Error(`Failed to load fallback playlists: ${fallbackError.message}`);
+    playlistsData = Array.isArray(fallbackData) ? fallbackData : [];
+  }
+
+  return (playlistsData ?? []) as PlaylistRow[];
+}
+
+function isUnclassifiedCategory(categoryRows: CategoryRow[], categoryId: string | null | undefined) {
+  if (!categoryId) return true;
+  const category = categoryRows.find((row) => row.id === categoryId);
+  const slug = normalizeText(category?.slug);
+  return slug === 'nao-classificados' || slug === 'unclassified' || slug === 'uncategorized';
+}
+
+async function maybeAssignCategory(params: {
+  supabaseServiceRole: ReturnType<typeof createClient>;
+  categoryRows: CategoryRow[];
+  enrichment: VideoEnrichmentResult;
+  videoId: string;
+  currentVideoCategoryId: string | null;
+}) {
+  const suggestedCategoryId = params.enrichment.suggested_category_id;
+  const hasValidSuggestion = !!suggestedCategoryId && params.categoryRows.some((category) => category.id === suggestedCategoryId);
+  const shouldAssign =
+    hasValidSuggestion &&
+    params.enrichment.classification_confidence >= 0.55 &&
+    isUnclassifiedCategory(params.categoryRows, params.currentVideoCategoryId);
+
+  if (!shouldAssign || !suggestedCategoryId) {
+    return null;
+  }
+
+  const { error } = await params.supabaseServiceRole
+    .from('videos')
+    .update({ category_id: suggestedCategoryId })
+    .eq('id', params.videoId);
+
+  if (error) throw new Error(`Failed to assign category: ${error.message}`);
+  return suggestedCategoryId;
+}
+
+function createDefaultAssignment(reason: string, providerError: string | null = null): AssignmentWithError {
+  return {
+    algorithmVersion: PLAYLIST_ASSIGNMENT_ALGORITHM_VERSION,
+    assignedPlaylistId: null,
+    score: 0,
+    reliability: 'low',
+    reason,
+    topCandidates: [],
+    rejectedPlaylistId: null,
+    providerConfidence: null,
+    decisionSource: 'none',
+    signals: {
+      math: 0,
+      design: 0,
+      programming: 0,
+      business: 0,
+      language: 0,
+      science: 0,
+      humanities: 0,
+    },
+    providerError,
+  };
+}
+
+async function runPlaylistAssignment(params: {
+  supabaseServiceRole: ReturnType<typeof createClient>;
+  requestId: string;
+  videoId: string;
+  userId: string;
+  video: VideoProcessingVideo;
+  enrichment: VideoEnrichmentResult;
+  playlistRows: PlaylistRow[];
+  playlistLoadError: string | null;
+}): Promise<AssignmentWithError> {
+  if (params.playlistLoadError) {
+    return createDefaultAssignment('Playlist assignment skipped because playlist candidates could not be loaded.', params.playlistLoadError);
+  }
+
+  if (params.playlistRows.length === 0) {
+    return createDefaultAssignment('No educational playlist candidates were available for this language.');
+  }
+
+  const assignment = assignPlaylist({
+    playlists: params.playlistRows,
+    analysis: {
+      title: params.video.title,
+      description: params.video.description,
+      semanticTags: params.enrichment.semantic_tags,
+      summaryDescription: params.enrichment.summary_description,
+      shortSummary: params.enrichment.short_summary,
+      language: params.enrichment.language,
+      suggestedPlaylistId: params.enrichment.suggested_playlist_id,
+      suggestedPlaylistQuery: params.enrichment.suggested_playlist_query,
+      classificationConfidence: params.enrichment.classification_confidence,
+    },
+  });
+
+  const result: AssignmentWithError = {
+    ...assignment,
+    providerError: null,
+  };
+
+  if (!assignment.assignedPlaylistId) {
+    return result;
+  }
+
+  try {
+    await assignVideoToPlaylist(
+      params.supabaseServiceRole,
+      assignment.assignedPlaylistId,
+      params.videoId,
+      params.userId,
+    );
+  } catch (error) {
+    const message = error instanceof Error ? error.message : 'Unknown playlist insert error';
+    logProcessingError(params.requestId, 'assignment', 'Playlist assignment insert failed; enrichment will still complete', {
+      videoId: params.videoId,
+      playlistId: assignment.assignedPlaylistId,
+      error: message,
+    });
+
+    return {
+      ...result,
+      assignedPlaylistId: null,
+      score: 0,
+      reliability: 'low',
+      reason: 'Playlist match was found but could not be saved. The video enrichment still completed.',
+      providerError: message,
+    };
+  }
+
+  return result;
 }
 
 async function runVideoProcessingTask(params: {
@@ -970,11 +419,10 @@ async function runVideoProcessingTask(params: {
   requestId: string;
   submissionId: string | null;
   videoId: string;
-  youtubeUrl: string;
   userId: string;
   video: VideoProcessingVideo;
 }) {
-  const { supabaseServiceRole, requestId, submissionId, videoId, youtubeUrl, userId, video } = params;
+  const { supabaseServiceRole, requestId, submissionId, videoId, userId, video } = params;
   let currentStage = 'background_start';
 
   try {
@@ -982,42 +430,41 @@ async function runVideoProcessingTask(params: {
     if (submissionId) await updateSubmissionStage(supabaseServiceRole, submissionId, requestId, currentStage);
 
     const effectiveLanguage = video.language && video.language !== 'und' ? video.language : 'pt';
-    const { data: playlistsByLanguage, error: playlistFetchError } = await supabaseServiceRole
-      .rpc('list_education_playlists_for_assignment', {
-        p_language: effectiveLanguage,
-        p_limit: 160,
+    const categoryRows = await loadCategories(supabaseServiceRole, requestId);
+
+    let playlistRows: PlaylistRow[] = [];
+    let playlistLoadError: string | null = null;
+    try {
+      playlistRows = await loadAssignmentPlaylists(supabaseServiceRole, effectiveLanguage);
+    } catch (error) {
+      playlistLoadError = error instanceof Error ? error.message : 'Unknown playlist loading error';
+      logProcessingError(requestId, currentStage, 'Failed to load playlist candidates; enrichment will continue', {
+        videoId,
+        error: playlistLoadError,
       });
-
-    if (playlistFetchError) throw new Error(`Failed to load playlists: ${playlistFetchError.message}`);
-
-    let playlistsData = playlistsByLanguage;
-    if (!playlistsData || playlistsData.length === 0) {
-      const { data: fallbackData, error: fallbackError } = await supabaseServiceRole
-        .rpc('list_education_playlists_for_assignment', {
-          p_language: null,
-          p_limit: 160,
-        });
-
-      if (fallbackError) throw new Error(`Failed to load fallback playlists: ${fallbackError.message}`);
-      playlistsData = fallbackData;
     }
 
-    const playlistRows = (playlistsData ?? []) as PlaylistRow[];
-
-    currentStage = 'analysis';
+    currentStage = 'enrichment';
     if (submissionId) await updateSubmissionStage(supabaseServiceRole, submissionId, requestId, currentStage);
 
-    const transcriptResult = await processVideoAnalysis({
-      supabaseServiceRole,
-      requestId,
+    const openaiClient = createOpenAIClient();
+    logProcessing(requestId, currentStage, 'Starting OpenAI video enrichment', {
       videoId,
-      youtubeUrl,
-      videoTitle: video.title || '',
-      videoDescription: video.description ?? null,
-      effectiveLanguage,
+      model: openaiClient.modelName,
+      playlistCandidateCount: playlistRows.length,
     });
 
-    currentStage = 'assignment';
+    const enrichmentParams: VideoEnrichmentParams = {
+      title: video.title || '',
+      description: video.description || '',
+      language: effectiveLanguage,
+      channelName: video.channel_name,
+      categories: categoryRows,
+      playlists: playlistRows.slice(0, 60),
+    };
+    const enrichment = await openaiClient.enrichVideo(enrichmentParams);
+    const detectedLanguage = normalizeLanguage(enrichment.language) ?? normalizeLanguage(effectiveLanguage) ?? 'pt';
+
     if (submissionId) {
       await updateSubmissionStatusWithMetadataPatch(
         supabaseServiceRole,
@@ -1026,78 +473,63 @@ async function runVideoProcessingTask(params: {
         {
           ...processingMetadata(requestId, currentStage),
           analysis: {
-            transcriptId: transcriptResult.id,
-            provider: transcriptResult.provider,
-            model: transcriptResult.providerModel,
-            status: transcriptResult.status,
-            summary: transcriptResult.summary,
-            language: transcriptResult.language,
-            confidence: transcriptResult.confidence,
-            errorMessage: transcriptResult.errorMessage,
-            semanticTags: transcriptResult.analysis.semanticTags,
-          },
-          transcription: {
-            transcriptId: transcriptResult.id,
-            provider: transcriptResult.provider,
-            model: transcriptResult.providerModel,
-            status: transcriptResult.status,
-            summary: transcriptResult.summary,
-            language: transcriptResult.language,
-            confidence: transcriptResult.confidence,
-            errorMessage: transcriptResult.errorMessage,
+            provider: 'openai',
+            model: openaiClient.modelName,
+            status: 'completed',
+            summary: enrichment.summary_description || enrichment.short_summary,
+            language: detectedLanguage,
+            confidence: enrichment.classification_confidence,
+            semanticTags: enrichment.semantic_tags,
+            optimizedTitle: enrichment.optimized_title,
           },
         },
       );
     }
 
-    let assignment: PlaylistAssignmentResult = {
-      algorithmVersion: 'playlist-assignment-v4-deterministic-openai-fallback',
-      assignedPlaylistId: null,
-      score: 0,
-      reliability: 'low',
-      reason: 'No playlist assigned because the video analysis did not provide enough educational signals',
-      provider: null,
-      providerConfidence: null,
-      decisionSource: 'none',
-      providerError: null,
-      signals: {},
-      topCandidates: [],
-      rejectedAiPlaylistId: null,
-    };
+    currentStage = 'assignment';
+    if (submissionId) await updateSubmissionStage(supabaseServiceRole, submissionId, requestId, currentStage);
 
-    if (playlistRows.length > 0 && hasProcessedAnalysisContent(transcriptResult.analysis)) {
-      assignment = await runPlaylistAssignment({
-        analysis: transcriptResult.analysis,
-        playlistRows,
-        requestId,
-      });
-
-      if (assignment.assignedPlaylistId) {
-        await assignVideoToPlaylist(supabaseServiceRole, assignment.assignedPlaylistId, videoId, userId);
-      }
-    } else {
-      logProcessing(requestId, currentStage, 'Skipping playlist assignment because processed analysis is empty', {
+    let assignedCategoryId: string | null = null;
+    try {
+      assignedCategoryId = await maybeAssignCategory({
+        supabaseServiceRole,
+        categoryRows,
+        enrichment,
         videoId,
-        playlistCount: playlistRows.length,
-        semanticTagCount: transcriptResult.analysis.semanticTags.length,
+        currentVideoCategoryId: video.category_id ?? null,
+      });
+    } catch (error) {
+      logProcessingError(requestId, currentStage, 'Category assignment failed; enrichment will continue', {
+        videoId,
+        error: error instanceof Error ? error.message : 'Unknown category assignment error',
       });
     }
+
+    const assignment = await runPlaylistAssignment({
+      supabaseServiceRole,
+      requestId,
+      videoId,
+      userId,
+      video,
+      enrichment,
+      playlistRows,
+      playlistLoadError,
+    });
 
     currentStage = 'storage';
     if (submissionId) await updateSubmissionStage(supabaseServiceRole, submissionId, requestId, currentStage);
 
-    const detectedLanguage = normalizeLanguage(transcriptResult.analysis.language) ?? normalizeLanguage(effectiveLanguage);
     const { data, error } = await supabaseServiceRole
       .from('ai_enrichments')
       .insert({
         video_id: videoId,
-        optimized_title: null,
-        summary_description: transcriptResult.analysis.summaryDescription ?? transcriptResult.analysis.shortSummary,
-        semantic_tags: transcriptResult.analysis.semanticTags,
-        suggested_category_id: null,
+        optimized_title: enrichment.optimized_title,
+        summary_description: enrichment.summary_description,
+        semantic_tags: enrichment.semantic_tags,
+        suggested_category_id: assignedCategoryId,
         language: detectedLanguage,
-        cultural_relevance: null,
-        short_summary: transcriptResult.analysis.shortSummary ?? transcriptResult.analysis.summaryDescription,
+        cultural_relevance: enrichment.cultural_relevance,
+        short_summary: enrichment.short_summary,
       })
       .select()
       .single();
@@ -1128,42 +560,45 @@ async function runVideoProcessingTask(params: {
           enrichmentId: data.id,
           detectedLanguage,
           analysis: {
-            transcriptId: transcriptResult.id,
-            provider: transcriptResult.provider,
-            model: transcriptResult.providerModel,
-            status: transcriptResult.status,
-            summary: transcriptResult.summary,
-            language: transcriptResult.language,
-            confidence: transcriptResult.confidence,
-            errorMessage: transcriptResult.errorMessage,
-            semanticTags: transcriptResult.analysis.semanticTags,
+            provider: 'openai',
+            model: openaiClient.modelName,
+            status: 'completed',
+            summary: enrichment.summary_description || enrichment.short_summary,
+            language: detectedLanguage,
+            confidence: enrichment.classification_confidence,
+            semanticTags: enrichment.semantic_tags,
+            optimizedTitle: enrichment.optimized_title,
           },
-          transcription: {
-            transcriptId: transcriptResult.id,
-            provider: transcriptResult.provider,
-            model: transcriptResult.providerModel,
-            status: transcriptResult.status,
-            summary: transcriptResult.summary,
-            language: transcriptResult.language,
-            confidence: transcriptResult.confidence,
-            errorMessage: transcriptResult.errorMessage,
+          enrichment: {
+            provider: 'openai',
+            model: openaiClient.modelName,
+            optimizedTitle: enrichment.optimized_title,
+            summaryDescription: enrichment.summary_description,
+            shortSummary: enrichment.short_summary,
+            semanticTags: enrichment.semantic_tags,
+            classificationConfidence: enrichment.classification_confidence,
+            suggestedCategoryId: enrichment.suggested_category_id,
+            suggestedCategory: enrichment.suggested_category,
+            suggestedPlaylistId: enrichment.suggested_playlist_id,
+            suggestedPlaylistQuery: enrichment.suggested_playlist_query,
+            culturalRelevance: enrichment.cultural_relevance,
           },
           assignment: {
             fallbackUsed: assignment.reliability === 'low',
             reliability: assignment.reliability,
             reason: assignment.reason,
-            assignedCategoryId: null,
+            assignedCategoryId,
             assignedPlaylistId: assignment.assignedPlaylistId,
             algorithmVersion: assignment.algorithmVersion,
             score: assignment.score,
-            provider: assignment.provider,
+            provider: 'openai',
             providerConfidence: assignment.providerConfidence,
             decisionSource: assignment.decisionSource,
             providerError: assignment.providerError,
             signals: assignment.signals,
             topCandidates: assignment.topCandidates,
-            rejectedPlaylistId: assignment.rejectedAiPlaylistId,
-            rejectedAiPlaylistId: assignment.rejectedAiPlaylistId,
+            rejectedPlaylistId: assignment.rejectedPlaylistId,
+            rejectedAiPlaylistId: assignment.rejectedPlaylistId,
           },
         },
       });
@@ -1173,9 +608,8 @@ async function runVideoProcessingTask(params: {
       videoId,
       submissionId: submissionId ?? 'none',
       enrichmentId: data.id,
-      transcriptId: transcriptResult.id,
-      transcriptStatus: transcriptResult.status,
-      provider: transcriptResult.provider,
+      provider: 'openai',
+      assignedCategoryId,
       assignedPlaylistId: assignment.assignedPlaylistId,
       decisionSource: assignment.decisionSource,
     });
@@ -1216,7 +650,7 @@ serve(async (req) => {
     SUPABASE_URL: Deno.env.get('SUPABASE_URL'),
     SUPABASE_ANON_KEY: Deno.env.get('SUPABASE_ANON_KEY'),
     SUPABASE_SERVICE_ROLE_KEY: Deno.env.get('SUPABASE_SERVICE_ROLE_KEY'),
-    GEMINI_API_KEY: Deno.env.get('GEMINI_API_KEY'),
+    OPENAI_API_KEY: Deno.env.get('OPENAI_API_KEY'),
   };
   const missingEnv = Object.entries(requiredEnv)
     .filter(([, value]) => !value)
@@ -1412,7 +846,6 @@ serve(async (req) => {
       requestId,
       submissionId,
       videoId,
-      youtubeUrl,
       userId: user.id,
       video: video as VideoProcessingVideo,
     }));

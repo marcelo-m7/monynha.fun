@@ -140,12 +140,14 @@ describe('SubmitStatus page', () => {
     renderWithProviders(<SubmitStatus />, { route: '/submit/status/submission-1' });
 
     expect(screen.getByText('Assigned playlist')).toBeInTheDocument();
-    expect(screen.getByText('Analise Matematica II - 1º Ano 2º Semestre - LESTI')).toBeInTheDocument();
+    expect(screen.getAllByText('Analise Matematica II - 1º Ano 2º Semestre - LESTI')).toHaveLength(2);
     expect(screen.getByText('Best compatible playlist selected by source and enrichment score')).toBeInTheDocument();
     expect(screen.getByText('Video summary and tags')).toBeInTheDocument();
     expect(screen.getByText('Aula sobre integrais e calculo vetorial.')).toBeInTheDocument();
     expect(screen.getByText('integral')).toBeInTheDocument();
     expect(screen.getByText('Decision source: deterministic')).toBeInTheDocument();
+    expect(screen.getByText('Evaluated candidates')).toBeInTheDocument();
+    expect(screen.getByText('Score: 32')).toBeInTheDocument();
   });
 
   it('shows when no playlist was assigned after processing', () => {
@@ -245,7 +247,7 @@ describe('SubmitStatus page', () => {
     expect(screen.getByText('Video ready without a full transcript')).toBeInTheDocument();
     expect(screen.getByText(/Processing finished, but the full transcript was not available/)).toBeInTheDocument();
     expect(screen.getByText('Transcript fetch timed out')).toBeInTheDocument();
-    expect(screen.getByText('Educacao')).toBeInTheDocument();
+    expect(screen.getAllByText('Educacao')).toHaveLength(2);
   });
 
   it('shows duplicate status with link to the existing video', () => {

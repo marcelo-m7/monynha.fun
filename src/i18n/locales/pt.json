@@ -62,7 +62,7 @@
     "badge": "Inteligência para vídeos educacionais",
     "headingPart1": "Descubra vídeos que",
     "headingPart2": "entram na trilha certa",
-    "description": "Cole uma URL do YouTube, deixe o Tube O2 extrair metadados, transcrever o que for possível, enriquecer o conteúdo e atribuí-lo à playlist educacional mais relevante.",
+    "description": "Cole uma URL do YouTube, deixe o Tube O2 extrair metadados, gerar resumo e tags, e atribuí-lo à playlist educacional mais relevante.",
     "submitUrlPlaceholder": "Cole uma URL de vídeo do YouTube aqui...",
     "submitVideoButton": "Enviar um Vídeo",
     "exploreVideosButton": "Explorar Vídeos",
@@ -86,7 +86,7 @@
         },
         "step2": {
           "title": "Acompanhe o processamento",
-          "description": "Siga a página de status enquanto metadados, idioma e sinais de transcrição são coletados."
+          "description": "Siga a página de status enquanto metadados, idioma, resumo, tags e sinais de playlist são gerados."
         },
         "step3": {
           "title": "Receba enriquecimento",
@@ -478,7 +478,7 @@
         "submission_validation": "Validando submissão",
         "video_load": "Carregando vídeo",
         "context_load": "Carregando playlists educacionais",
-        "analysis": "Analisando vídeo com Gemini",
+        "analysis": "Analisando metadados do vídeo",
         "transcription": "Gerando resumo da transcrição",
         "enrichment": "Enriquecendo metadados",
         "assignment": "Atribuindo playlists",
@@ -494,7 +494,10 @@
       "partialDescription": "O processamento terminou, mas a transcrição completa não ficou disponível. O vídeo continua publicado."
     },
     "analysis": {
-      "label": "Resumo e tags do vídeo"
+      "label": "Resumo e tags do vídeo",
+      "generatedTitle": "Título enriquecido",
+      "summary": "Resumo",
+      "tags": "Tags"
     },
     "assignment": {
       "label": "Playlist atribuída",
@@ -502,7 +505,12 @@
       "noneTitle": "Sem playlist atribuída",
       "noneDescription": "Não houve aderência suficiente a uma playlist educacional existente.",
       "decisionSource": "Fonte da decisão",
-      "providerError": "Detalhe do classificador"
+      "providerError": "Detalhe do classificador",
+      "candidatesLabel": "Candidatas avaliadas",
+      "scoreLabel": "Pontuação",
+      "rejectedLabel": "Playlist rejeitada",
+      "openaiSuggested": "Sugerida pela IA",
+      "compatible": "Compatível"
     },
     "statusLabels": {
       "pending": "Pendente",
