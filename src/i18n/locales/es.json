@@ -477,7 +477,8 @@
       "values": {
         "submission_validation": "Validando envío",
         "video_load": "Cargando video",
-        "context_load": "Cargando categorías y playlists",
+        "context_load": "Cargando playlists educativas",
+        "analysis": "Analizando video con Gemini",
         "transcription": "Generando resumen de transcripción",
         "enrichment": "Enriqueciendo metadatos",
         "assignment": "Asignando playlists",
@@ -490,10 +491,13 @@
     "transcription": {
       "label": "Resumen de transcripción",
       "partialTitle": "Video listo sin transcripción completa",
-      "partialDescription": "El procesamiento terminó y la playlist fue asignada, pero la transcripción no estuvo disponible. El video sigue publicado."
+      "partialDescription": "El procesamiento terminó, pero la transcripción completa no estuvo disponible. El video sigue publicado."
     },
     "assignment": {
-      "label": "Playlist asignada"
+      "label": "Playlist asignada",
+      "noneLabel": "Playlist curricular",
+      "noneTitle": "Sin playlist asignada",
+      "noneDescription": "No hubo suficiente afinidad con una playlist educativa existente."
     },
     "statusLabels": {
       "pending": "Pendiente",

@@ -1,7 +1,6 @@
 ﻿import { serve } from "https://deno.land/std@0.190.0/http/server.ts"
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.45.0'
-import { createOpenAIClient, type VideoEnrichmentParams } from '../_shared/openai-client.ts'
-import { createGeminiClient, type GeminiError } from '../_shared/gemini-client.ts'
+import { createGeminiClient, type GeminiError, type GeminiVideoAnalysisResult } from '../_shared/gemini-client.ts'
 import { assignPlaylist, type PlaylistAssignmentResult } from '../_shared/playlist-assignment.ts'
 
 const corsHeaders = {
@@ -11,12 +10,6 @@ const corsHeaders = {
 
 declare const EdgeRuntime: {
   waitUntil: (promise: Promise<unknown>) => void;
-};
-
-type CategoryRow = {
-  id: string;
-  name: string;
-  slug: string;
 };
 
 type PlaylistRow = {
@@ -30,25 +23,9 @@ type PlaylistRow = {
   unit_code: string | null;
 };
 
-type EnrichmentPayload = {
-  optimized_title: string;
-  summary_description: string;
-  semantic_tags: string[];
-  suggested_category_id: string | null;
-  suggested_category: string | null;
-  suggested_playlist_id: string | null;
-  suggested_playlist_query: string | null;
-  classification_confidence: number;
-  language: string;
-  cultural_relevance: string;
-  short_summary: string;
-};
-
 type EnhancedAssignmentResult = {
-  suggestedCategoryId: string | null;
-  assignedCategoryId: string | null;
   assignedPlaylistId: string | null;
-  playlistAssignment: PlaylistAssignmentResult;
+  playlistAssignment: PlaylistAssignmentResult | null;
   reliability: 'high' | 'low';
   reason: string;
 };
@@ -85,6 +62,7 @@ type TranscriptProcessingResult = {
   summary: string | null;
   confidence: number;
   errorMessage: string | null;
+  analysis: GeminiVideoAnalysisResult;
 };
 
 type VideoProcessingVideo = {
@@ -195,73 +173,9 @@ function toProcessingErrorPayload(error: unknown, requestId: string, fallbackSta
   };
 }
 
-function normalizeText(value: string | null | undefined): string {
-  return (value ?? '')
-    .normalize('NFD')
-    .replace(/[\u0300-\u036f]/g, '')
-    .toLowerCase()
-    .trim();
-}
-
 function normalizeLanguage(value: string | null | undefined): string | null {
   const normalized = (value ?? '').trim().toLowerCase();
   return normalized.length >= 2 ? normalized : null;
-}
-
-function tokenize(value: string | null | undefined): string[] {
-  return normalizeText(value)
-    .split(/[^a-z0-9]+/)
-    .filter((token) => token.length > 2);
-}
-
-function tokenOverlapScore(left: string | null | undefined, right: string | null | undefined): number {
-  const leftTokens = new Set(tokenize(left));
-  if (leftTokens.size === 0) return 0;
-
-  let score = 0;
-  for (const token of tokenize(right)) {
-    if (leftTokens.has(token)) {
-      score += 1;
-    }
-  }
-
-  return score;
-}
-
-function resolveSuggestedCategoryId(
-  categories: CategoryRow[],
-  enrichment: EnrichmentPayload,
-): { categoryId: string | null; score: number } {
-  const suggested = normalizeText(enrichment.suggested_category);
-  const tagsText = enrichment.semantic_tags.join(' ');
-
-  let bestMatch: { categoryId: string | null; score: number } = {
-    categoryId: null,
-    score: 0,
-  };
-
-  for (const category of categories) {
-    const categorySlug = normalizeText(category.slug);
-    const categoryName = normalizeText(category.name);
-
-    let score = 0;
-
-    if (suggested && (suggested === categorySlug || suggested === categoryName)) {
-      score += 6;
-    }
-
-    if (suggested && (suggested.includes(categorySlug) || suggested.includes(categoryName))) {
-      score += 3;
-    }
-
-    score += Math.min(3, tokenOverlapScore(`${category.slug} ${category.name}`, tagsText));
-
-    if (score > bestMatch.score) {
-      bestMatch = { categoryId: category.id, score };
-    }
-  }
-
-  return bestMatch;
 }
 
 async function assignVideoToPlaylist(
@@ -443,31 +357,42 @@ async function insertTranscriptRecord(
   return data.id as string;
 }
 
-async function processTranscript(params: {
+async function processVideoAnalysis(params: {
   supabaseServiceRole: ReturnType<typeof createClient>;
+  geminiClient: ReturnType<typeof createGeminiClient>;
   requestId: string;
   videoId: string;
   youtubeUrl: string;
   videoTitle: string;
+  videoDescription: string | null;
   effectiveLanguage: string;
 }): Promise<TranscriptProcessingResult> {
-  const { supabaseServiceRole, requestId, videoId, youtubeUrl, videoTitle, effectiveLanguage } = params;
-  const geminiClient = createGeminiClient();
-  logProcessing(requestId, 'transcription', 'Starting Gemini transcript extraction', {
+  const {
+    supabaseServiceRole,
+    geminiClient,
+    requestId,
+    videoId,
+    youtubeUrl,
+    videoTitle,
+    videoDescription,
+    effectiveLanguage,
+  } = params;
+  logProcessing(requestId, 'analysis', 'Starting Gemini video analysis', {
     videoId,
     model: geminiClient.modelName,
   });
 
-  let transcript;
+  let analysis: GeminiVideoAnalysisResult;
   try {
-    transcript = await geminiClient.transcribeYouTubeVideo({
+    analysis = await geminiClient.analyzeYouTubeVideo({
       youtubeUrl,
       title: videoTitle,
+      description: videoDescription,
       language: effectiveLanguage,
     });
   } catch (error) {
     const geminiError = error as Partial<GeminiError>;
-    const errorMessage = error instanceof Error ? error.message : 'Unknown Gemini transcription error';
+    const errorMessage = error instanceof Error ? error.message : 'Unknown Gemini analysis error';
     const transcriptId = await insertTranscriptRecord(supabaseServiceRole, {
       videoId,
       providerModel: geminiClient.modelName,
@@ -479,15 +404,15 @@ async function processTranscript(params: {
       errorMessage,
       metadata: {
         requestId,
-        code: geminiError.code ?? 'GEMINI_TRANSCRIPTION_FAILED',
+        code: geminiError.code ?? 'GEMINI_ANALYSIS_FAILED',
         recoverable: geminiError.recoverable ?? isRecoverableExternalError(error),
       },
     });
 
-    logProcessingError(requestId, 'transcription', 'Gemini transcript extraction failed, continuing without transcript', {
+    logProcessingError(requestId, 'analysis', 'Gemini video analysis failed, continuing without transcript', {
       videoId,
       transcriptId,
-      code: geminiError.code ?? 'GEMINI_TRANSCRIPTION_FAILED',
+      code: geminiError.code ?? 'GEMINI_ANALYSIS_FAILED',
       error: errorMessage,
     });
 
@@ -500,36 +425,47 @@ async function processTranscript(params: {
       summary: null,
       confidence: 0,
       errorMessage,
+      analysis: {
+        transcriptText: null,
+        transcriptSummary: null,
+        summaryDescription: null,
+        shortSummary: null,
+        semanticTags: [],
+        language: normalizeLanguage(effectiveLanguage),
+        confidence: 0,
+        unavailableReason: errorMessage,
+      },
     };
   }
 
-  const status: 'completed' | 'unavailable' = transcript.transcriptText || transcript.transcriptSummary
+  const status: 'completed' | 'unavailable' = analysis.transcriptText || analysis.transcriptSummary || analysis.summaryDescription
     ? 'completed'
     : 'unavailable';
   const errorMessage = status === 'unavailable'
-    ? transcript.unavailableReason || 'Transcript unavailable from Gemini'
+    ? analysis.unavailableReason || 'Transcript unavailable from Gemini'
     : null;
 
   const transcriptId = await insertTranscriptRecord(supabaseServiceRole, {
     videoId,
     providerModel: geminiClient.modelName,
     status,
-    language: normalizeLanguage(transcript.language) ?? normalizeLanguage(effectiveLanguage),
-    transcriptText: transcript.transcriptText,
-    summary: transcript.transcriptSummary,
-    confidence: transcript.confidence,
+    language: normalizeLanguage(analysis.language) ?? normalizeLanguage(effectiveLanguage),
+    transcriptText: analysis.transcriptText,
+    summary: analysis.transcriptSummary ?? analysis.summaryDescription,
+    confidence: analysis.confidence,
     errorMessage,
     metadata: {
       requestId,
-      unavailableReason: transcript.unavailableReason,
+      unavailableReason: analysis.unavailableReason,
+      semanticTags: analysis.semanticTags,
     },
   });
 
-  logProcessing(requestId, 'transcription', 'Gemini transcript extraction completed', {
+  logProcessing(requestId, 'analysis', 'Gemini video analysis completed', {
     videoId,
     transcriptId,
     status,
-    confidence: transcript.confidence,
+    confidence: analysis.confidence,
   });
 
   return {
@@ -537,89 +473,46 @@ async function processTranscript(params: {
     provider: 'gemini',
     providerModel: geminiClient.modelName,
     status,
-    language: normalizeLanguage(transcript.language) ?? normalizeLanguage(effectiveLanguage),
-    summary: transcript.transcriptSummary,
-    confidence: transcript.confidence,
+    language: normalizeLanguage(analysis.language) ?? normalizeLanguage(effectiveLanguage),
+    summary: analysis.transcriptSummary ?? analysis.summaryDescription,
+    confidence: analysis.confidence,
     errorMessage,
+    analysis,
   };
 }
 
 async function runEnhancedAssignments(params: {
   supabaseServiceRole: ReturnType<typeof createClient>;
-  enrichment: EnrichmentPayload;
-  categoryRows: CategoryRow[];
+  geminiClient: ReturnType<typeof createGeminiClient>;
+  analysis: GeminiVideoAnalysisResult;
   playlistRows: PlaylistRow[];
   videoId: string;
-  currentVideoCategoryId: string | null;
-  videoLanguage: string;
-  videoTitle: string | null;
-  videoDescription: string | null;
-  channelName: string | null;
   userId: string;
 }): Promise<EnhancedAssignmentResult> {
   const {
     supabaseServiceRole,
-    enrichment,
-    categoryRows,
+    geminiClient,
+    analysis,
     playlistRows,
     videoId,
-    currentVideoCategoryId,
-    videoLanguage,
-    videoTitle,
-    videoDescription,
-    channelName,
     userId,
   } = params;
 
-  const categoryConfidence = enrichment.classification_confidence;
-
-  // Primary path: AI returned a valid UUID from the provided categories list
-  let resolvedCategoryId: string | null =
-    enrichment.suggested_category_id &&
-    categoryRows.some((c) => c.id === enrichment.suggested_category_id)
-      ? enrichment.suggested_category_id
-      : null;
-
-  // Fallback: token-overlap scoring (handles cases where AI skipped returning a UUID)
-  if (!resolvedCategoryId) {
-    const scored = resolveSuggestedCategoryId(categoryRows, enrichment);
-    if (scored.score >= 4) {
-      resolvedCategoryId = scored.categoryId;
-    }
-  }
-
-  const hasReliableCategory = !!resolvedCategoryId && categoryConfidence >= 0.40;
-
-  let assignedCategoryId: string | null = null;
-  if (hasReliableCategory && resolvedCategoryId) {
-    const unclassifiedCategoryId =
-      categoryRows.find((c) => normalizeText(c.slug) === 'nao-classificados')?.id ?? null;
-
-    const shouldUpdateCategory =
-      currentVideoCategoryId === null || currentVideoCategoryId === unclassifiedCategoryId;
-
-    if (shouldUpdateCategory) {
-      const { error: updateCategoryError } = await supabaseServiceRole
-        .from('videos')
-        .update({ category_id: resolvedCategoryId })
-        .eq('id', videoId);
-
-      if (updateCategoryError) {
-        throw new Error(`Failed to assign category: ${updateCategoryError.message}`);
-      }
-    }
-
-    assignedCategoryId = resolvedCategoryId;
-  }
+  const geminiAssignment = await geminiClient.assignPlaylistFromAnalysis({
+    analysis,
+    playlists: playlistRows,
+  });
 
   const playlistAssignment = assignPlaylist({
     playlists: playlistRows,
-    enrichment,
-    video: {
-      title: videoTitle,
-      description: videoDescription,
-      channelName,
-      language: videoLanguage || enrichment.language || 'pt',
+    analysis: {
+      semanticTags: analysis.semanticTags,
+      summaryDescription: analysis.summaryDescription,
+      shortSummary: analysis.shortSummary,
+      language: analysis.language,
+      geminiAssignedPlaylistId: geminiAssignment.assignedPlaylistId,
+      geminiConfidence: geminiAssignment.confidence,
+      geminiReason: geminiAssignment.reason,
     },
   });
 
@@ -634,21 +527,26 @@ async function runEnhancedAssignments(params: {
     assignedPlaylistId = playlistAssignment.assignedPlaylistId;
   }
 
-  const reliable = hasReliableCategory || !!assignedPlaylistId;
+  const reliable = !!assignedPlaylistId;
   const reason = assignedPlaylistId
     ? playlistAssignment.reason
-    : reliable
-      ? 'Enhanced category assignment applied'
-      : 'Enhanced suggestions below reliability threshold';
+    : playlistAssignment.reason;
 
   return {
-    suggestedCategoryId: resolvedCategoryId,
-    assignedCategoryId,
     assignedPlaylistId,
     playlistAssignment,
     reliability: reliable ? 'high' : 'low',
     reason,
   };
+}
+
+function hasProcessedAnalysisContent(analysis: GeminiVideoAnalysisResult): boolean {
+  return (
+    analysis.semanticTags.length > 0 ||
+    !!analysis.summaryDescription ||
+    !!analysis.shortSummary ||
+    !!analysis.transcriptSummary
+  );
 }
 
 async function runVideoProcessingTask(params: {
@@ -677,14 +575,6 @@ async function runVideoProcessingTask(params: {
       await updateSubmissionStage(supabaseServiceRole, submissionId, requestId, currentStage);
     }
 
-    const { data: categoriesData, error: categoryFetchError } = await supabaseServiceRole
-      .from('categories')
-      .select('id, name, slug');
-    if (categoryFetchError) {
-      throw new Error(`Failed to load categories: ${categoryFetchError.message}`);
-    }
-    const categoryRows = (categoriesData ?? []) as CategoryRow[];
-
     const effectiveLanguage = video.language && video.language !== 'und' ? video.language : 'pt';
     const { data: playlistsByLanguage, error: playlistFetchError } = await supabaseServiceRole
       .rpc('list_education_playlists_for_assignment', {
@@ -708,21 +598,24 @@ async function runVideoProcessingTask(params: {
       playlistsData = fallbackData;
     }
     const playlistRows = (playlistsData ?? []) as PlaylistRow[];
+    const geminiClient = createGeminiClient();
 
-    currentStage = 'transcription';
+    currentStage = 'analysis';
     if (submissionId) {
       await updateSubmissionStage(supabaseServiceRole, submissionId, requestId, currentStage);
     }
-    const transcriptResult = await processTranscript({
+    const transcriptResult = await processVideoAnalysis({
       supabaseServiceRole,
+      geminiClient,
       requestId,
       videoId,
       youtubeUrl,
       videoTitle: video.title || '',
+      videoDescription: video.description ?? null,
       effectiveLanguage,
     });
 
-    currentStage = 'enrichment';
+    currentStage = 'assignment';
     if (submissionId) {
       await updateSubmissionStatusWithMetadataPatch(
         supabaseServiceRole,
@@ -744,86 +637,44 @@ async function runVideoProcessingTask(params: {
       );
     }
 
-    let enrichment: EnrichmentPayload;
-    try {
-      const openaiClient = createOpenAIClient();
-      const enrichmentParams: VideoEnrichmentParams = {
-        title: video.title || '',
-        description: [video.description || '', transcriptResult.summary || ''].filter(Boolean).join('\n\nTranscript summary: '),
-        channelName: video.channel_name || null,
-        language: transcriptResult.language || effectiveLanguage,
-        categories: categoryRows,
-        playlists: playlistRows,
-      };
-      enrichment = await openaiClient.enrichVideo(enrichmentParams) as EnrichmentPayload;
-      logProcessing(requestId, currentStage, 'OpenAI enrichment completed', {
-        videoId,
-        suggestedCategoryId: enrichment.suggested_category_id,
-        suggestedPlaylistId: enrichment.suggested_playlist_id,
-      });
-    } catch (openaiError) {
-      const errorMsg = openaiError instanceof Error ? openaiError.message : 'Unknown OpenAI error';
-      logProcessingError(requestId, currentStage, 'OpenAI enrichment failed', { error: errorMsg });
-      throw new Error(`AI enrichment failed: ${errorMsg}`);
-    }
-
-    let enhancedAssignment = {
-      fallbackUsed: false,
-      reliability: 'low' as 'low' | 'high',
-      reason: 'Enhanced assignment not evaluated',
-      suggestedCategoryId: null as string | null,
-      assignedCategoryId: null as string | null,
-      assignedPlaylistId: null as string | null,
-      playlistAssignment: null as PlaylistAssignmentResult | null,
+    let enhancedAssignment: EnhancedAssignmentResult = {
+      assignedPlaylistId: null,
+      playlistAssignment: null,
+      reliability: 'low',
+      reason: 'No playlist assigned because the video analysis did not provide enough educational signals',
     };
 
-    currentStage = 'assignment';
-    if (submissionId) {
-      await updateSubmissionStage(supabaseServiceRole, submissionId, requestId, currentStage);
-    }
     try {
-      const assignment = await runEnhancedAssignments({
-        supabaseServiceRole,
-        enrichment,
-        categoryRows,
-        playlistRows,
-        videoId,
-        currentVideoCategoryId: video.category_id ?? null,
-        videoLanguage: effectiveLanguage,
-        videoTitle: video.title ?? null,
-        videoDescription: video.description ?? null,
-        channelName: video.channel_name ?? null,
-        userId,
-      });
-
-      enhancedAssignment = {
-        fallbackUsed: assignment.reliability === 'low',
-        reliability: assignment.reliability,
-        reason: assignment.reason,
-        suggestedCategoryId: assignment.reliability === 'high'
-          ? assignment.suggestedCategoryId
-          : null,
-        assignedCategoryId: assignment.assignedCategoryId,
-        assignedPlaylistId: assignment.assignedPlaylistId,
-        playlistAssignment: assignment.playlistAssignment,
-      };
+      if (playlistRows.length > 0 && hasProcessedAnalysisContent(transcriptResult.analysis)) {
+        enhancedAssignment = await runEnhancedAssignments({
+          supabaseServiceRole,
+          geminiClient,
+          analysis: transcriptResult.analysis,
+          playlistRows,
+          videoId,
+          userId,
+        });
+      } else {
+        logProcessing(requestId, currentStage, 'Skipping playlist assignment because processed analysis is empty', {
+          videoId,
+          playlistCount: playlistRows.length,
+          semanticTagCount: transcriptResult.analysis.semanticTags.length,
+        });
+      }
     } catch (assignmentError) {
       const assignmentErrorMessage = assignmentError instanceof Error
         ? assignmentError.message
-        : 'Unknown enhanced assignment error';
+        : 'Unknown playlist assignment error';
 
-      logProcessingError(requestId, currentStage, 'Enhanced assignment failed, continuing with enrichment only', {
+      logProcessingError(requestId, currentStage, 'Playlist assignment failed, continuing without playlist insertion', {
         error: assignmentErrorMessage,
       });
 
       enhancedAssignment = {
-        fallbackUsed: true,
-        reliability: 'low',
-        reason: `Fallback to legacy enrichment: ${assignmentErrorMessage}`,
-        suggestedCategoryId: null,
-        assignedCategoryId: null,
         assignedPlaylistId: null,
         playlistAssignment: null,
+        reliability: 'low',
+        reason: `Playlist assignment skipped after error: ${assignmentErrorMessage}`,
       };
     }
 
@@ -835,13 +686,13 @@ async function runVideoProcessingTask(params: {
       .from('ai_enrichments')
       .insert({
         video_id: videoId,
-        optimized_title: enrichment.optimized_title,
-        summary_description: enrichment.summary_description,
-        semantic_tags: enrichment.semantic_tags,
-        suggested_category_id: enhancedAssignment.suggestedCategoryId,
-        language: enrichment.language,
-        cultural_relevance: enrichment.cultural_relevance,
-        short_summary: enrichment.short_summary,
+        optimized_title: null,
+        summary_description: transcriptResult.analysis.summaryDescription ?? transcriptResult.analysis.transcriptSummary,
+        semantic_tags: transcriptResult.analysis.semanticTags,
+        suggested_category_id: null,
+        language: normalizeLanguage(transcriptResult.analysis.language) ?? normalizeLanguage(effectiveLanguage),
+        cultural_relevance: null,
+        short_summary: transcriptResult.analysis.shortSummary ?? transcriptResult.analysis.summaryDescription ?? transcriptResult.analysis.transcriptSummary,
       })
       .select()
       .single();
@@ -850,7 +701,7 @@ async function runVideoProcessingTask(params: {
       throw new Error(`Failed to save AI enrichment: ${error.message}`);
     }
 
-    const detectedLanguage = normalizeLanguage(enrichment.language);
+    const detectedLanguage = normalizeLanguage(transcriptResult.analysis.language) ?? normalizeLanguage(effectiveLanguage);
     if (detectedLanguage && detectedLanguage !== 'und') {
       const { error: updateLanguageError } = await supabaseServiceRole
         .from('videos')
@@ -887,16 +738,18 @@ async function runVideoProcessingTask(params: {
             errorMessage: transcriptResult.errorMessage,
           },
           assignment: {
-            fallbackUsed: enhancedAssignment.fallbackUsed,
+            fallbackUsed: enhancedAssignment.reliability === 'low',
             reliability: enhancedAssignment.reliability,
             reason: enhancedAssignment.reason,
-            assignedCategoryId: enhancedAssignment.assignedCategoryId,
+            assignedCategoryId: null,
             assignedPlaylistId: enhancedAssignment.assignedPlaylistId,
             algorithmVersion: enhancedAssignment.playlistAssignment?.algorithmVersion ?? null,
             score: enhancedAssignment.playlistAssignment?.score ?? null,
+            geminiConfidence: enhancedAssignment.playlistAssignment?.geminiConfidence ?? null,
             signals: enhancedAssignment.playlistAssignment?.signals ?? null,
             topCandidates: enhancedAssignment.playlistAssignment?.topCandidates ?? [],
-            rejectedAiPlaylistId: enhancedAssignment.playlistAssignment?.rejectedAiPlaylistId ?? null,
+            rejectedPlaylistId: enhancedAssignment.playlistAssignment?.rejectedPlaylistId ?? null,
+            rejectedAiPlaylistId: enhancedAssignment.playlistAssignment?.rejectedPlaylistId ?? null,
           },
         },
       });
@@ -908,6 +761,7 @@ async function runVideoProcessingTask(params: {
       enrichmentId: data.id,
       transcriptId: transcriptResult.id,
       transcriptStatus: transcriptResult.status,
+      assignedPlaylistId: enhancedAssignment.assignedPlaylistId,
     });
   } catch (error) {
     const errorPayload = toProcessingErrorPayload(error, requestId, currentStage);
@@ -952,7 +806,6 @@ serve(async (req) => {
     SUPABASE_URL: Deno.env.get('SUPABASE_URL'),
     SUPABASE_ANON_KEY: Deno.env.get('SUPABASE_ANON_KEY'),
     SUPABASE_SERVICE_ROLE_KEY: Deno.env.get('SUPABASE_SERVICE_ROLE_KEY'),
-    OPENAI_API_KEY: Deno.env.get('OPENAI_API_KEY'),
     GEMINI_API_KEY: Deno.env.get('GEMINI_API_KEY'),
   };
   const missingEnv = Object.entries(requiredEnv)

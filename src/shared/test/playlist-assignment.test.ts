@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import {
   assignPlaylist,
-  type PlaylistAssignmentEnrichment,
+  type PlaylistAssignmentAnalysis,
   type PlaylistAssignmentPlaylist,
 } from '../../../supabase/functions/_shared/playlist-assignment';
 
@@ -9,18 +9,17 @@ const playlists: PlaylistAssignmentPlaylist[] = [
   {
     id: 'educacao',
     name: 'Educacao',
-    slug: 'educacao',
-    description: 'Colecao geral para videos educacionais submetidos pela comunidade antes da classificacao curricular por IA.',
+    description: 'Colecao geral para videos educacionais submetidos pela comunidade.',
     language: 'pt',
     is_public: true,
     is_ordered: false,
     course_code: null,
     unit_code: null,
-  } as PlaylistAssignmentPlaylist,
+  },
   {
     id: 'math-ii',
     name: 'Analise Matematica II - 1º Ano 2º Semestre - LESTI',
-    description: 'Roteiro oficial de aprendizagem da unidade curricular 19411008 da licenciatura em Engenharia de Sistemas e Tecnologias da Informacao (LESTI), organizado por semestre.',
+    description: 'Roteiro oficial de aprendizagem da unidade curricular 19411008 da licenciatura em Engenharia de Sistemas e Tecnologias da Informacao.',
     language: 'pt',
     is_public: true,
     is_ordered: true,
@@ -30,7 +29,7 @@ const playlists: PlaylistAssignmentPlaylist[] = [
   {
     id: 'design-i',
     name: 'Design de Comunicacao I - 1º Ano 1º Semestre - LDC',
-    description: 'Roteiro oficial de aprendizagem da unidade curricular 14541000 da licenciatura em Design de Comunicacao (LDC), organizado por semestre.',
+    description: 'Roteiro oficial de aprendizagem da unidade curricular 14541000 da licenciatura em Design de Comunicacao.',
     language: 'pt',
     is_public: true,
     is_ordered: true,
@@ -49,29 +48,28 @@ const playlists: PlaylistAssignmentPlaylist[] = [
   },
 ];
 
-const baseEnrichment: PlaylistAssignmentEnrichment = {
-  semantic_tags: ['educacao'],
-  suggested_category: 'educacao',
-  suggested_playlist_id: null,
-  suggested_playlist_query: null,
-  classification_confidence: 0.70,
+const baseAnalysis: PlaylistAssignmentAnalysis = {
+  semanticTags: ['educacao'],
+  summaryDescription: 'Aula introdutoria com conteudo educacional.',
+  shortSummary: 'Aula introdutoria.',
   language: 'pt',
+  geminiAssignedPlaylistId: null,
+  geminiConfidence: null,
+  geminiReason: null,
 };
 
 describe('playlist assignment', () => {
-  it('assigns Integral de Linha videos to Analise Matematica II', () => {
+  it('assigns Integral de Linha videos to Analise Matematica II when Gemini and local signals agree', () => {
     const result = assignPlaylist({
       playlists,
-      enrichment: {
-        ...baseEnrichment,
-        semantic_tags: ['integral', 'calculo', 'matematica'],
-        suggested_playlist_query: 'integral de linha matematica',
-      },
-      video: {
-        title: 'INTEGRAL DE LINHA #01',
-        description: null,
-        channelName: 'Prof. MURAKAMI - MATEMATICA RAPIDOLA',
-        language: 'pt',
+      analysis: {
+        ...baseAnalysis,
+        semanticTags: ['integral de linha', 'calculo', 'matematica'],
+        summaryDescription: 'Aula sobre integrais de linha, calculo vetorial e aplicacoes em matematica.',
+        shortSummary: 'Integral de linha em calculo vetorial.',
+        geminiAssignedPlaylistId: 'math-ii',
+        geminiConfidence: 0.88,
+        geminiReason: 'O conteudo trata de calculo e analise matematica.',
       },
     });
 
@@ -80,82 +78,68 @@ describe('playlist assignment', () => {
     expect(result.topCandidates[0].playlistId).toBe('math-ii');
   });
 
-  it('rejects an AI design suggestion when original metadata strongly indicates math', () => {
+  it('rejects a Gemini design suggestion when processed analysis strongly indicates math', () => {
     const result = assignPlaylist({
       playlists,
-      enrichment: {
-        ...baseEnrichment,
-        semantic_tags: ['design', 'comunicacao', 'visual'],
-        suggested_category: 'design',
-        suggested_playlist_id: 'design-i',
-        suggested_playlist_query: 'design comunicacao visual',
-      },
-      video: {
-        title: 'INTEGRAL DE LINHA #02',
-        description: null,
-        channelName: 'Prof. MURAKAMI - MATEMATICA RAPIDOLA',
-        language: 'pt',
+      analysis: {
+        ...baseAnalysis,
+        semanticTags: ['integral de linha', 'calculo', 'matematica'],
+        summaryDescription: 'Aula de calculo sobre integrais e coordenadas.',
+        shortSummary: 'Exercicios de calculo integral.',
+        geminiAssignedPlaylistId: 'design-i',
+        geminiConfidence: 0.92,
+        geminiReason: 'Sugestao incorreta para design.',
       },
     });
 
-    expect(result.rejectedAiPlaylistId).toBe('design-i');
-    expect(result.assignedPlaylistId).toBe('math-ii');
+    expect(result.assignedPlaylistId).toBeNull();
+    expect(result.rejectedPlaylistId).toBe('design-i');
     expect(result.reason).toContain('rejected');
   });
 
   it('keeps clear design videos eligible for LDC playlists', () => {
     const result = assignPlaylist({
       playlists,
-      enrichment: {
-        ...baseEnrichment,
-        semantic_tags: ['design', 'comunicacao', 'tipografia'],
-        suggested_playlist_id: 'design-i',
-        suggested_playlist_query: 'design comunicacao tipografia',
-      },
-      video: {
-        title: 'Fundamentos de Design de Comunicacao',
-        description: 'Aula de comunicacao visual e grafismo.',
-        channelName: 'LDC Studio',
-        language: 'pt',
+      analysis: {
+        ...baseAnalysis,
+        semanticTags: ['design de comunicacao', 'tipografia', 'comunicacao visual'],
+        summaryDescription: 'Aula de design de comunicacao sobre tipografia e composicao visual.',
+        shortSummary: 'Fundamentos de design de comunicacao.',
+        geminiAssignedPlaylistId: 'design-i',
+        geminiConfidence: 0.83,
       },
     });
 
     expect(result.assignedPlaylistId).toBe('design-i');
-    expect(result.rejectedAiPlaylistId).toBeNull();
+    expect(result.rejectedPlaylistId).toBeNull();
   });
 
-  it('falls back to enrichment scoring when no strong source signal exists', () => {
+  it('returns null when Gemini does not choose a playlist even if broad tokens exist', () => {
     const result = assignPlaylist({
       playlists,
-      enrichment: {
-        ...baseEnrichment,
-        semantic_tags: ['algoritmo', 'codigo'],
-        suggested_playlist_query: 'programacao algoritmos codigo',
-      },
-      video: {
-        title: 'Aula 1',
-        description: null,
-        channelName: 'Canal de estudos',
-        language: 'pt',
+      analysis: {
+        ...baseAnalysis,
+        semanticTags: ['aula', 'educacao', 'estudo'],
+        summaryDescription: 'Video de estudo com conteudo generico sem unidade curricular clara.',
+        shortSummary: 'Conteudo educacional generico.',
+        geminiAssignedPlaylistId: null,
+        geminiConfidence: 0.25,
       },
     });
 
-    expect(result.assignedPlaylistId).toBe('programming');
+    expect(result.assignedPlaylistId).toBeNull();
   });
 
   it('does not let the general education playlist beat a strong curricular match', () => {
     const result = assignPlaylist({
       playlists,
-      enrichment: {
-        ...baseEnrichment,
-        semantic_tags: ['educacao', 'integracao', 'calculo'],
-        suggested_playlist_query: 'educacao matematica integracao',
-      },
-      video: {
-        title: 'Integracao por partes passo a passo',
-        description: null,
-        channelName: 'Prof. MURAKAMI - MATEMATICA RAPIDOLA',
-        language: 'pt',
+      analysis: {
+        ...baseAnalysis,
+        semanticTags: ['integracao', 'calculo', 'matematica'],
+        summaryDescription: 'Aula de matematica sobre integracao por partes e calculo integral.',
+        shortSummary: 'Integracao por partes passo a passo.',
+        geminiAssignedPlaylistId: 'math-ii',
+        geminiConfidence: 0.9,
       },
     });
 

@@ -144,4 +144,108 @@ describe('GeminiClient', () => {
       unavailableReason: 'Gemini returned partial JSON transcript data',
     });
   });
+
+  it('analyzes a YouTube video into summaries, tags and detected language', async () => {
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue(
+      new Response(JSON.stringify({
+        candidates: [
+          {
+            content: {
+              parts: [
+                {
+                  text: JSON.stringify({
+                    transcriptText: 'Aula sobre integrais de linha.',
+                    transcriptSummary: 'Resumo da aula de calculo.',
+                    summaryDescription: 'Aula sobre integrais de linha e calculo vetorial.',
+                    shortSummary: 'Integral de linha em calculo.',
+                    semanticTags: ['integral de linha', 'calculo', 'matematica'],
+                    language: 'pt',
+                    confidence: 0.86,
+                    unavailableReason: null,
+                  }),
+                },
+              ],
+            },
+          },
+        ],
+      }), {
+        status: 200,
+        headers: { 'Content-Type': 'application/json' },
+      }),
+    ));
+
+    const client = new GeminiClient({ apiKey: 'gemini-key', timeout: 1000, maxRetries: 0 });
+    await expect(client.analyzeYouTubeVideo({
+      youtubeUrl: 'https://youtu.be/USW31veYWAc',
+      title: 'Integral de linha',
+      language: 'pt',
+    })).resolves.toEqual({
+      transcriptText: 'Aula sobre integrais de linha.',
+      transcriptSummary: 'Resumo da aula de calculo.',
+      summaryDescription: 'Aula sobre integrais de linha e calculo vetorial.',
+      shortSummary: 'Integral de linha em calculo.',
+      semanticTags: ['integral de linha', 'calculo', 'matematica'],
+      language: 'pt',
+      confidence: 0.86,
+      unavailableReason: null,
+    });
+  });
+
+  it('assigns playlists from processed analysis without sending YouTube file data', async () => {
+    const fetchMock = vi.fn().mockResolvedValue(
+      new Response(JSON.stringify({
+        candidates: [
+          {
+            content: {
+              parts: [
+                {
+                  text: JSON.stringify({
+                    assignedPlaylistId: 'math-ii',
+                    confidence: 0.82,
+                    reason: 'Tags and summary match Analise Matematica II.',
+                  }),
+                },
+              ],
+            },
+          },
+        ],
+      }), {
+        status: 200,
+        headers: { 'Content-Type': 'application/json' },
+      }),
+    );
+    vi.stubGlobal('fetch', fetchMock);
+
+    const client = new GeminiClient({ apiKey: 'gemini-key', timeout: 1000, maxRetries: 0 });
+    const result = await client.assignPlaylistFromAnalysis({
+      analysis: {
+        transcriptText: null,
+        transcriptSummary: 'Resumo de calculo.',
+        summaryDescription: 'Aula de calculo sobre integral.',
+        shortSummary: 'Integral em calculo.',
+        semanticTags: ['integral', 'calculo', 'matematica'],
+        language: 'pt',
+        confidence: 0.88,
+        unavailableReason: null,
+      },
+      playlists: [
+        {
+          id: 'math-ii',
+          name: 'Analise Matematica II',
+          description: 'Calculo integral',
+          language: 'pt',
+          course_code: 'LESTI',
+          unit_code: '19411008',
+        },
+      ],
+    });
+
+    expect(result).toEqual({
+      assignedPlaylistId: 'math-ii',
+      confidence: 0.82,
+      reason: 'Tags and summary match Analise Matematica II.',
+    });
+    const body = JSON.parse(String(fetchMock.mock.calls[0][1]?.body));
+    expect(JSON.stringify(body)).not.toContain('file_uri');
+  });
 });

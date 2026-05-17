@@ -384,7 +384,8 @@
       "values": {
         "submission_validation": "Validating submission",
         "video_load": "Loading video",
-        "context_load": "Loading categories and playlists",
+        "context_load": "Loading educational playlists",
+        "analysis": "Analyzing video with Gemini",
         "transcription": "Generating transcript summary",
         "enrichment": "Enriching metadata",
         "assignment": "Assigning playlists",
@@ -397,10 +398,13 @@
     "transcription": {
       "label": "Transcript summary",
       "partialTitle": "Video ready without a full transcript",
-      "partialDescription": "Processing finished and the playlist was assigned, but the transcript was not available. The video is still published."
+      "partialDescription": "Processing finished, but the full transcript was not available. The video is still published."
     },
     "assignment": {
-      "label": "Assigned playlist"
+      "label": "Assigned playlist",
+      "noneLabel": "Curricular playlist",
+      "noneTitle": "No playlist assigned",
+      "noneDescription": "There was not enough adherence to an existing educational playlist."
     },
     "statusLabels": {
       "pending": "Pending",

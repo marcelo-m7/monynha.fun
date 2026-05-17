@@ -138,6 +138,33 @@ describe('SubmitStatus page', () => {
     expect(screen.getByText('Best compatible playlist selected by source and enrichment score')).toBeInTheDocument();
   });
 
+  it('shows when no playlist was assigned after processing', () => {
+    useVideoSubmissionMock.mockReturnValue({
+      data: {
+        ...baseSubmission,
+        status: 'success',
+        metadata: {
+          detectedLanguage: 'pt',
+          enrichmentId: 'enrichment-1',
+          assignment: {
+            assignedPlaylistId: null,
+            reason: 'No playlist met the content adherence threshold',
+            topCandidates: [],
+          },
+        },
+      },
+      isLoading: false,
+      isError: false,
+      refetch: refetchMock,
+    });
+
+    renderWithProviders(<SubmitStatus />, { route: '/submit/status/submission-1' });
+
+    expect(screen.getByText('No playlist assigned')).toBeInTheDocument();
+    expect(screen.getByText('No playlist met the content adherence threshold')).toBeInTheDocument();
+  });
+
+
   it('shows processing stage, request id, and transcript summary metadata', () => {
     useVideoSubmissionMock.mockReturnValue({
       data: {
@@ -204,7 +231,7 @@ describe('SubmitStatus page', () => {
 
     expect(screen.getByText('Video ready')).toBeInTheDocument();
     expect(screen.getByText('Video ready without a full transcript')).toBeInTheDocument();
-    expect(screen.getByText(/Processing finished and the playlist was assigned/)).toBeInTheDocument();
+    expect(screen.getByText(/Processing finished, but the full transcript was not available/)).toBeInTheDocument();
     expect(screen.getByText('Transcript fetch timed out')).toBeInTheDocument();
     expect(screen.getByText('Educacao')).toBeInTheDocument();
   });

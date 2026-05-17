@@ -11,20 +11,14 @@ export type PlaylistAssignmentPlaylist = {
   unit_code: string | null;
 };
 
-export type PlaylistAssignmentEnrichment = {
-  semantic_tags: string[];
-  suggested_category: string | null;
-  suggested_playlist_id: string | null;
-  suggested_playlist_query: string | null;
-  classification_confidence: number;
-  language: string;
-};
-
-export type PlaylistAssignmentVideo = {
-  title: string | null;
-  description: string | null;
-  channelName: string | null;
-  language: string;
+export type PlaylistAssignmentAnalysis = {
+  semanticTags: string[];
+  summaryDescription: string | null;
+  shortSummary: string | null;
+  language: string | null;
+  geminiAssignedPlaylistId?: string | null;
+  geminiConfidence?: number | null;
+  geminiReason?: string | null;
 };
 
 export type PlaylistAssignmentTopCandidate = {
@@ -32,6 +26,7 @@ export type PlaylistAssignmentTopCandidate = {
   name: string;
   score: number;
   compatible: boolean;
+  isGeminiSuggested: boolean;
   isAiSuggested: boolean;
 };
 
@@ -42,11 +37,14 @@ export type PlaylistAssignmentResult = {
   reliability: 'high' | 'low';
   reason: string;
   topCandidates: PlaylistAssignmentTopCandidate[];
-  rejectedAiPlaylistId: string | null;
+  rejectedPlaylistId: string | null;
+  geminiConfidence: number | null;
   signals: Record<SubjectSignal, number>;
 };
 
-export const PLAYLIST_ASSIGNMENT_ALGORITHM_VERSION = 'playlist-assignment-v1';
+export const PLAYLIST_ASSIGNMENT_ALGORITHM_VERSION = 'playlist-assignment-v2';
+export const MIN_PLAYLIST_ASSIGNMENT_CONFIDENCE = 0.70;
+export const MIN_PLAYLIST_ASSIGNMENT_SCORE = 5;
 
 const subjectKeywords: Record<SubjectSignal, string[]> = {
   math: [
@@ -66,8 +64,6 @@ const subjectKeywords: Record<SubjectSignal, string[]> = {
     'linha',
     'coordenadas',
     'polares',
-    'murakami',
-    'rapidola',
   ],
   design: [
     'design',
@@ -151,70 +147,60 @@ function playlistText(playlist: PlaylistAssignmentPlaylist): string {
   ].join(' ');
 }
 
+function analysisText(analysis: PlaylistAssignmentAnalysis): string {
+  return [
+    analysis.semanticTags.join(' '),
+    analysis.summaryDescription ?? '',
+    analysis.shortSummary ?? '',
+  ].join(' ');
+}
+
+function isGeneralEducationPlaylist(playlist: PlaylistAssignmentPlaylist): boolean {
+  const text = normalizeText(`${playlist.name} ${playlist.description ?? ''}`);
+  return !playlist.course_code && !playlist.unit_code && (
+    text.includes('educacao') ||
+    text.includes('education')
+  );
+}
+
 function playlistSubjectScore(playlist: PlaylistAssignmentPlaylist, subject: SubjectSignal): number {
   return subjectSignalScore(playlistText(playlist), subject);
 }
 
-function getOriginalVideoText(video: PlaylistAssignmentVideo): string {
-  return [
-    video.title ?? '',
-    video.description ?? '',
-    video.channelName ?? '',
-  ].join(' ');
-}
-
-function isPlaylistCompatibleWithSignals(
+function hasStrongSubjectConflict(
   playlist: PlaylistAssignmentPlaylist,
   signals: Record<SubjectSignal, number>,
 ): boolean {
-  if (signals.math >= 2) {
-    return playlistSubjectScore(playlist, 'math') > 0;
+  const strongestSubject = (Object.entries(signals) as Array<[SubjectSignal, number]>)
+    .sort((left, right) => right[1] - left[1])[0];
+
+  if (!strongestSubject || strongestSubject[1] < 2) {
+    return false;
   }
 
-  if (signals.design >= 2) {
-    return playlistSubjectScore(playlist, 'design') > 0;
-  }
-
-  if (signals.programming >= 2) {
-    return playlistSubjectScore(playlist, 'programming') > 0;
-  }
-
-  return true;
+  return playlistSubjectScore(playlist, strongestSubject[0]) === 0;
 }
 
-function scorePlaylistAgainstOriginalSource(
-  playlist: PlaylistAssignmentPlaylist,
-  sourceText: string,
-  videoLanguage: string,
-  signals: Record<SubjectSignal, number>,
-): number {
-  let score = 0;
+function scorePlaylist(params: {
+  playlist: PlaylistAssignmentPlaylist;
+  analysis: PlaylistAssignmentAnalysis;
+  sourceText: string;
+  signals: Record<SubjectSignal, number>;
+}): number {
+  const { playlist, analysis, sourceText, signals } = params;
   const text = playlistText(playlist);
+  let score = 0;
 
   score += Math.min(8, tokenOverlapScore(sourceText, text));
+  score += Math.min(4, tokenOverlapScore(analysis.semanticTags.join(' '), text));
 
-  const playlistMath = playlistSubjectScore(playlist, 'math');
-  const playlistDesign = playlistSubjectScore(playlist, 'design');
-  const playlistProgramming = playlistSubjectScore(playlist, 'programming');
-
-  if (signals.math >= 2) {
-    score += playlistMath * 6;
-    if (playlistDesign > 0 && playlistMath === 0) score -= 18;
-    if (normalizeText(playlist.name).includes('matematica ii')) score += 14;
-    if (normalizeText(playlist.name).includes('matematica i')) score += 6;
+  for (const subject of Object.keys(signals) as SubjectSignal[]) {
+    if (signals[subject] > 0) {
+      score += Math.min(12, signals[subject] * playlistSubjectScore(playlist, subject) * 2);
+    }
   }
 
-  if (signals.design >= 2) {
-    score += playlistDesign * 5;
-    if (playlistMath > 0 && playlistDesign === 0) score -= 8;
-  }
-
-  if (signals.programming >= 2) {
-    score += playlistProgramming * 5;
-    if (playlistDesign > 0 && playlistProgramming === 0) score -= 8;
-  }
-
-  if (normalizeText(playlist.language) === normalizeText(videoLanguage)) {
+  if (normalizeText(playlist.language) === normalizeText(analysis.language)) {
     score += 1;
   }
 
@@ -222,82 +208,75 @@ function scorePlaylistAgainstOriginalSource(
     score += 1;
   }
 
+  if (isGeneralEducationPlaylist(playlist)) {
+    score -= 6;
+  }
+
   return score;
 }
 
-function scorePlaylist(params: {
-  playlist: PlaylistAssignmentPlaylist;
-  enrichment: PlaylistAssignmentEnrichment;
-  sourceText: string;
-  videoLanguage: string;
-  signals: Record<SubjectSignal, number>;
-}): number {
-  const { playlist, enrichment, sourceText, videoLanguage, signals } = params;
-  const text = playlistText(playlist);
-  let score = scorePlaylistAgainstOriginalSource(playlist, sourceText, videoLanguage, signals);
+function normalizeConfidence(value: number | null | undefined): number | null {
+  if (typeof value !== 'number' || !Number.isFinite(value)) {
+    return null;
+  }
 
-  score += Math.min(4, tokenOverlapScore(enrichment.suggested_playlist_query, text));
-  score += Math.min(2, tokenOverlapScore(enrichment.suggested_category, text));
-  score += Math.min(3, tokenOverlapScore(enrichment.semantic_tags.join(' '), text));
-
-  return score;
+  return Math.min(1, Math.max(0, value));
 }
 
 export function assignPlaylist(params: {
   playlists: PlaylistAssignmentPlaylist[];
-  enrichment: PlaylistAssignmentEnrichment;
-  video: PlaylistAssignmentVideo;
+  analysis: PlaylistAssignmentAnalysis;
   topCandidateLimit?: number;
 }): PlaylistAssignmentResult {
-  const { playlists, enrichment, video, topCandidateLimit = 5 } = params;
-  const sourceText = getOriginalVideoText(video);
+  const { playlists, analysis, topCandidateLimit = 5 } = params;
+  const sourceText = analysisText(analysis);
   const signals = getSubjectSignals(sourceText);
+  const geminiConfidence = normalizeConfidence(analysis.geminiConfidence);
 
   const scoredCandidates = playlists
     .map((playlist) => {
-      const compatible = isPlaylistCompatibleWithSignals(playlist, signals);
+      const score = scorePlaylist({
+        playlist,
+        analysis,
+        sourceText,
+        signals,
+      });
+      const compatible = score >= MIN_PLAYLIST_ASSIGNMENT_SCORE && !hasStrongSubjectConflict(playlist, signals);
+      const isGeminiSuggested = playlist.id === analysis.geminiAssignedPlaylistId;
+
       return {
         playlistId: playlist.id,
         name: playlist.name,
-        score: scorePlaylist({
-          playlist,
-          enrichment,
-          sourceText,
-          videoLanguage: video.language || enrichment.language || 'pt',
-          signals,
-        }),
+        score,
         compatible,
-        isAiSuggested: playlist.id === enrichment.suggested_playlist_id,
+        isGeminiSuggested,
+        isAiSuggested: isGeminiSuggested,
       };
     })
     .sort((left, right) => right.score - left.score);
 
   const topCandidates = scoredCandidates.slice(0, topCandidateLimit);
-  const aiCandidate = enrichment.suggested_playlist_id
-    ? scoredCandidates.find((candidate) => candidate.playlistId === enrichment.suggested_playlist_id) ?? null
-    : null;
-
-  const rejectedAiPlaylistId = aiCandidate && !aiCandidate.compatible
-    ? aiCandidate.playlistId
+  const geminiCandidate = analysis.geminiAssignedPlaylistId
+    ? scoredCandidates.find((candidate) => candidate.playlistId === analysis.geminiAssignedPlaylistId) ?? null
     : null;
 
   let assignedPlaylistId: string | null = null;
   let score = 0;
-  let reason = 'No playlist met the reliability threshold';
+  let rejectedPlaylistId: string | null = null;
+  let reason = 'No playlist met the content adherence threshold';
 
-  if (aiCandidate?.compatible) {
-    assignedPlaylistId = aiCandidate.playlistId;
-    score = aiCandidate.score;
-    reason = 'AI playlist suggestion accepted after source-signal compatibility check';
-  } else {
-    const bestCompatibleCandidate = scoredCandidates.find((candidate) => candidate.compatible) ?? null;
-    if (bestCompatibleCandidate && bestCompatibleCandidate.score >= 5 && enrichment.classification_confidence >= 0.40) {
-      assignedPlaylistId = bestCompatibleCandidate.playlistId;
-      score = bestCompatibleCandidate.score;
-      reason = rejectedAiPlaylistId
-        ? 'AI playlist suggestion rejected by source-signal guard; best compatible candidate selected'
-        : 'Best compatible playlist selected by source and enrichment score';
+  if (geminiCandidate && geminiConfidence !== null && geminiConfidence >= MIN_PLAYLIST_ASSIGNMENT_CONFIDENCE) {
+    if (geminiCandidate.compatible) {
+      assignedPlaylistId = geminiCandidate.playlistId;
+      score = geminiCandidate.score;
+      reason = analysis.geminiReason || 'Gemini playlist suggestion accepted after deterministic adherence check';
+    } else {
+      rejectedPlaylistId = geminiCandidate.playlistId;
+      reason = 'Gemini playlist suggestion rejected by deterministic adherence check';
     }
+  } else if (analysis.geminiAssignedPlaylistId) {
+    rejectedPlaylistId = analysis.geminiAssignedPlaylistId;
+    reason = 'Gemini playlist suggestion rejected because confidence is below threshold';
   }
 
   return {
@@ -307,7 +286,8 @@ export function assignPlaylist(params: {
     reliability: assignedPlaylistId ? 'high' : 'low',
     reason,
     topCandidates,
-    rejectedAiPlaylistId,
+    rejectedPlaylistId,
+    geminiConfidence,
     signals,
   };
 }

@@ -1,7 +1,6 @@
 import { useMutation } from '@tanstack/react-query';
 import { createVideo, findVideoByYoutubeId } from '@/entities/video/video.api';
 import type { Video } from '@/entities/video/video.types';
-import { addVideoToDefaultEducationPlaylist } from '@/entities/playlist/playlist.api';
 import { createVideoSubmission } from '@/entities/video_submission/video_submission.api';
 import type { VideoSubmission } from '@/entities/video_submission/video_submission.types';
 import type { YouTubeMetadata } from './useYouTubeMetadata';
@@ -34,8 +33,6 @@ export function useSubmitVideo() {
           metadata: { reason: 'youtube_id_match' },
         });
 
-        await addVideoToDefaultEducationPlaylist(existingVideo.id);
-
         return { status: 'duplicate', submission, videoId: existingVideo.id } as const;
       }
 
@@ -56,8 +53,6 @@ export function useSubmitVideo() {
         youtube_url: payload.youtubeUrl,
         status: 'pending',
       });
-
-      await addVideoToDefaultEducationPlaylist(newVideo.id);
 
       return { status: 'created', video: newVideo, submission } as const;
     },

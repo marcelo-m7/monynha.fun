@@ -16,6 +16,7 @@ export type VideoSubmissionAssignmentCandidate = {
   name: string;
   score?: number | null;
   compatible?: boolean | null;
+  isGeminiSuggested?: boolean | null;
   isAiSuggested?: boolean | null;
 };
 
@@ -27,8 +28,10 @@ export type VideoSubmissionAssignment = {
   assignedPlaylistId?: string | null;
   algorithmVersion?: string | null;
   score?: number | null;
+  geminiConfidence?: number | null;
   signals?: Record<string, number> | null;
   topCandidates?: VideoSubmissionAssignmentCandidate[];
+  rejectedPlaylistId?: string | null;
   rejectedAiPlaylistId?: string | null;
 };
 

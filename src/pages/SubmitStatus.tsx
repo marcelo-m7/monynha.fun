@@ -72,6 +72,7 @@ export default function SubmitStatus() {
   const assignedPlaylist = assignedPlaylistId
     ? metadata.assignment?.topCandidates?.find((candidate) => candidate.playlistId === assignedPlaylistId) ?? null
     : null;
+  const noAssignedPlaylist = status === 'success' && !!metadata.assignment && !assignedPlaylistId;
   const processingStage = metadata.processing?.stage ?? metadata.error?.stage ?? metadata.clientError?.stage ?? null;
   const requestId = metadata.processing?.requestId ?? metadata.error?.requestId ?? null;
   const transcript = metadata.transcription;
@@ -226,6 +227,22 @@ export default function SubmitStatus() {
                       {metadata.assignment?.reason && (
                         <p className="mt-1 text-xs text-muted-foreground">{metadata.assignment.reason}</p>
                       )}
+                    </div>
+                  </div>
+                </div>
+              )}
+              {noAssignedPlaylist && (
+                <div className="rounded-md border border-border p-4 sm:col-span-2">
+                  <div className="flex items-start gap-3">
+                    <ListVideo className="mt-0.5 h-5 w-5 shrink-0 text-muted-foreground" />
+                    <div>
+                      <p className="text-xs font-medium uppercase text-muted-foreground">
+                        {t('submitStatus.assignment.noneLabel')}
+                      </p>
+                      <p className="mt-1 text-sm font-medium">{t('submitStatus.assignment.noneTitle')}</p>
+                      <p className="mt-1 text-xs text-muted-foreground">
+                        {metadata.assignment?.reason || t('submitStatus.assignment.noneDescription')}
+                      </p>
                     </div>
                   </div>
                 </div>

@@ -6,6 +6,27 @@ export type GeminiTranscriptResult = {
   unavailableReason: string | null;
 };
 
+export type GeminiVideoAnalysisResult = GeminiTranscriptResult & {
+  summaryDescription: string | null;
+  shortSummary: string | null;
+  semanticTags: string[];
+};
+
+export type GeminiPlaylistAssignmentPlaylist = {
+  id: string;
+  name: string;
+  description: string | null;
+  language: string;
+  course_code: string | null;
+  unit_code: string | null;
+};
+
+export type GeminiPlaylistAssignmentResult = {
+  assignedPlaylistId: string | null;
+  confidence: number;
+  reason: string | null;
+};
+
 export interface GeminiError extends Error {
   code: string;
   status?: number;
@@ -60,6 +81,26 @@ function normalizeConfidence(value: unknown): number {
 
 function optionalString(value: unknown): string | null {
   return typeof value === 'string' && value.trim() ? value.trim() : null;
+}
+
+function optionalStringArray(value: unknown): string[] {
+  if (!Array.isArray(value)) {
+    return [];
+  }
+
+  return value
+    .filter((item): item is string => typeof item === 'string' && !!item.trim())
+    .map((item) => item.trim())
+    .slice(0, 10);
+}
+
+function parseJsonObject(content: string): Record<string, unknown> {
+  const jsonMatch = content.match(/\{[\s\S]*\}/);
+  if (!jsonMatch) {
+    throw new Error('No JSON found in Gemini response');
+  }
+
+  return JSON.parse(jsonMatch[0]) as Record<string, unknown>;
 }
 
 function extractPartialJsonStringField(content: string, field: string): string | null {
@@ -170,8 +211,40 @@ export class GeminiClient {
     language?: string | null;
   }): Promise<GeminiTranscriptResult> {
     const prompt = this.buildTranscriptPrompt(params.title, params.language);
-    const response = await this.callWithRetry(() => this.callGemini(params.youtubeUrl, prompt));
+    const response = await this.callWithRetry(() => this.callGemini({
+      youtubeUrl: params.youtubeUrl,
+      prompt,
+      maxOutputTokens: 1024,
+    }));
     return this.parseTranscriptResponse(response);
+  }
+
+  async analyzeYouTubeVideo(params: {
+    youtubeUrl: string;
+    title: string;
+    description?: string | null;
+    language?: string | null;
+  }): Promise<GeminiVideoAnalysisResult> {
+    const prompt = this.buildVideoAnalysisPrompt(params);
+    const response = await this.callWithRetry(() => this.callGemini({
+      youtubeUrl: params.youtubeUrl,
+      prompt,
+      maxOutputTokens: 1600,
+    }));
+    return this.parseVideoAnalysisResponse(response);
+  }
+
+  async assignPlaylistFromAnalysis(params: {
+    analysis: GeminiVideoAnalysisResult;
+    playlists: GeminiPlaylistAssignmentPlaylist[];
+  }): Promise<GeminiPlaylistAssignmentResult> {
+    const prompt = this.buildPlaylistAssignmentPrompt(params.analysis, params.playlists);
+    const response = await this.callWithRetry(() => this.callGemini({
+      prompt,
+      temperature: 0,
+      maxOutputTokens: 700,
+    }));
+    return this.parsePlaylistAssignmentResponse(response, params.playlists);
   }
 
   private buildTranscriptPrompt(title: string, language?: string | null) {
@@ -199,9 +272,102 @@ Rules:
 `;
   }
 
-  private async callGemini(youtubeUrl: string, prompt: string): Promise<string> {
+  private buildVideoAnalysisPrompt(params: {
+    title: string;
+    description?: string | null;
+    language?: string | null;
+  }) {
+    return `Analyze the public YouTube video and return compact educational metadata.
+
+Video title: "${params.title}"
+Video description: "${params.description || ''}"
+Preferred language: ${params.language || 'auto'}
+
+Respond ONLY with valid JSON:
+{
+  "transcriptText": "short faithful transcript excerpt only when captions/audio are immediately available, otherwise null",
+  "transcriptSummary": "2-4 sentence summary of the spoken or visible educational content",
+  "summaryDescription": "2-3 sentence user-facing summary under 280 characters",
+  "shortSummary": "single sentence summary under 140 characters",
+  "semanticTags": ["specific subject tag", "concept tag", "course topic tag"],
+  "language": "ISO 639-1 language code if detected, otherwise null",
+  "confidence": 0.0,
+  "unavailableReason": "short reason when transcriptText is unavailable, otherwise null"
+}
+
+Rules:
+- Do not attempt a long full-video transcript.
+- Do not invent transcriptText when captions/audio are unavailable quickly.
+- semanticTags must describe the real subject matter, not visual style or clickbait wording.
+- Prefer concrete concepts such as "integral de linha", "calculo", "design de comunicacao", "programacao".
+- Keep summaries compact and public-safe.
+- confidence must be a number between 0 and 1.
+`;
+  }
+
+  private buildPlaylistAssignmentPrompt(
+    analysis: GeminiVideoAnalysisResult,
+    playlists: GeminiPlaylistAssignmentPlaylist[],
+  ) {
+    const playlistLines = playlists
+      .map((playlist) => JSON.stringify({
+        id: playlist.id,
+        name: playlist.name,
+        description: playlist.description,
+        language: playlist.language,
+        course_code: playlist.course_code,
+        unit_code: playlist.unit_code,
+      }))
+      .join('\n');
+
+    return `Choose the single best educational playlist for this processed video analysis.
+
+Processed video analysis:
+${JSON.stringify({
+  summaryDescription: analysis.summaryDescription,
+  shortSummary: analysis.shortSummary,
+  transcriptSummary: analysis.transcriptSummary,
+  semanticTags: analysis.semanticTags,
+  language: analysis.language,
+  confidence: analysis.confidence,
+})}
+
+Candidate playlists:
+${playlistLines}
+
+Respond ONLY with valid JSON:
+{
+  "assignedPlaylistId": "exact playlist id or null",
+  "confidence": 0.0,
+  "reason": "short decision reason"
+}
+
+Rules:
+- Use only the processed analysis above. Do not infer from unavailable original metadata.
+- Return null unless there is strong real content adherence to an existing educational playlist.
+- Prefer curricular playlists with matching course/unit subject matter over broad general education collections.
+- Do not assign a design playlist to math/programming content, or a math playlist to design/programming content.
+- confidence must be at least 0.70 only when the match is clearly supported by tags or summary.
+`;
+  }
+
+  private async callGemini(params: {
+    prompt: string;
+    youtubeUrl?: string;
+    maxOutputTokens?: number;
+    temperature?: number;
+  }): Promise<string> {
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), this.timeout);
+    const parts: Array<Record<string, unknown>> = [{ text: params.prompt }];
+
+    if (params.youtubeUrl) {
+      parts.push({
+        file_data: {
+          file_uri: params.youtubeUrl,
+        },
+      });
+    }
 
     try {
       const response = await fetch(`${this.apiUrl}/models/${this.model}:generateContent`, {
@@ -213,19 +379,12 @@ Rules:
         body: JSON.stringify({
           contents: [
             {
-              parts: [
-                { text: prompt },
-                {
-                  file_data: {
-                    file_uri: youtubeUrl,
-                  },
-                },
-              ],
+              parts,
             },
           ],
           generationConfig: {
-            temperature: 0.2,
-            maxOutputTokens: 1024,
+            temperature: params.temperature ?? 0.2,
+            maxOutputTokens: params.maxOutputTokens ?? 1024,
             responseMimeType: 'application/json',
           },
         }),
@@ -303,23 +462,22 @@ Rules:
 
   private parseTranscriptResponse(content: string): GeminiTranscriptResult {
     try {
-      const jsonMatch = content.match(/\{[\s\S]*\}/);
-      if (!jsonMatch) {
+      try {
+        const parsed = parseJsonObject(content);
+        return {
+          transcriptText: optionalString(parsed.transcriptText),
+          transcriptSummary: optionalString(parsed.transcriptSummary),
+          language: optionalString(parsed.language),
+          confidence: normalizeConfidence(parsed.confidence),
+          unavailableReason: optionalString(parsed.unavailableReason),
+        };
+      } catch {
         const fallback = compactSummaryFallback(content);
         if (fallback) {
           return fallback;
         }
         throw new Error('No JSON found in Gemini response');
       }
-
-      const parsed = JSON.parse(jsonMatch[0]) as Record<string, unknown>;
-      return {
-        transcriptText: optionalString(parsed.transcriptText),
-        transcriptSummary: optionalString(parsed.transcriptSummary),
-        language: optionalString(parsed.language),
-        confidence: normalizeConfidence(parsed.confidence),
-        unavailableReason: optionalString(parsed.unavailableReason),
-      };
     } catch (error) {
       const fallback = compactSummaryFallback(content);
       if (fallback) {
@@ -328,6 +486,71 @@ Rules:
 
       throw createGeminiError({
         message: `Failed to parse Gemini transcript response: ${
+          error instanceof Error ? error.message : 'Unknown parse error'
+        }`,
+        code: 'GEMINI_PARSE_ERROR',
+        recoverable: true,
+      });
+    }
+  }
+
+  private parseVideoAnalysisResponse(content: string): GeminiVideoAnalysisResult {
+    try {
+      const parsed = parseJsonObject(content);
+      const transcriptSummary = optionalString(parsed.transcriptSummary);
+      const summaryDescription = optionalString(parsed.summaryDescription) ?? transcriptSummary;
+      const shortSummary = optionalString(parsed.shortSummary) ?? summaryDescription;
+
+      return {
+        transcriptText: optionalString(parsed.transcriptText),
+        transcriptSummary,
+        summaryDescription,
+        shortSummary,
+        semanticTags: optionalStringArray(parsed.semanticTags ?? parsed.semantic_tags),
+        language: optionalString(parsed.language),
+        confidence: normalizeConfidence(parsed.confidence),
+        unavailableReason: optionalString(parsed.unavailableReason),
+      };
+    } catch (error) {
+      const fallback = compactSummaryFallback(content);
+      if (fallback) {
+        return {
+          ...fallback,
+          summaryDescription: fallback.transcriptSummary,
+          shortSummary: fallback.transcriptSummary,
+          semanticTags: [],
+        };
+      }
+
+      throw createGeminiError({
+        message: `Failed to parse Gemini video analysis response: ${
+          error instanceof Error ? error.message : 'Unknown parse error'
+        }`,
+        code: 'GEMINI_PARSE_ERROR',
+        recoverable: true,
+      });
+    }
+  }
+
+  private parsePlaylistAssignmentResponse(
+    content: string,
+    playlists: GeminiPlaylistAssignmentPlaylist[],
+  ): GeminiPlaylistAssignmentResult {
+    try {
+      const parsed = parseJsonObject(content);
+      const candidateId = optionalString(parsed.assignedPlaylistId ?? parsed.assigned_playlist_id);
+      const assignedPlaylistId = candidateId && playlists.some((playlist) => playlist.id === candidateId)
+        ? candidateId
+        : null;
+
+      return {
+        assignedPlaylistId,
+        confidence: normalizeConfidence(parsed.confidence),
+        reason: optionalString(parsed.reason),
+      };
+    } catch (error) {
+      throw createGeminiError({
+        message: `Failed to parse Gemini playlist assignment response: ${
           error instanceof Error ? error.message : 'Unknown parse error'
         }`,
         code: 'GEMINI_PARSE_ERROR',
