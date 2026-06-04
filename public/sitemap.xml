@@ -1,42 +1,42 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
-    <loc>https://monynha.fun/</loc>
+    <loc>https://tube.open2.tech/</loc>
     <changefreq>daily</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
-    <loc>https://monynha.fun/videos</loc>
+    <loc>https://tube.open2.tech/videos</loc>
     <changefreq>daily</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
-    <loc>https://monynha.fun/playlists</loc>
+    <loc>https://tube.open2.tech/playlists</loc>
     <changefreq>daily</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://monynha.fun/community</loc>
+    <loc>https://tube.open2.tech/community</loc>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://monynha.fun/about</loc>
+    <loc>https://tube.open2.tech/about</loc>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://monynha.fun/faq</loc>
+    <loc>https://tube.open2.tech/faq</loc>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://monynha.fun/contact</loc>
+    <loc>https://tube.open2.tech/contact</loc>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://monynha.fun/rules</loc>
+    <loc>https://tube.open2.tech/rules</loc>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
   </url>

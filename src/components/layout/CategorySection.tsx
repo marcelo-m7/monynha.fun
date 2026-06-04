@@ -40,7 +40,7 @@ export const CategorySection = () => {
       <div className="container relative z-10">
         <div className="flex flex-col md:flex-row md:items-end justify-between mb-10 gap-4">
           <div className="space-y-2">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-sm border border-primary/40 text-primary text-[0.65rem] font-bold uppercase tracking-[0.25em]">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-sm border border-primary/40 bg-primary/8 text-foreground text-[0.65rem] font-bold uppercase tracking-[0.25em]">
               <Sparkles className="w-3 h-3" />
               {t('index.categoriesTitle')}
             </div>
@@ -51,7 +51,7 @@ export const CategorySection = () => {
           
           <Button
             variant="ghost"
-            className="w-fit gap-2 group text-muted-foreground hover:text-primary transition-colors"
+            className="w-fit gap-2 group text-muted-foreground hover:opacity-75 transition-opacity"
             onClick={() => navigate('/videos')}
           >
             {t('index.viewAll')}

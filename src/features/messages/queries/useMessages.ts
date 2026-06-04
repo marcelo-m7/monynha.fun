@@ -36,7 +36,7 @@ export function useUnreadMessagesCount() {
     queryKey: directMessageKeys.unreadCount(),
     queryFn: async () => {
       if (!user) return 0;
-      return getUnreadMessagesCount();
+      return getUnreadMessagesCount(user.id);
     },
     enabled: !!user,
     staleTime: 15000,

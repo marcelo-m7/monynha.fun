@@ -1,6 +1,7 @@
 import { useMutation } from '@tanstack/react-query';
 import { useAuth } from './useAuth';
-import { toast } from 'sonner';
+import { notify } from '@/shared/lib/notify';
+import { getEdgeFunctionErrorDetails, invokeEdgeFunction } from '@/shared/api/supabase/edgeFunctions';
 
 export interface EnrichVideoRequest {
   videoId: string;
@@ -9,7 +10,10 @@ export interface EnrichVideoRequest {
 
 export interface EnrichVideoResponse {
   message: string;
-  data: {
+  requestId?: string;
+  submissionId?: string | null;
+  status?: 'processing';
+  data?: {
     id: string;
     video_id: string;
     optimized_title: string;
@@ -55,36 +59,28 @@ export function useEnrichVideo() {
         throw new Error('Authentication required');
       }
 
-      const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
-      if (!supabaseUrl) {
-        throw new Error('Supabase URL not configured');
+      const { data, error } = await invokeEdgeFunction<EnrichVideoResponse>('enrich-video', {
+        body: request,
+        headers: { 'Content-Type': 'application/json' },
+      });
+
+      if (error) {
+        const details = await getEdgeFunctionErrorDetails(error);
+        throw new Error(details.requestId ? `${details.message} (request ${details.requestId})` : details.message);
       }
 
-      const response = await fetch(
-        `${supabaseUrl}/functions/v1/enrich-video`,
-        {
-          method: 'POST',
-          headers: {
-            'Authorization': `Bearer ${session.access_token}`,
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(request),
-        }
-      );
-
-      if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.error || `Enrichment failed: ${response.status}`);
+      if (!data) {
+        throw new Error('No enrichment response returned');
       }
 
-      return response.json();
+      return data;
     },
     onSuccess: (data) => {
-      toast.success('Video enriched successfully!');
+      notify.success(data.status === 'processing' ? 'Video processing started!' : 'Video enriched successfully!');
     },
     onError: (error) => {
       const message = error instanceof Error ? error.message : 'Failed to enrich video';
-      toast.error(message);
+      notify.error(message);
     },
   });
 }

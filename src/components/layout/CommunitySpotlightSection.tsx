@@ -64,7 +64,7 @@ export const CommunitySpotlightSection = () => {
               <Link
                 key={profile.id}
                 to={`/profile/${profile.username}`}
-                className="group flex flex-col items-center text-center gap-3 p-4 bg-card/95 border border-primary/20 rounded-md shadow-sm transition-all duration-300 hover:scale-[1.02] hover:shadow-[0_0_15px_var(--glow-primary)] hover:border-primary/60"
+                className="group flex flex-col items-center text-center gap-3 p-4 bg-card border border-border transition-colors hover:border-primary"
                 style={{ animationDelay: `${index * 0.08}s` }}
               >
                 <Avatar className="w-16 h-16 border-2 border-primary/50">
@@ -74,7 +74,7 @@ export const CommunitySpotlightSection = () => {
                   </AvatarFallback>
                 </Avatar>
                 <div className="flex-1">
-                  <h3 className="font-semibold text-base group-hover:text-primary transition-colors line-clamp-1">
+                  <h3 className="font-semibold text-base group-hover:opacity-75 transition-opacity line-clamp-1">
                     {profile.display_name || profile.username || t('common.anonymous')}
                   </h3>
                   {profile.username && (

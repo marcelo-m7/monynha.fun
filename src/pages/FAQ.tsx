@@ -51,10 +51,10 @@ const FAQ = () => {
         </div>
 
         <section className="bg-card border border-border rounded-2xl p-6 shadow-sm">
-          <h2 className="text-2xl font-bold mb-6 flex items-center gap-2">
-            <HelpCircle className="w-6 h-6 text-primary" />
-            {t('faq.title')}
-          </h2 >
+          <div className="flex items-center gap-2 mb-6">
+            <HelpCircle className="w-6 h-6 text-primary" aria-hidden="true" />
+            <span className="text-2xl font-bold">{t('faq.title')}</span>
+          </div>
           <Accordion type="single" collapsible className="w-full">
             {faqs.map((faq, index) => (
               <AccordionItem key={index} value={`item-${index}`}>

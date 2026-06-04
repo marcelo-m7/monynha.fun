@@ -10,6 +10,8 @@ export interface EnvironmentConfig {
   supabaseServiceRoleKey: string;
   openaiApiKey?: string;
   openaiModel?: string;
+  geminiApiKey?: string;
+  geminiModel?: string;
 }
 
 /**
@@ -22,6 +24,8 @@ export function validateEnvironment(): EnvironmentConfig {
   const supabaseServiceRoleKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
   const openaiApiKey = Deno.env.get('OPENAI_API_KEY');
   const openaiModel = Deno.env.get('OPENAI_MODEL');
+  const geminiApiKey = Deno.env.get('GEMINI_API_KEY');
+  const geminiModel = Deno.env.get('GEMINI_MODEL');
 
   const errors: string[] = [];
 
@@ -39,6 +43,8 @@ export function validateEnvironment(): EnvironmentConfig {
     supabaseServiceRoleKey: supabaseServiceRoleKey!,
     openaiApiKey,
     openaiModel,
+    geminiApiKey,
+    geminiModel,
   };
 }
 
@@ -57,5 +63,19 @@ export function validateOpenAIEnvironment(): EnvironmentConfig & { openaiApiKey:
     ...config,
     openaiApiKey: config.openaiApiKey,
     openaiModel: config.openaiModel || 'gpt-4o-mini',
+  };
+}
+
+export function validateGeminiEnvironment(): EnvironmentConfig & { geminiApiKey: string; geminiModel: string } {
+  const config = validateEnvironment();
+
+  if (!config.geminiApiKey) {
+    throw new Error('GEMINI_API_KEY is required for video transcription');
+  }
+
+  return {
+    ...config,
+    geminiApiKey: config.geminiApiKey,
+    geminiModel: config.geminiModel || 'gemini-2.5-flash',
   };
 }

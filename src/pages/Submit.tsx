@@ -10,14 +10,15 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { toast } from 'sonner';
-import { ArrowLeft, Link as LinkIcon, Loader2, Play, CheckCircle, AlertCircle, ListVideo } from 'lucide-react';
+import { notify } from '@/shared/lib/notify';
+import { Link as LinkIcon, Loader2, ListVideo, Wand2 } from 'lucide-react';
 import { submitVideoSchema, SubmitVideoFormValues } from '@/features/submit/submitVideoSchema';
 import { useTranslation } from 'react-i18next';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { MainLayout } from '@/components/layout/MainLayout';
 import { VideoPreviewCard } from '@/features/submit/components/VideoPreviewCard';
+import { PageHero } from '@/components/showcase';
 
 export default function Submit() {
   const { t } = useTranslation();
@@ -35,7 +36,6 @@ export default function Submit() {
     defaultValues: {
       youtubeUrl: '',
       description: '',
-      language: 'pt',
       categoryId: '',
       playlistId: 'none',
     },
@@ -43,7 +43,6 @@ export default function Submit() {
 
   const youtubeUrl = watch('youtubeUrl');
   const description = watch('description');
-  const language = watch('language');
   const categoryId = watch('categoryId');
   const playlistId = watch('playlistId');
 
@@ -71,16 +70,13 @@ export default function Submit() {
       const result = await submitVideoMutation.mutateAsync({
         metadata,
         description: values.description,
-        language: values.language,
         categoryId: values.categoryId || undefined,
         userId: user.id,
         youtubeUrl,
       });
 
-      if (result.status === 'exists') {
-        toast.error(t('submit.error.videoExistsTitle'), {
-          description: t('submit.error.videoExistsDescription'),
-        });
+      if (result.status === 'duplicate') {
+        navigate(`/submit/status/${result.submission.id}`);
         return;
       }
 
@@ -93,10 +89,10 @@ export default function Submit() {
         });
       }
 
-      toast.success(t('submit.success.videoSubmittedTitle'));
-      navigate('/');
+      notify.success(t('submit.success.videoQueuedTitle'));
+      navigate(`/submit/status/${result.submission.id}`);
     } catch (err) {
-      toast.error(t('submit.error.genericSubmitTitle'));
+      notify.error(t('submit.error.genericSubmitTitle'));
     }
   };
 
@@ -110,14 +106,17 @@ export default function Submit() {
 
   return (
     <MainLayout>
-      <div className="container py-8 max-w-4xl">
-        <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold">{t('submit.title')}</h1>
-          <p className="text-muted-foreground mt-2">{t('submit.description')}</p>
-        </div>
+      <PageHero
+        eyebrow={t('header.submitVideo')}
+        title={t('submit.title')}
+        description={t('submit.description')}
+        className="mb-8"
+      />
+
+      <div className="container max-w-5xl pb-12">
 
         <div className="grid lg:grid-cols-2 gap-8">
-          <div className="bg-card border border-border rounded-2xl p-6 shadow-sm">
+          <div className="border-2 border-border bg-card p-6 shadow-sm">
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
               <div className="space-y-2">
                 <Label htmlFor="youtube-url">{t('submit.form.youtubeUrlLabel')} *</Label>
@@ -151,22 +150,6 @@ export default function Submit() {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="language">{t('submit.form.languageLabel')}</Label>
-                <Select value={language} onValueChange={(value) => setValue('language', value)}>
-                  <SelectTrigger>
-                    <SelectValue placeholder={t('submit.form.languagePlaceholder')} />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="pt">{t('common.language.pt')}</SelectItem>
-                    <SelectItem value="en">{t('common.language.en')}</SelectItem>
-                    <SelectItem value="es">{t('common.language.es')}</SelectItem>
-                    <SelectItem value="fr">{t('common.language.fr')}</SelectItem>
-                    <SelectItem value="other">{t('common.language.other')}</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div className="space-y-2">
                 <Label htmlFor="category">{t('submit.form.categoryLabel')}</Label>
                 <Select value={categoryId} onValueChange={(value) => setValue('categoryId', value)}>
                   <SelectTrigger>
@@ -178,6 +161,13 @@ export default function Submit() {
                     ))}
                   </SelectContent>
                 </Select>
+              </div>
+
+              <div className="rounded-md border border-border bg-muted/30 p-3 text-sm text-muted-foreground">
+                <div className="flex items-start gap-2">
+                  <Wand2 className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
+                  <p>{t('submit.form.languageAutoDetectionHint')}</p>
+                </div>
               </div>
 
               <div className="space-y-2">
@@ -213,7 +203,7 @@ export default function Submit() {
           <div className="space-y-4">
             <h2 className="font-semibold text-lg">{t('submit.previewTitle')}</h2>
             <VideoPreviewCard metadata={metadata} />
-            <div className="bg-muted/30 rounded-xl p-4 space-y-2">
+            <div className="space-y-2 border-2 border-border bg-muted/30 p-4">
               <h3 className="font-medium text-sm">{t('submit.tipsTitle')}</h3>
               <ul className="text-xs text-muted-foreground space-y-1">
                 <li>• {t('submit.tip1')}</li>

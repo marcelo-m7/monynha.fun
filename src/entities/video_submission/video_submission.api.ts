@@ -1,0 +1,52 @@
+import { supabase } from '@/shared/api/supabase/supabaseClient';
+import { getSupabaseErrorMessage } from '@/shared/api/supabase/supabaseErrors';
+import type { VideoSubmission, VideoSubmissionInsert } from './video_submission.types';
+
+export async function createVideoSubmission(payload: VideoSubmissionInsert) {
+  const { data, error } = await supabase
+    .from('video_submissions')
+    .insert(payload)
+    .select()
+    .single();
+
+  if (error) {
+    throw new Error(getSupabaseErrorMessage(error));
+  }
+
+  return data as VideoSubmission;
+}
+
+export async function getVideoSubmissionById(id: string) {
+  const { data, error } = await supabase
+    .from('video_submissions')
+    .select('*')
+    .eq('id', id)
+    .maybeSingle();
+
+  if (error) {
+    throw new Error(getSupabaseErrorMessage(error));
+  }
+
+  return data as VideoSubmission | null;
+}
+
+export async function markVideoSubmissionClientError(payload: {
+  submissionId: string;
+  errorMessage: string;
+  errorCode?: string | null;
+  stage?: string | null;
+}) {
+  const { data, error } = await supabase
+    .rpc('mark_video_submission_client_error', {
+      p_submission_id: payload.submissionId,
+      p_error_message: payload.errorMessage,
+      p_error_code: payload.errorCode ?? null,
+      p_stage: payload.stage ?? 'start_processing',
+    });
+
+  if (error) {
+    throw new Error(getSupabaseErrorMessage(error));
+  }
+
+  return data as VideoSubmission;
+}

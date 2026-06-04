@@ -185,6 +185,107 @@ export type Database = {
           },
         ]
       }
+      contact_messages: {
+        Row: {
+          created_at: string
+          email: string
+          id: string
+          message: string
+          metadata: Json
+          name: string
+          status: string
+          subject: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          id?: string
+          message: string
+          metadata?: Json
+          name: string
+          status?: string
+          subject: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          id?: string
+          message?: string
+          metadata?: Json
+          name?: string
+          status?: string
+          subject?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      editor_applications: {
+        Row: {
+          confirmation_error: string | null
+          confirmation_provider_id: string | null
+          confirmation_sent_at: string | null
+          consent_privacy: boolean
+          created_at: string
+          email: string
+          full_name: string
+          id: string
+          motivation: string | null
+          portfolio_url: string | null
+          review_notes: string | null
+          reviewed_at: string | null
+          reviewed_by: string | null
+          source_page: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          confirmation_error?: string | null
+          confirmation_provider_id?: string | null
+          confirmation_sent_at?: string | null
+          consent_privacy: boolean
+          created_at?: string
+          email: string
+          full_name: string
+          id?: string
+          motivation?: string | null
+          portfolio_url?: string | null
+          review_notes?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          source_page?: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          confirmation_error?: string | null
+          confirmation_provider_id?: string | null
+          confirmation_sent_at?: string | null
+          consent_privacy?: boolean
+          created_at?: string
+          email?: string
+          full_name?: string
+          id?: string
+          motivation?: string | null
+          portfolio_url?: string | null
+          review_notes?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          source_page?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "editor_applications_reviewed_by_fkey"
+            columns: ["reviewed_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       favorites: {
         Row: {
           created_at: string
@@ -476,6 +577,7 @@ export type Database = {
           created_at: string
           display_name: string | null
           id: string
+          role: string
           submissions_count: number
           updated_at: string
           username: string | null
@@ -487,6 +589,7 @@ export type Database = {
           created_at?: string
           display_name?: string | null
           id: string
+          role?: string
           submissions_count?: number
           updated_at?: string
           username?: string | null
@@ -498,6 +601,7 @@ export type Database = {
           created_at?: string
           display_name?: string | null
           id?: string
+          role?: string
           submissions_count?: number
           updated_at?: string
           username?: string | null
@@ -566,6 +670,135 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      video_submissions: {
+        Row: {
+          completed_at: string | null
+          created_at: string
+          duplicate_video_id: string | null
+          error_message: string | null
+          id: string
+          metadata: Json
+          processing_started_at: string | null
+          recoverable: boolean
+          status: string
+          updated_at: string
+          user_id: string
+          video_id: string | null
+          youtube_id: string
+          youtube_url: string
+        }
+        Insert: {
+          completed_at?: string | null
+          created_at?: string
+          duplicate_video_id?: string | null
+          error_message?: string | null
+          id?: string
+          metadata?: Json
+          processing_started_at?: string | null
+          recoverable?: boolean
+          status?: string
+          updated_at?: string
+          user_id: string
+          video_id?: string | null
+          youtube_id: string
+          youtube_url: string
+        }
+        Update: {
+          completed_at?: string | null
+          created_at?: string
+          duplicate_video_id?: string | null
+          error_message?: string | null
+          id?: string
+          metadata?: Json
+          processing_started_at?: string | null
+          recoverable?: boolean
+          status?: string
+          updated_at?: string
+          user_id?: string
+          video_id?: string | null
+          youtube_id?: string
+          youtube_url?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "video_submissions_duplicate_video_id_fkey"
+            columns: ["duplicate_video_id"]
+            isOneToOne: false
+            referencedRelation: "videos"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "video_submissions_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "video_submissions_video_id_fkey"
+            columns: ["video_id"]
+            isOneToOne: false
+            referencedRelation: "videos"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      video_transcripts: {
+        Row: {
+          confidence: number
+          created_at: string
+          error_message: string | null
+          id: string
+          language: string | null
+          metadata: Json
+          provider: string
+          provider_model: string
+          status: string
+          summary: string | null
+          transcript_text: string | null
+          updated_at: string
+          video_id: string
+        }
+        Insert: {
+          confidence?: number
+          created_at?: string
+          error_message?: string | null
+          id?: string
+          language?: string | null
+          metadata?: Json
+          provider?: string
+          provider_model: string
+          status?: string
+          summary?: string | null
+          transcript_text?: string | null
+          updated_at?: string
+          video_id: string
+        }
+        Update: {
+          confidence?: number
+          created_at?: string
+          error_message?: string | null
+          id?: string
+          language?: string | null
+          metadata?: Json
+          provider?: string
+          provider_model?: string
+          status?: string
+          summary?: string | null
+          transcript_text?: string | null
+          updated_at?: string
+          video_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "video_transcripts_video_id_fkey"
+            columns: ["video_id"]
+            isOneToOne: false
+            referencedRelation: "videos"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       video_view_events: {
         Row: {
@@ -676,9 +909,46 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      v_home_exhibition: {
+        Row: {
+          categories: Json
+          curation_signals: Json
+          facodi_highlights: Json
+          featured_playlists: Json
+          generated_at: string
+          hero_videos: Json
+          metrics: Json
+        }
+        Insert: {
+          categories?: never
+          curation_signals?: never
+          facodi_highlights?: never
+          featured_playlists?: never
+          generated_at?: never
+          hero_videos?: never
+          metrics?: never
+        }
+        Update: {
+          categories?: never
+          curation_signals?: never
+          facodi_highlights?: never
+          featured_playlists?: never
+          generated_at?: never
+          hero_videos?: never
+          metrics?: never
+        }
+        Relationships: []
+      }
     }
     Functions: {
+      add_video_to_default_education_playlist: {
+        Args: { p_video_id: string }
+        Returns: string
+      }
+      current_profile_can_manage_facodi_playlist: {
+        Args: Record<PropertyKey, never>
+        Returns: boolean
+      }
       follow_by_username_secure: {
         Args: { p_target_username: string }
         Returns: string
@@ -714,12 +984,46 @@ export type Database = {
         Args: Record<PropertyKey, never>
         Returns: number
       }
+      get_default_education_playlist_id: {
+        Args: Record<PropertyKey, never>
+        Returns: string
+      }
       increment_video_view_count:
         | { Args: { p_video_id: string }; Returns: number }
         | {
             Args: { p_session_id?: string; p_video_id: string }
             Returns: number
           }
+      is_facodi_playlist: {
+        Args: {
+          p_course_code: string
+          p_is_ordered: boolean
+          p_unit_code: string
+        }
+        Returns: boolean
+      }
+      is_education_assignment_playlist: {
+        Args: {
+          p_course_code: string
+          p_is_ordered: boolean
+          p_slug: string
+          p_unit_code: string
+        }
+        Returns: boolean
+      }
+      list_education_playlists_for_assignment: {
+        Args: { p_language?: string; p_limit?: number }
+        Returns: {
+          course_code: string | null
+          description: string | null
+          id: string
+          is_ordered: boolean
+          is_public: boolean
+          language: string
+          name: string
+          unit_code: string | null
+        }[]
+      }
       list_featured_videos: {
         Args: { p_limit?: number; p_offset?: number }
         Returns: {
@@ -795,6 +1099,15 @@ export type Database = {
       mark_top_videos_as_featured: {
         Args: { p_limit?: number }
         Returns: number
+      }
+      mark_video_submission_client_error: {
+        Args: {
+          p_error_code?: string
+          p_error_message: string
+          p_stage?: string
+          p_submission_id: string
+        }
+        Returns: Database["public"]["Tables"]["video_submissions"]["Row"]
       }
       mark_all_notifications_as_read_secure: {
         Args: Record<PropertyKey, never>

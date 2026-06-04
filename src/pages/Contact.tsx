@@ -10,14 +10,15 @@ import { useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { toast } from 'sonner';
+import { notify } from '@/shared/lib/notify';
 import { useState } from 'react';
 import { emailSchema } from '@/shared/lib/validation';
+import { submitContactForm } from '@/shared/api/contact.api';
 
 // Define Zod schema for the contact form
 const contactFormSchema = z.object({
   name: z.string().min(1, 'contactPage.form.nameRequired'),
-  email: emailSchema.refine(() => true, { message: 'contactPage.form.emailInvalid' }),
+  email: emailSchema,
   subject: z.string().min(1, 'contactPage.form.subjectRequired'),
   message: z.string().min(1, 'contactPage.form.messageRequired').max(1000, 'contactPage.form.messageMaxLength'),
 });
@@ -42,12 +43,16 @@ const Contact = () => {
   const onSubmit = async (values: ContactFormValues) => {
     setIsSubmitting(true);
     try {
-      // Simulate API call - TODO: Replace with actual backend endpoint
-      await new Promise(resolve => setTimeout(resolve, 1500)); 
-      toast.success(t('contactPage.successMessage'));
+      await submitContactForm({
+        name: values.name,
+        email: values.email,
+        subject: values.subject,
+        message: values.message,
+      });
+      notify.success(t('contactPage.successMessage'));
       reset();
     } catch (error) {
-      toast.error(t('contactPage.errorMessage'));
+      notify.error(t('contactPage.errorMessage'));
     } finally {
       setIsSubmitting(false);
     }
@@ -153,7 +158,7 @@ const Contact = () => {
             <h2 className="text-2xl font-bold mb-4">{t('contactPage.directEmailLabel')}</h2>
             <div className="flex items-center gap-3 text-muted-foreground">
               <Mail className="w-5 h-5 text-primary" />
-              <a href="mailto:hello@monynha.com" className="text-foreground hover:underline">hello@monynha.com</a>
+              <a href="mailto:hello@open2.tech" className="text-foreground hover:underline">hello@open2.tech</a>
             </div>
 
             <h2 className="text-2xl font-bold mb-4">{t('contactPage.locationLabel')}</h2>

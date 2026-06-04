@@ -8,7 +8,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Mail, Loader2, Info } from 'lucide-react';
-import { toast } from 'sonner';
+import { notify } from '@/shared/lib/notify';
 import { updateUserEmail } from '@/features/auth/auth.api';
 import { useAuth } from '@/features/auth/useAuth';
 import { Alert, AlertDescription } from '@/components/ui/alert';
@@ -38,12 +38,12 @@ export const ChangeEmailForm: React.FC = () => {
 
   const onSubmit = async (values: ChangeEmailFormValues) => {
     if (!user) {
-      toast.error(t('account.settings.error.notLoggedIn'));
+      notify.error(t('account.settings.error.notLoggedIn'));
       return;
     }
 
     if (values.newEmail === user.email) {
-      toast.error(t('account.settings.error.sameEmail'));
+      notify.error(t('account.settings.error.sameEmail'));
       return;
     }
 
@@ -51,17 +51,17 @@ export const ChangeEmailForm: React.FC = () => {
       const { error } = await updateUserEmail(values.newEmail);
 
       if (error) {
-        toast.error(t('account.settings.error.emailUpdateFailed'), {
+        notify.error(t('account.settings.error.emailUpdateFailed'), {
           description: error.message,
         });
         return;
       }
 
-      toast.success(t('account.settings.success.emailUpdated'));
+      notify.success(t('account.settings.success.emailUpdated'));
       reset();
     } catch (err) {
       console.error('Email change error:', err);
-      toast.error(t('auth.error.genericAuthError'), {
+      notify.error(t('auth.error.genericAuthError'), {
         description: err instanceof Error ? err.message : String(err),
       });
     }

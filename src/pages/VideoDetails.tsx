@@ -1,5 +1,7 @@
+import { useState } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
-import { useVideoById, useRelatedVideos } from '@/features/videos/queries/useVideos';
+import { useDeleteVideo, useUpdateVideo, useVideoById, useRelatedVideos } from '@/features/videos/queries/useVideos';
+import { useCategories } from '@/features/categories/queries/useCategories';
 import { formatDuration, formatViewCount } from '@/shared/lib/format';
 import { useAuth } from '@/features/auth/useAuth';
 import { useIsFavorited, useAddFavorite, useRemoveFavorite } from '@/features/favorites/queries/useFavorites';
@@ -13,14 +15,32 @@ import { AspectRatio } from '@/components/ui/aspect-ratio';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Badge } from '@/components/ui/badge'; // Import Badge component
 import { Card } from '@/components/ui/card';
-import { Sparkles } from 'lucide-react';
+import { FileText, Sparkles } from 'lucide-react';
 import { CulturalRelevanceBadge } from '@/components/video/CulturalRelevanceBadge';
 import { SemanticTagBadge } from '@/components/video/SemanticTagBadge';
-import { Eye, Clock, Folder, ArrowLeft, Heart as HeartIcon, Loader2 } from 'lucide-react';
+import { Eye, Clock, Folder, ArrowLeft, Heart as HeartIcon, Loader2, Edit, Trash2, Languages, ListVideo } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { toast } from 'sonner';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
+import { notify } from '@/shared/lib/notify';
 import { useTranslation } from 'react-i18next';
 import { CommentsSection } from '@/components/comment/CommentsSection'; // Import CommentsSection
+
+function getLanguageLabelKey(language?: string | null) {
+  if (!language || language === 'und') {
+    return 'videoDetails.detectingLanguage';
+  }
+
+  if (['pt', 'en', 'es', 'fr', 'other'].includes(language)) {
+    return `common.language.${language}`;
+  }
+
+  return null;
+}
 
 const VideoDetails = () => {
   const { t } = useTranslation();
@@ -28,6 +48,7 @@ const VideoDetails = () => {
   const navigate = useNavigate();
   const { user, loading: authLoading } = useAuth();
   const { data: video, isLoading, isError } = useVideoById(videoId);
+  const { data: categories } = useCategories();
   const { data: profile } = useProfileById(video?.submitted_by);
   const { data: relatedVideos, isLoading: relatedLoading } = useRelatedVideos(
     video?.id || '', 
@@ -37,6 +58,14 @@ const VideoDetails = () => {
   const { data: isFavorited, isLoading: isFavoritedLoading } = useIsFavorited(video?.id);
   const addFavoriteMutation = useAddFavorite();
   const removeFavoriteMutation = useRemoveFavorite();
+  const updateVideoMutation = useUpdateVideo();
+  const deleteVideoMutation = useDeleteVideo();
+
+  const [editDialogOpen, setEditDialogOpen] = useState(false);
+  const [editTitle, setEditTitle] = useState('');
+  const [editDescription, setEditDescription] = useState('');
+  const [editCategoryId, setEditCategoryId] = useState('none');
+  const [editLanguage, setEditLanguage] = useState('pt');
 
   const trimDescription = (text?: string | null, maxLength = 160) => {
     const value = (text ?? '').trim();
@@ -48,20 +77,20 @@ const VideoDetails = () => {
   const metaDescription =
     video?.enrichment?.short_summary?.trim() ||
     trimDescription(video?.description) ||
-    'Curadoria coletiva de vídeos do YouTube.';
+    t('videoDetails.metaFallbackDescription');
 
   const metaTitle = video?.title
-    ? `${video.title.trim()} | Monynha Fun`
-    : 'Monynha Fun';
+    ? `${video.title.trim()} | Tube O2`
+    : 'Tube O2';
 
   // Set dynamic meta tags for social media sharing
   useMetaTags({
     title: metaTitle,
     description: metaDescription,
-    image: video?.thumbnail_url || 'https://monynha.com/opengraph-image-monynha-fun.png',
+    image: video?.thumbnail_url || 'https://tube.open2.tech/opengraph-image-tube-o2.png',
     type: 'video.other',
-    siteName: 'Monynha Fun',
-    twitterImageAlt: video?.title || 'Capa do vídeo no Monynha Fun',
+    siteName: 'Tube O2',
+    twitterImageAlt: video?.title || t('videoDetails.metaImageAlt'),
     imageWidth: 1280,
     imageHeight: 720,
     imageType: 'image/jpeg',
@@ -69,7 +98,7 @@ const VideoDetails = () => {
 
   const handleFavoriteToggle = async () => {
     if (!user) {
-      toast.info(t('videoDetails.favoriteInfo'), {
+      notify.info(t('videoDetails.favoriteInfo'), {
         action: {
           label: t('videoDetails.loginAction'),
           onClick: () => navigate('/auth'),
@@ -85,6 +114,36 @@ const VideoDetails = () => {
     } else {
       await addFavoriteMutation.mutateAsync(video.id);
     }
+  };
+
+  const isOwner = !!user && !!video?.submitted_by && video.submitted_by === user.id;
+
+  const openEditDialog = () => {
+    if (!video) return;
+    setEditTitle(video.title);
+    setEditDescription(video.description || '');
+    setEditCategoryId(video.category_id || 'none');
+    setEditLanguage(video.language && video.language !== 'und' ? video.language : video.enrichment?.language || 'pt');
+    setEditDialogOpen(true);
+  };
+
+  const handleUpdateVideo = async () => {
+    if (!video || !editTitle.trim()) return;
+
+    await updateVideoMutation.mutateAsync({
+      id: video.id,
+      title: editTitle.trim(),
+      description: editDescription.trim() || null,
+      category_id: editCategoryId === 'none' ? null : editCategoryId,
+      language: editLanguage,
+    });
+    setEditDialogOpen(false);
+  };
+
+  const handleDeleteVideo = async () => {
+    if (!video) return;
+    await deleteVideoMutation.mutateAsync(video.id);
+    navigate('/videos');
   };
 
   if (isLoading || authLoading) {
@@ -140,6 +199,18 @@ const VideoDetails = () => {
     );
   }
 
+  const languageLabelKey = getLanguageLabelKey(video.language);
+  const languageLabel = languageLabelKey ? t(languageLabelKey) : video.language;
+  const hasDetectedLanguage = !!video.enrichment?.language && video.enrichment.language === video.language && video.language !== 'und';
+  const assignedPlaylists = [...(video.assignedPlaylists ?? [])].sort((left, right) => {
+    const leftIsLearningPath = left.is_ordered || !!left.course_code || !!left.unit_code;
+    const rightIsLearningPath = right.is_ordered || !!right.course_code || !!right.unit_code;
+    if (leftIsLearningPath !== rightIsLearningPath) {
+      return leftIsLearningPath ? -1 : 1;
+    }
+    return left.name.localeCompare(right.name);
+  });
+
   return (
     <div className="min-h-screen flex flex-col">
       <Header />
@@ -157,7 +228,7 @@ const VideoDetails = () => {
           {/* Main Video Content */}
           <div className="lg:col-span-2 space-y-6">
             {/* Video Player */}
-            <AspectRatio ratio={16 / 9} className="bg-muted rounded-xl overflow-hidden shadow-lg">
+            <AspectRatio ratio={16 / 9} className="overflow-hidden border-2 border-border bg-muted shadow-[10px_10px_0_#000]">
               <iframe
                 className="w-full h-full"
                 src={getYouTubeEmbedUrl(video.youtube_id)}
@@ -169,21 +240,65 @@ const VideoDetails = () => {
 
             {/* Video Info */}
             <div className="space-y-3">
-              <div className="flex items-center justify-between">
+              <div className="flex items-center justify-between gap-3">
                 <h1 className="text-2xl md:text-3xl font-bold leading-tight">{video.title}</h1>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={handleFavoriteToggle}
-                  disabled={isFavoritedLoading || addFavoriteMutation.isPending || removeFavoriteMutation.isPending}
-                  className="text-muted-foreground hover:text-primary"
-                >
-                  {isFavoritedLoading || addFavoriteMutation.isPending || removeFavoriteMutation.isPending ? (
-                    <Loader2 className="w-6 h-6 animate-spin" />
-                  ) : (
-                    <HeartIcon className={`w-6 h-6 ${isFavorited ? 'fill-primary text-primary' : ''}`} />
+                <div className="flex shrink-0 items-center gap-1">
+                  {isOwner && (
+                    <>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={openEditDialog}
+                        disabled={updateVideoMutation.isPending || deleteVideoMutation.isPending}
+                        className="text-muted-foreground hover:text-foreground"
+                        aria-label={t('videoDetails.management.editVideo')}
+                      >
+                        <Edit className="w-5 h-5" />
+                      </Button>
+                      <AlertDialog>
+                        <AlertDialogTrigger asChild>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            disabled={deleteVideoMutation.isPending}
+                            className="text-muted-foreground hover:text-destructive"
+                            aria-label={t('videoDetails.management.deleteVideo')}
+                          >
+                            <Trash2 className="w-5 h-5" />
+                          </Button>
+                        </AlertDialogTrigger>
+                        <AlertDialogContent>
+                          <AlertDialogHeader>
+                            <AlertDialogTitle>{t('videoDetails.management.confirmDeleteTitle')}</AlertDialogTitle>
+                            <AlertDialogDescription>
+                              {t('videoDetails.management.confirmDeleteDescription', { title: video.title })}
+                            </AlertDialogDescription>
+                          </AlertDialogHeader>
+                          <AlertDialogFooter>
+                            <AlertDialogCancel>{t('common.cancel')}</AlertDialogCancel>
+                            <AlertDialogAction onClick={handleDeleteVideo} disabled={deleteVideoMutation.isPending}>
+                              {deleteVideoMutation.isPending ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : null}
+                              {t('common.delete')}
+                            </AlertDialogAction>
+                          </AlertDialogFooter>
+                        </AlertDialogContent>
+                      </AlertDialog>
+                    </>
                   )}
-                </Button>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={handleFavoriteToggle}
+                    disabled={isFavoritedLoading || addFavoriteMutation.isPending || removeFavoriteMutation.isPending}
+                    className="text-muted-foreground hover:text-primary"
+                  >
+                    {isFavoritedLoading || addFavoriteMutation.isPending || removeFavoriteMutation.isPending ? (
+                      <Loader2 className="w-6 h-6 animate-spin" />
+                    ) : (
+                      <HeartIcon className={`w-6 h-6 ${isFavorited ? 'fill-primary text-primary' : ''}`} />
+                    )}
+                  </Button>
+                </div>
               </div>
               <p className="text-lg text-muted-foreground">{video.channel_name}</p>
               <p className="text-sm text-muted-foreground">
@@ -217,7 +332,49 @@ const VideoDetails = () => {
                     {video.category.name}
                   </Badge>
                 )}
+                {video.language && (
+                  <Badge variant="outline" className="text-sm px-2.5 py-1 flex items-center gap-1">
+                    <Languages className="w-3.5 h-3.5" />
+                    <span>{t('videoDetails.languageLabel')}: {languageLabel}</span>
+                    {hasDetectedLanguage && (
+                      <span className="text-muted-foreground">({t('videoDetails.detectedAutomatically')})</span>
+                    )}
+                  </Badge>
+                )}
               </div>
+              {assignedPlaylists.length > 0 && (
+                <section aria-labelledby="assigned-playlists-heading" className="border-2 border-border bg-muted/20 p-4">
+                  <div className="flex items-start gap-3">
+                    <ListVideo className="mt-0.5 h-5 w-5 shrink-0 text-primary" />
+                    <div>
+                      <h2 id="assigned-playlists-heading" className="text-sm font-semibold">
+                        {t('videoDetails.assignedPlaylistsTitle')}
+                      </h2>
+                      <p className="mt-1 text-xs text-muted-foreground">
+                        {t('videoDetails.assignedPlaylistsDescription')}
+                      </p>
+                    </div>
+                  </div>
+                  <div className="mt-3 flex flex-wrap gap-2">
+                    {assignedPlaylists.map((playlist) => {
+                      const isLearningPath = playlist.is_ordered || !!playlist.course_code || !!playlist.unit_code;
+                      return (
+                        <Link key={playlist.id} to={`/playlists/${playlist.id}`}>
+                          <Badge
+                            variant="outline"
+                            className="max-w-full gap-1.5 px-2.5 py-1 text-sm hover:bg-muted"
+                          >
+                            <span className="truncate">{playlist.name}</span>
+                            <span className="shrink-0 text-xs text-muted-foreground">
+                              {isLearningPath ? t('playlists.learningPath') : t('playlists.collection')}
+                            </span>
+                          </Badge>
+                        </Link>
+                      );
+                    })}
+                  </div>
+                </section>
+              )}
             </div>
 
             {/* Description */}
@@ -228,16 +385,16 @@ const VideoDetails = () => {
               </p>
             </div>
 
-              {/* AI-Generated Summary */}
+              {/* AI-generated summary */}
               {video.enrichment && (
-                <Card className="p-6 bg-gradient-to-br from-purple-50/50 to-pink-50/50 dark:from-purple-950/20 dark:to-pink-950/20 border-purple-200/50 dark:border-purple-800/50">
+                <Card className="border-2 border-primary/30 bg-card p-6">
                   <div className="flex items-start gap-3">
-                    <div className="rounded-full bg-gradient-to-r from-purple-500 to-pink-500 p-2 flex-shrink-0">
+                    <div className="bg-primary p-2 flex-shrink-0">
                       <Sparkles className="w-5 h-5 text-white" />
                     </div>
                     <div className="flex-1 space-y-3">
                       <div className="flex items-center justify-between">
-                        <h3 className="text-lg font-semibold">AI-Generated Summary</h3>
+                        <h3 className="text-lg font-semibold">{t('videoDetails.aiSummaryTitle')}</h3>
                         <CulturalRelevanceBadge relevance={video.enrichment.cultural_relevance} />
                       </div>
                     
@@ -250,7 +407,7 @@ const VideoDetails = () => {
                       {video.enrichment.summary_description && video.enrichment.summary_description !== video.enrichment.short_summary && (
                         <details className="group">
                           <summary className="text-sm text-primary cursor-pointer hover:underline">
-                            Read full summary
+                            {t('videoDetails.readFullSummary')}
                           </summary>
                           <p className="text-sm text-muted-foreground mt-2 leading-relaxed">
                             {video.enrichment.summary_description}
@@ -265,6 +422,22 @@ const VideoDetails = () => {
                           ))}
                         </div>
                       )}
+                    </div>
+                  </div>
+                </Card>
+              )}
+
+              {video.transcriptStatus === 'completed' && video.transcriptSummary && (
+                <Card className="border-2 border-border bg-card p-6">
+                  <div className="flex items-start gap-3">
+                    <div className="bg-muted p-2 flex-shrink-0">
+                      <FileText className="w-5 h-5 text-primary" />
+                    </div>
+                    <div className="flex-1 space-y-2">
+                      <h3 className="text-lg font-semibold">{t('videoDetails.transcriptSummaryTitle')}</h3>
+                      <p className="text-sm text-muted-foreground leading-relaxed">
+                        {video.transcriptSummary}
+                      </p>
                     </div>
                   </div>
                 </Card>
@@ -310,6 +483,84 @@ const VideoDetails = () => {
           </div>
         </div>
       </main>
+      <Dialog open={editDialogOpen} onOpenChange={setEditDialogOpen}>
+        <DialogContent className="sm:max-w-lg">
+          <DialogHeader>
+            <DialogTitle>{t('videoDetails.management.editVideo')}</DialogTitle>
+            <DialogDescription>{t('videoDetails.management.editDescription')}</DialogDescription>
+          </DialogHeader>
+
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="video-title">{t('videoDetails.management.titleLabel')}</Label>
+              <Input
+                id="video-title"
+                value={editTitle}
+                onChange={(event) => setEditTitle(event.target.value)}
+                maxLength={120}
+                aria-invalid={!editTitle.trim()}
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="video-description">{t('videoDetails.management.descriptionLabel')}</Label>
+              <Textarea
+                id="video-description"
+                value={editDescription}
+                onChange={(event) => setEditDescription(event.target.value)}
+                rows={4}
+                maxLength={500}
+              />
+              <p className="text-xs text-muted-foreground text-right">{editDescription.length}/500</p>
+            </div>
+
+            <div className="grid gap-4 sm:grid-cols-2">
+              <div className="space-y-2">
+                <Label>{t('videoDetails.management.categoryLabel')}</Label>
+                <Select value={editCategoryId} onValueChange={setEditCategoryId}>
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="none">{t('common.none')}</SelectItem>
+                    {categories?.map((category) => (
+                      <SelectItem key={category.id} value={category.id}>
+                        {category.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="space-y-2">
+                <Label>{t('videoDetails.management.languageLabel')}</Label>
+                <Select value={editLanguage} onValueChange={setEditLanguage}>
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="pt">{t('common.language.pt')}</SelectItem>
+                    <SelectItem value="en">{t('common.language.en')}</SelectItem>
+                    <SelectItem value="es">{t('common.language.es')}</SelectItem>
+                    <SelectItem value="fr">{t('common.language.fr')}</SelectItem>
+                    <SelectItem value="other">{t('common.language.other')}</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+          </div>
+
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setEditDialogOpen(false)}>
+              {t('common.cancel')}
+            </Button>
+            <Button onClick={handleUpdateVideo} disabled={updateVideoMutation.isPending || !editTitle.trim()}>
+              {updateVideoMutation.isPending ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : null}
+              {t('videoDetails.management.saveChanges')}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
       <Footer />
     </div>
   );

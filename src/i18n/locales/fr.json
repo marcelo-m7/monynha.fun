@@ -15,7 +15,8 @@
     "cancel": "Annuler",
     "delete": "Supprimer",
     "anonymous": "Anonyme",
-    "none": "Aucun"
+    "none": "Aucun",
+    "loading": "Chargement..."
   },
   "header": {
     "searchPlaceholder": "Rechercher des vidéos, des chaînes...",
@@ -31,10 +32,16 @@
     "home": "Accueil",
     "toggleMenu": "Basculer le menu",
     "closeMenu": "Fermer le menu",
-    "languageLabel": "Langue"
+    "languageLabel": "Langue",
+    "switchToDark": "Passer en mode sombre",
+    "switchToLight": "Passer en mode clair",
+    "community": "Communauté",
+    "editorialPortal": "Portail Éditorial",
+    "messages": "Messages",
+    "notifications": "Notifications"
   },
   "footer": {
-    "description": "Une plateforme de curation collective de vidéos YouTube. Préserver et découvrir du contenu précieux ensemble.",
+    "description": "Tube O2 enrichit les vidéos YouTube et les organise dans des playlists éducatives pour apprendre plus vite.",
     "navigation": "Navigation",
     "categories": "Catégories",
     "recent": "Récents",
@@ -46,16 +53,16 @@
     "contact": "Contact",
     "faq": "FAQ",
     "madeWithLove": "Fait avec",
-    "byMonynhaSoftwares": "par Monynha Softwares"
+    "byOpen2Technology": "par Open 2 Technology"
   },
   "labels": {
     "featured": "En Vedette"
   },
   "hero": {
-    "badge": "Curation collective de vidéos",
+    "badge": "Intelligence pour vidéos éducatives",
     "headingPart1": "Découvrez des vidéos qui",
-    "headingPart2": "méritent d'être mémorisées",
-    "description": "Une communauté dédiée à la préservation et au partage des meilleures vidéos YouTube. Vieux tutoriels, recettes traditionnelles, mèmes emblématiques et bien plus encore.",
+    "headingPart2": "trouvent le bon parcours",
+    "description": "Collez une URL YouTube, laissez Tube O2 extraire les métadonnées, générer un résumé et des tags, puis l'attribuer à la playlist éducative la plus pertinente.",
     "submitUrlPlaceholder": "Collez une URL de vidéo YouTube ici...",
     "submitVideoButton": "Soumettre une Vidéo",
     "exploreVideosButton": "Explorer les Vidéos",
@@ -68,56 +75,61 @@
   "home": {
     "onboarding": {
       "title": "Commencez en moins d'une minute",
-      "subtitle": "Collez un lien, vérifiez les infos, puis publiez pour la communauté."
+      "subtitle": "Collez un lien et suivez le statut pendant que Tube O2 enrichit la vidéo."
     },
     "howItWorks": {
       "title": "Comment ça marche",
       "steps": {
         "step1": {
           "title": "Collez l'URL",
-          "description": "Ajoutez un lien YouTube pour démarrer."
+          "description": "Ajoutez un lien YouTube pour créer une soumission rapide."
         },
         "step2": {
-          "title": "Vérifiez les métadonnées",
-          "description": "Confirmez le titre, la langue et la catégorie suggérée."
+          "title": "Suivez le traitement",
+          "description": "Consultez la page de statut pendant la génération des métadonnées, de la langue, du résumé, des tags et des signaux de playlist."
         },
         "step3": {
-          "title": "Publiez avec contexte",
-          "description": "Ajoutez une note courte pour aider les autres curateurs."
+          "title": "Recevez l'enrichissement",
+          "description": "L'IA génère des résumés, tags et contexte sans bloquer la soumission initiale."
         },
         "step4": {
-          "title": "Explorez avec des humains",
-          "description": "Parcourez des collections humaines, pas des flux algorithmiques."
+          "title": "Arrivez dans la bonne playlist",
+          "description": "Les vidéos éducatives sont associées à des playlists curriculaires pour faciliter la découverte."
         }
       }
     },
-    "features": {
-      "title": "Fonctionnalités clés",
-      "cards": {
-        "card1": {
-          "title": "Curation humaine",
-          "description": "Des sélections faites par des personnes avec contexte culturel."
+    "intelligence": {
+      "badge": "Propulsé par l'IA",
+      "title": "Intelligence intégrée",
+      "description": "Chaque vidéo soumise est traitée en arrière-plan. L'utilisateur voit un statut clair pendant que Tube O2 enrichit les métadonnées et attribue les playlists éducatives.",
+      "features": {
+        "tags": {
+          "title": "Balisage sémantique",
+          "description": "L'IA analyse la vidéo et génère des tags thématiques précis — sans saisie manuelle."
         },
-        "card2": {
-          "title": "Playlists vivantes",
-          "description": "Des collections qui évoluent avec les contributions."
+        "summary": {
+          "title": "Résumés automatiques",
+          "description": "Les spectateurs reçoivent une description précise avant de décider de regarder."
         },
-        "card3": {
-          "title": "Classification intelligente",
-          "description": "Suggestions IA avec validation communautaire."
+        "relevance": {
+          "title": "Contexte culturel",
+          "description": "L'IA explique pourquoi la vidéo est importante, aidant les curateurs à rédiger des notes plus riches."
         },
-        "card4": {
-          "title": "Recherche sans bruit",
-          "description": "Trouvez l'essentiel sans surcharge de clickbait."
-        },
-        "card5": {
-          "title": "Préservation d'abord",
-          "description": "Sauvegardez les vidéos utiles avant qu'elles disparaissent."
-        },
-        "card6": {
-          "title": "Multilingue",
-          "description": "Partagez et découvrez des contenus en plusieurs langues."
+        "category": {
+          "title": "Catégorisation automatique",
+          "description": "La meilleure playlist éducative est choisie parmi les candidates curriculaires avec un score auditable."
         }
+      },
+      "preview": {
+        "label": "Enrichissement IA · exemple réel",
+        "titleLabel": "Titre optimisé",
+        "tagsLabel": "Tags sémantiques",
+        "summaryLabel": "Résumé",
+        "relevanceLabel": "Pertinence culturelle",
+        "categoryLabel": "Catégorie suggérée",
+        "mockSummary": "Les principes de conception de Ken Thompson et Dennis Ritchie pour des outils composables à usage unique. Un concept fondamental pour quiconque travaille avec des systèmes logiciels.",
+        "mockRelevance": "Référence fondamentale dans la culture de l'ingénierie logicielle, largement citée dans les discussions modernes sur le DevOps et les plateformes.",
+        "mockCategory": "Technologie"
       }
     },
     "useCases": {
@@ -221,7 +233,7 @@
         "current": "E-mail actuel",
         "newEmail": "Nouvelle adresse e-mail",
         "confirmChange": "Mettre à Jour l'E-mail",
-        "changeInfo": "Usted recibirá un enlace de confirmación en su nueva dirección de correo electrónico. El cambio se hará efectivo después de la confirmación."
+        "changeInfo": "Vous recevrez un lien de confirmation à votre nouvelle adresse e-mail. Le changement prendra effet après confirmation."
       },
       "passwordSection": {
         "title": "Mot de Passe",
@@ -267,6 +279,38 @@
       "dangerZone": {
         "title": "Zone Dangereuse",
         "description": "Actions irréversibles qui affectent définitivement votre compte."
+      },
+      "deleteAccount": {
+        "title": "Supprimer le compte",
+        "description": "Supprimez définitivement votre compte et toutes les données associées.",
+        "button": "Supprimer mon compte",
+        "warning": "Cette action est irréversible. Toutes vos données seront supprimées définitivement.",
+        "consequences": {
+          "title": "Ce qui sera supprimé :",
+          "data": "Votre profil et les informations de votre compte",
+          "videos": "Toutes les vidéos que vous avez soumises",
+          "playlists": "Toutes vos playlists",
+          "favorites": "Vos favoris et préférences",
+          "irreversible": "Cette action est permanente et irréversible"
+        },
+        "dialog": {
+          "title": "Attendez, êtes-vous sûr de vouloir continuer ?",
+          "playfulMessage": "Nous sommes désolés de vous voir partir. Si vous supprimez votre compte, il n'y aura pas de retour possible.",
+          "reallyConfirm": "Si vous êtes absolument sûr, saisissez DELETE ci-dessous pour confirmer :",
+          "typeToConfirm": "Saisissez \"{{text}}\" pour confirmer",
+          "finalWarning": "Dernière chance. Tout sera supprimé définitivement.",
+          "confirm": "Oui, supprimer définitivement",
+          "deleting": "Suppression...",
+          "cancel": "Non, conserver mon compte"
+        },
+        "success": {
+          "deleted": "Compte supprimé avec succès",
+          "goodbye": "Nous sommes désolés de vous voir partir. À bientôt."
+        },
+        "error": {
+          "failed": "Impossible de supprimer le compte",
+          "confirmationMismatch": "Veuillez saisir DELETE pour confirmer"
+        }
       }
     }
   },
@@ -276,10 +320,11 @@
   },
   "about": {
     "title": "À Propos",
-    "description": "En savoir plus sur Monynha Fun et notre mission."
+    "description": "En savoir plus sur Tube O2 et notre mission."
   },
   "rules": {
     "title": "Règles",
+    "subtitle": "Directives de la Communauté",
     "description": "Directives communautaires et politiques de contenu."
   },
   "faq": {
@@ -342,8 +387,8 @@
   },
   "faqPage": {
     "q1": {
-      "question": "Qu'est-ce que Monynha Fun ?",
-      "answer": "Monynha Fun est une plateforme communautaire de curation de contenus YouTube utiles."
+      "question": "Qu'est-ce que Tube O2 ?",
+      "answer": "Tube O2 est une plateforme communautaire de curation de contenus YouTube utiles."
     },
     "q2": {
       "question": "Qui peut soumettre des vidéos ?",
@@ -359,7 +404,7 @@
     },
     "q5": {
       "question": "Comment contacter l'équipe ?",
-      "answer": "Utilisez le formulaire de contact ou écrivez à hello@monynha.com."
+      "answer": "Utilisez le formulaire de contact ou écrivez à hello@open2.tech."
     }
   },
   "submit": {
@@ -372,6 +417,7 @@
       "descriptionPlaceholder": "Pourquoi cette vidéo est-elle intéressante ?",
       "languageLabel": "Langue de la Vidéo",
       "languagePlaceholder": "Sélectionner la langue",
+      "languageAutoDetectionHint": "La langue de la vidéo sera détectée automatiquement pendant le traitement.",
       "categoryLabel": "Catégorie (facultatif)",
       "categoryPlaceholder": "Sélectionner une catégorie",
       "submitButton": "Soumettre la Vidéo",
@@ -401,11 +447,104 @@
     },
     "success": {
       "videoSubmittedTitle": "Vidéo Soumise !",
-      "videoSubmittedDescription": "Votre vidéo a été ajoutée avec succès à la collection"
+      "videoSubmittedDescription": "Votre vidéo a été ajoutée avec succès à la collection",
+      "videoQueuedTitle": "Vidéo soumise. Traitement démarré."
     },
     "info": {
       "aiEnrichmentStartedTitle": "Enrichissement IA Démarré",
       "aiEnrichmentStartedDescription": "L'IA traite maintenant les métadonnées vidéo pour l'enrichissement."
+    }
+  },
+  "submitStatus": {
+    "backToSubmit": "Retour à la soumission",
+    "notFoundTitle": "Soumission introuvable",
+    "notFoundDescription": "Nous n'avons pas trouvé cette soumission, ou vous n'y avez pas accès.",
+    "startErrorTitle": "Impossible de démarrer le traitement",
+    "processingErrorTitle": "Problème de traitement",
+    "requestIdLabel": "ID de requête",
+    "youtubeIdLabel": "ID YouTube",
+    "processingTitle": "Traitement des métadonnées vidéo",
+    "processingDescription": "Tube O2 enrichit cette soumission et mettra cette page à jour automatiquement.",
+    "viewVideo": "Voir la vidéo",
+    "retry": "Réessayer",
+    "exploreVideos": "Explorer les vidéos",
+    "language": {
+      "label": "Langue détectée",
+      "pending": "Détection automatique"
+    },
+    "stage": {
+      "label": "Étape actuelle",
+      "values": {
+        "submission_validation": "Validation de la soumission",
+        "video_load": "Chargement de la vidéo",
+        "context_load": "Chargement des playlists éducatives",
+        "analysis": "Analyse des métadonnées vidéo",
+        "transcription": "Génération du résumé de transcription",
+        "enrichment": "Enrichissement des métadonnées",
+        "assignment": "Attribution des playlists",
+        "storage": "Enregistrement des résultats",
+        "success": "Terminé",
+        "queued": "En file d'attente pour traitement en arrière-plan",
+        "start_processing": "Démarrage du traitement"
+      }
+    },
+    "transcription": {
+      "label": "Résumé de transcription",
+      "partialTitle": "Vidéo prête sans transcription complète",
+      "partialDescription": "Le traitement est terminé, mais la transcription complète n'était pas disponible. La vidéo reste publiée."
+    },
+    "analysis": {
+      "label": "Résumé et tags de la vidéo",
+      "generatedTitle": "Titre enrichi",
+      "summary": "Résumé",
+      "tags": "Tags"
+    },
+    "assignment": {
+      "label": "Playlist attribuée",
+      "noneLabel": "Playlist curriculaire",
+      "noneTitle": "Aucune playlist attribuée",
+      "noneDescription": "Il n'y avait pas assez d'adhérence avec une playlist éducative existante.",
+      "decisionSource": "Source de décision",
+      "providerError": "Détail du classificateur",
+      "candidatesLabel": "Candidates évaluées",
+      "scoreLabel": "Score",
+      "rejectedLabel": "Playlist rejetée",
+      "openaiSuggested": "Suggérée par IA",
+      "compatible": "Compatible"
+    },
+    "statusLabels": {
+      "pending": "En attente",
+      "processing": "Traitement",
+      "success": "Prête",
+      "failed": "Échec",
+      "duplicate": "Doublon",
+      "recoverable_error": "À réessayer"
+    },
+    "states": {
+      "pending": {
+        "title": "Soumission reçue",
+        "description": "Le traitement va commencer dans un instant."
+      },
+      "processing": {
+        "title": "Traitement de la vidéo",
+        "description": "Nous détectons la langue et enrichissons les métadonnées."
+      },
+      "success": {
+        "title": "Vidéo prête",
+        "description": "La vidéo a été enrichie et peut être consultée."
+      },
+      "failed": {
+        "title": "Le traitement a échoué",
+        "description": "Cette soumission n'a pas pu être traitée."
+      },
+      "duplicate": {
+        "title": "Doublon détecté",
+        "description": "Cette vidéo YouTube existe déjà dans Tube O2."
+      },
+      "recoverable_error": {
+        "title": "Le traitement doit être réessayé",
+        "description": "La soumission a été enregistrée, mais l'enrichissement peut être relancé."
+      }
     }
   },
   "videos": {
@@ -431,7 +570,34 @@
     "relatedVideosTitle": "Vidéos Similaires",
     "noRelatedVideos": "Aucune vidéo similaire trouvée.",
     "favoriteInfo": "Vous devez être connecté pour ajouter des vidéos aux favoris.",
-    "loginAction": "Connexion"
+    "loginAction": "Connexion",
+    "languageLabel": "Langue",
+    "detectedAutomatically": "Détectée automatiquement",
+    "detectingLanguage": "Détection de la langue",
+    "assignedPlaylistLabel": "Playlist attribuée",
+    "assignedPlaylistsTitle": "Playlists attribuées",
+    "assignedPlaylistsDescription": "Cette vidéo fait partie de ces parcours d'apprentissage et collections.",
+    "aiSummaryTitle": "Résumé généré par IA",
+    "transcriptSummaryTitle": "Résumé de transcription",
+    "readFullSummary": "Lire le résumé complet",
+    "metaFallbackDescription": "Curation collective de vidéos YouTube.",
+    "metaImageAlt": "Couverture de la vidéo sur Tube O2",
+    "management": {
+      "editVideo": "Modifier la vidéo",
+      "deleteVideo": "Supprimer la vidéo",
+      "editDescription": "Mettez à jour les métadonnées autorisées pour cette vidéo.",
+      "titleLabel": "Titre",
+      "descriptionLabel": "Description",
+      "categoryLabel": "Catégorie",
+      "languageLabel": "Langue",
+      "saveChanges": "Enregistrer",
+      "updateSuccess": "Vidéo mise à jour avec succès.",
+      "updateError": "Impossible de mettre à jour la vidéo.",
+      "deleteSuccess": "Vidéo supprimée avec succès.",
+      "deleteError": "Impossible de supprimer la vidéo.",
+      "confirmDeleteTitle": "Supprimer la vidéo ?",
+      "confirmDeleteDescription": "Cette action est irréversible. La vidéo '{{title}}' sera supprimée définitivement."
+    }
   },
   "favorites": {
     "title": "Mes Favoris",
@@ -453,10 +619,10 @@
     "recentDescription": "Dernières vidéos soumises",
     "noRecentVideos": "Aucune vidéo récente pour l'instant. Soyez le premier à en soumettre une !",
     "ctaTitle": "Connaissez-vous une vidéo que mérite d'être préservée ?",
-    "ctaDescription": "Partagez avec la communauté et aidez à construire la plus grande archive de vidéos précieuses sur Internet.",
+    "ctaDescription": "Partagez-la avec Tube O2 pour l'enrichir, la classer et l'ajouter à la bonne playlist éducative.",
     "ctaButton": "Soumettre une Vidéo",
     "playlistsTitle": "Playlists Récentes",
-    "playlistsDescription": "Parcours d'apprentissage et collections créés par la communauté",
+    "playlistsDescription": "Parcours éducatifs et collections curés par Open 2 Technology et la communauté",
     "noPlaylistsTitle": "Aucune playlist publique trouvée.",
     "noPlaylistsDescription": "Soyez le premier à créer une playlist et à organiser les connaissances !",
     "createFirstPlaylist": "Créer votre première playlist",
@@ -464,6 +630,100 @@
     "communitySpotlightTitle": "Pleins feux sur la communauté",
     "communitySpotlightDescription": "Rencontrez nos meilleurs curateurs et contributeurs",
     "noContributorsFound": "Aucun contributeur principal trouvé pour l'instant. Soyez le premier à soumettre une vidéo !"
+  },
+  "homeExhibition": {
+    "hero": {
+      "title": "Des vidéos YouTube transformées en parcours d’apprentissage",
+      "description": "Tube O2 organise des vidéos publiques, playlists et parcours curriculaires avec une curation humaine et l’appui de l’IA pour transformer la découverte en étude concrète.",
+      "primaryCta": "Explorer les vidéos",
+      "secondaryCta": "Envoyer une vidéo",
+      "railTitle": "À la une maintenant"
+    },
+    "empty": {
+      "hero": "La curation publique n’a pas encore renvoyé de vidéos.",
+      "categories": "Les catégories apparaissent ici lorsque des vidéos publiques y sont associées.",
+      "playlists": "Les playlists publiques à la une apparaîtront bientôt ici.",
+      "facodi": "Les preuves FACODI apparaissent ici lorsque des parcours curriculaires publics sont actifs."
+    },
+    "metrics": {
+      "videos_total": "Vidéos publiques",
+      "playlists_total": "Playlists publiques",
+      "categories_total": "Catégories actives",
+      "videos_with_summaries": "Résumés IA"
+    },
+    "categories": {
+      "title": "Catégories actives",
+      "description": "Des zones réelles du catalogue reliées aux vidéos publiées et prêtes à être explorées par thème.",
+      "videoCount": "{{count}} vidéo",
+      "videoCount_plural": "{{count}} vidéos"
+    },
+    "actions": {
+      "viewAllVideos": "Voir toutes les vidéos",
+      "viewAllPlaylists": "Voir les playlists"
+    },
+    "playlists": {
+      "title": "Playlists à la une",
+      "description": "Des séquences publiques pour dépasser la vidéo isolée et suivre une ligne d’apprentissage."
+    },
+    "facodi": {
+      "title": "FACODI en pratique",
+      "description": "Des parcours curriculaires montrant comment Tube O2 soutient les trajets d’étude pour FACODI/LESTI.",
+      "cta": "Ouvrir le parcours"
+    },
+    "curation": {
+      "title": "Curation IA + humaine",
+      "description": "La plateforme combine métadonnées, résumés, tags, transcriptions et revue éditoriale pour réduire le bruit sans perdre le contexte.",
+      "panelTitle": "Comment le contenu prend forme",
+      "signals": {
+        "with_summaries": "Vidéos avec résumé",
+        "with_tags": "Vidéos avec tags",
+        "transcripts_completed": "Transcriptions terminées",
+        "recent_submissions": "Envois récents"
+      },
+      "steps": {
+        "summary": {
+          "title": "Résumé actionnable",
+          "description": "Chaque vidéo peut recevoir une synthèse courte avant lecture."
+        },
+        "tags": {
+          "title": "Tags et catégories",
+          "description": "Des signaux sémantiques relient thèmes, langues et objectifs d’apprentissage."
+        },
+        "review": {
+          "title": "Revue éditoriale",
+          "description": "Des éditeurs affinent la pertinence, la confidentialité et la qualité du catalogue."
+        },
+        "paths": {
+          "title": "Parcours d’étude",
+          "description": "Playlists et parcours FACODI transforment la découverte en progression."
+        }
+      }
+    },
+    "cta": {
+      "title": "Choisissez la bonne entrée",
+      "description": "Apprenez, contribuez avec des vidéos ou aidez à curer le catalogue public.",
+      "cards": {
+        "learners": {
+          "title": "Apprendre maintenant",
+          "description": "Explorez les vidéos par catégorie, langue, durée et résumé avant de regarder."
+        },
+        "contributors": {
+          "title": "Envoyer une référence",
+          "description": "Suggérez des vidéos YouTube publiques pour enrichir le catalogue."
+        },
+        "editors": {
+          "title": "Postuler comme éditeur",
+          "description": "Aidez à revoir, organiser et qualifier playlists et parcours."
+        }
+      }
+    },
+    "finalCta": {
+      "title": "Une vidéo mérite de devenir apprentissage ?",
+      "description": "Envoyez une référence publique et aidez Tube O2 à grandir avec contexte, catégories et curation.",
+      "submit": "Envoyer une vidéo",
+      "editor": "Je veux curer"
+    },
+    "error": "Impossible de charger la curation publique pour le moment. Nous affichons la structure de la page pendant une nouvelle tentative."
   },
   "notFound": {
     "title": "404",
@@ -482,98 +742,6 @@
     "noUsersFoundDescription": "Il semble qu'il n'y ait pas encore d'utilisateurs dans la communauté. Soyez le premier à rejoindre!",
     "createFirstPlaylist": "Créez votre première playlist"
   },
-  "contact": {
-    "title": "Contact",
-    "description": "Contactez-nous. Nous serions ravis de vous entendre."
-  },
-  "about": {
-    "title": "À Propos",
-    "description": "En savoir plus sur Monynha Fun et notre mission."
-  },
-  "rules": {
-    "title": "Règles",
-    "description": "Directives communautaires et politiques de contenu."
-  },
-  "faq": {
-    "title": "FAQ",
-    "description": "Questions fréquemment posées et réponses."
-  },
-  "aboutPage": {
-    "missionTitle": "Notre mission",
-    "missionDescription": "Nous aidons les personnes à découvrir et préserver des vidéos précieuses grâce à la curation humaine et à la collaboration communautaire.",
-    "founderTitle": "À propos du fondateur",
-    "founderName": "Marcelo Santos",
-    "founderRole": "Fondateur et curateur",
-    "founderDescription": "Marcelo construit des produits centrés sur la communauté, axés sur la culture, l'apprentissage et la découverte attentive.",
-    "githubLink": "Profil GitHub",
-    "websiteLink": "Site personnel",
-    "valuesTitle": "Nos valeurs",
-    "value1": "La curation humaine avant les algorithmes",
-    "value2": "Respect des créateurs et des communautés",
-    "value3": "Apprentissage, curiosité et savoir-faire",
-    "value4": "Collaboration et responsabilité partagée",
-    "value5": "Préservation du savoir à long terme",
-    "philosophyTitle": "Notre philosophie",
-    "philosophyDescription": "Nous pensons que les meilleures recommandations viennent de personnes qui valorisent la qualité, le contexte et la culture."
-  },
-  "rulesPage": {
-    "rule1": "Soyez respectueux et constructif dans toutes les interactions.",
-    "rule2": "Aucun harcèlement, discours de haine ni attaques personnelles.",
-    "rule3": "Soumettez uniquement des vidéos YouTube que vous êtes autorisé à partager.",
-    "rule4": "Priorisez les contenus de haute qualité, utiles et originaux.",
-    "rule5": "Respectez les lois locales et les règles de la plateforme.",
-    "rule6": "Attribuez correctement le crédit et évitez les erreurs d'attribution.",
-    "rule7": "Aidez à maintenir la communauté sûre et accueillante."
-  },
-  "contactPage": {
-    "successMessage": "Message envoyé avec succès !",
-    "errorMessage": "Une erreur s'est produite. Veuillez réessayer.",
-    "directEmailLabel": "Email direct",
-    "locationLabel": "Localisation",
-    "locationValue": "À distance, dans le monde entier",
-    "responseTimeLabel": "Délai de réponse",
-    "responseTimeValue": "Sous 48 heures",
-    "feedbackTitle": "Retours et suggestions",
-    "feedbackDescription": "Nous nous améliorons en continu. Envoyez vos retours, idées et questions.",
-    "form": {
-      "nameLabel": "Nom",
-      "namePlaceholder": "Votre nom",
-      "nameRequired": "Veuillez saisir votre nom",
-      "emailLabel": "Email",
-      "emailPlaceholder": "vous@exemple.com",
-      "emailInvalid": "Veuillez saisir un email valide",
-      "subjectLabel": "Sujet",
-      "subjectPlaceholder": "Comment pouvons-nous aider ?",
-      "subjectRequired": "Veuillez saisir un sujet",
-      "messageLabel": "Message",
-      "messagePlaceholder": "Dites-nous en plus sur votre demande...",
-      "messageRequired": "Veuillez saisir un message",
-      "messageMaxLength": "Le message ne peut pas dépasser 1000 caractères",
-      "sendButton": "Envoyer le message"
-    }
-  },
-  "faqPage": {
-    "q1": {
-      "question": "Qu'est-ce que Monynha Fun ?",
-      "answer": "Monynha Fun est une plateforme communautaire de curation de contenus YouTube utiles."
-    },
-    "q2": {
-      "question": "Qui peut soumettre des vidéos ?",
-      "answer": "Toute personne ayant un compte peut soumettre des vidéos pour revue et curation."
-    },
-    "q3": {
-      "question": "Comment les vidéos mises en avant sont-elles sélectionnées ?",
-      "answer": "Les vidéos mises en avant sont choisies selon l'engagement de la communauté et la revue des curateurs."
-    },
-    "q4": {
-      "question": "Puis-je créer des playlists ?",
-      "answer": "Oui. Vous pouvez créer des playlists pour organiser et partager des parcours d'apprentissage."
-    },
-    "q5": {
-      "question": "Comment contacter l'équipe ?",
-      "answer": "Utilisez le formulaire de contact ou écrivez à hello@monynha.com."
-    }
-  },
   "playlists": {
     "searchPlaceholder": "Buscar listas de reproducción...",
     "createPlaylist": "Crear Lista de Reproducción",
@@ -590,46 +758,92 @@
     "filter": {
       "all": "Todas las Listas",
       "myPlaylists": "Mis Listas",
-      "collaborating": "Colaborando"
+      "collaborating": "Colaborando",
+      "allCourseCodes": "Tous les cours",
+      "allSemesters": "Tous les semestres",
+      "allLanguages": "Toutes les langues",
+      "allTypes": "Tous les types",
+      "allVideoRanges": "Tous les volumes de vidéos",
+      "withVideos": "Avec vidéos",
+      "emptyVideos": "Playlists vides",
+      "videos1to9": "1 à 9 vidéos",
+      "videos10plus": "10+ vidéos"
     },
     "import": {
-      "button": "Importar de YouTube",
-      "title": "Importar Lista de Reproducción de YouTube",
-      "description": "Pega una URL de una lista de reproducción de YouTube para importarla como una nueva lista de reproducción, incluyendo todos sus videos.",
+      "button": "Importer des vidéos YouTube",
+      "title": "Importer les vidéos d'une playlist YouTube",
+      "description": "Collez l'URL d'une playlist YouTube pour envoyer ses vidéos dans le flux normal d'enrichissement et d'affectation éducative de Tube O2.",
       "form": {
-        "urlLabel": "URL de la Lista de Reproducción de YouTube",
+        "urlLabel": "URL de la playlist YouTube",
         "urlPlaceholder": "https://www.youtube.com/playlist?list=...",
-        "nameLabel": "Nombre de la Lista de Reproducción",
-        "namePlaceholder": "Nombre para tu nueva lista de reproducción",
-        "defaultPlaylistName": "Lista de Reproducción Importada de YouTube",
-        "importButton": "Importar Lista de Reproducción",
-        "importingButton": "Importando..."
+        "importButton": "Importer les vidéos",
+        "importingButton": "Importation..."
       },
       "error": {
-        "invalidUrl": "Por favor, introduce una URL de lista de reproducción de YouTube válida.",
-        "notYoutubePlaylistUrl": "Solo se aceptan URLs de listas de reproducción de YouTube.",
-        "nameMinLength": "El nombre de la lista de reproducción debe tener al menos 3 caracteres.",
-        "nameMaxLength": "El nombre de la lista de reproducción no puede exceder los 100 caracteres.",
-        "notLoggedIn": "Debes iniciar sesión para importar listas de reproducción.",
-        "noPlaylistId": "No se pudo extraer un ID de lista de reproducción de la URL proporcionada.",
-        "generic": "Ocurrió un error durante la importación de la lista de reproducción. Por favor, inténtalo de nuevo.",
-        "maxRetriesReached": "No se pudo crear la lista de reproducción después de varios intentos debido a un conflicto de slug. Por favor, intenta con un nombre de playlist diferente.",
-        "youtubeApiFetchFailed": "Error al obtener los detalles de la lista de reproducción de YouTube. Por favor, verifica la URL o inténtalo de nuevo más tarde.",
-        "videoProcessingFailed": "Error al procesar el video '{{title}}': {{error}}",
-        "youtubeApiKeyMissing": "La clave de API de YouTube no está configurada ou est invalide sur le serveur. Veuillez contacter le support."
+        "invalidUrl": "Veuillez entrer une URL de playlist YouTube valide.",
+        "notYoutubePlaylistUrl": "Seules les URLs de playlists YouTube sont acceptées.",
+        "notLoggedIn": "Vous devez être connecté pour importer des playlists.",
+        "noPlaylistId": "Impossible d'extraire un identifiant de playlist depuis l'URL fournie.",
+        "generic": "Une erreur est survenue lors de l'importation de la playlist. Veuillez réessayer.",
+        "importFunctionFailed": "Impossible d'exécuter l'importation de la playlist côté serveur.",
+        "noImportResponse": "La fonction d'importation n'a renvoyé aucune donnée.",
+        "youtubeApiFetchFailed": "Échec de la récupération des détails de la playlist YouTube. Vérifiez l'URL ou réessayez plus tard.",
+        "videoProcessingFailed": "Échec du traitement de la vidéo '{{title}}' : {{error}}",
+        "youtubeApiKeyMissing": "La clé API YouTube est absente ou invalide sur le serveur. Veuillez contacter le support."
       },
       "success": {
-        "playlistCreated": "¡Lista de reproducción '{{name}}' creada con éxito!",
-        "videoAdded": "Video '{{title}}' añadido a Monynha Fun.",
-        "allVideosProcessed": "Se importaron {{count}} videos a la lista de reproducción con éxito."
+        "summaryTitle": "Importation terminée",
+        "summaryDescription": "Trouvées : {{found}} • Nouvelles soumissions : {{created}} • Déjà traitées : {{existing}} • Envoyées au traitement : {{queued}}",
+        "videoAdded": "Vidéo '{{title}}' ajoutée à Tube O2.",
+        "allVideosProcessed": "{{count}} vidéos ont été envoyées au traitement."
       },
       "info": {
-        "videoAlreadyExists": "El video '{{title}}' ya existe en Monynha Fun. Se omite la creación."
+        "videoAlreadyExists": "La vidéo '{{title}}' existe déjà dans Tube O2. Création ignorée."
       },
       "warning": {
-        "noVideosFoundInPlaylist": "No se encontraron videos en la lista de reproducción de YouTube. Se creará una lista de reproducción vacía."
+        "enrichPartial": "{{failed}} vidéo(s) n'ont pas pu être envoyées au traitement pour le moment.",
+        "noVideosFoundInPlaylist": "Aucune vidéo n'a été trouvée dans la playlist YouTube."
       },
-      "apiLimitationInfo": "Monynha Fun utiliza un servicio de backend para obtener videos de listas de reproducción de YouTube, pero depende de la API de datos de YouTube, que tiene cuotas y puede que no siempre devuelva todos los videos para listas de reproducción muy grandes. Para obtener resultados óptimos, asegúrate de que la lista de reproducción sea pública."
+      "apiLimitationInfo": "Tube O2 envoie les vidéos de playlists YouTube publiques dans le même flux d'enrichissement que les soumissions individuelles. Les vidéos ne sont ajoutées aux playlists éducatives qu'après confirmation d'une correspondance réelle."
+    },
+    "feedback": {
+      "createSuccess": "Playlist créée avec succès !",
+      "createError": "Échec de la création de la playlist",
+      "updateSuccess": "Playlist mise à jour avec succès !",
+      "updateError": "Échec de la mise à jour de la playlist",
+      "deleteSuccess": "Playlist supprimée avec succès !",
+      "deleteError": "Échec de la suppression de la playlist",
+      "addVideoSuccess": "Vidéo ajoutée à la playlist !",
+      "addVideoError": "Échec de l'ajout de la vidéo à la playlist",
+      "removeVideoSuccess": "Vidéo retirée de la playlist !",
+      "removeVideoError": "Échec du retrait de la vidéo de la playlist",
+      "reorderSuccess": "Playlist réorganisée avec succès !",
+      "reorderError": "Échec de la réorganisation de la playlist",
+      "markWatchedSuccess": "Vidéo marquée comme vue !",
+      "markUnwatchedSuccess": "Vidéo marquée comme non vue !",
+      "progressError": "Échec de la mise à jour de la progression de la vidéo",
+      "collaboratorAdded": "Collaborateur ajouté !",
+      "collaboratorAddError": "Échec de l'ajout du collaborateur",
+      "collaboratorRoleUpdated": "Rôle du collaborateur mis à jour !",
+      "collaboratorRoleUpdateError": "Échec de la mise à jour du rôle du collaborateur",
+      "collaboratorRemoved": "Collaborateur supprimé !",
+      "collaboratorRemoveError": "Échec de la suppression du collaborateur"
+    },
+    "title": "Playlists",
+    "description": "Curated learning paths and video collections."
+  },
+  "editorialPortal": {
+    "title": "Portail Éditorial FACODI",
+    "description": "Gérez les playlists FACODI avec un accès global éditeur.",
+    "searchPlaceholder": "Rechercher des playlists FACODI...",
+    "noAccessTitle": "Zone restreinte",
+    "noAccessDescription": "Seuls les utilisateurs avec le rôle éditeur peuvent accéder à ce portail.",
+    "emptyTitle": "Aucune playlist FACODI trouvée.",
+    "emptyDescription": "Créez ou mettez à jour des playlists avec un code de cours ou d'unité pour les gérer ici.",
+    "stats": {
+      "editableTotal": "Playlists modifiables",
+      "facodiTotal": "Playlists FACODI",
+      "withUnitCode": "Avec code d'unité"
     }
   },
   "playlistDetails": {
@@ -638,6 +852,7 @@
     "backToPlaylists": "Volver a Listas de Reproducción",
     "byAuthor": "Por {{author}}",
     "anonymousAuthor": "Por autor anónimo",
+    "metaFallbackDescription": "Playlist sur Tube O2 : curation collective de vidéos YouTube.",
     "noDescription": "No se proporcionó ninguna descripción para esta lista de reproducción.",
     "editPlaylist": "Editar Lista de Reproducción",
     "deletePlaylist": "Eliminar Lista de Reproducción",
@@ -685,6 +900,8 @@
     "editDescription": "Actualiza los detalles de tu lista de reproducción.",
     "loadErrorTitle": "Error al cargar lista de reproducción",
     "loadErrorDescription": "No se pudieron cargar los detalles de la lista de reproducción. Por favor, inténtalo de nouveau plus tard.",
+    "facodiRestrictedTitle": "Zone restreinte",
+    "facodiRestrictedDescription": "Les playlists d'étude FACODI ne peuvent être créées ou modifiées que par des profils éligibles.",
     "backToPlaylists": "Volver a Listas de Reproducción",
     "form": {
       "nameLabel": "Nombre de la Lista de Reproducción",
@@ -709,7 +926,7 @@
       "isPublicHint": "Les playlists publiques sont visibles par tous les utilisateurs.",
       "playlistTypeLabel": "Tipo de Lista de Reproducción",
       "learningPath": "Ruta de Aprendizaje",
-      "learningPathHint": "Les vidéos sont ordonnées et doivent être suivies séquentiellement. Les champs FACODI apparaîtront si sélectionné. Pour plus d'informations, visitez <a href=\"https://facodi.pt\" target=\"_blank\" rel=\"noopener noreferrer\" class=\"text-primary hover:underline\">FACODI.pt</a>.",
+      "learningPathHint": "Les vidéos sont ordonnées et doivent être suivies séquentiellement. Les champs FACODI apparaîtront si sélectionné. Pour plus d'informations, visitez <facodiLink>FACODI.pt</facodiLink>.",
       "collection": "Colección",
       "collectionHint": "Les vidéos sont un ensemble curé, l'ordre n'est pas strictement imposé.",
       "facodiFieldsTitle": "Detalles del Curso FACODI",
@@ -730,7 +947,8 @@
       "unitCodeMaxLength": "Le code de l'unité ne peut pas dépasser 50 caractères",
       "languageRequired": "La langue est obligatoire",
       "notLoggedInTitle": "Erreur",
-      "notLoggedInDescription": "Vous devez être connecté pour créer ou modifier des playlists."
+      "notLoggedInDescription": "Vous devez être connecté pour créer ou modifier des playlists.",
+      "facodiRoleRequired": "Seuls les profils éligibles peuvent créer des playlists d'étude FACODI."
     }
   },
   "comments": {
@@ -753,5 +971,112 @@
       "contentRequired": "Le commentaire ne peut pas être vide",
       "contentMaxLength": "Le commentaire doit faire au maximum 500 caractères"
     }
+  },
+  "profile": {
+    "defaultMetaTitle": "Tube O2",
+    "metaTitle": "{{name}} | Tube O2",
+    "metaDescription": "{{name}} sur Tube O2 : curation collaborative de vidéos YouTube.",
+    "notFoundTitle": "Profil introuvable",
+    "notFoundDescription": "Le profil recherché n'existe pas ou n'est pas disponible.",
+    "joinedOn": "Inscrit le {{date}}",
+    "editProfile": "Modifier le profil",
+    "uploadedVideos": "Vidéos publiées",
+    "videosLoadError": "Impossible de charger les vidéos de ce profil. Veuillez réessayer plus tard.",
+    "noVideosTitle": "Aucune vidéo publiée pour le moment",
+    "noVideosDescription": "Lorsqu'une vidéo sera publiée, elle apparaîtra ici.",
+    "uploadFirstVideo": "Publier la première vidéo",
+    "createdPlaylists": "Playlists créées",
+    "playlistsLoadError": "Impossible de charger les playlists de ce profil. Veuillez réessayer plus tard.",
+    "noPlaylistsTitle": "Aucune playlist créée pour le moment",
+    "noPlaylistsDescription": "Les playlists de ce profil apparaîtront ici.",
+    "createFirstPlaylist": "Créer la première playlist"
+  },
+  "editorApplications": {
+    "cta": {
+      "badge": "Équipe éditoriale",
+      "title": "Candidatez pour devenir éditrice",
+      "description": "Aidez à curer des playlists de qualité et à organiser le contenu de la communauté.",
+      "button": "Je candidate"
+    },
+    "status": {
+      "pending": "En attente",
+      "under_review": "En analyse",
+      "approved": "Approuvée",
+      "rejected": "Rejetée"
+    },
+    "applyPage": {
+      "badge": "Appel ouvert",
+      "title": "Candidature éditoriale",
+      "description": "Parlez-nous de votre expérience et de votre motivation pour la curation sur Tube O2."
+    },
+    "form": {
+      "fields": {
+        "nameLabel": "Nom complet",
+        "namePlaceholder": "Votre nom complet",
+        "emailLabel": "Email",
+        "emailPlaceholder": "vous@exemple.com",
+        "motivationLabel": "Motivation",
+        "motivationPlaceholder": "Partagez votre motivation et votre expérience éditoriale (optionnel)",
+        "portfolioLinksLabel": "Liens de portfolio",
+        "portfolioLinksPlaceholder": "Un lien par ligne (optionnel)",
+        "consentLabel": "J'accepte la politique de confidentialité et j'autorise le traitement de mes données pour cette candidature."
+      },
+      "submitButton": "Envoyer la candidature",
+      "successTitle": "Candidature reçue",
+      "successDescription": "Merci. Nous avons reçu votre candidature et envoyé un email de confirmation.",
+      "successWithEmailWarningDescription": "Votre candidature est enregistrée, mais l'email de confirmation n'a pas pu être envoyé pour le moment.",
+      "errorTitle": "Erreur d'envoi",
+      "errorDescription": "Impossible d'envoyer votre candidature. Veuillez réessayer.",
+      "errors": {
+        "nameRequired": "Le nom est obligatoire",
+        "nameTooLong": "Le nom ne peut pas dépasser 120 caractères",
+        "motivationTooLong": "La motivation ne peut pas dépasser 2000 caractères",
+        "portfolioTooLong": "Les liens de portfolio ne peuvent pas dépasser 2000 caractères",
+        "consentRequired": "Vous devez accepter le consentement de confidentialité"
+      }
+    },
+    "adminPage": {
+      "title": "Candidatures éditoriales",
+      "description": "Examinez les candidatures reçues et mettez à jour leur statut.",
+      "searchPlaceholder": "Rechercher par nom ou email",
+      "statusFilterPlaceholder": "Filtrer par statut",
+      "statusFilterAll": "Tous les statuts",
+      "appliedAt": "Candidature le",
+      "loadError": "Impossible de charger les candidatures.",
+      "empty": "Aucune candidature trouvée pour les filtres actuels.",
+      "statusUpdatedTitle": "Statut mis à jour",
+      "statusUpdatedDescription": "Candidature déplacée vers {{status}}.",
+      "statusUpdateErrorTitle": "Impossible de mettre à jour le statut",
+      "statusUpdateErrorDescription": "Veuillez réessayer.",
+      "noAccessTitle": "Zone restreinte",
+      "noAccessDescription": "Seules les éditrices et administratrices peuvent accéder à cette page.",
+      "backToEditorial": "Retour au portail éditorial"
+    }
+  },
+  "messages": {
+    "title": "Messages",
+    "description": "Vos conversations directes avec d'autres curateurs.",
+    "inbox": "Boîte de réception",
+    "emptyInbox": "Aucune conversation pour le moment.",
+    "selectConversation": "Sélectionnez une conversation pour commencer.",
+    "emptyConversation": "Aucun message pour le moment. Dites bonjour.",
+    "inputPlaceholder": "Écrire un message...",
+    "tipPrefix": "Astuce :",
+    "tipLink": "visitez les profils de la communauté"
+  },
+  "notifications": {
+    "title": "Notifications",
+    "description": "Suivez les mises à jour, les nouveaux messages et l'activité du compte.",
+    "inbox": "Notifications récentes",
+    "empty": "Vous n'avez pas encore de notifications.",
+    "markAsRead": "Marquer comme lue",
+    "markAllAsRead": "Tout marquer comme lu"
+  },
+  "socialProfile": {
+    "followers": "followers",
+    "following": "following",
+    "follow": "Follow",
+    "unfollow": "Unfollow",
+    "sendMessage": "Message"
   }
 }

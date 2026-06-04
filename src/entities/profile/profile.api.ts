@@ -2,20 +2,41 @@ import { supabase } from '@/shared/api/supabase/supabaseClient';
 import type { Profile, ProfileUpdate } from './profile.types';
 
 export async function getProfileById(userId: string) {
-  const { data, error } = await supabase.from('profiles').select('*, avatar_path').eq('id', userId).single();
-  if (error) throw error;
-  return data as Profile;
+  const { data, error, status } = await supabase
+    .from('profiles')
+    .select('*, avatar_path')
+    .eq('id', userId)
+    .maybeSingle();
+
+  if (error && status !== 406) throw error;
+  return (data ?? null) as Profile | null;
 }
 
 export async function getProfileByUsername(username: string) {
-  const { data, error } = await supabase
+  const normalizedUsername = decodeURIComponent(username).trim();
+
+  const { data, error, status } = await supabase
     .from('profiles')
     .select('*, avatar_path')
-    .eq('username', username)
-    .single();
+    .eq('username', normalizedUsername)
+    .maybeSingle();
 
-  if (error) throw error;
-  return data as Profile;
+  if (data) {
+    return data as Profile;
+  }
+
+  if (error && status !== 406) throw error;
+
+  // Fallback for environments with case-sensitive username mismatch.
+  const { data: fallbackData, error: fallbackError, status: fallbackStatus } = await supabase
+    .from('profiles')
+    .select('*, avatar_path')
+    .ilike('username', normalizedUsername)
+    .limit(1)
+    .maybeSingle();
+
+  if (fallbackError && fallbackStatus !== 406) throw fallbackError;
+  return (fallbackData ?? null) as Profile | null;
 }
 
 export async function findProfileByUsername(username: string) {

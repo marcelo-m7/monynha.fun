@@ -1,6 +1,6 @@
 # Sistema de Profundidade Visual (Elevation)
 
-Este documento descreve o sistema de profundidade visual (elevation) do Monynha Fun, baseado em tokens CSS globais e utilitários Tailwind. O objetivo é padronizar sombras e hierarquia visual sem depender de estilos inline ou alterações nos componentes shadcn/ui.
+Este documento descreve o sistema de profundidade visual (elevation) do Tube O2, baseado em tokens CSS globais e utilitários Tailwind. O objetivo é padronizar sombras e hierarquia visual sem depender de estilos inline ou alterações nos componentes shadcn/ui.
 
 ## Tokens de Profundidade (CSS)
 

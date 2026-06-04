@@ -1,5 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
+import { useTranslation } from 'react-i18next';
 import { useAuth } from '@/features/auth/useAuth';
 import { playlistKeys } from '@/entities/playlist/playlist.keys';
 import type { PlaylistProgress } from '@/entities/playlist/playlist.types';
@@ -21,6 +22,7 @@ export function usePlaylistProgress(playlistId: string | undefined) {
 export function useMarkVideoWatched() {
   const queryClient = useQueryClient();
   const { user } = useAuth();
+  const { t } = useTranslation();
 
   return useMutation<PlaylistProgress, Error, { playlistId: string; videoId: string; watched: boolean; lastPositionSeconds?: number }>({
     mutationFn: async ({ playlistId, videoId, watched, lastPositionSeconds = 0 }) => {
@@ -35,10 +37,14 @@ export function useMarkVideoWatched() {
     },
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: playlistKeys.progress(variables.playlistId, user?.id) });
-      toast.success(variables.watched ? 'Video marked as watched!' : 'Video marked as unwatched!');
+      toast.success(
+        variables.watched
+          ? t('playlists.feedback.markWatchedSuccess')
+          : t('playlists.feedback.markUnwatchedSuccess'),
+      );
     },
     onError: (error) => {
-      toast.error('Failed to update video progress', { description: error.message });
+      toast.error(t('playlists.feedback.progressError'), { description: error.message });
     },
   });
 }

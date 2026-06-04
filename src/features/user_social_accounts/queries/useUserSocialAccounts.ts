@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { toast } from 'sonner';
+import { notify } from '@/shared/lib/notify';
 import { useAuth } from '@/features/auth/useAuth';
 import { userSocialAccountKeys } from '@/entities/user_social_account/user_social_account.keys';
 import {
@@ -32,10 +32,10 @@ export function useCreateUserSocialAccount() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: userSocialAccountKeys.list(user?.id ?? '') });
-      toast.success('Social account added successfully!');
+      notify.success('Social account added successfully!');
     },
     onError: (error) => {
-      toast.error('Failed to add social account', { description: error.message });
+      notify.error('Failed to add social account', { description: error.message });
     },
   });
 }

@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { toast } from 'sonner';
+import { notify } from '@/shared/lib/notify';
 import { useAuth } from '@/features/auth/useAuth';
 import { commentKeys } from '@/entities/comment/comment.keys';
 import { createComment, listComments, deleteComment } from '@/entities/comment/comment.api';
@@ -32,10 +32,10 @@ export function useCreateComment() {
     },
     onSuccess: (newComment) => {
       queryClient.invalidateQueries({ queryKey: commentKeys.list(newComment.video_id) });
-      toast.success('Comment added successfully!');
+      notify.success('Comment added successfully!');
     },
     onError: (error) => {
-      toast.error('Failed to add comment', { description: error.message });
+      notify.error('Failed to add comment', { description: error.message });
     },
   });
 }
@@ -49,10 +49,10 @@ export function useDeleteComment() {
     },
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: commentKeys.list(variables.videoId) });
-      toast.success('Comment deleted successfully!');
+      notify.success('Comment deleted successfully!');
     },
     onError: (error) => {
-      toast.error('Failed to delete comment', { description: error.message });
+      notify.error('Failed to delete comment', { description: error.message });
     },
   });
 }

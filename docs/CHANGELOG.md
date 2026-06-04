@@ -1,8 +1,66 @@
-# Changelog - Monynha Fun 🎬
+# Changelog - Tube O2 🎬
 
 *Where we document every bug fix, feature drop, and "oops I broke production" moment*
 
-> **Monynha Softwares Philosophy**: Move fast, break things (but fix them quickly), and always keep it real. No corporate BS here. 🚀
+> **Open 2 Technology Philosophy**: Move fast, break things (but fix them quickly), and always keep it real. No corporate BS here. 🚀
+
+---
+
+## [v0.3.2] - May 17, 2026 🧭 **Docs + Async Pipeline Alignment**
+
+### Documentation Refresh
+
+- Updated README, `AGENTS.md`, `AI_RULES.md`, and scoped agent instructions to reflect the current Supabase Edge Function backend.
+- Removed/marked stale FastAPI backend guidance where that code no longer exists in the tree.
+- Refreshed `docs/CODEBASE.md` with current route, Feature-Sliced, Edge Function, migration, and async submission details.
+- Replaced the old TODO/recent-updates note with current backlog and release checklist guidance.
+
+### Async Submission / Playlist Import Contracts
+
+- Documented `video_submissions` as the source of truth for `/submit/status/:submissionId`.
+- Documented the `import-youtube-playlist` request/response contract and its relationship to `enrich-video`.
+- Marked the Odoo eLearning sync note as historical because the referenced `backend/` implementation is no longer present.
+
+### Site Preview Asset
+
+- Refreshed `public/placeholder.png` for Tube O2 branding so generic OG/Twitter previews no longer show Monynha Fun.
+
+---
+
+## [v0.3.1] - May 2, 2026 ⚡ **Playlists UX + Build Performance**
+
+### 🎓 Course-Centric Playlists Discovery
+
+**What's New**:
+- Added aggregated course data integration on playlists page:
+  - `src/entities/course/course.types.ts`
+  - `src/entities/course/course.keys.ts`
+  - `src/entities/course/course.api.ts`
+  - `src/features/courses/queries/useCoursePlaylists.ts`
+- `src/pages/Playlists.tsx` now consumes `v_course_playlist_summary` and shows course summary cards.
+- Advanced filter UX improvements:
+  - removable active filter chips
+  - responsive filter layout
+  - URL-persisted filter state
+  - fallback options when course summary view is empty
+
+**Testing**:
+- `src/pages/Playlists.test.tsx` updated to mock course summary hook and avoid unhandled network warnings.
+- Typecheck and playlists tests passing after integration.
+
+### 📦 Build Performance Improvements
+
+**The Problem**: Initial bundle was too large (~570 kB minified for `index`) with chunk warning in production build.
+
+**The Solution**: Updated `vite.config.ts` manual chunk strategy by domain (`react-core`, `router`, `query`, `supabase`, `i18n`, `radix-ui`, `icons`, `zod`, `i18n-locales`).
+
+**Result**:
+- Main `index` chunk reduced from ~570 kB to ~75 kB.
+- Large chunk warning eliminated in build output.
+
+### 🖼️ Docs Refresh
+
+- README screenshots updated to current UI state (homepage, videos, playlists, comments, community/profile).
 
 ---
 
@@ -188,8 +246,8 @@ OPENAI_MODEL=gpt-4o-mini              # Documented in .env.example
 **Configuration**:
 ```javascript
 {
-  name: 'Monynha Fun',
-  short_name: 'Monynha',
+  name: 'Tube O2',
+  short_name: 'Tube O2',
   display: 'standalone',
   theme_color: '#1a1a1a',
   icons: [192x192, 512x512],
@@ -472,4 +530,4 @@ When making changes, please:
 ## Resources
 - [Main README](../README.md)
 - [CODEBASE Documentation](./CODEBASE.md)
-- [GitHub Repository](https://github.com/marcelo-m7/monynha.fun)
+- [GitHub Repository](https://github.com/marcelo-m7/tube-o2)

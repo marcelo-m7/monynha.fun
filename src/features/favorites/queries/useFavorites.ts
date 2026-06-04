@@ -2,7 +2,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { addFavorite, isFavorited, listFavorites, removeFavorite } from '@/entities/favorite/favorite.api';
 import type { Favorite } from '@/entities/favorite/favorite.types';
 import { useAuth } from '@/features/auth/useAuth';
-import { toast } from 'sonner';
+import { notify } from '@/shared/lib/notify';
 
 const favoriteKeys = {
   all: ['favorites'] as const,
@@ -47,12 +47,12 @@ export function useAddFavorite() {
       return addFavorite(user.id, videoId);
     },
     onSuccess: (newFavorite) => {
-      toast.success('Vídeo adicionado aos favoritos!');
+      notify.success('Vídeo adicionado aos favoritos!');
       queryClient.invalidateQueries({ queryKey: favoriteKeys.list(user?.id) });
       queryClient.invalidateQueries({ queryKey: favoriteKeys.status(user?.id, newFavorite.video_id) });
     },
     onError: (error) => {
-      toast.error('Erro ao adicionar aos favoritos', { description: error.message });
+      notify.error('Erro ao adicionar aos favoritos', { description: error.message });
     },
   });
 }
@@ -67,12 +67,12 @@ export function useRemoveFavorite() {
       return removeFavorite(user.id, videoId);
     },
     onSuccess: (_, videoId) => {
-      toast.success('Vídeo removido dos favoritos!');
+      notify.success('Vídeo removido dos favoritos!');
       queryClient.invalidateQueries({ queryKey: favoriteKeys.list(user?.id) });
       queryClient.invalidateQueries({ queryKey: favoriteKeys.status(user?.id, videoId) });
     },
     onError: (error) => {
-      toast.error('Erro ao remover dos favoritos', { description: error.message });
+      notify.error('Erro ao remover dos favoritos', { description: error.message });
     },
   });
 }

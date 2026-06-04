@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { toast } from 'sonner';
+import { notify } from '@/shared/lib/notify';
 import {
   followByUsername,
   getFollowStatsByUsername,
@@ -66,7 +66,7 @@ export function useFollowByUsername() {
   return useMutation<string, Error, { targetUsername: string; currentUsername?: string }>({
     mutationFn: ({ targetUsername }) => followByUsername(targetUsername),
     onSuccess: (_, variables) => {
-      toast.success('Agora voce esta seguindo este perfil.');
+      notify.success('Agora voce esta seguindo este perfil.');
       queryClient.invalidateQueries({ queryKey: followKeys.status(variables.targetUsername) });
       queryClient.invalidateQueries({ queryKey: followKeys.stats(variables.targetUsername) });
       queryClient.invalidateQueries({ queryKey: followKeys.followers(variables.targetUsername) });
@@ -76,7 +76,7 @@ export function useFollowByUsername() {
       }
     },
     onError: (error) => {
-      toast.error('Nao foi possivel seguir este perfil.', { description: error.message });
+      notify.error('Nao foi possivel seguir este perfil.', { description: error.message });
     },
   });
 }
@@ -87,7 +87,7 @@ export function useUnfollowByUsername() {
   return useMutation<number, Error, { targetUsername: string; currentUsername?: string }>({
     mutationFn: ({ targetUsername }) => unfollowByUsername(targetUsername),
     onSuccess: (_, variables) => {
-      toast.success('Voce deixou de seguir este perfil.');
+      notify.success('Voce deixou de seguir este perfil.');
       queryClient.invalidateQueries({ queryKey: followKeys.status(variables.targetUsername) });
       queryClient.invalidateQueries({ queryKey: followKeys.stats(variables.targetUsername) });
       queryClient.invalidateQueries({ queryKey: followKeys.followers(variables.targetUsername) });
@@ -97,7 +97,7 @@ export function useUnfollowByUsername() {
       }
     },
     onError: (error) => {
-      toast.error('Nao foi possivel deixar de seguir este perfil.', { description: error.message });
+      notify.error('Nao foi possivel deixar de seguir este perfil.', { description: error.message });
     },
   });
 }

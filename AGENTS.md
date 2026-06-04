@@ -1,35 +1,185 @@
-# Monynha Fun: Diretrizes de Projeto para Agentes de IA
+# Tube O2 Agent Guide
 
-Este documento descreve as tecnologias centrais e as regras específicas de uso de bibliotecas para o projeto **Monynha Fun**, de **Monynha Softwares**. A adesão a estas diretrizes garante consistência, manutenibilidade e desempenho ideal, alinhando-se à nossa filosofia de democratizar a tecnologia e valorizar a curadoria humana assistida por IA.
+This file is the fast-start guide for AI coding agents in this repository. Keep changes small, follow existing patterns, and prefer linking to docs over duplicating them.
 
-## Visão Geral da Pilha Tecnológica
+## Quick Start
 
-*   **Framework Frontend**: React.js
-*   **Linguagem**: TypeScript
-*   **Ferramenta de Build**: Vite
-*   **Estilização**: Tailwind CSS
-*   **Biblioteca de Componentes UI**: shadcn/ui (construída sobre Radix UI)
-*   **Backend-as-a-Service**: Supabase (para autenticação, banco de dados e Edge Functions)
-*   **Roteamento**: React Router DOM
-*   **Busca e Cache de Dados**: TanStack Query
-*   **Ícones**: Lucide React
-*   **Gerenciamento e Validação de Formulários**: React Hook Form com Zod
-*   **Notificações Toast**: Sonner
-*   **Manipulação de Datas**: date-fns
+- Product: Tube O2 (https://tube.open2.tech)
+- Company: Open 2 Technology (Open2 / O2T)
+- Stack: React 18, TypeScript, Vite, Tailwind, shadcn/ui, Supabase, TanStack Query
+- Architecture style: Feature-Sliced Design
 
-## Regras de Uso de Bibliotecas (Monynha Fun)
+Run from repository root:
 
-Para manter uma base de código consistente e eficiente, siga estas regras ao implementar novos recursos ou modificar os existentes:
+| Goal | Command |
+|---|---|
+| Development | `pnpm dev` |
+| Build | `pnpm build` |
+| Analyze build | `pnpm build:analyze` |
+| Lint | `pnpm lint` |
+| Type check | `pnpm typecheck` |
+| Tests | `pnpm test` |
+| Coverage | `pnpm test:coverage` |
 
-*   **Componentes UI**: Sempre priorize os componentes `shadcn/ui`. Se um componente específico não estiver disponível no `shadcn/ui`, crie um novo componente pequeno seguindo os padrões de estilo e acessibilidade do `shadcn/ui`. Não modifique diretamente os arquivos de componentes `shadcn/ui` existentes.
-*   **Estilização**: Use `Tailwind CSS` exclusivamente para toda a estilização. Evite estilos inline ou módulos CSS separados, a menos que seja absolutamente necessário para um caso muito específico e isolado (e justifique seu uso).
-*   **Ícones**: Use ícones da biblioteca `lucide-react`.
-*   **Gerenciamento de Estado e Busca de Dados**: Para estado do servidor (busca de dados, cache, sincronização), use `TanStack Query`. Para estado simples do lado do cliente, use `useState` e `useContext` do React.
-*   **Roteamento**: Toda a navegação dentro do aplicativo deve ser tratada usando `react-router-dom`. Mantenha as definições de rota em `src/App.tsx`.
-*   **Autenticação e Interações com o Banco de Dados**: Todos os fluxos de autenticação (cadastro, login, logout) e operações de banco de dados devem usar o cliente `Supabase` (`@supabase/supabase-js`) importado de `src/integrations/supabase/client.ts`. **Para a interface de usuário de autenticação, utilizamos formulários customizados implementados com `react-hook-form` e `Zod` para maior flexibilidade e controle sobre o design.**
-*   **Manipulação de Formulários**: Para formulários, use `react-hook-form` para gerenciar o estado e as submissões do formulário, combinado com `Zod` para validação de esquema.
-*   **Esquemas de Validação**: **SEMPRE use os esquemas de validação compartilhados** de `src/shared/lib/validation.ts` para garantir consistência. Não duplique validações de email, senha ou username. Use `emailSchema`, `passwordSchema`, `usernameSchema`, e `createPasswordConfirmationSchema()` para casos comuns. Este é um princípio DRY (Don't Repeat Yourself) fundamental do projeto.
-*   **Notificações Toast**: Para exibir mensagens transitórias ao usuário (sucesso, erro, informação), use a biblioteca `sonner`.
-*   **Funções Utilitárias**: Para combinar classes Tailwind CSS, use a função utilitária `cn` de `src/lib/utils.ts`.
-*   **Manipulação de Datas**: Use `date-fns` para quaisquer tarefas de formatação ou manipulação de datas.
-*   **Design Responsivo**: Todos os componentes e layouts devem ser responsivos e se adaptar graciosamente a diferentes tamanhos de tela, utilizando as utilidades responsivas do Tailwind.
+Supabase/backend commands:
+
+| Goal | Command |
+|---|---|
+| Discover Supabase CLI commands | `supabase --help` |
+| Serve an Edge Function locally | `supabase functions serve <function-name> --env-file .env` |
+| Create a migration | `supabase migration new <descriptive-name>` |
+| Apply local migrations | `supabase migration up` |
+
+There is currently no `backend/` FastAPI service in this tree. Backend work lives in [supabase/functions](supabase/functions), [supabase/migrations](supabase/migrations), and the Bun SSR preview server in [server/server.ts](server/server.ts).
+
+## Runtime & Ports
+
+- Frontend dev server runs on port `8080` (see [vite.config.ts](vite.config.ts)).
+- SSR preview server runs on port `3000` by default (see [server/server.ts](server/server.ts)); override with `PORT`.
+- Production preview flow: run `pnpm build` then `pnpm preview`.
+- Supabase Edge Functions run through the Supabase CLI. Check `supabase functions --help` before assuming command flags.
+
+## Test Runner Notes
+
+- Tests use Vitest + jsdom with shared setup in [src/shared/test/setup.ts](src/shared/test/setup.ts).
+- Use `pnpm test -- <pattern>` for targeted tests.
+- Do **not** use Jest-style `--testPathPattern` with Vitest in this repo.
+- Networked frontend tests should follow MSW patterns in [src/shared/test/mswHandlers.ts](src/shared/test/mswHandlers.ts).
+
+## Instruction Files
+
+- Frontend code rules: [.github/instructions/frontend.instructions.md](.github/instructions/frontend.instructions.md)
+- Supabase/backend code rules: [.github/instructions/backend.instructions.md](.github/instructions/backend.instructions.md)
+- i18n rules (keep locales aligned): [.github/instructions/i18n.instructions.md](.github/instructions/i18n.instructions.md)
+- Test rules: [.github/instructions/testing.instructions.md](.github/instructions/testing.instructions.md)
+
+## Architecture Boundaries
+
+Use these boundaries when deciding where code belongs:
+
+- `src/entities/*`: domain types, query keys, and API functions
+- `src/features/*`: feature logic, mostly query/mutation hooks and orchestration
+- `src/components/*`: UI components by domain (`ui`, `video`, `comment`, etc.)
+- `src/shared/*`: cross-domain utilities, validation, shared API clients, shared hooks
+- `src/pages/*`: route-level pages
+- `src/i18n/*`: localization setup and translation resources
+- `supabase/functions/*`: Supabase Edge Functions and shared Deno helpers
+- `supabase/migrations/*`: Postgres schema, RLS, functions, triggers, and data fixes
+- `server/*`: Bun runtime server for serving `dist/` and injecting dynamic OG/Twitter tags
+
+Reference architecture details in [docs/CODEBASE.md](docs/CODEBASE.md).
+
+## Non-Negotiable Conventions
+
+### 1. Validation Is Centralized (DRY)
+
+- Always reuse schemas from [src/shared/lib/validation.ts](src/shared/lib/validation.ts).
+- Do not redefine email/password/username validators in feature or component files.
+- Prefer these exports: `emailSchema`, `passwordSchema`, `usernameSchema`, `createPasswordConfirmationSchema`.
+
+### 2. Server State Uses TanStack Query
+
+- Do not fetch server data directly inside components.
+- Keep query/mutation hooks in `src/features/*/queries`.
+- Use domain query-key factories from `src/entities/*/*.keys.ts`.
+- Keep key behavior covered by [src/entities/queryKeys.test.ts](src/entities/queryKeys.test.ts).
+
+### 3. API Calls Live In Entities
+
+- Put Supabase access in `src/entities/[domain]/[domain].api.ts`.
+- Import Supabase via [src/shared/api/supabase/supabaseClient.ts](src/shared/api/supabase/supabaseClient.ts).
+- Select relations up front to avoid avoidable follow-up queries.
+- Throw or handle errors explicitly.
+- Use `getSupabaseErrorMessage()` from [src/shared/api/supabase/supabaseErrors.ts](src/shared/api/supabase/supabaseErrors.ts) to extract readable error strings.
+- Invoke Supabase Edge Functions via `invokeEdgeFunction()` from [src/shared/api/supabase/edgeFunctions.ts](src/shared/api/supabase/edgeFunctions.ts) — do not call `supabase.functions.invoke` directly.
+- Keep service-role operations inside Edge Functions or server-only runtime code. Never expose service-role keys through `VITE_*` variables.
+
+### 4. UI And Styling Standards
+
+- Prefer shadcn/ui primitives before creating custom UI.
+- Use Tailwind utilities for styling.
+- Use `cn()` from [src/lib/utils.ts](src/lib/utils.ts) for class composition.
+- Avoid editing generated shadcn primitives directly unless the task explicitly requires it.
+
+> **`src/lib/` vs `src/shared/lib/`**: `src/lib/utils.ts` is the shadcn/ui convention file (only `cn()`). All other shared utilities (format, image, slug, youtube, validation) live in `src/shared/lib/`. Never add business logic to `src/lib/`.
+
+### 5. Forms
+
+- Use React Hook Form + Zod together.
+- Reuse shared schemas from [src/shared/lib/validation.ts](src/shared/lib/validation.ts).
+
+### 6. Localization
+
+- Do not hard-code user-facing strings.
+- Use i18n keys and update locale resources in [src/i18n/locales](src/i18n/locales).
+- Keep locale files aligned (pt, en, es, fr) when adding or changing translation keys.
+
+### 7. Imports
+
+- Use alias imports with `@/`.
+- Avoid deep relative import chains like `../../../`.
+
+## Common Pitfalls
+
+- Duplicating validation logic instead of reusing shared schemas.
+- Fetching data directly in pages/components instead of using feature query hooks.
+- Adding custom CSS when Tailwind utilities are sufficient.
+- Forgetting to invalidate related queries after successful mutations.
+- Writing mutable or unstable query keys instead of using key factories.
+- Bypassing access constraints in mutations instead of respecting RLS-compatible patterns.
+- Putting business logic utilities in `src/lib/` instead of `src/shared/lib/`.
+- Calling `supabase.functions.invoke` directly instead of using `invokeEdgeFunction()`.
+- Updating one locale file but leaving other locales missing the same key.
+- Running `pnpm test -- --testPathPattern=...` (unsupported by Vitest in this repo).
+
+## Adding New Pages
+
+All routes are lazy-loaded. When creating a new page:
+1. Add the component in `src/pages/`.
+2. Register with `React.lazy()` at the top of [src/App.tsx](src/App.tsx).
+3. Add the `<Route>` inside the existing `<Routes>` block.
+4. Add i18n keys for any new navigation labels.
+
+## Providers
+
+All global context providers (QueryClient, Auth, i18n, ThemeProvider, Helmet, Toasts) are in [src/app/providers/AppProviders.tsx](src/app/providers/AppProviders.tsx). Add new providers there, not in `main.tsx` or component files.
+
+## Key Files For Pattern Discovery
+
+- Router: [src/App.tsx](src/App.tsx)
+- Shared validation: [src/shared/lib/validation.ts](src/shared/lib/validation.ts)
+- Query-key behavior: [src/entities/queryKeys.test.ts](src/entities/queryKeys.test.ts)
+- API pattern: [src/entities/video/video.api.ts](src/entities/video/video.api.ts)
+- Form pattern: [src/components/comment/CommentForm.tsx](src/components/comment/CommentForm.tsx)
+- Mention UX pattern: [src/components/comment/MentionAutocomplete.tsx](src/components/comment/MentionAutocomplete.tsx)
+- YouTube playlist import UI: [src/components/playlist/PlaylistImportDialog.tsx](src/components/playlist/PlaylistImportDialog.tsx)
+- Async submission status API: [src/entities/video_submission/video_submission.api.ts](src/entities/video_submission/video_submission.api.ts)
+- SSR preview server: [server/server.ts](server/server.ts)
+- Supabase functions: [supabase/functions](supabase/functions), especially [supabase/functions/enrich-video/index.ts](supabase/functions/enrich-video/index.ts) and [supabase/functions/import-youtube-playlist/index.ts](supabase/functions/import-youtube-playlist/index.ts)
+- Supabase contract notes: [docs/features/supabase-db-02-03-04.md](docs/features/supabase-db-02-03-04.md)
+
+## Generated Artifacts
+
+- Do not edit [dist](dist) by hand; it is build output.
+- The canonical generic social preview image is [public/placeholder.png](public/placeholder.png). Documentation copies may be refreshed from it when needed.
+
+## Branding Migration Notes
+
+This repository is mid-transition:
+
+- Old product/brand references: Monynha Fun, Monynha Softwares
+- Current product/brand references: Tube O2, Open 2 Technology
+
+When editing copy, metadata, URLs, docs, or SEO files, prefer:
+
+- `tube.open2.tech` for the product
+- `open2.tech` for corporate references
+
+## Source Of Truth Docs
+
+- Project overview: [README.md](README.md)
+- Architecture and conventions: [docs/CODEBASE.md](docs/CODEBASE.md)
+- Version history: [docs/CHANGELOG.md](docs/CHANGELOG.md)
+- Work backlog and status notes: [docs/TODO.md](docs/TODO.md)
+- React Router migration flags: [docs/REACT_ROUTER_V7_FLAGS.md](docs/REACT_ROUTER_V7_FLAGS.md)
+- Team coding rules: [AI_RULES.md](AI_RULES.md)

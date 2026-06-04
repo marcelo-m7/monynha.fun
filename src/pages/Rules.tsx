@@ -27,10 +27,10 @@ const Rules = () => {
         </div>
 
         <section className="bg-card border border-border rounded-2xl p-6 shadow-sm space-y-6">
-          <h2 className="text-2xl font-bold mb-4 flex items-center gap-2">
-            <Gavel className="w-6 h-6 text-primary" />
-            {t('rules.title')}
-          </h2>
+          <div className="flex items-center gap-2 mb-4">
+            <Gavel className="w-6 h-6 text-primary" aria-hidden="true" />
+            <span className="text-2xl font-bold">{t('rules.subtitle')}</span>
+          </div>
           <ul className="space-y-4 text-muted-foreground leading-relaxed">
             <li className="flex items-start gap-3">
               <Heart className="w-5 h-5 text-primary mt-1 shrink-0" />

@@ -75,7 +75,7 @@ const buildMetaBlock = (params: {
     `<meta property="og:image" content="${escapeHtml(image)}" />`,
     `<meta property="og:url" content="${escapeHtml(url)}" />`,
     `<meta property="og:type" content="video.other" />`,
-    `<meta property="og:site_name" content="Monynha Fun" />`,
+    `<meta property="og:site_name" content="Tube O2" />`,
     `<meta name="twitter:card" content="summary_large_image" />`,
     `<meta name="twitter:title" content="${escapeHtml(title)}" />`,
     `<meta name="twitter:description" content="${escapeHtml(description)}" />`,
@@ -163,9 +163,9 @@ const fetchVideoMeta = async (videoIdOrYoutubeId: string): Promise<{
   const fallbackDescription = trimSummary(video.description, 160);
 
   return {
-    title: `${video.title} | Monynha Fun`,
-    description: shortSummary || fallbackDescription || 'Watch this video on Monynha Fun.',
-    image: video.thumbnail_url || 'https://monynha.fun/placeholder.png',
+    title: `${video.title} | Tube O2`,
+    description: shortSummary || fallbackDescription || 'Watch this video on Tube O2.',
+    image: video.thumbnail_url || 'https://tube.open2.tech/placeholder.png',
   };
 };
 

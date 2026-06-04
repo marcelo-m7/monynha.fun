@@ -18,12 +18,16 @@ export interface PlaylistContext {
   id: string;
   name: string;
   description: string | null;
+  language?: string | null;
+  course_code?: string | null;
+  unit_code?: string | null;
 }
 
 export interface VideoEnrichmentParams {
   title: string;
   description: string;
   language?: string;
+  channelName?: string | null;
   categories?: CategoryContext[];
   playlists?: PlaylistContext[];
 }
@@ -66,8 +70,12 @@ export class OpenAIClient {
   }) {
     this.apiKey = options.apiKey;
     this.model = options.model || 'gpt-4o-mini';
-    this.timeout = options.timeout || 15000; // 15 seconds
+    this.timeout = options.timeout || 30000; // 30 seconds
     this.maxRetries = options.maxRetries || 2;
+  }
+
+  get modelName() {
+    return this.model;
   }
 
   /**
@@ -103,10 +111,11 @@ export class OpenAIClient {
         },
         body: JSON.stringify({
           model: this.model,
+          response_format: { type: 'json_object' },
           messages: [
             {
               role: 'system',
-              content: `You are a cultural video metadata expert. Enrich video metadata with optimized titles, summaries, tags, and cultural relevance assessments. Always respond with valid JSON.`,
+              content: `You are an educational video metadata expert. Enrich video metadata with compact summaries, tags, category hints, and playlist hints. Always respond with valid JSON.`,
             },
             {
               role: 'user',
@@ -155,7 +164,10 @@ export class OpenAIClient {
     } catch (error) {
       clearTimeout(timeoutId);
 
-      if (error instanceof TypeError && error.message.includes('signal')) {
+      if (
+        error instanceof Error &&
+        (error.name === 'AbortError' || error.message.toLowerCase().includes('aborted') || error.message.includes('signal'))
+      ) {
         throw new Error(`OpenAI request timeout after ${this.timeout}ms`);
       }
 
@@ -206,15 +218,25 @@ export class OpenAIClient {
 
     const playlistBlock =
       params.playlists && params.playlists.length > 0
-        ? `\nAvailable playlists (return the EXACT id of the best match, or null if none is clearly relevant):\n${params.playlists
-            .map((p) => `  {"id": "${p.id}", "name": "${p.name}"${p.description ? `, "description": "${p.description.substring(0, 80)}"` : ''}}`)
+        ? `\nAvailable educational playlists (return the EXACT id only when the video directly belongs in one of them; otherwise null):\n${params.playlists
+            .map((p) => {
+              const context = [
+                p.description ? `"description": "${p.description.substring(0, 80)}"` : null,
+                p.course_code ? `"course_code": "${p.course_code}"` : null,
+                p.unit_code ? `"unit_code": "${p.unit_code}"` : null,
+                p.language ? `"language": "${p.language}"` : null,
+              ].filter(Boolean).join(', ');
+
+              return `  {"id": "${p.id}", "name": "${p.name}"${context ? `, ${context}` : ''}}`;
+            })
             .join('\n')}\n`
         : '';
 
-    return `Enrich the following video metadata and classify it.
+    return `Enrich the following educational YouTube video metadata and classify it quickly.
 
 Title: "${params.title}"
 Description: "${params.description}"
+Channel: "${params.channelName || 'Unknown'}"
 Preferred Language: ${params.language || 'Portuguese'}
 ${categoryBlock}${playlistBlock}
 Respond ONLY with valid JSON (no markdown, no explanation):
@@ -223,7 +245,9 @@ Respond ONLY with valid JSON (no markdown, no explanation):
   "summary_description": "A 2-3 sentence summary (max 250 chars)",
   "semantic_tags": ["tag1", "tag2", "tag3", "tag4", "tag5"],
   "suggested_category_id": "exact-uuid-from-list-or-null",
+  "suggested_category": "short category/topic label",
   "suggested_playlist_id": "exact-uuid-from-list-or-null",
+  "suggested_playlist_query": "short natural-language course/topic query",
   "classification_confidence": 0.0,
   "cultural_relevance": "High, Medium, or Low",
   "short_summary": "A single sentence summary for UI display"
@@ -232,8 +256,12 @@ Respond ONLY with valid JSON (no markdown, no explanation):
 Rules:
 - suggested_category_id MUST be one of the exact UUIDs from the categories list above, or null.
 - suggested_playlist_id MUST be one of the exact UUIDs from the playlists list above, or null.
-- classification_confidence: number 0-1 reflecting how confident you are in the category choice.
+- Return a suggested_playlist_id only when the topic directly matches that playlist's course/unit/subject. Do not force a playlist for general educational content.
+- suggested_playlist_query should explain the core subject in 3-8 words and can be provided even when suggested_playlist_id is null.
+- Prefer the original title, description, and channel when classifying course/topic. Do not infer a design/communication topic from decorative symbols, handwriting/pencil emojis, or generic visual wording when the title/channel indicates mathematics or another subject.
+- classification_confidence: number 0-1 reflecting how confident you are in the category and playlist classification.
 - If uncertain about category or playlist, return null for that field and set confidence < 0.5.
+- Keep summaries concise, useful to learners, and written in the preferred/detected language.
 `;
   }
 
@@ -256,9 +284,7 @@ Rules:
       return {
         optimized_title: parsed.optimized_title || '',
         summary_description: parsed.summary_description || '',
-        semantic_tags: Array.isArray(parsed.semantic_tags)
-          ? parsed.semantic_tags.slice(0, 5)
-          : [],
+        semantic_tags: this.parseStringArray(parsed.semantic_tags, 8),
         suggested_category_id: this.parseUuid(parsed.suggested_category_id),
         suggested_category:
           typeof parsed.suggested_category === 'string'
@@ -272,7 +298,10 @@ Rules:
         classification_confidence: this.normalizeConfidence(
           parsed.classification_confidence
         ),
-        language: language || 'pt',
+        language:
+          typeof parsed.language === 'string' && parsed.language.trim()
+            ? parsed.language.trim().slice(0, 12)
+            : language || 'pt',
         cultural_relevance: this.normalizeRelevance(
           parsed.cultural_relevance
         ),
@@ -307,6 +336,16 @@ Rules:
     return UUID_RE.test(trimmed) ? trimmed : null;
   }
 
+  private parseStringArray(value: unknown, limit: number): string[] {
+    if (!Array.isArray(value)) return [];
+
+    return value
+      .filter((item): item is string => typeof item === 'string' && !!item.trim())
+      .map((item) => item.trim().slice(0, 80))
+      .filter(Boolean)
+      .slice(0, limit);
+  }
+
   /**
    * Normalize classification confidence to [0, 1]
    */
@@ -338,7 +377,7 @@ export function createOpenAIClient(): OpenAIClient {
   return new OpenAIClient({
     apiKey,
     model: Deno.env.get('OPENAI_MODEL') || 'gpt-4o-mini',
-    timeout: 15000,
+    timeout: 30000,
     maxRetries: 2,
   });
 }

@@ -1,12 +1,12 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { toast } from 'sonner';
+import { notify } from '@/shared/lib/notify';
 import { useAuth } from '@/features/auth/useAuth';
 import { getContributorCount, getProfileById, getProfileByUsername, updateProfile, listProfiles, searchProfiles } from '@/entities/profile/profile.api';
 import { profileKeys } from '@/entities/profile/profile.keys';
 import type { Profile } from '@/entities/profile/profile.types';
 
 export function useProfileById(userId: string | undefined) {
-  return useQuery<Profile, Error>({
+  return useQuery<Profile | null, Error>({
     queryKey: userId ? profileKeys.detail(userId) : profileKeys.detail(''),
     queryFn: async () => {
       if (!userId) throw new Error('User ID is required');
@@ -17,7 +17,7 @@ export function useProfileById(userId: string | undefined) {
 }
 
 export function useProfileByUsername(username: string | undefined) {
-  return useQuery<Profile, Error>({
+  return useQuery<Profile | null, Error>({
     queryKey: username ? profileKeys.byUsername(username) : profileKeys.byUsername(''),
     queryFn: async () => {
       if (!username) throw new Error('Username is required');
@@ -37,14 +37,14 @@ export function useUpdateProfile() {
       return updateProfile(user.id, updatedProfileData);
     },
     onSuccess: (updatedProfile) => {
-      toast.success('Perfil atualizado com sucesso!');
+      notify.success('Perfil atualizado com sucesso!');
       queryClient.invalidateQueries({ queryKey: profileKeys.detail(user?.id ?? '') });
       if (updatedProfile.username) {
         queryClient.invalidateQueries({ queryKey: profileKeys.byUsername(updatedProfile.username) });
       }
     },
     onError: (error) => {
-      toast.error('Erro ao atualizar perfil', { description: error.message });
+      notify.error('Erro ao atualizar perfil', { description: error.message });
     },
   });
 }
@@ -70,4 +70,19 @@ export function useSearchProfiles(query: string, limit = 10) {
     enabled: query.trim().length > 0,
     staleTime: 30000, // Cache for 30 seconds
   });
+}
+
+export function useCurrentUserProfile() {
+  const { user } = useAuth();
+  return useProfileById(user?.id);
+}
+
+export function useIsEditor() {
+  const { data: profile, isLoading } = useCurrentUserProfile();
+
+  return {
+    isEditor: profile?.role === 'editor' || profile?.role === 'admin',
+    isLoading,
+    role: profile?.role,
+  };
 }

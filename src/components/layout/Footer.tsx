@@ -12,11 +12,11 @@ export const Footer = () => {
           {/* Brand */}
           <div className="md:col-span-2 space-y-4">
             <Link to="/" className="flex items-center gap-2">
-              <div className="flex h-9 w-9 items-center justify-center rounded-sm bg-primary text-primary-foreground shadow-[0_0_12px_var(--glow-primary)]">
-                <span className="text-lg font-bold">M</span>
+              <div className="flex h-9 w-9 items-center justify-center bg-primary text-primary-foreground">
+                <span className="text-sm font-bold tracking-tighter">O2</span>
               </div>
               <span className="font-bold text-xl tracking-[0.2em] uppercase">
-                Monynha<span className="text-primary">Fun</span>
+                Tube<span className="text-primary">O2</span>
               </span>
             </Link>
             <p className="text-muted-foreground text-sm max-w-sm">
@@ -28,10 +28,10 @@ export const Footer = () => {
           <div className="space-y-4">
             <h4 className="font-semibold text-xs uppercase tracking-widest text-muted-foreground">{t('footer.navigation')}</h4>
             <ul className="space-y-2 text-xs uppercase tracking-widest text-muted-foreground">
-              <li><Link to="/videos" className="hover:text-primary transition-colors">{t('footer.categories')}</Link></li>
-              <li><Link to="/videos?recent=true" className="hover:text-primary transition-colors">{t('footer.recent')}</Link></li>
-              <li><Link to="/videos?featured=true" className="hover:text-primary transition-colors">{t('footer.featured')}</Link></li>
-              <li><Link to="/submit" className="hover:text-primary transition-colors">{t('footer.submitVideo')}</Link></li>
+              <li><Link to="/videos" className="hover:opacity-75 transition-opacity">{t('footer.categories')}</Link></li>
+              <li><Link to="/videos?recent=true" className="hover:opacity-75 transition-opacity">{t('footer.recent')}</Link></li>
+              <li><Link to="/videos?featured=true" className="hover:opacity-75 transition-opacity">{t('footer.featured')}</Link></li>
+              <li><Link to="/submit" className="hover:opacity-75 transition-opacity">{t('footer.submitVideo')}</Link></li>
             </ul>
           </div>
 
@@ -39,33 +39,33 @@ export const Footer = () => {
           <div className="space-y-4">
             <h4 className="font-semibold text-xs uppercase tracking-widest text-muted-foreground">{t('footer.community')}</h4>
             <ul className="space-y-2 text-xs uppercase tracking-widest text-muted-foreground">
-              <li><Link to="/community" className="hover:text-primary transition-colors">{t('footer.community')}</Link></li>
-              <li><Link to="/about" className="hover:text-primary transition-colors">{t('footer.about')}</Link></li>
-              <li><Link to="/rules" className="hover:text-primary transition-colors">{t('footer.rules')}</Link></li>
-              <li><Link to="/contact" className="hover:text-primary transition-colors">{t('footer.contact')}</Link></li>
-              <li><Link to="/faq" className="hover:text-primary transition-colors">{t('footer.faq')}</Link></li>
+              <li><Link to="/community" className="hover:opacity-75 transition-opacity">{t('footer.community')}</Link></li>
+              <li><Link to="/about" className="hover:opacity-75 transition-opacity">{t('footer.about')}</Link></li>
+              <li><Link to="/rules" className="hover:opacity-75 transition-opacity">{t('footer.rules')}</Link></li>
+              <li><Link to="/contact" className="hover:opacity-75 transition-opacity">{t('footer.contact')}</Link></li>
+              <li><Link to="/faq" className="hover:opacity-75 transition-opacity">{t('footer.faq')}</Link></li>
             </ul>
           </div>
         </div>
 
         {/* Bottom */}
-        <div className="flex flex-col md:flex-row items-center justify-between gap-4 pt-8 mt-8 border-t border-primary/30">
+        <div className="flex flex-col md:flex-row items-center justify-between gap-4 pt-8 mt-8 border-t border-border">
           <p className="text-sm text-muted-foreground flex items-center gap-1">
             {t('footer.madeWithLove')} <Heart className="w-4 h-4 text-primary fill-primary inline-block" />{" "}
             <a 
-              href="https://monynha.com" 
+              href="https://open2.tech" 
               target="_blank" 
               rel="noopener noreferrer" 
-              className="hover:text-primary transition-colors"
+              className="hover:opacity-75 transition-opacity"
             >
-              {t('footer.byMonynhaSoftwares')}
+              {t('footer.byOpen2Technology')}
             </a>
           </p>
           <div className="flex items-center gap-4">
-            <a href="https://monynha.com" target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-primary transition-colors">
+            <a href="https://open2.tech" target="_blank" rel="noopener noreferrer" aria-label="Open 2 Technology website" className="text-muted-foreground hover:opacity-75 transition-opacity">
               <Globe className="w-5 h-5" />
             </a>
-            <a href="https://github.com/Monynha-Softwares/video-vault" target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-primary transition-colors">
+            <a href="https://github.com/marcelo-m7/tube-o2" target="_blank" rel="noopener noreferrer" aria-label="GitHub repository" className="text-muted-foreground hover:opacity-75 transition-opacity">
               <Github className="w-5 h-5" />
             </a>
           </div>

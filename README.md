@@ -1,16 +1,16 @@
-# Monynha Fun – Cultural Video Curation Platform 🎬
+# Tube O2 – Cultural Video Curation Platform 🎬
 
-![Monynha Fun Hero](./docs/placeholder.png)
+![Tube O2 Hero](./docs/readme-homepage.png)
 
 > *A passion project by **Marcelo Santos**, crafted with care to bring together the best of cultural video content that gets lost in the algorithmic noise. Now with mention autocomplete because Marcelo got tired of copying usernames like it's 2005.*
 
-**🌐 Live Platform**: https://monynha.fun
+**🌐 Live Platform**: https://tube.open2.tech
 
 ---
 
 ## 💭 What's This All About?
 
-Look, I built Monynha Fun because I was fed up, sabe? Scrolling through YouTube, seeing the same algorithm-driven trash, while *amazing* cultural content just... disappears. So here's the deal:
+Look, I built Tube O2 because I was fed up, sabe? Scrolling through YouTube, seeing the same algorithm-driven trash, while *amazing* cultural content just... disappears. So here's the deal:
 
 We're creating a space where **human taste matters**. A place where curators (like you, like me) can say "ey, this video is worth your time" – and mean it. AI helps us out, sure, but **humans are in charge**. No predatory engagement metrics. No dark patterns. Just good content, properly organized.
 
@@ -23,25 +23,43 @@ We're creating a space where **human taste matters**. A place where curators (li
 
 ---
 
+## 📌 Documentation & Instructions (Updated May 17, 2026)
+
+To keep onboarding and AI-assisted edits consistent, treat these as the primary references:
+
+- Project guide: [`README.md`](README.md)
+- Architecture and boundaries: [`docs/CODEBASE.md`](docs/CODEBASE.md)
+- Team/agent rules: [`AGENTS.md`](AGENTS.md) and [`AI_RULES.md`](AI_RULES.md)
+- Frontend instruction profile: [`.github/instructions/frontend.instructions.md`](.github/instructions/frontend.instructions.md)
+- Supabase/backend instruction profile: [`.github/instructions/backend.instructions.md`](.github/instructions/backend.instructions.md)
+- i18n consistency rules: [`.github/instructions/i18n.instructions.md`](.github/instructions/i18n.instructions.md)
+- Testing rules: [`.github/instructions/testing.instructions.md`](.github/instructions/testing.instructions.md)
+
+> Note: when guidance conflicts, follow `AGENTS.md` + `.github/instructions/*` first, then use older historical notes as context.
+
+---
+
 ## 📸 See It In Action
 
 ### Homepage – Where Magic Happens ✨
-![Homepage Screenshot](./docs/homepage.png)
+![Homepage Screenshot](./docs/readme-homepage.png)
 
 Your first impression matters, né? Clean hero section, easy access to what's hot right now, and categories that actually make sense. No fluff.
 
 ### Discover Videos 🔍
-![Video Discovery](./docs/videos.png)
+![Video Discovery](./docs/readme-videos.png)
 
 Browse through categories that real people organized. Search, filter, read about *why* someone added a video. Simple as that.
 
 ### Create Playlists Like You Own The Place 📋
-![Playlists](./docs/placeholder.png)
+![Playlists](./docs/readme-playlists.png)
 
 Build learning paths. Curate collections. Share with friends or the whole community. Your taste, your rules. You can even invite collaborators to help build something together.
 
+**✨ NEW**: Course-focused filtering with active removable chips, semester/language/type/video-range filters, URL-persisted state, and summary cards per course for quick drill-in.
+
 ### Comments & Community Interaction 💬
-![Comments Preview](./docs/preview.png)
+![Comments Preview](./docs/readme-comments.png)
 
 Every video deserves thoughtful discussion. Leave comments, reply to curators, share why a video matters to you. Build real conversations around content that resonates.
 
@@ -52,7 +70,7 @@ Every video deserves thoughtful discussion. Leave comments, reply to curators, s
 No algorithms deciding what's visible – comments stay honest and community-driven. Tag people with `@username` and actually see their face pop up. Because UX matters, viu?
 
 ### Your Profile 👤
-![User Profile](./docs/placeholder.png)
+![User Profile](./docs/readme-profile.png)
 
 Show the world what you're passionate about. Add a bio, customize your presence. People will see the videos *you* curated. Be proud of that.
 
@@ -78,6 +96,7 @@ I chose a stack that's modern, scalable, and – honestly – a joy to work with
 - **Supabase** – PostgreSQL, Auth, and Edge Functions in one place
 - **Supabase RLS** – Row-level security, properly implemented
 - **Edge Functions** – AI enrichment and smart automations
+- **Bun runtime server** – Serves production `dist/` and injects dynamic OG/Twitter tags for video pages
 
 ### UX Polish 🎨
 - **Lucide React** – Clean icons
@@ -101,6 +120,9 @@ Browse intelligently organized content. Search, filter by category, see what rea
 ### 📋 Build Playlists
 Create learning paths, collections, whatever makes sense to you. Share with the community or keep it personal. Invite friends to collaborate – yeah, we support that.
 
+### ▶️ Import YouTube Playlists
+Paste a public YouTube playlist URL and Tube O2 queues the videos through Supabase Edge Functions. Existing enriched videos are skipped, recently queued videos are reused, and new submissions flow through the same async enrichment/status pipeline as manual submissions.
+
 ### 👥 User System
 Sign up securely. Create a profile that represents *you*. Show everyone your curated taste. Your contribution matters here.
 
@@ -111,7 +133,7 @@ Keep track of videos that hit different. Your personal collection grows with you
 See who else is curating. Check out their playlists. Learn from other people's taste. Share knowledge.
 
 ### 📹 Submit Content
-Found an amazing video the world should see? Add it to Monynha Fun. Our AI will help enrich it with metadata.
+Found an amazing video the world should see? Add it to Tube O2. Our AI will help enrich it with metadata.
 
 ### 🌐 Multi-Language
 Portuguese, English, Spanish, French – we're building for everyone. More languages coming.
@@ -145,12 +167,14 @@ Open **http://localhost:8080** and boom – you're in.
 
 ### Environment Setup
 
-Create a `.env.local` file (ask Marcelo for the keys, or set up your own Supabase project):
+Create a `.env` or `.env.local` file (ask Marcelo for the keys, or set up your own Supabase project):
 
 ```env
 VITE_SUPABASE_URL=your_supabase_url_here
 VITE_SUPABASE_PUBLISHABLE_KEY=your_publishable_key_here
 ```
+
+Server-only values such as `SUPABASE_SERVICE_ROLE_KEY`, `OPENAI_API_KEY`, `GEMINI_API_KEY`, and `RESEND_API_KEY` belong in Supabase secrets or runtime server env, not in client-exposed `VITE_*` variables. See [`.env.example`](.env.example) for the full local template.
 
 ---
 
@@ -160,53 +184,44 @@ The structure is clean and logical – I hate messy codebases:
 
 ```
 src/
-├── components/              # Reusable UI pieces
-│   ├── ui/                 # shadcn/ui components (don't touch upstream)
-│   ├── playlist/           # Playlist-specific components
-│   ├── Header.tsx
-│   ├── Footer.tsx
+├── app/providers/           # Global providers (QueryClient, Auth, i18n, theme, Helmet, toasts)
+├── components/              # Reusable UI by domain
+│   ├── ui/                  # shadcn/ui primitives
+│   ├── layout/              # Header, Footer, hero/category layout
+│   ├── playlist/            # Playlist UI, including YouTube import dialog
+│   ├── comment/             # Comment forms, mentions, display
+│   ├── video/               # Video cards and video-specific UI
 │   └── ...
-├── pages/                   # Page-level components (one per route)
-│   ├── Index.tsx           # Homepage
-│   ├── Auth.tsx            # Login/Signup
-│   ├── Videos.tsx          # Video browse
-│   ├── VideoDetails.tsx    # Single video view
-│   ├── Playlists.tsx       # Playlist manager
-│   ├── PlaylistDetails.tsx
-│   ├── Profile.tsx         # User profiles
-│   ├── EditProfile.tsx
-│   ├── Favorites.tsx
-│   ├── Community.tsx
-│   ├── Submit.tsx          # Add videos
-│   └── ...more pages
-├── features/                # Feature modules (organized by domain)
-│   ├── auth/               # Authentication
-│   ├── videos/             # Video management
-│   ├── playlists/          # Playlist management
+├── pages/                   # Lazy route-level pages registered in App.tsx
+├── features/                # Feature orchestration hooks and mutations
+│   ├── videos/
+│   ├── playlists/
+│   ├── video-submissions/
+│   ├── editor-applications/
 │   └── ...
-├── entities/                # Domain entities
-│   ├── video/              # Video entity & API
-│   ├── playlist/           # Playlist entity & API
+├── entities/                # Domain API, types, and query-key factories
+│   ├── video/
+│   ├── playlist/
+│   ├── video_submission/
 │   └── ...
-├── shared/                  # Shared utilities and hooks
-│   ├── hooks/              # Reusable React hooks
-│   │   ├── use-mobile.tsx        # Mobile detection
-│   │   ├── useVideoViewIncrement.tsx  # Video view tracking
-│   │   └── useRequireAuth.tsx    # Authentication guard
-│   ├── lib/                # Helper functions
-│   │   ├── format.ts       # Data formatting utilities
-│   │   └── youtube.ts      # YouTube URL parsing
-│   └── test/               # Testing utilities
-├── integrations/            # External services
-│   └── supabase/           # Supabase client setup
-├── lib/                     # Utilities
-│   ├── utils.ts            # Helpers (cn, etc)
-│   └── youtube.ts          # YouTube URL parsing, oEmbed
-├── i18n/                    # Translations
-│   ├── config.ts           # i18next setup
-│   └── locales/            # PT, EN, etc
-├── App.tsx                  # Main app & routes
+├── shared/                  # Cross-domain hooks, API clients, validation, tests
+│   ├── api/supabase/        # Shared Supabase client + Edge Function wrapper
+│   ├── hooks/               # Reusable React hooks
+│   ├── lib/                 # validation, format, youtube, slug, image
+│   └── test/                # Vitest/MSW utilities
+├── integrations/supabase/   # Generated Supabase client/types
+├── lib/utils.ts             # shadcn cn() helper only
+├── i18n/locales/            # PT, EN, ES, FR locale resources
+├── App.tsx                  # Lazy routes
 └── main.tsx                 # Entry point
+
+supabase/
+├── functions/               # Edge Functions: enrich-video, import-youtube-playlist, email flows
+├── functions/_shared/       # Shared Deno helpers and enrichment clients
+└── migrations/              # Postgres schema, RLS, functions, and data fixes
+
+server/
+└── server.ts                # Bun runtime server for static assets + dynamic social metadata
 ```
 
 ### Custom Hooks
@@ -277,13 +292,13 @@ We use Docker to keep everything consistent. Production now uses a **Bun runtime
 
 ```bash
 # Build the image
-docker build -t monynha-fun .
+docker build -t tube-o2 .
 
 # Run it locally (runtime Supabase vars required for dynamic OG tags)
 docker run -p 80:80 \
 	-e SUPABASE_URL=https://your-project.supabase.co \
 	-e SUPABASE_ANON_KEY=your_anon_key \
-	monynha-fun
+	tube-o2
 ```
 
 Then hit `http://localhost` and you're golden.
@@ -323,6 +338,65 @@ These are used by `server/server.ts` at request time to fetch video metadata and
 
 ---
 
+## ⚙️ Supabase Backend & Edge Functions
+
+There is no active `backend/` FastAPI service in this repository. The backend surface is:
+
+- **Postgres + RLS** in Supabase, versioned through `supabase/migrations/`
+- **Edge Functions** in `supabase/functions/`
+- **Bun runtime server** in `server/server.ts` for production static serving and dynamic social metadata
+
+### Edge Functions
+
+| Function | Purpose |
+|---|---|
+| `enrich-video` | Enriches video metadata, updates `video_submissions`, and assigns eligible playlists |
+| `import-youtube-playlist` | Reads a public YouTube playlist, upserts missing video shells, and queues pending submissions |
+| `mark-top-featured` | Marks top videos as featured based on database logic |
+| `send-contact-message` | Stores contact messages and sends transactional email |
+| `send-editor-application-confirmation` | Sends editor-application confirmation email |
+
+Frontend code invokes Edge Functions through [`src/shared/api/supabase/edgeFunctions.ts`](src/shared/api/supabase/edgeFunctions.ts). Do not call `supabase.functions.invoke` directly in components or feature hooks.
+
+### Async Submission Pipeline
+
+Manual submissions and YouTube playlist imports both flow through `public.video_submissions`:
+
+1. The frontend creates or receives a `video_submissions.id`.
+2. `/submit/status/:submissionId` reads status by submission id.
+3. `enrich-video` moves submissions through `pending`, `processing`, `success`, `failed`, `duplicate`, or `recoverable_error`.
+4. Playlist assignment metadata is stored in the submission/enrichment flow for education/course playlists.
+
+The local contract is documented in [`docs/features/supabase-db-02-03-04.md`](docs/features/supabase-db-02-03-04.md).
+
+### YouTube Playlist Import
+
+[`PlaylistImportDialog`](src/components/playlist/PlaylistImportDialog.tsx) accepts a public YouTube playlist URL and sends this payload to `import-youtube-playlist`:
+
+```json
+{
+  "playlist_url": "https://www.youtube.com/playlist?list=...",
+  "language": "und",
+  "max_videos": 200
+}
+```
+
+The Edge Function returns counts plus new queued submissions. The dialog dispatches `enrich-video` for returned submissions with a small concurrency limit, while already enriched or recently queued videos are skipped/reused.
+
+### Local Edge Function Work
+
+Use the Supabase CLI and discover flags with help before assuming them:
+
+```bash
+supabase --help
+supabase functions --help
+supabase functions serve import-youtube-playlist --env-file .env
+```
+
+Server-only values such as `SUPABASE_SERVICE_ROLE_KEY`, `OPENAI_API_KEY`, `GEMINI_API_KEY`, and `RESEND_API_KEY` should be configured as Supabase secrets for deployed Edge Functions.
+
+---
+
 ## 🗄️ The Database (Where The Magic Happens)
 
 I designed the database with security and simplicity in mind:
@@ -335,8 +409,12 @@ I designed the database with security and simplicity in mind:
 - **playlists** – Your collections
 - **playlist_videos** – Links videos to playlists (with ordering!)
 - **ai_enrichments** – AI-generated metadata for each video
+- **video_submissions** – Async submission/import status tracking
 - **playlist_collaborators** – Share playlists with friends
 - **playlist_progress** – Track watched videos in learning playlists
+- **playlist_follows** – Follow public playlists
+- **editor_applications** – Editorial access requests
+- **contact_messages** – Contact form messages and delivery tracking
 
 ### Security First 🔒
 Every table has Row-Level Security (RLS) enabled. Users can only see/edit their own data. Period.
@@ -363,8 +441,10 @@ Simple, beautiful, consistent. Covers almost everything.
 Built with i18next so we can add languages super easily. Right now:
 - 🇧🇷 **Portuguese (PT-BR)**
 - 🇺🇸 **English (EN-US)**
+- 🇪🇸 **Spanish (ES)**
+- 🇫🇷 **French (FR)**
 
-More languages? Easy. Just ask or add translations to `src/i18n/locales/`.
+Locale files must stay aligned across `src/i18n/locales`.
 
 ---
 
@@ -374,8 +454,8 @@ Great! You can work locally or directly on GitHub. Here's how:
 
 ### Option 1: Local Development (The Pro Way)
 ```bash
-git clone https://github.com/marcelo-m7/monynha.fun
-cd monynha.fun
+git clone https://github.com/marcelo-m7/tube-o2
+cd tube-o2
 pnpm install
 pnpm dev
 ```
@@ -448,7 +528,7 @@ Check the [Supabase docs](https://supabase.com/docs) or [Vite docs](https://vite
 ## 📝 About This Project
 
 **Built by**: Marcelo Santos  
-**Organization**: Monynha Softwares  
+**Organization**: Open 2 Technology  
 **License**: Check the LICENSE file  
 **Version**: 0.1.5 (and growing!)
 
@@ -460,7 +540,6 @@ We're constantly improving. On the roadmap:
 - Batch AI enrichment for existing videos
 - Video search with full-text indexing
 - Smart recommendations
-- Community comments & ratings
 - Better mobile experience
 - Maybe a mobile app someday
 
@@ -476,5 +555,5 @@ We're constantly improving. On the roadmap:
 
 ---
 
-**Visit us at**: https://monynha.com  
+**Visit us at**: https://open2.tech  
 **Made with** ☕ **and** 💡 **by Marcelo Santos**

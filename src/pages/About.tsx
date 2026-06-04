@@ -1,5 +1,5 @@
-import { Header } from '@/components/layout/Header';
-import { Footer } from '@/components/layout/Footer';
+import { MainLayout } from '@/components/layout/MainLayout';
+import { PageHero } from '@/components/showcase';
 import { useTranslation } from 'react-i18next';
 import { ArrowLeft, Sparkles, User, Heart, Lightbulb, ShieldCheck, Handshake, Scale } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -10,25 +10,26 @@ const About = () => {
   const navigate = useNavigate();
 
   return (
-    <div className="min-h-screen flex flex-col">
-      <Header />
-      <main className="flex-1 container py-8">
-        <div className="mb-8">
-          <Button 
+    <MainLayout>
+      <PageHero
+        title={t('about.title')}
+        description={t('about.description')}
+        actions={
+          <Button
             variant="ghost" 
             onClick={() => navigate('/')}
-            className="text-muted-foreground hover:text-foreground mb-4"
+            className="justify-start px-0 text-muted-foreground hover:text-foreground"
           >
             <ArrowLeft className="w-4 h-4 mr-2" />
             {t('common.back')}
           </Button>
-          <h1 className="text-3xl font-bold">{t('about.title')}</h1>
-          <p className="text-muted-foreground mt-2">{t('about.description')}</p>
-        </div>
+        }
+      />
 
+      <div className="container py-12">
         <section className="space-y-12">
           {/* Our Mission */}
-          <div className="bg-card border border-border rounded-2xl p-6 shadow-sm">
+          <div className="bg-card border-2 border-border p-6 shadow-sm">
             <h2 className="text-2xl font-bold mb-4 flex items-center gap-2">
               <Sparkles className="w-6 h-6 text-primary" />
               {t('aboutPage.missionTitle')}
@@ -39,7 +40,7 @@ const About = () => {
           </div>
 
           {/* About the Founder */}
-          <div className="bg-card border border-border rounded-2xl p-6 shadow-sm">
+          <div className="bg-card border-2 border-border p-6 shadow-sm">
             <h2 className="text-2xl font-bold mb-4 flex items-center gap-2">
               <User className="w-6 h-6 text-accent" />
               {t('aboutPage.founderTitle')}
@@ -63,15 +64,15 @@ const About = () => {
                 href="https://github.com/marcelo-m7" 
                 target="_blank" 
                 rel="noopener noreferrer" 
-                className="text-primary hover:underline text-sm"
+                 className="text-foreground underline hover:opacity-75 transition-opacity text-sm"
               >
                 {t('aboutPage.githubLink')}
               </a>
               <a 
-                href="https://marcelo.monynha.com" 
+                href="https://marcelo.open2.tech" 
                 target="_blank" 
                 rel="noopener noreferrer" 
-                className="text-primary hover:underline text-sm"
+                 className="text-foreground underline hover:opacity-75 transition-opacity text-sm"
               >
                 {t('aboutPage.websiteLink')}
               </a>
@@ -79,7 +80,7 @@ const About = () => {
           </div>
 
           {/* Values */}
-          <div className="bg-card border border-border rounded-2xl p-6 shadow-sm">
+          <div className="bg-card border-2 border-border p-6 shadow-sm">
             <h2 className="text-2xl font-bold mb-4 flex items-center gap-2">
               <Heart className="w-6 h-6 text-destructive" />
               {t('aboutPage.valuesTitle')}
@@ -94,7 +95,7 @@ const About = () => {
           </div>
 
           {/* Philosophy */}
-          <div className="bg-card border border-border rounded-2xl p-6 shadow-sm">
+          <div className="bg-card border-2 border-border p-6 shadow-sm">
             <h2 className="text-2xl font-bold mb-4 flex items-center gap-2">
               <Lightbulb className="w-6 h-6 text-primary" />
               {t('aboutPage.philosophyTitle')}
@@ -104,9 +105,8 @@ const About = () => {
             </p>
           </div>
         </section>
-      </main>
-      <Footer />
-    </div>
+      </div>
+    </MainLayout>
   );
 };
 

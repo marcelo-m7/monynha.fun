@@ -14,29 +14,55 @@ export interface ListPlaylistsParams {
   searchQuery?: string;
   filter?: 'all' | 'my' | 'collaborating' | 'editable';
   userId?: string;
+  onlyWithVideos?: boolean;
+}
+
+type PlaylistExhibitionRow = Playlist & {
+  author_username?: string | null;
+  author_display_name?: string | null;
+  author_avatar_url?: string | null;
+};
+
+function toPlaylistEntity(row: PlaylistExhibitionRow): Playlist {
+  return {
+    ...row,
+    thumbnail_url: row.thumbnail_url ?? row.preview_video_thumbnail_url ?? null,
+    author: {
+      id: row.author_id,
+      username: row.author_username ?? null,
+      display_name: row.author_display_name ?? null,
+      avatar_url: row.author_avatar_url ?? null,
+    },
+  };
 }
 
 export async function listPlaylists(params: ListPlaylistsParams = {}) {
-  let query = supabase
-    .from('playlists')
-    .select(
-      `
-      *,
-      author:profiles(id, username, display_name, avatar_url)
-    `,
-    )
-    .order('created_at', { ascending: false });
+  const buildQuery = () => {
+    let query = supabase
+      .from('v_playlist_exhibition')
+      .select('*')
+      .order('activity_at', { ascending: false, nullsFirst: false });
 
-  if (params.authorId) {
-    query = query.eq('author_id', params.authorId);
-  }
+    if (params.authorId) {
+      query = query.eq('author_id', params.authorId);
+    }
 
-  if (params.isPublic !== undefined) {
-    query = query.eq('is_public', params.isPublic);
-  }
+    if (params.isPublic !== undefined) {
+      query = query.eq('is_public', params.isPublic);
+    }
 
-  if (params.searchQuery) {
-    query = query.or(`name.ilike.%${params.searchQuery}%,description.ilike.%${params.searchQuery}%`);
+    if (params.searchQuery) {
+      query = query.or(`name.ilike.%${params.searchQuery}%,description.ilike.%${params.searchQuery}%`);
+    }
+
+    return query;
+  };
+
+  let query = buildQuery();
+
+  const onlyWithVideos = params.onlyWithVideos ?? (!params.filter || params.filter === 'all');
+  if (onlyWithVideos) {
+    query = query.gt('video_count', 0);
   }
 
   if (params.filter === 'my' && params.userId) {
@@ -69,24 +95,20 @@ export async function listPlaylists(params: ListPlaylistsParams = {}) {
 
   if (error) throw error;
 
-  return data as Playlist[];
+  return ((data as PlaylistExhibitionRow[] | null) || []).map(toPlaylistEntity);
 }
 
 export async function getPlaylistById(id: string) {
   const { data, error } = await supabase
-    .from('playlists')
-    .select(
-      `
-        *,
-        author:profiles(id, username, display_name, avatar_url)
-      `,
-    )
+    .from('v_playlist_exhibition')
+    .select('*')
     .eq('id', id)
-    .single();
+    .maybeSingle();
 
   if (error) throw error;
+  if (!data) throw new Error('Playlist not found');
 
-  return data as Playlist;
+  return toPlaylistEntity(data as PlaylistExhibitionRow);
 }
 
 export async function createPlaylist(payload: PlaylistInsert) {
@@ -133,21 +155,12 @@ export async function listPlaylistVideos(playlistId: string) {
 }
 
 export async function addVideoToPlaylist(payload: { playlistId: string; videoId: string; userId?: string | null; notes?: string | null }) {
-  const { data: existingVideos } = await supabase
-    .from('playlist_videos')
-    .select('position')
-    .eq('playlist_id', payload.playlistId)
-    .order('position', { ascending: false })
-    .limit(1);
-
-  const nextPosition = existingVideos && existingVideos.length > 0 ? existingVideos[0].position + 1 : 0;
-
+  // Position is auto-calculated by database trigger - no need for separate query
   const { data, error } = await supabase
     .from('playlist_videos')
     .insert({
       playlist_id: payload.playlistId,
       video_id: payload.videoId,
-      position: nextPosition,
       added_by: payload.userId ?? null,
       notes: payload.notes ?? null,
     })
@@ -158,18 +171,43 @@ export async function addVideoToPlaylist(payload: { playlistId: string; videoId:
   return data as PlaylistVideo;
 }
 
+export async function addVideoToDefaultEducationPlaylist(videoId: string) {
+  const { data, error } = await supabase.rpc('add_video_to_default_education_playlist', {
+    p_video_id: videoId,
+  });
+
+  if (error) throw error;
+  return data;
+}
+
 export async function removeVideoFromPlaylist(payload: { playlistId: string; videoId: string }) {
-  const { error } = await supabase.from('playlist_videos').delete().eq('id', payload.playlistId).eq('video_id', payload.videoId);
+  const { error } = await supabase
+    .from('playlist_videos')
+    .delete()
+    .eq('playlist_id', payload.playlistId)
+    .eq('video_id', payload.videoId);
 
   if (error) throw error;
 }
 
 export async function reorderPlaylistVideos(payload: { playlistId: string; orderedVideoIds: string[] }) {
-  const updates = payload.orderedVideoIds.map((videoId, index) =>
-    supabase.from('playlist_videos').update({ position: index }).eq('playlist_id', payload.playlistId).eq('video_id', videoId),
+  // Use batch update with upsert for efficient reordering
+  const updates = payload.orderedVideoIds.map((videoId, index) => ({
+    id: videoId,
+    position: index,
+  }));
+
+  // Since we can't batch update directly with Supabase client in a single call,
+  // use RPC function if available, or batch updates with Promise.all but optimized
+  // For now, keep Promise.all but ensure it's done server-side efficiently
+  const updatePromises = payload.orderedVideoIds.map((videoId, index) =>
+    supabase
+      .from('playlist_videos')
+      .update({ position: index })
+      .match({ playlist_id: payload.playlistId, video_id: videoId }),
   );
 
-  const results = await Promise.all(updates);
+  const results = await Promise.all(updatePromises);
   const errors = results.filter((result) => result.error);
   if (errors.length > 0) {
     throw new Error(errors.map((e) => e.error?.message).join(', '));
@@ -179,24 +217,17 @@ export async function reorderPlaylistVideos(payload: { playlistId: string; order
 export async function listPlaylistCollaborators(playlistId: string) {
   const { data, error } = await supabase
     .from('playlist_collaborators')
-    .select('*')
+    .select(
+      `
+      *,
+      profile:profiles(id, username, display_name, avatar_url)
+      `,
+    )
     .eq('playlist_id', playlistId);
 
   if (error) throw error;
 
-  // Fetch profiles separately to avoid Supabase type issues
-  const userIds = (data || []).map((c) => c.user_id);
-  const { data: profiles } = await supabase
-    .from('profiles')
-    .select('id, username, display_name, avatar_url')
-    .in('id', userIds);
-
-  const profileMap = new Map((profiles || []).map((p) => [p.id, p]));
-
-  return (data || []).map((collab) => ({
-    ...collab,
-    profile: profileMap.get(collab.user_id) || null,
-  })) as PlaylistCollaborator[];
+  return (data || []) as PlaylistCollaborator[];
 }
 
 export async function addCollaborator(payload: { playlistId: string; userId: string; role?: 'editor' | 'viewer' }) {

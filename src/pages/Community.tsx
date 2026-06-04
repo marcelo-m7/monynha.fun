@@ -73,7 +73,7 @@ const Community = () => {
             {profiles.map((profile, index) => (
               <Link
                 key={profile.id}
-                to={`/profile/${profile.username}`}
+                to={`/profile/${encodeURIComponent(profile.username || '')}`}
                 className="group flex items-center gap-4 p-4 bg-card border border-border rounded-xl shadow-sm transition-all duration-300 hover:scale-[1.02] hover:shadow-lg"
                 style={{ animationDelay: `${index * 0.05}s` }}
               >
@@ -84,7 +84,7 @@ const Community = () => {
                   </AvatarFallback>
                 </Avatar>
                 <div className="flex-1">
-                  <h3 className="font-semibold text-lg group-hover:text-primary transition-colors line-clamp-1">
+                   <h3 className="font-semibold text-lg group-hover:opacity-75 transition-opacity line-clamp-1">
                     {profile.display_name || profile.username || t('common.anonymous')}
                   </h3>
                   {profile.username && (

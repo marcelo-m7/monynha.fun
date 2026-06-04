@@ -1,5 +1,12 @@
 import { supabase } from '@/shared/api/supabase/supabaseClient';
-import type { Video, VideoCategory, VideoInsert, VideoWithCategory } from './video.types';
+import type {
+  Video,
+  VideoAssignedPlaylist,
+  VideoCategory,
+  VideoInsert,
+  VideoUpdate,
+  VideoWithCategory,
+} from './video.types';
 import type { AiEnrichment } from '@/entities/ai_enrichment/ai_enrichment.types';
 import { extractYouTubeId } from '@/shared/lib/youtube';
 import type { Json } from '@/integrations/supabase/types';
@@ -14,11 +21,68 @@ function getLatestEnrichment(enrichments: AiEnrichment[] | null | undefined): Ai
 type VideoWithRelations = Video & {
   category?: VideoCategory | null;
   ai_enrichments?: AiEnrichment[] | null;
+  playlist_videos?: Array<{
+    playlist?: VideoAssignedPlaylist | null;
+  }> | null;
 };
 
 type FeaturedVideoRpcRow = Video & {
   category?: Json | null;
 };
+
+type VideoExhibitionRow = Video & {
+  category_name?: string | null;
+  category_slug?: string | null;
+  category_color?: string | null;
+  enrichment_optimized_title?: string | null;
+  enrichment_short_summary?: string | null;
+  enrichment_summary_description?: string | null;
+  enrichment_cultural_relevance?: string | null;
+  enrichment_semantic_tags?: string[] | null;
+  enrichment_language?: string | null;
+  transcript_summary?: string | null;
+  transcript_language?: string | null;
+  transcript_status?: string | null;
+};
+
+function mapExhibitionRowToVideoWithCategory(row: VideoExhibitionRow, includeEnrichment = true): VideoWithCategory {
+  const category =
+    row.category_name && row.category_slug && row.category_color
+      ? {
+          id: row.category_id ?? '',
+          name: row.category_name,
+          slug: row.category_slug,
+          color: row.category_color,
+          icon: 'folder',
+          created_at: row.created_at,
+        }
+      : null;
+
+  const enrichment = includeEnrichment
+    ? {
+        id: `${row.id}-latest`,
+        video_id: row.id,
+        optimized_title: row.enrichment_optimized_title ?? null,
+        short_summary: row.enrichment_short_summary ?? null,
+        summary_description: row.enrichment_summary_description ?? null,
+        cultural_relevance: row.enrichment_cultural_relevance ?? null,
+        semantic_tags: row.enrichment_semantic_tags ?? null,
+        language: row.enrichment_language ?? null,
+        suggested_category_id: row.category_id ?? null,
+        created_at: row.updated_at,
+        reprocessed_at: null,
+      }
+    : null;
+
+  return {
+    ...row,
+    category,
+    enrichment,
+    transcriptSummary: row.transcript_summary ?? null,
+    transcriptLanguage: row.transcript_language ?? null,
+    transcriptStatus: row.transcript_status ?? null,
+  };
+}
 
 function isVideoCategory(value: unknown): value is VideoCategory {
   if (!value || typeof value !== 'object') return false;
@@ -45,25 +109,9 @@ export async function listVideos(params: ListVideosParams = {}) {
   const includeEnrichment = params.includeEnrichment !== false; // Default true
   
   let query = supabase
-    .from('videos')
-    .select(
-      includeEnrichment
-        ? `
-          *,
-          category:categories(id, name, slug, color),
-          ai_enrichments!video_id(*)
-        `
-        : `
-          *,
-          category:categories(id, name, slug, color)
-        `,
-    )
+    .from('v_video_exhibition')
+    .select('*')
     .order('created_at', { ascending: false });
-
-  if (includeEnrichment) {
-    // Order enrichments by created_at DESC to get latest first
-    query = query.order('created_at', { foreignTable: 'ai_enrichments', ascending: false });
-  }
 
   if (params.featured) {
     query = query.eq('is_featured', true);
@@ -98,18 +146,10 @@ export async function listVideos(params: ListVideosParams = {}) {
   const { data, error } = await query;
 
   if (error) throw error;
-  
-  // Process enrichments - extract only the latest one
-  if (includeEnrichment && data) {
-    const videos = data as VideoWithRelations[];
-    return videos.map((video) => ({
-      ...video,
-      enrichment: getLatestEnrichment(video.ai_enrichments),
-      ai_enrichments: undefined, // Remove the array
-    })) as VideoWithCategory[];
-  }
-  
-  return data as VideoWithCategory[];
+
+  return ((data as VideoExhibitionRow[] | null) || []).map((row) =>
+    mapExhibitionRowToVideoWithCategory(row, includeEnrichment),
+  );
 }
 
 export async function getVideoById(id: string) {
@@ -122,7 +162,10 @@ export async function getVideoById(id: string) {
       `
       *,
         category:categories(id, name, slug, color),
-        ai_enrichments!video_id(*)
+        ai_enrichments!video_id(*),
+        playlist_videos!playlist_videos_video_id_fkey(
+          playlist:playlists(id, name, slug, is_ordered, course_code, unit_code)
+        )
     `,
       )
       .order('created_at', { foreignTable: 'ai_enrichments', ascending: false });
@@ -140,10 +183,26 @@ export async function getVideoById(id: string) {
     // Process enrichment - extract only the latest one
     if (data) {
       const video = data as VideoWithRelations;
+      const { data: exhibitionRow } = await supabase
+        .from('v_video_exhibition')
+        .select('id, transcript_summary, transcript_language, transcript_status')
+        .eq(isUuid ? 'id' : 'youtube_id', id)
+        .maybeSingle();
+      const transcriptData = exhibitionRow as Pick<
+        VideoExhibitionRow,
+        'transcript_summary' | 'transcript_language' | 'transcript_status'
+      > | null;
       return {
         ...video,
         enrichment: getLatestEnrichment(video.ai_enrichments),
+        assignedPlaylists: (video.playlist_videos ?? [])
+          .map((entry) => entry.playlist)
+          .filter((playlist): playlist is VideoAssignedPlaylist => !!playlist),
+        transcriptSummary: transcriptData?.transcript_summary ?? null,
+        transcriptLanguage: transcriptData?.transcript_language ?? null,
+        transcriptStatus: transcriptData?.transcript_status ?? null,
         ai_enrichments: undefined,
+        playlist_videos: undefined,
       } as VideoWithCategory;
     }
   
@@ -157,9 +216,23 @@ export async function listFeaturedVideos(limit = 4, offset = 0) {
   });
 
   if (!error && data) {
-    const rows = data as FeaturedVideoRpcRow[];
-    return rows.map((row) => {
-      // Parse the category JSON if it's a string or object
+    const rpcRows = data as FeaturedVideoRpcRow[];
+    const featuredIds = rpcRows.map((row) => row.id);
+    const { data: enrichedRows, error: enrichedError } = await supabase
+      .from('v_video_exhibition')
+      .select('*')
+      .in('id', featuredIds);
+
+    if (!enrichedError && enrichedRows) {
+      const enrichedById = new Map(
+        (enrichedRows as VideoExhibitionRow[]).map((row) => [row.id, mapExhibitionRowToVideoWithCategory(row)]),
+      );
+      return featuredIds
+        .map((id) => enrichedById.get(id))
+        .filter((row): row is VideoWithCategory => !!row);
+    }
+
+    return rpcRows.map((row) => {
       let parsedCategory: VideoCategory | null = null;
       if (row.category) {
         if (typeof row.category === 'string') {
@@ -180,67 +253,38 @@ export async function listFeaturedVideos(limit = 4, offset = 0) {
       return {
         ...row,
         category: parsedCategory,
-          enrichment: null, // RPC doesn't include enrichments yet
+        enrichment: null,
       };
     }) as unknown as VideoWithCategory[];
   }
 
   const { data: fallbackData, error: fallbackError } = await supabase
-    .from('videos')
-    .select(
-      `
-      *,
-        category:categories(id, name, slug, color),
-        ai_enrichments!video_id(*)
-    `,
-    )
-      .order('created_at', { foreignTable: 'ai_enrichments', ascending: false })
+    .from('v_video_exhibition')
+    .select('*')
     .order('view_count', { ascending: false })
+    .range(offset, offset + limit - 1)
     .limit(limit);
 
   if (fallbackError) throw fallbackError;
-  
-    // Process enrichments
-    if (fallbackData) {
-        const videos = fallbackData as VideoWithRelations[];
-        return videos.map((video) => ({
-        ...video,
-        enrichment: getLatestEnrichment(video.ai_enrichments),
-        ai_enrichments: undefined,
-      })) as VideoWithCategory[];
-    }
-  
-    return fallbackData as VideoWithCategory[];
+
+  return ((fallbackData as VideoExhibitionRow[] | null) || []).map((row) =>
+    mapExhibitionRowToVideoWithCategory(row),
+  );
 }
 
 export async function listRecentVideos(limit = 4) {
   const { data, error } = await supabase
-    .from('videos')
-    .select(
-      `
-      *,
-        category:categories(id, name, slug, color),
-        ai_enrichments!video_id(*)
-    `,
-    )
-      .order('created_at', { foreignTable: 'ai_enrichments', ascending: false })
+    .from('v_video_exhibition')
+    .select('*')
     .eq('is_featured', false)
     .order('created_at', { ascending: false })
     .limit(limit);
 
   if (error) throw error;
-  
-    // Process enrichments
-    if (data) {
-        const videos = data as VideoWithRelations[];
-        return videos.map((video) => ({
-        ...video,
-        enrichment: getLatestEnrichment(video.ai_enrichments),
-        ai_enrichments: undefined,
-      })) as VideoWithCategory[];
-    }
-  
-    return data as VideoWithCategory[];
+
+  return ((data as VideoExhibitionRow[] | null) || []).map((row) =>
+    mapExhibitionRowToVideoWithCategory(row),
+  );
 }
 
 export async function listRelatedVideos(currentVideoId: string, categoryId: string | null, limit = 4) {
@@ -292,6 +336,24 @@ export async function createVideo(payload: VideoInsert) {
 
   if (error) throw error;
   return data as Video;
+}
+
+export async function updateVideo(payload: VideoUpdate & { id: string }) {
+  const { id, ...updates } = payload;
+  const { data, error } = await supabase
+    .from('videos')
+    .update(updates)
+    .eq('id', id)
+    .select()
+    .single();
+
+  if (error) throw error;
+  return data as Video;
+}
+
+export async function deleteVideo(videoId: string) {
+  const { error } = await supabase.from('videos').delete().eq('id', videoId);
+  if (error) throw error;
 }
 
 export async function findVideoByYoutubeId(youtubeId: string) {

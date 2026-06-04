@@ -3,6 +3,7 @@ import { videoKeys } from './video/video.keys';
 import { playlistKeys } from './playlist/playlist.keys';
 import { profileKeys } from './profile/profile.keys';
 import { categoryKeys } from './category/category.keys';
+import { videoSubmissionKeys } from './video_submission/video_submission.keys';
 
 describe('query key factories', () => {
   it('creates stable video keys', () => {
@@ -21,5 +22,13 @@ describe('query key factories', () => {
     expect(profileKeys.detail('user-1')).toEqual(['profiles', 'detail', 'user-1']);
     expect(profileKeys.byUsername('jane')).toEqual(['profiles', 'by-username', 'jane']);
     expect(categoryKeys.list()).toEqual(['categories', 'list']);
+  });
+
+  it('creates stable video submission keys', () => {
+    expect(videoSubmissionKeys.detail('submission-1')).toEqual([
+      'video-submissions',
+      'detail',
+      'submission-1',
+    ]);
   });
 });
