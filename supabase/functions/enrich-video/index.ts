@@ -1,101 +1,28 @@
-﻿import { serve } from "https://deno.land/std@0.190.0/http/server.ts"
+import { serve } from "https://deno.land/std@0.190.0/http/server.ts"
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.45.0'
-import { createGeminiClient, type GeminiError, type GeminiVideoAnalysisResult } from '../_shared/gemini-client.ts'
-import { assignPlaylist, type PlaylistAssignmentResult } from '../_shared/playlist-assignment.ts'
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 }
 
-declare const EdgeRuntime: {
-  waitUntil: (promise: Promise<unknown>) => void;
-};
-
-type PlaylistRow = {
+type CategoryRow = {
   id: string;
   name: string;
-  description: string | null;
-  language: string;
-  is_public: boolean;
-  is_ordered: boolean;
-  course_code: string | null;
-  unit_code: string | null;
-};
-
-type EnhancedAssignmentResult = {
-  assignedPlaylistId: string | null;
-  playlistAssignment: PlaylistAssignmentResult | null;
-  reliability: 'high' | 'low';
-  reason: string;
+  slug: string;
 };
 
 class HttpError extends Error {
   status: number;
   code: string;
-  stage: string;
   recoverable: boolean;
 
-  constructor(message: string, status: number, options: { code?: string; stage?: string; recoverable?: boolean } = {}) {
+  constructor(message: string, status: number, options: { code?: string; recoverable?: boolean } = {}) {
     super(message);
     this.status = status;
     this.code = options.code ?? 'HTTP_ERROR';
-    this.stage = options.stage ?? 'request';
-    this.recoverable = options.recoverable ?? false;
+    this.recoverable = options.recoverable ?? status >= 500;
   }
-}
-
-type ProcessingErrorPayload = {
-  code: string;
-  message: string;
-  stage: string;
-  recoverable: boolean;
-  requestId: string;
-};
-
-type TranscriptProcessingResult = {
-  id: string | null;
-  provider: 'gemini';
-  providerModel: string;
-  status: 'completed' | 'unavailable' | 'failed';
-  language: string | null;
-  summary: string | null;
-  confidence: number;
-  errorMessage: string | null;
-  analysis: GeminiVideoAnalysisResult;
-};
-
-type VideoProcessingVideo = {
-  youtube_id: string;
-  title: string | null;
-  description: string | null;
-  channel_name: string | null;
-  language: string | null;
-  category_id: string | null;
-};
-
-function createRequestId() {
-  return crypto.randomUUID();
-}
-
-function logProcessing(requestId: string, stage: string, message: string, details: Record<string, unknown> = {}) {
-  console.log(JSON.stringify({
-    source: 'enrich-video',
-    requestId,
-    stage,
-    message,
-    ...details,
-  }));
-}
-
-function logProcessingError(requestId: string, stage: string, message: string, details: Record<string, unknown> = {}) {
-  console.error(JSON.stringify({
-    source: 'enrich-video',
-    requestId,
-    stage,
-    message,
-    ...details,
-  }));
 }
 
 function extractYouTubeId(url: string): string | null {
@@ -106,128 +33,133 @@ function extractYouTubeId(url: string): string | null {
 
   for (const pattern of patterns) {
     const match = url.match(pattern);
-    if (match?.[1]) {
-      return match[1];
-    }
+    if (match?.[1]) return match[1];
   }
 
   return null;
 }
 
-function isRecoverableExternalError(error: unknown) {
-  if (!(error instanceof Error)) return true;
-  const message = error.message.toLowerCase();
-  return (
-    message.includes('timeout') ||
-    message.includes('aborted') ||
-    message.includes('rate limit') ||
-    message.includes('429') ||
-    message.includes('500') ||
-    message.includes('502') ||
-    message.includes('503') ||
-    message.includes('504') ||
-    message.includes('network') ||
-    message.includes('fetch')
-  );
-}
-
-function toProcessingErrorPayload(error: unknown, requestId: string, fallbackStage = 'processing'): ProcessingErrorPayload {
-  if (error instanceof HttpError) {
-    return {
-      code: error.code,
-      message: error.message,
-      stage: error.stage,
-      recoverable: error.recoverable,
-      requestId,
-    };
-  }
-
-  const maybeGeminiError = error as Partial<GeminiError>;
-  if (maybeGeminiError.code && error instanceof Error) {
-    return {
-      code: maybeGeminiError.code,
-      message: error.message,
-      stage: fallbackStage,
-      recoverable: maybeGeminiError.recoverable ?? isRecoverableExternalError(error),
-      requestId,
-    };
-  }
-
-  if (error instanceof Error) {
-    const recoverable = isRecoverableExternalError(error);
-    return {
-      code: recoverable ? 'EXTERNAL_PROCESSING_ERROR' : 'PROCESSING_ERROR',
-      message: error.message,
-      stage: fallbackStage,
-      recoverable,
-      requestId,
-    };
-  }
-
-  return {
-    code: 'UNKNOWN_PROCESSING_ERROR',
-    message: 'Unknown error occurred',
-    stage: fallbackStage,
-    recoverable: true,
-    requestId,
-  };
-}
-
-function normalizeLanguage(value: string | null | undefined): string | null {
+function normalizeLanguage(value: string | null | undefined): string {
   const normalized = (value ?? '').trim().toLowerCase();
-  return normalized.length >= 2 ? normalized : null;
+  return normalized.length >= 2 ? normalized.slice(0, 12) : 'pt';
 }
 
-async function assignVideoToPlaylist(
-  supabaseServiceRole: ReturnType<typeof createClient>,
-  playlistId: string,
-  videoId: string,
-  addedBy: string,
-) {
-  const { data: existing, error: existingError } = await supabaseServiceRole
-    .from('playlist_videos')
-    .select('id')
-    .eq('playlist_id', playlistId)
-    .eq('video_id', videoId)
-    .maybeSingle();
+function normalizeText(value: string | null | undefined): string {
+  return (value ?? '')
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+    .trim();
+}
 
-  if (existingError) {
-    throw new Error(`Failed to check existing playlist assignment: ${existingError.message}`);
+function summarize(value: string | null | undefined, fallback: string) {
+  const normalized = (value ?? '').replace(/\s+/g, ' ').trim();
+  if (!normalized) return fallback;
+  return normalized.length > 420 ? `${normalized.slice(0, 417).trim()}...` : normalized;
+}
+
+function buildVideoSummary(params: {
+  title: string | null;
+  description: string | null;
+  channelName: string | null;
+  youtubeId: string;
+}) {
+  const description = summarize(params.description, '');
+  if (description) return description;
+
+  const title = params.title?.trim() || 'video do YouTube';
+  const channel = params.channelName?.trim();
+  return channel
+    ? `Video do canal ${channel} sobre "${title}", enviado para curadoria Tube O2.`
+    : `Video sobre "${title}", enviado para curadoria Tube O2 a partir do YouTube (${params.youtubeId}).`;
+}
+
+function deriveTags(params: {
+  title: string | null;
+  description: string | null;
+  channelName: string | null;
+  language: string;
+}) {
+  const source = `${params.title ?? ''} ${params.description ?? ''} ${params.channelName ?? ''}`.toLowerCase();
+  const tags = new Set<string>(['youtube', 'curadoria', params.language]);
+  const signals: Array<[string, string[]]> = [
+    ['matematica', ['matem', 'calculo', 'algebra', 'equacao', 'estatistica']],
+    ['programacao', ['programa', 'javascript', 'python', 'codigo', 'software']],
+    ['design', ['design', 'visual', 'grafico', 'tipografia']],
+    ['dados', ['sql', 'database', 'dados', 'banco de dados']],
+    ['educacao', ['aula', 'curso', 'aprenda', 'tutorial', 'facodi']],
+  ];
+
+  for (const [tag, keywords] of signals) {
+    if (keywords.some((keyword) => source.includes(keyword))) tags.add(tag);
   }
 
-  if (existing) {
-    return;
+  return [...tags].slice(0, 8);
+}
+
+function scoreCategory(category: CategoryRow, source: string, semanticTags: string[]) {
+  const slug = normalizeText(category.slug);
+  const name = normalizeText(category.name);
+  const tagsText = semanticTags.map(normalizeText).join(' ');
+  let score = 0;
+
+  if (source.includes(slug) || source.includes(name)) score += 10;
+  if (tagsText.includes(slug) || tagsText.includes(name)) score += 8;
+
+  const keywordMap: Record<string, string[]> = {
+    cultura: ['cultura', 'historia', 'sociedade', 'arte', 'tradicao', 'antropologia'],
+    educacao: ['educacao', 'aula', 'curso', 'aprenda', 'tutorial', 'ensino', 'estudo', 'facodi', 'universidade', 'escola'],
+    'memes-iconicos': ['meme', 'memes', 'viral', 'humor', 'engracado'],
+    musica: ['musica', 'music', 'audio', 'som', 'cantor', 'banda', 'instrumento'],
+    tech: ['tech', 'tecnologia', 'programacao', 'programa', 'codigo', 'software', 'javascript', 'python', 'sql', 'database', 'dados', 'ia', 'inteligencia artificial'],
+    'tutoriais-antigos': ['tutorial', 'como fazer', 'passo a passo', 'guia', 'dica', 'aprenda'],
+    receitas: ['receita', 'receitas', 'cozinha', 'culinaria', 'comida', 'bolo', 'prato'],
+    'receitas-tradicionais': ['receita', 'receitas', 'cozinha', 'culinaria', 'comida', 'bolo', 'prato'],
+  };
+
+  const keywords = [
+    ...(keywordMap[slug] ?? []),
+    ...(slug === 'tech' ? keywordMap.tecnologia ?? [] : []),
+  ];
+
+  for (const keyword of keywords) {
+    if (source.includes(normalizeText(keyword))) score += 3;
   }
 
-  const { data: lastPositionRows, error: positionError } = await supabaseServiceRole
-    .from('playlist_videos')
-    .select('position')
-    .eq('playlist_id', playlistId)
-    .order('position', { ascending: false })
-    .limit(1);
+  return score;
+}
 
-  if (positionError) {
-    throw new Error(`Failed to calculate playlist position: ${positionError.message}`);
+function pickCategory(categories: CategoryRow[], params: {
+  currentCategoryId: string | null;
+  title: string | null;
+  description: string | null;
+  channelName: string | null;
+  semanticTags: string[];
+}) {
+  const currentCategory = categories.find((category) => category.id === params.currentCategoryId) ?? null;
+  const unclassifiedCategory = categories.find((category) => normalizeText(category.slug) === 'nao-classificados') ?? null;
+  if (currentCategory && currentCategory.id !== unclassifiedCategory?.id) return currentCategory;
+
+  const source = normalizeText([
+    params.title,
+    params.description,
+    params.channelName,
+    params.semanticTags.join(' '),
+  ].filter(Boolean).join(' '));
+
+  let best: { category: CategoryRow | null; score: number } = { category: null, score: 0 };
+  for (const category of categories) {
+    if (category.id === unclassifiedCategory?.id) continue;
+    const score = scoreCategory(category, source, params.semanticTags);
+    if (score > best.score) best = { category, score };
   }
 
-  const nextPosition =
-    lastPositionRows && lastPositionRows.length > 0
-      ? Number(lastPositionRows[0].position ?? 0) + 1
-      : 0;
+  if (best.category && best.score >= 3) return best.category;
 
-  const { error: insertError } = await supabaseServiceRole
-    .from('playlist_videos')
-    .insert({
-      playlist_id: playlistId,
-      video_id: videoId,
-      position: nextPosition,
-      added_by: addedBy,
-      notes: null,
-    });
-
-  if (insertError) {
-    throw new Error(`Failed to add video to playlist: ${insertError.message}`);
-  }
+  return categories.find((category) => normalizeText(category.slug) === 'educacao')
+    ?? unclassifiedCategory
+    ?? categories[0]
+    ?? null;
 }
 
 async function updateSubmissionStatus(
@@ -240,496 +172,235 @@ async function updateSubmissionStatus(
     .update(values)
     .eq('id', submissionId);
 
-  if (error) {
-    throw new Error(`Failed to update submission status: ${error.message}`);
-  }
+  if (error) throw new Error(`Failed to update submission status: ${error.message}`);
 }
 
-async function updateSubmissionStatusWithMetadataPatch(
-  supabaseServiceRole: ReturnType<typeof createClient>,
-  submissionId: string,
-  values: Record<string, unknown>,
-  metadataPatch: Record<string, unknown>,
-) {
-  const { data: current, error: currentError } = await supabaseServiceRole
-    .from('video_submissions')
-    .select('metadata')
-    .eq('id', submissionId)
-    .single();
-
-  if (currentError) {
-    throw new Error(`Failed to load submission metadata: ${currentError.message}`);
-  }
-
-  const currentMetadata =
-    current?.metadata && typeof current.metadata === 'object' && !Array.isArray(current.metadata)
-      ? current.metadata as Record<string, unknown>
-      : {};
-
-  await updateSubmissionStatus(supabaseServiceRole, submissionId, {
-    ...values,
-    metadata: {
-      ...currentMetadata,
-      ...metadataPatch,
-    },
-  });
-}
-
-async function safeUpdateSubmissionStatusWithMetadataPatch(
+async function safeUpdateSubmissionStatus(
   supabaseServiceRole: ReturnType<typeof createClient> | null,
   submissionId: string | null,
   values: Record<string, unknown>,
-  metadataPatch: Record<string, unknown>,
 ) {
-  if (!supabaseServiceRole || !submissionId) {
-    return;
-  }
+  if (!supabaseServiceRole || !submissionId) return;
 
   try {
-    await updateSubmissionStatusWithMetadataPatch(supabaseServiceRole, submissionId, values, metadataPatch);
-  } catch (statusError) {
-    const statusErrorMessage = statusError instanceof Error
-      ? statusError.message
-      : 'Unknown submission status update error';
-    console.error(`[enrich-video] ${statusErrorMessage}`);
-  }
-}
-
-function processingMetadata(requestId: string, stage: string) {
-  return {
-    processing: {
-      requestId,
-      stage,
-      updatedAt: new Date().toISOString(),
-    },
-  };
-}
-
-async function updateSubmissionStage(
-  supabaseServiceRole: ReturnType<typeof createClient>,
-  submissionId: string,
-  requestId: string,
-  stage: string,
-) {
-  await updateSubmissionStatusWithMetadataPatch(
-    supabaseServiceRole,
-    submissionId,
-    {},
-    processingMetadata(requestId, stage),
-  );
-}
-
-async function insertTranscriptRecord(
-  supabaseServiceRole: ReturnType<typeof createClient>,
-  params: {
-    videoId: string;
-    providerModel: string;
-    status: 'completed' | 'unavailable' | 'failed';
-    language: string | null;
-    transcriptText: string | null;
-    summary: string | null;
-    confidence: number;
-    errorMessage: string | null;
-    metadata: Record<string, unknown>;
-  },
-): Promise<string> {
-  const { data, error } = await supabaseServiceRole
-    .from('video_transcripts')
-    .insert({
-      video_id: params.videoId,
-      provider: 'gemini',
-      provider_model: params.providerModel,
-      language: params.language,
-      transcript_text: params.transcriptText,
-      summary: params.summary,
-      confidence: params.confidence,
-      status: params.status,
-      error_message: params.errorMessage,
-      metadata: params.metadata,
-    })
-    .select('id')
-    .single();
-
-  if (error) {
-    throw new Error(`Failed to save transcript: ${error.message}`);
-  }
-
-  return data.id as string;
-}
-
-async function processVideoAnalysis(params: {
-  supabaseServiceRole: ReturnType<typeof createClient>;
-  geminiClient: ReturnType<typeof createGeminiClient>;
-  requestId: string;
-  videoId: string;
-  youtubeUrl: string;
-  videoTitle: string;
-  videoDescription: string | null;
-  effectiveLanguage: string;
-}): Promise<TranscriptProcessingResult> {
-  const {
-    supabaseServiceRole,
-    geminiClient,
-    requestId,
-    videoId,
-    youtubeUrl,
-    videoTitle,
-    videoDescription,
-    effectiveLanguage,
-  } = params;
-  logProcessing(requestId, 'analysis', 'Starting Gemini video analysis', {
-    videoId,
-    model: geminiClient.modelName,
-  });
-
-  let analysis: GeminiVideoAnalysisResult;
-  try {
-    analysis = await geminiClient.analyzeYouTubeVideo({
-      youtubeUrl,
-      title: videoTitle,
-      description: videoDescription,
-      language: effectiveLanguage,
-    });
+    await updateSubmissionStatus(supabaseServiceRole, submissionId, values);
   } catch (error) {
-    const geminiError = error as Partial<GeminiError>;
-    const errorMessage = error instanceof Error ? error.message : 'Unknown Gemini analysis error';
-    const recoverable = geminiError.recoverable ?? isRecoverableExternalError(error);
-    const transcriptId = await insertTranscriptRecord(supabaseServiceRole, {
-      videoId,
-      providerModel: geminiClient.modelName,
-      status: 'failed',
-      language: normalizeLanguage(effectiveLanguage),
-      transcriptText: null,
-      summary: null,
-      confidence: 0,
-      errorMessage,
-      metadata: {
+    console.error(`[enrich-video] ${error instanceof Error ? error.message : 'Unknown status update error'}`);
+  }
+}
+
+serve(async (req) => {
+  const requestId = crypto.randomUUID();
+
+  if (req.method === 'OPTIONS') {
+    return new Response(null, { headers: corsHeaders });
+  }
+
+  const authHeader = req.headers.get('Authorization');
+  if (!authHeader) {
+    return new Response(JSON.stringify({
+      error: {
+        code: 'UNAUTHORIZED_NO_AUTH_HEADER',
+        message: 'Missing authorization header',
         requestId,
-        code: geminiError.code ?? 'GEMINI_ANALYSIS_FAILED',
-        recoverable,
       },
+    }), {
+      status: 401,
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
-
-    logProcessingError(requestId, 'analysis', 'Gemini video analysis failed, continuing without transcript', {
-      videoId,
-      transcriptId,
-      code: geminiError.code ?? 'GEMINI_ANALYSIS_FAILED',
-      error: errorMessage,
-    });
-
-    if (recoverable) {
-      throw new HttpError(`Gemini video analysis failed: ${errorMessage}`, 503, {
-        code: geminiError.code ?? 'GEMINI_ANALYSIS_FAILED',
-        stage: 'analysis',
-        recoverable: true,
-      });
-    }
-
-    return {
-      id: transcriptId,
-      provider: 'gemini',
-      providerModel: geminiClient.modelName,
-      status: 'failed',
-      language: normalizeLanguage(effectiveLanguage),
-      summary: null,
-      confidence: 0,
-      errorMessage,
-      analysis: {
-        transcriptText: null,
-        transcriptSummary: null,
-        summaryDescription: null,
-        shortSummary: null,
-        semanticTags: [],
-        language: normalizeLanguage(effectiveLanguage),
-        confidence: 0,
-        unavailableReason: errorMessage,
-      },
-    };
   }
 
-  const status: 'completed' | 'unavailable' = analysis.transcriptText || analysis.transcriptSummary || analysis.summaryDescription
-    ? 'completed'
-    : 'unavailable';
-  const errorMessage = status === 'unavailable'
-    ? analysis.unavailableReason || 'Transcript unavailable from Gemini'
-    : null;
+  const supabaseUrl = Deno.env.get('SUPABASE_URL') ?? '';
+  const supabaseAnonKey = Deno.env.get('SUPABASE_ANON_KEY') ?? '';
+  const serviceRoleKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '';
 
-  const transcriptId = await insertTranscriptRecord(supabaseServiceRole, {
-    videoId,
-    providerModel: geminiClient.modelName,
-    status,
-    language: normalizeLanguage(analysis.language) ?? normalizeLanguage(effectiveLanguage),
-    transcriptText: analysis.transcriptText,
-    summary: analysis.transcriptSummary ?? analysis.summaryDescription,
-    confidence: analysis.confidence,
-    errorMessage,
-    metadata: {
-      requestId,
-      unavailableReason: analysis.unavailableReason,
-      semanticTags: analysis.semanticTags,
-    },
-  });
-
-  logProcessing(requestId, 'analysis', 'Gemini video analysis completed', {
-    videoId,
-    transcriptId,
-    status,
-    confidence: analysis.confidence,
-  });
-
-  return {
-    id: transcriptId,
-    provider: 'gemini',
-    providerModel: geminiClient.modelName,
-    status,
-    language: normalizeLanguage(analysis.language) ?? normalizeLanguage(effectiveLanguage),
-    summary: analysis.transcriptSummary ?? analysis.summaryDescription,
-    confidence: analysis.confidence,
-    errorMessage,
-    analysis,
-  };
-}
-
-async function runEnhancedAssignments(params: {
-  supabaseServiceRole: ReturnType<typeof createClient>;
-  geminiClient: ReturnType<typeof createGeminiClient>;
-  analysis: GeminiVideoAnalysisResult;
-  playlistRows: PlaylistRow[];
-  videoId: string;
-  userId: string;
-}): Promise<EnhancedAssignmentResult> {
-  const {
-    supabaseServiceRole,
-    geminiClient,
-    analysis,
-    playlistRows,
-    videoId,
-    userId,
-  } = params;
-
-  const geminiAssignment = await geminiClient.assignPlaylistFromAnalysis({
-    analysis,
-    playlists: playlistRows,
-  });
-
-  const playlistAssignment = assignPlaylist({
-    playlists: playlistRows,
-    analysis: {
-      semanticTags: analysis.semanticTags,
-      summaryDescription: analysis.summaryDescription,
-      shortSummary: analysis.shortSummary,
-      language: analysis.language,
-      suggestedPlaylistId: geminiAssignment.assignedPlaylistId,
-      classificationConfidence: geminiAssignment.confidence,
-    },
-  });
-
-  let assignedPlaylistId: string | null = null;
-  if (playlistAssignment.assignedPlaylistId) {
-    await assignVideoToPlaylist(
-      supabaseServiceRole,
-      playlistAssignment.assignedPlaylistId,
-      videoId,
-      userId,
-    );
-    assignedPlaylistId = playlistAssignment.assignedPlaylistId;
+  if (!supabaseUrl || !supabaseAnonKey || !serviceRoleKey) {
+    return new Response(JSON.stringify({
+      error: {
+        code: 'MISSING_ENVIRONMENT',
+        message: 'Missing required Supabase environment variables',
+        requestId,
+      },
+    }), {
+      status: 500,
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+    });
   }
 
-  const reliable = !!assignedPlaylistId;
-  const reason = assignedPlaylistId
-    ? playlistAssignment.reason
-    : playlistAssignment.reason;
-
-  return {
-    assignedPlaylistId,
-    playlistAssignment,
-    reliability: reliable ? 'high' : 'low',
-    reason,
-  };
-}
-
-function hasProcessedAnalysisContent(analysis: GeminiVideoAnalysisResult): boolean {
-  return (
-    analysis.semanticTags.length > 0 ||
-    !!analysis.summaryDescription ||
-    !!analysis.shortSummary ||
-    !!analysis.transcriptSummary
+  const token = authHeader.replace('Bearer ', '');
+  const supabase = createClient(
+    supabaseUrl,
+    supabaseAnonKey,
+    { global: { headers: { Authorization: `Bearer ${token}` } } },
   );
-}
 
-async function runVideoProcessingTask(params: {
-  supabaseServiceRole: ReturnType<typeof createClient>;
-  requestId: string;
-  submissionId: string | null;
-  videoId: string;
-  youtubeUrl: string;
-  userId: string;
-  video: VideoProcessingVideo;
-}) {
-  const {
-    supabaseServiceRole,
-    requestId,
-    submissionId,
-    videoId,
-    youtubeUrl,
-    userId,
-    video,
-  } = params;
-  let currentStage = 'background_start';
+  const { data: { user }, error: userError } = await supabase.auth.getUser();
+  if (userError || !user) {
+    return new Response(JSON.stringify({
+      error: {
+        code: 'UNAUTHORIZED_INVALID_TOKEN',
+        message: 'Invalid or expired authorization token',
+        requestId,
+      },
+    }), {
+      status: 401,
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+    });
+  }
+
+  let submissionId: string | null = null;
+  let submissionBelongsToUser = false;
+  let supabaseServiceRole: ReturnType<typeof createClient> | null = null;
 
   try {
-    currentStage = 'context_load';
-    if (submissionId) {
-      await updateSubmissionStage(supabaseServiceRole, submissionId, requestId, currentStage);
-    }
-
-    const effectiveLanguage = video.language && video.language !== 'und' ? video.language : 'pt';
-    const { data: playlistsByLanguage, error: playlistFetchError } = await supabaseServiceRole
-      .rpc('list_education_playlists_for_assignment', {
-        p_language: effectiveLanguage,
-        p_limit: 120,
-      });
-    if (playlistFetchError) {
-      throw new Error(`Failed to load playlists: ${playlistFetchError.message}`);
-    }
-
-    let playlistsData = playlistsByLanguage;
-    if (!playlistsData || playlistsData.length === 0) {
-      const { data: fallbackData, error: fallbackError } = await supabaseServiceRole
-        .rpc('list_education_playlists_for_assignment', {
-          p_language: null,
-          p_limit: 120,
-        });
-      if (fallbackError) {
-        throw new Error(`Failed to load fallback playlists: ${fallbackError.message}`);
-      }
-      playlistsData = fallbackData;
-    }
-    const playlistRows = (playlistsData ?? []) as PlaylistRow[];
-    const geminiClient = createGeminiClient();
-
-    currentStage = 'analysis';
-    if (submissionId) {
-      await updateSubmissionStage(supabaseServiceRole, submissionId, requestId, currentStage);
-    }
-    const transcriptResult = await processVideoAnalysis({
-      supabaseServiceRole,
-      geminiClient,
-      requestId,
-      videoId,
-      youtubeUrl,
-      videoTitle: video.title || '',
-      videoDescription: video.description ?? null,
-      effectiveLanguage,
+    const requestBody = await req.json().catch(() => {
+      throw new HttpError('Request body must be valid JSON', 400, { code: 'INVALID_JSON', recoverable: false });
     });
 
-    currentStage = 'assignment';
+    const videoId = typeof requestBody?.videoId === 'string' ? requestBody.videoId.trim() : '';
+    const youtubeUrl = typeof requestBody?.youtubeUrl === 'string' ? requestBody.youtubeUrl.trim() : '';
+    const requestedSubmissionId = typeof requestBody?.submissionId === 'string' ? requestBody.submissionId.trim() : '';
+    submissionId = requestedSubmissionId || null;
+
+    if (!videoId || !youtubeUrl) {
+      throw new HttpError('videoId and youtubeUrl are required', 400, { code: 'INVALID_PAYLOAD', recoverable: false });
+    }
+
+    const requestYoutubeId = extractYouTubeId(youtubeUrl);
+    if (!requestYoutubeId) {
+      throw new HttpError('youtubeUrl must be a valid YouTube video URL', 400, {
+        code: 'INVALID_YOUTUBE_URL',
+        recoverable: false,
+      });
+    }
+
+    supabaseServiceRole = createClient(supabaseUrl, serviceRoleKey);
+
     if (submissionId) {
-      await updateSubmissionStatusWithMetadataPatch(
-        supabaseServiceRole,
-        submissionId,
-        {},
-        {
-          ...processingMetadata(requestId, currentStage),
-          transcription: {
-            transcriptId: transcriptResult.id,
-            provider: transcriptResult.provider,
-            model: transcriptResult.providerModel,
-            status: transcriptResult.status,
-            summary: transcriptResult.summary,
-            language: transcriptResult.language,
-            confidence: transcriptResult.confidence,
-            errorMessage: transcriptResult.errorMessage,
+      const { data: submission, error: submissionError } = await supabaseServiceRole
+        .from('video_submissions')
+        .select('id, user_id, youtube_id')
+        .eq('id', submissionId)
+        .single();
+
+      if (submissionError || !submission) {
+        throw new HttpError(`Submission not found: ${submissionError?.message || 'Unknown error'}`, 404, {
+          code: 'SUBMISSION_NOT_FOUND',
+          recoverable: false,
+        });
+      }
+
+      if (submission.user_id !== user.id) {
+        throw new HttpError('Submission does not belong to the authenticated user', 403, {
+          code: 'SUBMISSION_FORBIDDEN',
+          recoverable: false,
+        });
+      }
+
+      if (submission.youtube_id && submission.youtube_id !== requestYoutubeId) {
+        throw new HttpError('Submission YouTube ID does not match request URL', 400, {
+          code: 'YOUTUBE_ID_MISMATCH',
+          recoverable: false,
+        });
+      }
+
+      submissionBelongsToUser = true;
+      await updateSubmissionStatus(supabaseServiceRole, submissionId, {
+        video_id: videoId,
+        status: 'processing',
+        error_message: null,
+        recoverable: false,
+        processing_started_at: new Date().toISOString(),
+        completed_at: null,
+        metadata: {
+          processing: {
+            requestId,
+            stage: 'legacy_fast_enrichment',
+            updatedAt: new Date().toISOString(),
           },
         },
-      );
-    }
-
-    let enhancedAssignment: EnhancedAssignmentResult = {
-      assignedPlaylistId: null,
-      playlistAssignment: null,
-      reliability: 'low',
-      reason: 'No playlist assigned because the video analysis did not provide enough educational signals',
-    };
-
-    try {
-      if (playlistRows.length > 0 && hasProcessedAnalysisContent(transcriptResult.analysis)) {
-        enhancedAssignment = await runEnhancedAssignments({
-          supabaseServiceRole,
-          geminiClient,
-          analysis: transcriptResult.analysis,
-          playlistRows,
-          videoId,
-          userId,
-        });
-      } else {
-        logProcessing(requestId, currentStage, 'Skipping playlist assignment because processed analysis is empty', {
-          videoId,
-          playlistCount: playlistRows.length,
-          semanticTagCount: transcriptResult.analysis.semanticTags.length,
-        });
-      }
-    } catch (assignmentError) {
-      const assignmentErrorMessage = assignmentError instanceof Error
-        ? assignmentError.message
-        : 'Unknown playlist assignment error';
-      const geminiError = assignmentError as Partial<GeminiError>;
-      const recoverable = geminiError.recoverable ?? isRecoverableExternalError(assignmentError);
-
-      logProcessingError(requestId, currentStage, 'Playlist assignment failed', {
-        error: assignmentErrorMessage,
-        recoverable,
       });
+    }
 
-      if (recoverable) {
-        throw new HttpError(`Playlist assignment failed: ${assignmentErrorMessage}`, 503, {
-          code: geminiError.code ?? 'PLAYLIST_ASSIGNMENT_FAILED',
-          stage: currentStage,
-          recoverable: true,
-        });
+    const { data: video, error: videoError } = await supabaseServiceRole
+      .from('videos')
+      .select('youtube_id, title, description, channel_name, language, category_id')
+      .eq('id', videoId)
+      .single();
+
+    if (videoError || !video) {
+      throw new HttpError(`Video not found: ${videoError?.message || 'Unknown error'}`, 404, {
+        code: 'VIDEO_NOT_FOUND',
+        recoverable: false,
+      });
+    }
+
+    if (video.youtube_id !== requestYoutubeId) {
+      throw new HttpError('Request YouTube URL does not match the stored video', 400, {
+        code: 'VIDEO_YOUTUBE_ID_MISMATCH',
+        recoverable: false,
+      });
+    }
+
+    const { data: categoriesData, error: categoriesError } = await supabaseServiceRole
+      .from('categories')
+      .select('id, name, slug');
+
+    if (categoriesError) {
+      throw new Error(`Failed to load categories: ${categoriesError.message}`);
+    }
+
+    const categoryRows = (categoriesData ?? []) as CategoryRow[];
+    const language = normalizeLanguage(video.language);
+    const title = video.title || 'Video do YouTube';
+    const summary = buildVideoSummary({
+      title: video.title,
+      description: video.description,
+      channelName: video.channel_name,
+      youtubeId: requestYoutubeId,
+    });
+    const semanticTags = deriveTags({
+      title: video.title,
+      description: video.description,
+      channelName: video.channel_name,
+      language,
+    });
+    const selectedCategory = pickCategory(categoryRows, {
+      currentCategoryId: video.category_id ?? null,
+      title: video.title,
+      description: video.description,
+      channelName: video.channel_name,
+      semanticTags,
+    });
+
+    if (selectedCategory && selectedCategory.id !== video.category_id) {
+      const { error: categoryUpdateError } = await supabaseServiceRole
+        .from('videos')
+        .update({ category_id: selectedCategory.id })
+        .eq('id', videoId);
+
+      if (categoryUpdateError) {
+        throw new Error(`Failed to update video category: ${categoryUpdateError.message}`);
       }
-
-      enhancedAssignment = {
-        assignedPlaylistId: null,
-        playlistAssignment: null,
-        reliability: 'low',
-        reason: `Playlist assignment skipped after error: ${assignmentErrorMessage}`,
-      };
     }
 
-    currentStage = 'storage';
-    if (submissionId) {
-      await updateSubmissionStage(supabaseServiceRole, submissionId, requestId, currentStage);
-    }
-    const { data, error } = await supabaseServiceRole
+    const { data: enrichment, error: enrichmentError } = await supabaseServiceRole
       .from('ai_enrichments')
       .insert({
         video_id: videoId,
-        optimized_title: null,
-        summary_description: transcriptResult.analysis.summaryDescription ?? transcriptResult.analysis.transcriptSummary,
-        semantic_tags: transcriptResult.analysis.semanticTags,
-        suggested_category_id: null,
-        language: normalizeLanguage(transcriptResult.analysis.language) ?? normalizeLanguage(effectiveLanguage),
-        cultural_relevance: null,
-        short_summary: transcriptResult.analysis.shortSummary ?? transcriptResult.analysis.summaryDescription ?? transcriptResult.analysis.transcriptSummary,
+        optimized_title: title,
+        summary_description: summary,
+        semantic_tags: semanticTags,
+        suggested_category_id: selectedCategory?.id ?? null,
+        language,
+        cultural_relevance: 'Curadoria rapida sem analise externa',
+        short_summary: summarize(summary, 'Video pronto para curadoria.'),
       })
       .select()
       .single();
 
-    if (error) {
-      throw new Error(`Failed to save AI enrichment: ${error.message}`);
-    }
-
-    const detectedLanguage = normalizeLanguage(transcriptResult.analysis.language) ?? normalizeLanguage(effectiveLanguage);
-    if (detectedLanguage && detectedLanguage !== 'und') {
-      const { error: updateLanguageError } = await supabaseServiceRole
-        .from('videos')
-        .update({ language: detectedLanguage })
-        .eq('id', videoId);
-
-      if (updateLanguageError) {
-        throw new Error(`Failed to update detected language: ${updateLanguageError.message}`);
-      }
+    if (enrichmentError) {
+      throw new Error(`Failed to save AI enrichment: ${enrichmentError.message}`);
     }
 
     if (submissionId) {
@@ -744,343 +415,83 @@ async function runVideoProcessingTask(params: {
             stage: 'success',
             updatedAt: new Date().toISOString(),
           },
-          enrichmentId: data.id,
-          detectedLanguage,
-          transcription: {
-            transcriptId: transcriptResult.id,
-            provider: transcriptResult.provider,
-            model: transcriptResult.providerModel,
-            status: transcriptResult.status,
-            summary: transcriptResult.summary,
-            language: transcriptResult.language,
-            confidence: transcriptResult.confidence,
-            errorMessage: transcriptResult.errorMessage,
+          enrichmentId: enrichment.id,
+          detectedLanguage: language,
+          enrichment: {
+            provider: 'legacy_fast',
+            model: null,
+            optimizedTitle: title,
+            summaryDescription: summary,
+            shortSummary: summarize(summary, 'Video pronto para curadoria.'),
+            semanticTags,
           },
           assignment: {
-            fallbackUsed: enhancedAssignment.reliability === 'low',
-            reliability: enhancedAssignment.reliability,
-            reason: enhancedAssignment.reason,
-            assignedCategoryId: null,
-            assignedPlaylistId: enhancedAssignment.assignedPlaylistId,
-            algorithmVersion: enhancedAssignment.playlistAssignment?.algorithmVersion ?? null,
-            score: enhancedAssignment.playlistAssignment?.score ?? null,
-            provider: 'gemini',
-            providerConfidence: enhancedAssignment.playlistAssignment?.providerConfidence ?? null,
-            decisionSource: enhancedAssignment.playlistAssignment?.decisionSource ?? 'none',
-            signals: enhancedAssignment.playlistAssignment?.signals ?? null,
-            topCandidates: enhancedAssignment.playlistAssignment?.topCandidates ?? [],
-            rejectedPlaylistId: enhancedAssignment.playlistAssignment?.rejectedPlaylistId ?? null,
-            rejectedAiPlaylistId: enhancedAssignment.playlistAssignment?.rejectedPlaylistId ?? null,
+            fallbackUsed: true,
+            reliability: 'low',
+            reason: selectedCategory
+              ? `Categoria selecionada automaticamente: ${selectedCategory.name}`
+              : 'Legacy fast enrichment restored; playlist assignment skipped',
+            assignedCategoryId: selectedCategory?.id ?? null,
+            assignedPlaylistId: null,
+            decisionSource: 'none',
+            provider: 'legacy_fast',
+            providerConfidence: null,
+            signals: null,
+            topCandidates: [],
+            rejectedPlaylistId: null,
+            rejectedAiPlaylistId: null,
           },
         },
       });
     }
 
-    logProcessing(requestId, 'success', 'Video processing completed', {
-      videoId,
-      submissionId: submissionId ?? 'none',
-      enrichmentId: data.id,
-      transcriptId: transcriptResult.id,
-      transcriptStatus: transcriptResult.status,
-      assignedPlaylistId: enhancedAssignment.assignedPlaylistId,
-    });
-  } catch (error) {
-    const errorPayload = toProcessingErrorPayload(error, requestId, currentStage);
-    logProcessingError(requestId, errorPayload.stage, 'Background video processing failed', {
-      code: errorPayload.code,
-      error: errorPayload.message,
-      recoverable: errorPayload.recoverable,
-      submissionId: submissionId ?? 'none',
-    });
-
-    await safeUpdateSubmissionStatusWithMetadataPatch(
-      supabaseServiceRole,
-      submissionId,
-      {
-        status: errorPayload.recoverable ? 'recoverable_error' : 'failed',
-        error_message: errorPayload.message,
-        recoverable: errorPayload.recoverable,
-        completed_at: new Date().toISOString(),
-      },
-      {
-        ...processingMetadata(requestId, errorPayload.stage),
-        error: {
-          code: errorPayload.code,
-          message: errorPayload.message,
-          stage: errorPayload.stage,
-          recoverable: errorPayload.recoverable,
-          requestId,
-        },
-      },
-    );
-  }
-}
-
-serve(async (req) => {
-  const requestId = createRequestId();
-
-  if (req.method === 'OPTIONS') {
-    return new Response(null, { headers: corsHeaders })
-  }
-
-  const requiredEnv = {
-    SUPABASE_URL: Deno.env.get('SUPABASE_URL'),
-    SUPABASE_ANON_KEY: Deno.env.get('SUPABASE_ANON_KEY'),
-    SUPABASE_SERVICE_ROLE_KEY: Deno.env.get('SUPABASE_SERVICE_ROLE_KEY'),
-    GEMINI_API_KEY: Deno.env.get('GEMINI_API_KEY'),
-  };
-  const missingEnv = Object.entries(requiredEnv)
-    .filter(([, value]) => !value)
-    .map(([key]) => key);
-
-  if (missingEnv.length > 0) {
-    const errorPayload = {
-      error: {
-        code: 'MISSING_ENVIRONMENT',
-        message: `Missing required environment variables: ${missingEnv.join(', ')}`,
-        stage: 'environment',
-        recoverable: false,
-        requestId,
-      },
-    };
-    logProcessingError(requestId, 'environment', errorPayload.error.message);
-    return new Response(JSON.stringify(errorPayload), {
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      status: 500,
-    });
-  }
-
-  const authHeader = req.headers.get('Authorization')
-  if (!authHeader) {
-    const errorPayload = {
-      error: {
-        code: 'UNAUTHORIZED_NO_AUTH_HEADER',
-        message: 'Missing authorization header',
-        stage: 'authentication',
-        recoverable: false,
-        requestId,
-      },
-    };
-    logProcessingError(requestId, 'authentication', errorPayload.error.message);
-    return new Response(JSON.stringify(errorPayload), {
-      status: 401,
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-    })
-  }
-
-  const token = authHeader.replace('Bearer ', '')
-  const supabase = createClient(
-    requiredEnv.SUPABASE_URL ?? '',
-    requiredEnv.SUPABASE_ANON_KEY ?? '',
-    { global: { headers: { Authorization: `Bearer ${token}` } } }
-  )
-
-  const { data: { user }, error: userError } = await supabase.auth.getUser()
-
-  if (userError || !user) {
-    const errorPayload = {
-      error: {
-        code: 'UNAUTHORIZED_INVALID_TOKEN',
-        message: 'Invalid or expired authorization token',
-        stage: 'authentication',
-        recoverable: false,
-        requestId,
-      },
-    };
-    logProcessingError(requestId, 'authentication', errorPayload.error.message, {
-      authError: userError?.message,
-    });
-    return new Response(JSON.stringify(errorPayload), {
-      status: 401,
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-    })
-  }
-
-  let submissionId: string | null = null;
-  let submissionBelongsToUser = false;
-  let supabaseServiceRole: ReturnType<typeof createClient> | null = null;
-  let currentStage = 'request';
-
-  try {
-    currentStage = 'payload_validation';
-    const requestBody = await req.json().catch(() => {
-      throw new HttpError('Request body must be valid JSON', 400, {
-        code: 'INVALID_JSON',
-        stage: currentStage,
-      });
-    });
-
-    const videoId = typeof requestBody?.videoId === 'string' ? requestBody.videoId.trim() : '';
-    const youtubeUrl = typeof requestBody?.youtubeUrl === 'string' ? requestBody.youtubeUrl.trim() : '';
-    const requestedSubmissionId = typeof requestBody?.submissionId === 'string' ? requestBody.submissionId.trim() : '';
-    submissionId = requestedSubmissionId || null;
-
-    if (!videoId || !youtubeUrl) {
-      throw new HttpError('videoId and youtubeUrl are required', 400, {
-        code: 'INVALID_PAYLOAD',
-        stage: currentStage,
-      });
-    }
-
-    const requestYoutubeId = extractYouTubeId(youtubeUrl);
-    if (!requestYoutubeId) {
-      throw new HttpError('youtubeUrl must be a valid YouTube video URL', 400, {
-        code: 'INVALID_YOUTUBE_URL',
-        stage: currentStage,
-      });
-    }
-
-    logProcessing(requestId, currentStage, 'Received processing request', {
-      videoId,
-      youtubeId: requestYoutubeId,
-      submissionId: submissionId ?? 'none',
-      userId: user.id,
-    });
-
-    supabaseServiceRole = createClient(
-      requiredEnv.SUPABASE_URL ?? '',
-      requiredEnv.SUPABASE_SERVICE_ROLE_KEY ?? ''
-    );
-
-    currentStage = 'submission_validation';
-    if (submissionId) {
-      const { data: submission, error: submissionError } = await supabaseServiceRole
-        .from('video_submissions')
-        .select('id, user_id, youtube_id')
-        .eq('id', submissionId)
-        .single();
-
-      if (submissionError || !submission) {
-        throw new HttpError(`Submission not found: ${submissionError?.message || 'Unknown error'}`, 404, {
-          code: 'SUBMISSION_NOT_FOUND',
-          stage: currentStage,
-        });
-      }
-
-      if (submission.user_id !== user.id) {
-        throw new HttpError('Submission does not belong to the authenticated user', 403, {
-          code: 'SUBMISSION_FORBIDDEN',
-          stage: currentStage,
-        });
-      }
-
-      if (submission.youtube_id && submission.youtube_id !== requestYoutubeId) {
-        throw new HttpError('Submission YouTube ID does not match request URL', 400, {
-          code: 'YOUTUBE_ID_MISMATCH',
-          stage: currentStage,
-        });
-      }
-
-      submissionBelongsToUser = true;
-
-      await updateSubmissionStatus(supabaseServiceRole, submissionId, {
-        video_id: videoId,
-        status: 'processing',
-        error_message: null,
-        recoverable: false,
-        processing_started_at: new Date().toISOString(),
-        completed_at: null,
-        metadata: processingMetadata(requestId, currentStage),
-      });
-    }
-
-    currentStage = 'video_load';
-    const { data: video, error: videoError } = await supabaseServiceRole
-      .from('videos')
-      .select('youtube_id, title, description, channel_name, language, category_id')
-      .eq('id', videoId)
-      .single();
-
-    if (videoError || !video) {
-      throw new HttpError(`Video not found: ${videoError?.message || 'Unknown error'}`, 404, {
-        code: 'VIDEO_NOT_FOUND',
-        stage: currentStage,
-      });
-    }
-
-    if (video.youtube_id !== requestYoutubeId) {
-      throw new HttpError('Request YouTube URL does not match the stored video', 400, {
-        code: 'VIDEO_YOUTUBE_ID_MISMATCH',
-        stage: currentStage,
-      });
-    }
-
-    if (submissionId) {
-      await updateSubmissionStage(supabaseServiceRole, submissionId, requestId, currentStage);
-    }
-
-    if (typeof EdgeRuntime === 'undefined' || typeof EdgeRuntime.waitUntil !== 'function') {
-      throw new HttpError('Edge background processing is unavailable', 500, {
-        code: 'BACKGROUND_RUNTIME_UNAVAILABLE',
-        stage: currentStage,
-        recoverable: true,
-      });
-    }
-
-    currentStage = 'queued';
-    if (submissionId) {
-      await updateSubmissionStage(supabaseServiceRole, submissionId, requestId, currentStage);
-    }
-
-    EdgeRuntime.waitUntil(runVideoProcessingTask({
-      supabaseServiceRole,
-      requestId,
-      submissionId,
-      videoId,
-      youtubeUrl,
-      userId: user.id,
-      video: video as VideoProcessingVideo,
-    }));
-
-    logProcessing(requestId, currentStage, 'Video processing accepted for background execution', {
-      videoId,
-      submissionId: submissionId ?? 'none',
-      userId: user.id,
-    });
-
     return new Response(JSON.stringify({
-      message: 'Video processing started',
+      message: 'AI enrichment saved successfully',
+      data: enrichment,
+      provider: 'legacy_fast',
       requestId,
-      submissionId,
-      status: 'processing',
     }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      status: 202,
-    })
-  } catch (error) {
-    const errorPayload = toProcessingErrorPayload(error, requestId, currentStage);
-    const status = error instanceof HttpError ? error.status : errorPayload.recoverable ? 503 : 500;
-    logProcessingError(requestId, errorPayload.stage, 'Video processing failed', {
-      code: errorPayload.code,
-      error: errorPayload.message,
-      recoverable: errorPayload.recoverable,
-      submissionId: submissionId ?? 'none',
+      status: 200,
     });
+  } catch (error) {
+    const status = error instanceof HttpError ? error.status : 500;
+    const recoverable = error instanceof HttpError ? error.recoverable : true;
+    const code = error instanceof HttpError ? error.code : 'PROCESSING_ERROR';
+    const message = error instanceof Error ? error.message : 'Unknown error occurred';
+
     if (submissionBelongsToUser) {
-      await safeUpdateSubmissionStatusWithMetadataPatch(
-        supabaseServiceRole,
-        submissionId,
-        {
-          status: errorPayload.recoverable ? 'recoverable_error' : 'failed',
-          error_message: errorPayload.message,
-          recoverable: errorPayload.recoverable,
-          completed_at: new Date().toISOString(),
-        },
-        {
-          ...processingMetadata(requestId, errorPayload.stage),
+      await safeUpdateSubmissionStatus(supabaseServiceRole, submissionId, {
+        status: recoverable ? 'recoverable_error' : 'failed',
+        error_message: message,
+        recoverable,
+        completed_at: new Date().toISOString(),
+        metadata: {
+          processing: {
+            requestId,
+            stage: 'legacy_fast_enrichment_error',
+            updatedAt: new Date().toISOString(),
+          },
           error: {
-            code: errorPayload.code,
-            message: errorPayload.message,
-            stage: errorPayload.stage,
-            recoverable: errorPayload.recoverable,
+            code,
+            message,
+            recoverable,
             requestId,
           },
         },
-      );
+      });
     }
-    return new Response(JSON.stringify({ error: errorPayload }), {
+
+    return new Response(JSON.stringify({
+      error: {
+        code,
+        message,
+        recoverable,
+        requestId,
+      },
+    }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       status,
-    })
+    });
   }
 })
