@@ -16,6 +16,7 @@ const useProfileByIdMock = vi.fn();
 const useIsFavoritedMock = vi.fn();
 const useAddFavoriteMock = vi.fn();
 const useRemoveFavoriteMock = vi.fn();
+const useLatestVideoAnalysisJobMock = vi.fn();
 
 vi.mock('@/components/layout/Header', () => ({
   Header: () => <header data-testid="header" />,
@@ -60,6 +61,10 @@ vi.mock('@/features/favorites/queries/useFavorites', () => ({
   useIsFavorited: () => useIsFavoritedMock(),
   useAddFavorite: () => useAddFavoriteMock(),
   useRemoveFavorite: () => useRemoveFavoriteMock(),
+}));
+
+vi.mock('@/features/video-analysis/useVideoAnalysisJob', () => ({
+  useLatestVideoAnalysisJob: () => useLatestVideoAnalysisJobMock(),
 }));
 
 const sampleVideo: VideoWithCategory = {
@@ -123,6 +128,7 @@ beforeEach(() => {
   useRemoveFavoriteMock.mockReturnValue({ mutateAsync: vi.fn(), isPending: false });
   useUpdateVideoMock.mockReturnValue({ mutateAsync: vi.fn(), isPending: false });
   useDeleteVideoMock.mockReturnValue({ mutateAsync: vi.fn(), isPending: false });
+  useLatestVideoAnalysisJobMock.mockReturnValue({ data: null, isLoading: false });
 });
 
 describe('VideoDetails owner management', () => {
@@ -234,6 +240,29 @@ describe('VideoDetails owner management', () => {
 
     expect(screen.getByRole('heading', { name: 'Transcript summary' })).toBeInTheDocument();
     expect(screen.getByText('This lesson introduces polar coordinate regions and double integrals.')).toBeInTheDocument();
+  });
+
+  it('shows the fast curation summary source while deep analysis is queued', () => {
+    useLatestVideoAnalysisJobMock.mockReturnValue({
+      data: { id: 'job-1', status: 'pending', provider: 'v2' },
+      isLoading: false,
+    });
+    useVideoByIdMock.mockReturnValue({
+      data: {
+        ...sampleVideo,
+        enrichment: {
+          summary_description: 'A concise public summary from the fast path.',
+          cultural_relevance: 'Curadoria rapida sem analise externa',
+        },
+      },
+      isLoading: false,
+      isError: false,
+    });
+
+    renderVideoDetails();
+
+    expect(screen.getByText('Fast curation')).toBeInTheDocument();
+    expect(screen.getByText(/Deep analysis: Pending/)).toBeInTheDocument();
   });
 
   it('submits edited metadata through the update mutation', async () => {

@@ -671,6 +671,66 @@ export type Database = {
         }
         Relationships: []
       }
+      video_analysis_jobs: {
+        Row: {
+          completed_at: string | null
+          created_at: string
+          error_message: string | null
+          id: string
+          metadata: Json
+          provider: string
+          provider_model: string | null
+          started_at: string | null
+          status: string
+          submission_id: string | null
+          updated_at: string
+          video_id: string
+        }
+        Insert: {
+          completed_at?: string | null
+          created_at?: string
+          error_message?: string | null
+          id?: string
+          metadata?: Json
+          provider?: string
+          provider_model?: string | null
+          started_at?: string | null
+          status?: string
+          submission_id?: string | null
+          updated_at?: string
+          video_id: string
+        }
+        Update: {
+          completed_at?: string | null
+          created_at?: string
+          error_message?: string | null
+          id?: string
+          metadata?: Json
+          provider?: string
+          provider_model?: string | null
+          started_at?: string | null
+          status?: string
+          submission_id?: string | null
+          updated_at?: string
+          video_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "video_analysis_jobs_submission_id_fkey"
+            columns: ["submission_id"]
+            isOneToOne: false
+            referencedRelation: "video_submissions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "video_analysis_jobs_video_id_fkey"
+            columns: ["video_id"]
+            isOneToOne: false
+            referencedRelation: "videos"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       video_submissions: {
         Row: {
           completed_at: string | null

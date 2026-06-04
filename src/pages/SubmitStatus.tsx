@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { AlertCircle, ArrowLeft, CheckCircle2, CopyCheck, ListChecks, ListVideo, Loader2, RefreshCw, Sparkles, Tag, Wand2 } from 'lucide-react';
+import { AlertCircle, ArrowLeft, CheckCircle2, Clock3, CopyCheck, ListChecks, ListVideo, Loader2, RefreshCw, Sparkles, Tag, Wand2 } from 'lucide-react';
 import { MainLayout } from '@/components/layout/MainLayout';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
@@ -9,6 +9,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useAuth } from '@/features/auth/useAuth';
+import { useLatestVideoAnalysisJob } from '@/features/video-analysis/useVideoAnalysisJob';
 import { useStartSubmissionProcessing, useVideoSubmission } from '@/features/video-submissions/queries/useVideoSubmissions';
 import { getVideoSubmissionMetadata } from '@/entities/video_submission/video_submission.types';
 
@@ -68,6 +69,13 @@ export default function SubmitStatus() {
   const detectedLanguage = metadata.detectedLanguage;
   const detectedLanguageKey = languageLabelKey(detectedLanguage);
   const videoId = submission?.video_id ?? submission?.duplicate_video_id;
+  const { data: analysisJob } = useLatestVideoAnalysisJob({
+    videoId: submission?.video_id,
+    submissionId: submission?.id,
+  });
+  const legacyFastCompleted = metadata.enrichment?.provider === 'legacy_fast';
+  const analysisJobStatus = analysisJob?.status ?? metadata.analysisJob?.status ?? null;
+  const analysisJobProvider = analysisJob?.provider ?? metadata.analysisJob?.provider ?? null;
   const assignedPlaylistId = metadata.assignment?.assignedPlaylistId ?? null;
   const assignedPlaylist = assignedPlaylistId
     ? metadata.assignment?.topCandidates?.find((candidate) => candidate.playlistId === assignedPlaylistId) ?? null
@@ -198,6 +206,31 @@ export default function SubmitStatus() {
                   {transcriptError && (
                     <span className="mt-1 block text-xs">{transcriptError}</span>
                   )}
+                </AlertDescription>
+              </Alert>
+            )}
+
+            {status === 'success' && legacyFastCompleted && (
+              <Alert>
+                <CheckCircle2 className="h-4 w-4" />
+                <AlertTitle>{t('submitStatus.curation.fastTitle')}</AlertTitle>
+                <AlertDescription>{t('submitStatus.curation.fastDescription')}</AlertDescription>
+              </Alert>
+            )}
+
+            {analysisJobStatus && (
+              <Alert>
+                <Clock3 className="h-4 w-4" />
+                <AlertTitle>
+                  {t(`submitStatus.deepAnalysis.states.${analysisJobStatus}.title`, {
+                    defaultValue: t('submitStatus.deepAnalysis.title'),
+                  })}
+                </AlertTitle>
+                <AlertDescription>
+                  {t(`submitStatus.deepAnalysis.states.${analysisJobStatus}.description`, {
+                    provider: analysisJobProvider ?? 'v2',
+                    defaultValue: t('submitStatus.deepAnalysis.description', { provider: analysisJobProvider ?? 'v2' }),
+                  })}
                 </AlertDescription>
               </Alert>
             )}

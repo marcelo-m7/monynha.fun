@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { useDeleteVideo, useUpdateVideo, useVideoById, useRelatedVideos } from '@/features/videos/queries/useVideos';
 import { useCategories } from '@/features/categories/queries/useCategories';
+import { useLatestVideoAnalysisJob } from '@/features/video-analysis/useVideoAnalysisJob';
 import { formatDuration, formatViewCount } from '@/shared/lib/format';
 import { useAuth } from '@/features/auth/useAuth';
 import { useIsFavorited, useAddFavorite, useRemoveFavorite } from '@/features/favorites/queries/useFavorites';
@@ -15,7 +16,7 @@ import { AspectRatio } from '@/components/ui/aspect-ratio';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Badge } from '@/components/ui/badge'; // Import Badge component
 import { Card } from '@/components/ui/card';
-import { FileText, Sparkles } from 'lucide-react';
+import { CheckCircle2, Clock3, FileText, Sparkles } from 'lucide-react';
 import { CulturalRelevanceBadge } from '@/components/video/CulturalRelevanceBadge';
 import { SemanticTagBadge } from '@/components/video/SemanticTagBadge';
 import { Eye, Clock, Folder, ArrowLeft, Heart as HeartIcon, Loader2, Edit, Trash2, Languages, ListVideo } from 'lucide-react';
@@ -48,6 +49,7 @@ const VideoDetails = () => {
   const navigate = useNavigate();
   const { user, loading: authLoading } = useAuth();
   const { data: video, isLoading, isError } = useVideoById(videoId);
+  const { data: analysisJob } = useLatestVideoAnalysisJob({ videoId: video?.id });
   const { data: categories } = useCategories();
   const { data: profile } = useProfileById(video?.submitted_by);
   const { data: relatedVideos, isLoading: relatedLoading } = useRelatedVideos(
@@ -117,6 +119,12 @@ const VideoDetails = () => {
   };
 
   const isOwner = !!user && !!video?.submitted_by && video.submitted_by === user.id;
+  const isLegacyFastSummary = video?.enrichment?.cultural_relevance === 'Curadoria rapida sem analise externa';
+  const summarySourceKey = analysisJob?.status === 'completed'
+    ? 'videoDetails.summarySource.deep'
+    : isLegacyFastSummary
+      ? 'videoDetails.summarySource.fast'
+      : 'videoDetails.summarySource.editorial';
 
   const openEditDialog = () => {
     if (!video) return;
@@ -395,8 +403,23 @@ const VideoDetails = () => {
                     <div className="flex-1 space-y-3">
                       <div className="flex items-center justify-between">
                         <h3 className="text-lg font-semibold">{t('videoDetails.aiSummaryTitle')}</h3>
-                        <CulturalRelevanceBadge relevance={video.enrichment.cultural_relevance} />
+                        <div className="flex flex-wrap items-center justify-end gap-2">
+                          <Badge variant="secondary" className="gap-1.5">
+                            {analysisJob?.status === 'completed' ? (
+                              <CheckCircle2 className="h-3 w-3" />
+                            ) : (
+                              <Clock3 className="h-3 w-3" />
+                            )}
+                            {t(summarySourceKey)}
+                          </Badge>
+                          <CulturalRelevanceBadge relevance={video.enrichment.cultural_relevance} />
+                        </div>
                       </div>
+                      {analysisJob?.status && (
+                        <p className="text-xs text-muted-foreground">
+                          {t('videoDetails.deepAnalysisStatus')}: {t(`submitStatus.deepAnalysis.statusLabels.${analysisJob.status}`, { defaultValue: analysisJob.status })}
+                        </p>
+                      )}
                     
                       {video.enrichment.short_summary && (
                         <p className="text-sm text-muted-foreground leading-relaxed">

@@ -67,6 +67,73 @@ async function safeUpdateSubmissionStatus(
   }
 }
 
+async function ensureDeepAnalysisJob(params: {
+  supabaseServiceRole: ReturnType<typeof createClient>;
+  videoId: string;
+  submissionId: string | null;
+  enrichmentId: string;
+  requestId: string;
+}) {
+  const { supabaseServiceRole, videoId, submissionId, enrichmentId, requestId } = params;
+  const { data: existing, error: existingError } = await supabaseServiceRole
+    .from('video_analysis_jobs')
+    .select('id, status')
+    .eq('video_id', videoId)
+    .eq('provider', 'v2')
+    .in('status', ['pending', 'processing', 'recoverable_error'])
+    .order('created_at', { ascending: false })
+    .limit(1)
+    .maybeSingle();
+
+  if (existingError) {
+    throw new Error(`Failed to check video analysis jobs: ${existingError.message}`);
+  }
+
+  if (existing) {
+    return existing;
+  }
+
+  const { data, error } = await supabaseServiceRole
+    .from('video_analysis_jobs')
+    .insert({
+      video_id: videoId,
+      submission_id: submissionId,
+      status: 'pending',
+      provider: 'v2',
+      provider_model: null,
+      metadata: {
+        source: 'enrich-video',
+        fastProvider: 'legacy_fast',
+        enrichmentId,
+        requestId,
+      },
+    })
+    .select('id, status')
+    .single();
+
+  if (error) {
+    if (error.code === '23505') {
+      const { data: racedJob, error: racedJobError } = await supabaseServiceRole
+        .from('video_analysis_jobs')
+        .select('id, status')
+        .eq('video_id', videoId)
+        .eq('provider', 'v2')
+        .in('status', ['pending', 'processing', 'recoverable_error'])
+        .order('created_at', { ascending: false })
+        .limit(1)
+        .maybeSingle();
+
+      if (!racedJobError && racedJob) {
+        return racedJob;
+      }
+    }
+
+    throw new Error(`Failed to create video analysis job: ${error.message}`);
+  }
+
+  return data;
+}
+
 serve(async (req) => {
   const requestId = crypto.randomUUID();
 
@@ -281,6 +348,14 @@ serve(async (req) => {
       throw new Error(`Failed to save AI enrichment: ${enrichmentError.message}`);
     }
 
+    const analysisJob = await ensureDeepAnalysisJob({
+      supabaseServiceRole,
+      videoId,
+      submissionId,
+      enrichmentId: enrichment.id,
+      requestId,
+    });
+
     if (submissionId) {
       await updateSubmissionStatus(supabaseServiceRole, submissionId, {
         status: 'success',
@@ -295,6 +370,11 @@ serve(async (req) => {
           },
           enrichmentId: enrichment.id,
           detectedLanguage: language,
+          analysisJob: {
+            id: analysisJob.id,
+            status: analysisJob.status,
+            provider: 'v2',
+          },
           enrichment: {
             provider: 'legacy_fast',
             model: null,
