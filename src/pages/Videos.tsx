@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
-import { Header } from '@/components/layout/Header';
-import { Footer } from '@/components/layout/Footer';
+import { MainLayout } from '@/components/layout/MainLayout';
+import { PageHero } from '@/components/showcase';
 import { VideoCard } from '@/components/video/VideoCard';
 import { useFeaturedVideos, useVideos } from '@/features/videos/queries/useVideos';
 import { useCategories } from '@/features/categories/queries/useCategories';
@@ -62,18 +62,16 @@ const Videos = () => {
   ];
 
   return (
-    <div className="min-h-screen flex flex-col">
-      <Header />
-      <main className="flex-1 container py-8">
-        <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold">{t('videos.title')}</h1>
-          <p className="text-muted-foreground mt-2">
-            {t('videos.description')}
-          </p>
-        </div>
+    <MainLayout>
+      <PageHero
+        eyebrow={t('header.videos')}
+        title={t('videos.title')}
+        description={t('videos.description')}
+      />
+      <div className="container py-8">
 
         {/* Search and Filter Controls */}
-        <div className="flex flex-col md:flex-row gap-4 mb-8">
+        <div className="mb-8 flex flex-col gap-4 border-2 border-border bg-card p-4 md:flex-row">
           <div className="relative flex-1">
             <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
             <Input
@@ -190,9 +188,8 @@ const Videos = () => {
             {t('videos.noVideosFound')}
           </div>
         )}
-      </main>
-      <Footer />
-    </div>
+      </div>
+    </MainLayout>
   );
 };
 

@@ -622,6 +622,100 @@
     "communitySpotlightDescription": "Conheça nossos principais curadores e contribuidores",
     "noContributorsFound": "Nenhum contribuidor em destaque encontrado ainda. Seja o primeiro a enviar um vídeo!"
   },
+  "homeExhibition": {
+    "error": "Não foi possível atualizar alguns dados da homepage agora.",
+    "actions": {
+      "viewAllVideos": "Explorar vídeos",
+      "viewAllPlaylists": "Ver playlists"
+    },
+    "hero": {
+      "title": "Vídeos do YouTube que viram caminhos de aprendizagem",
+      "description": "Descubra, salve e organize vídeos reais em trilhas com contexto, resumo e curadoria humana.",
+      "primaryCta": "Explorar vídeos",
+      "secondaryCta": "Enviar vídeo",
+      "railTitle": "Em curadoria"
+    },
+    "metrics": {
+      "videos_total": "Vídeos catalogados",
+      "playlists_total": "Playlists públicas",
+      "categories_total": "Categorias vivas",
+      "videos_with_summaries": "Com resumo ou transcrição"
+    },
+    "categories": {
+      "title": "Categorias vivas",
+      "description": "A descoberta começa pelos temas reais da comunidade: educação, tecnologia, cultura, música, tutoriais e mais.",
+      "videoCount": "{{count}} vídeo",
+      "videoCount_plural": "{{count}} vídeos"
+    },
+    "playlists": {
+      "title": "Playlists em destaque",
+      "description": "Coleções públicas com thumbnails reais, contagem de vídeos e caminhos que dão forma ao conteúdo aberto."
+    },
+    "facodi": {
+      "title": "FACODI na prática",
+      "description": "As trilhas curriculares LESTI mostram como o Tube O2 transforma vídeos dispersos em roteiros de aprendizagem com curso, unidade e semestre.",
+      "cta": "Ver trilhas FACODI"
+    },
+    "curation": {
+      "title": "Curadoria com IA e pessoas",
+      "description": "A plataforma combina metadados, resumos, tags semânticas e revisão editorial para reduzir ruído sem tirar a energia do YouTube.",
+      "panelTitle": "Do link ao caminho",
+      "signals": {
+        "with_summaries": "Vídeos com resumo",
+        "with_tags": "Vídeos com tags IA",
+        "transcripts_completed": "Transcrições concluídas",
+        "recent_submissions": "Submissões recentes"
+      },
+      "steps": {
+        "summary": {
+          "title": "Resumo contextual",
+          "description": "Cada vídeo ganha uma leitura rápida para ajudar a decidir se vale entrar na trilha."
+        },
+        "tags": {
+          "title": "Tags semânticas",
+          "description": "Assuntos e sinais pedagógicos ajudam a agrupar conteúdo sem depender só do título original."
+        },
+        "review": {
+          "title": "Revisão editorial",
+          "description": "Editores e curadores transformam bons links em recursos úteis e verificáveis."
+        },
+        "paths": {
+          "title": "Caminhos públicos",
+          "description": "Playlists ordenadas preservam contexto, sequência e intenção de aprendizagem."
+        }
+      }
+    },
+    "cta": {
+      "title": "Escolha como participar",
+      "description": "Tube O2 funciona melhor quando learners, contribuidores e editores trabalham no mesmo fluxo.",
+      "cards": {
+        "learners": {
+          "title": "Aprender",
+          "description": "Explore vídeos e trilhas públicas com contexto antes de abrir uma nova aba."
+        },
+        "contributors": {
+          "title": "Contribuir",
+          "description": "Envie um vídeo do YouTube para enriquecer, resumir e classificar."
+        },
+        "editors": {
+          "title": "Curar",
+          "description": "Candidate-se para organizar playlists e melhorar caminhos de aprendizagem."
+        }
+      }
+    },
+    "finalCta": {
+      "title": "Conhece um vídeo útil?",
+      "description": "Envie o link e ajude a transformar descoberta solta em conhecimento organizado.",
+      "submit": "Enviar vídeo",
+      "editor": "Ser editor"
+    },
+    "empty": {
+      "hero": "Nenhum vídeo público disponível para a vitrine.",
+      "categories": "Nenhuma categoria pública encontrada.",
+      "playlists": "Nenhuma playlist pública com vídeos encontrada.",
+      "facodi": "Nenhuma trilha curricular pública encontrada."
+    }
+  },
   "notFound": {
     "title": "404",
     "description": "Oops! Página não encontrada",

@@ -909,7 +909,36 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      v_home_exhibition: {
+        Row: {
+          categories: Json
+          curation_signals: Json
+          facodi_highlights: Json
+          featured_playlists: Json
+          generated_at: string
+          hero_videos: Json
+          metrics: Json
+        }
+        Insert: {
+          categories?: never
+          curation_signals?: never
+          facodi_highlights?: never
+          featured_playlists?: never
+          generated_at?: never
+          hero_videos?: never
+          metrics?: never
+        }
+        Update: {
+          categories?: never
+          curation_signals?: never
+          facodi_highlights?: never
+          featured_playlists?: never
+          generated_at?: never
+          hero_videos?: never
+          metrics?: never
+        }
+        Relationships: []
+      }
     }
     Functions: {
       add_video_to_default_education_playlist: {

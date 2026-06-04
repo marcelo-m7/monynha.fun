@@ -123,7 +123,7 @@ const PlaylistDetails = () => {
           <PlaylistProgressBar
             watched={watchedVideos}
             total={totalVideos}
-            className="mb-8 p-4 bg-card border border-border rounded-xl shadow-sm"
+            className="mb-8 border-2 border-border bg-card p-4 shadow-sm"
           />
         )}
 
@@ -167,7 +167,9 @@ const PlaylistDetails = () => {
           )}
         </div>
 
-        <h2 className="text-2xl font-bold mb-6">{t('playlistDetails.videosInPlaylist')}</h2>
+        <div className="mb-6 border-t-2 border-border pt-6">
+          <h2 className="text-2xl font-black">{t('playlistDetails.videosInPlaylist')}</h2>
+        </div>
 
         {videosError ? (
           <div className="text-center py-12 text-muted-foreground">

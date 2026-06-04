@@ -18,6 +18,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { MainLayout } from '@/components/layout/MainLayout';
 import { VideoPreviewCard } from '@/features/submit/components/VideoPreviewCard';
+import { PageHero } from '@/components/showcase';
 
 export default function Submit() {
   const { t } = useTranslation();
@@ -105,14 +106,17 @@ export default function Submit() {
 
   return (
     <MainLayout>
-      <div className="container py-8 max-w-4xl">
-        <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold">{t('submit.title')}</h1>
-          <p className="text-muted-foreground mt-2">{t('submit.description')}</p>
-        </div>
+      <PageHero
+        eyebrow={t('header.submitVideo')}
+        title={t('submit.title')}
+        description={t('submit.description')}
+        className="mb-8"
+      />
+
+      <div className="container max-w-5xl pb-12">
 
         <div className="grid lg:grid-cols-2 gap-8">
-          <div className="bg-card border border-border rounded-2xl p-6 shadow-sm">
+          <div className="border-2 border-border bg-card p-6 shadow-sm">
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
               <div className="space-y-2">
                 <Label htmlFor="youtube-url">{t('submit.form.youtubeUrlLabel')} *</Label>
@@ -199,7 +203,7 @@ export default function Submit() {
           <div className="space-y-4">
             <h2 className="font-semibold text-lg">{t('submit.previewTitle')}</h2>
             <VideoPreviewCard metadata={metadata} />
-            <div className="bg-muted/30 rounded-xl p-4 space-y-2">
+            <div className="space-y-2 border-2 border-border bg-muted/30 p-4">
               <h3 className="font-medium text-sm">{t('submit.tipsTitle')}</h3>
               <ul className="text-xs text-muted-foreground space-y-1">
                 <li>• {t('submit.tip1')}</li>

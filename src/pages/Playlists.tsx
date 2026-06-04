@@ -15,6 +15,7 @@ import { PlaylistImportDialog } from '@/components/playlist/PlaylistImportDialog
 import { useCoursePlaylistSummary } from '@/features/courses/queries/useCoursePlaylists';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { PageHero } from '@/components/showcase';
 
 function extractSemesterLabel(name: string): string | null {
   const match = name.match(/(\d+[ºo]\s*Ano\s*\d+[ºo]\s*Semestre)/i);
@@ -282,13 +283,14 @@ const Playlists = () => {
   return (
     <div className="min-h-screen flex flex-col">
       <Header />
+      <PageHero
+        eyebrow={t('header.playlists')}
+        title={t('playlists.title')}
+        description={t('playlists.description')}
+      />
       <main className="flex-1 container py-8">
-        <div className="flex flex-col md:flex-row md:items-start justify-between mb-8 gap-4">
-          <div>
-            <h1 className="text-3xl font-bold">{t('playlists.title')}</h1>
-            <p className="text-muted-foreground mt-2">{t('playlists.description')}</p>
-          </div>
-          <div className="w-full md:flex-1 md:max-w-5xl space-y-2">
+        <div className="mb-8 border-2 border-border bg-card p-4">
+          <div className="w-full space-y-2">
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-2">
               <div className="relative sm:col-span-2 lg:col-span-3 xl:col-span-2 2xl:col-span-2">
                 <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
