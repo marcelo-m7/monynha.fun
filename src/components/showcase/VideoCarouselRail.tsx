@@ -30,7 +30,7 @@ export function VideoCarouselRail({
   const isDark = variant === 'dark';
 
   return (
-    <section className={cn('border-y-2 border-border py-14 md:py-20', isDark ? 'bg-black text-white' : 'bg-background text-foreground')}>
+    <section className={cn('overflow-x-clip border-y-2 border-border py-14 md:py-20', isDark ? 'bg-black text-white' : 'bg-background text-foreground')}>
       <div className="container">
         <SectionHeader
           title={title}

@@ -97,7 +97,7 @@ const Index = () => {
   const { data: recentVideosData = [], isLoading: isRecentLoading } = useRecentVideos(24);
 
   const heroFeature = home?.hero_videos[0];
-  const heroTiles = useMemo(() => home?.hero_videos.slice(1, 7) ?? [], [home?.hero_videos]);
+  const heroTiles = useMemo(() => home?.hero_videos.slice(1, 4) ?? [], [home?.hero_videos]);
   const featuredVideos = useMemo(() => featuredVideosData.map(mapVideoToShowcase), [featuredVideosData]);
   const recentVideos = useMemo(() => recentVideosData.map(mapVideoToShowcase), [recentVideosData]);
   const homeVideos = useMemo(() => home?.hero_videos ?? [], [home?.hero_videos]);
@@ -201,7 +201,8 @@ const Index = () => {
   return (
     <MainLayout>
       <PageHero
-        layoutClassName="lg:grid-cols-[1fr_2fr]"
+        className="overflow-x-clip"
+        contentClassName="lg:max-w-4xl"
         title={t('homeExhibition.hero.monynhaTitle')}
         description={t('homeExhibition.hero.description')}
         actions={
@@ -222,22 +223,42 @@ const Index = () => {
           </>
         }
         aside={
-          <div className="grid gap-2 border-2 border-border bg-black p-2 shadow-[12px_12px_0_#efff00] md:grid-cols-3">
+          <div className="grid gap-3 lg:ml-auto lg:grid-cols-[minmax(0,1fr)_14rem] lg:items-start xl:grid-cols-[minmax(0,1fr)_15rem]">
             {isLoading ? (
               <>
-                {Array.from({ length: 9 }).map((_, index) => (
-                  <Skeleton key={index} className="aspect-video border border-white/30 bg-white/10" />
-                ))}
+                <Skeleton className="aspect-[4/5] border-2 border-border bg-muted/60" />
+                <div className="border-2 border-border bg-black p-2">
+                  <Skeleton className="mb-2 h-4 w-24 bg-white/20" />
+                  <div className="space-y-2">
+                    {Array.from({ length: 3 }).map((_, index) => (
+                      <Skeleton key={index} className="aspect-video border border-white/30 bg-white/10" />
+                    ))}
+                  </div>
+                </div>
               </>
             ) : heroFeature ? (
               <>
-                <VideoShowcaseCard video={heroFeature} variant="tile" className="md:col-span-2 md:row-span-2 border-white/40 bg-black text-white hover:border-[#efff00]" />
-                {heroTiles.slice(0, 7).map((video) => (
-                  <VideoShowcaseCard key={video.id} video={video} variant="tile" className="border-white/40 bg-black text-white hover:border-[#efff00] [&_p]:hidden" />
-                ))}
+                <VideoShowcaseCard
+                  video={heroFeature}
+                  variant="feature"
+                  className="border-white/40 bg-black text-white hover:border-[#efff00]"
+                />
+                <div className="border-2 border-white/40 bg-black p-2 shadow-[8px_8px_0_#efff00]">
+                  <p className="mb-2 px-1 text-[0.62rem] font-black uppercase text-white/70">{t('homeExhibition.hero.railTitle')}</p>
+                  <div className="space-y-2">
+                    {heroTiles.map((video) => (
+                      <VideoShowcaseCard
+                        key={video.id}
+                        video={video}
+                        variant="tile"
+                        className="border-white/40 bg-black text-white hover:border-[#efff00] [&_h3]:line-clamp-2 [&_h3]:text-xs [&_p]:hidden [&_.text-muted-foreground]:hidden"
+                      />
+                    ))}
+                  </div>
+                </div>
               </>
             ) : (
-              <div className="border-2 border-white/30 p-8 text-white/70 md:col-span-3">{t('homeExhibition.empty.hero')}</div>
+              <div className="border-2 border-white/30 p-8 text-white/70 lg:col-span-2">{t('homeExhibition.empty.hero')}</div>
             )}
           </div>
         }
