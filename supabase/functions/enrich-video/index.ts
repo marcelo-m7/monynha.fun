@@ -519,9 +519,8 @@ async function runEnhancedAssignments(params: {
       summaryDescription: analysis.summaryDescription,
       shortSummary: analysis.shortSummary,
       language: analysis.language,
-      geminiAssignedPlaylistId: geminiAssignment.assignedPlaylistId,
-      geminiConfidence: geminiAssignment.confidence,
-      geminiReason: geminiAssignment.reason,
+      suggestedPlaylistId: geminiAssignment.assignedPlaylistId,
+      classificationConfidence: geminiAssignment.confidence,
     },
   });
 
@@ -765,7 +764,9 @@ async function runVideoProcessingTask(params: {
             assignedPlaylistId: enhancedAssignment.assignedPlaylistId,
             algorithmVersion: enhancedAssignment.playlistAssignment?.algorithmVersion ?? null,
             score: enhancedAssignment.playlistAssignment?.score ?? null,
-            geminiConfidence: enhancedAssignment.playlistAssignment?.geminiConfidence ?? null,
+            provider: 'gemini',
+            providerConfidence: enhancedAssignment.playlistAssignment?.providerConfidence ?? null,
+            decisionSource: enhancedAssignment.playlistAssignment?.decisionSource ?? 'none',
             signals: enhancedAssignment.playlistAssignment?.signals ?? null,
             topCandidates: enhancedAssignment.playlistAssignment?.topCandidates ?? [],
             rejectedPlaylistId: enhancedAssignment.playlistAssignment?.rejectedPlaylistId ?? null,
