@@ -1,6 +1,7 @@
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useTranslation } from 'react-i18next';
+import { Link } from 'react-router-dom';
 import { Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -130,7 +131,13 @@ export function EditorApplicationForm({ sourcePath }: EditorApplicationFormProps
           {...register('consentPrivacy')}
           className="mt-0.5 h-4 w-4 rounded border-border"
         />
-        <span>{t('editorApplications.form.fields.consentLabel')}</span>
+        <span>
+          {t('editorApplications.form.fields.consentPrefix')}{' '}
+          <Link to="/privacy" className="font-semibold underline hover:text-primary">
+            {t('footer.privacy')}
+          </Link>
+          .
+        </span>
       </label>
       {errors.consentPrivacy && (
         <p className="text-sm text-destructive">{t(errors.consentPrivacy.message as string)}</p>

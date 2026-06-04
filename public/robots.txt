@@ -1,4 +1,9 @@
 User-agent: *
 Allow: /
+Disallow: /account/
+Disallow: /messages
+Disallow: /notifications
+Disallow: /editor/applications
 
+Host: https://tube.open2.tech
 Sitemap: https://tube.open2.tech/sitemap.xml

@@ -1,14 +1,5 @@
 import type { Category } from "@/entities/category/category.types";
-import { 
-  BookOpen, 
-  ChefHat, 
-  GraduationCap, 
-  Laugh, 
-  Music, 
-  Globe, 
-  HelpCircle,
-  LucideIcon
-} from "lucide-react";
+import { resolveCategoryIcon } from "@/entities/category/category.icons";
 import { cn } from "@/lib/utils";
 
 interface CategoryCardProps {
@@ -18,18 +9,8 @@ interface CategoryCardProps {
   index?: number;
 }
 
-const iconMap: Record<string, LucideIcon> = {
-  BookOpen,
-  ChefHat,
-  GraduationCap,
-  Laugh,
-  Music,
-  Globe,
-  HelpCircle,
-};
-
 export const CategoryCard = ({ category, videoCount = 0, onClick, index = 0 }: CategoryCardProps) => {
-  const Icon = iconMap[category.icon] || HelpCircle;
+  const Icon = resolveCategoryIcon(category);
   
   return (
     <button
