@@ -631,6 +631,100 @@
     "communitySpotlightDescription": "Rencontrez nos meilleurs curateurs et contributeurs",
     "noContributorsFound": "Aucun contributeur principal trouvé pour l'instant. Soyez le premier à soumettre une vidéo !"
   },
+  "homeExhibition": {
+    "hero": {
+      "title": "Des vidéos YouTube transformées en parcours d’apprentissage",
+      "description": "Tube O2 organise des vidéos publiques, playlists et parcours curriculaires avec une curation humaine et l’appui de l’IA pour transformer la découverte en étude concrète.",
+      "primaryCta": "Explorer les vidéos",
+      "secondaryCta": "Envoyer une vidéo",
+      "railTitle": "À la une maintenant"
+    },
+    "empty": {
+      "hero": "La curation publique n’a pas encore renvoyé de vidéos.",
+      "categories": "Les catégories apparaissent ici lorsque des vidéos publiques y sont associées.",
+      "playlists": "Les playlists publiques à la une apparaîtront bientôt ici.",
+      "facodi": "Les preuves FACODI apparaissent ici lorsque des parcours curriculaires publics sont actifs."
+    },
+    "metrics": {
+      "videos_total": "Vidéos publiques",
+      "playlists_total": "Playlists publiques",
+      "categories_total": "Catégories actives",
+      "videos_with_summaries": "Résumés IA"
+    },
+    "categories": {
+      "title": "Catégories actives",
+      "description": "Des zones réelles du catalogue reliées aux vidéos publiées et prêtes à être explorées par thème.",
+      "videoCount": "{{count}} vidéo",
+      "videoCount_plural": "{{count}} vidéos"
+    },
+    "actions": {
+      "viewAllVideos": "Voir toutes les vidéos",
+      "viewAllPlaylists": "Voir les playlists"
+    },
+    "playlists": {
+      "title": "Playlists à la une",
+      "description": "Des séquences publiques pour dépasser la vidéo isolée et suivre une ligne d’apprentissage."
+    },
+    "facodi": {
+      "title": "FACODI en pratique",
+      "description": "Des parcours curriculaires montrant comment Tube O2 soutient les trajets d’étude pour FACODI/LESTI.",
+      "cta": "Ouvrir le parcours"
+    },
+    "curation": {
+      "title": "Curation IA + humaine",
+      "description": "La plateforme combine métadonnées, résumés, tags, transcriptions et revue éditoriale pour réduire le bruit sans perdre le contexte.",
+      "panelTitle": "Comment le contenu prend forme",
+      "signals": {
+        "with_summaries": "Vidéos avec résumé",
+        "with_tags": "Vidéos avec tags",
+        "transcripts_completed": "Transcriptions terminées",
+        "recent_submissions": "Envois récents"
+      },
+      "steps": {
+        "summary": {
+          "title": "Résumé actionnable",
+          "description": "Chaque vidéo peut recevoir une synthèse courte avant lecture."
+        },
+        "tags": {
+          "title": "Tags et catégories",
+          "description": "Des signaux sémantiques relient thèmes, langues et objectifs d’apprentissage."
+        },
+        "review": {
+          "title": "Revue éditoriale",
+          "description": "Des éditeurs affinent la pertinence, la confidentialité et la qualité du catalogue."
+        },
+        "paths": {
+          "title": "Parcours d’étude",
+          "description": "Playlists et parcours FACODI transforment la découverte en progression."
+        }
+      }
+    },
+    "cta": {
+      "title": "Choisissez la bonne entrée",
+      "description": "Apprenez, contribuez avec des vidéos ou aidez à curer le catalogue public.",
+      "cards": {
+        "learners": {
+          "title": "Apprendre maintenant",
+          "description": "Explorez les vidéos par catégorie, langue, durée et résumé avant de regarder."
+        },
+        "contributors": {
+          "title": "Envoyer une référence",
+          "description": "Suggérez des vidéos YouTube publiques pour enrichir le catalogue."
+        },
+        "editors": {
+          "title": "Postuler comme éditeur",
+          "description": "Aidez à revoir, organiser et qualifier playlists et parcours."
+        }
+      }
+    },
+    "finalCta": {
+      "title": "Une vidéo mérite de devenir apprentissage ?",
+      "description": "Envoyez une référence publique et aidez Tube O2 à grandir avec contexte, catégories et curation.",
+      "submit": "Envoyer une vidéo",
+      "editor": "Je veux curer"
+    },
+    "error": "Impossible de charger la curation publique pour le moment. Nous affichons la structure de la page pendant une nouvelle tentative."
+  },
   "notFound": {
     "title": "404",
     "description": "Oups ! Page introuvable",

@@ -538,6 +538,100 @@
     "communitySpotlightDescription": "Meet our top curators and contributors",
     "noContributorsFound": "No top contributors found yet. Be the first to submit a video!"
   },
+  "homeExhibition": {
+    "hero": {
+      "title": "YouTube videos turned into learning paths",
+      "description": "Tube O2 organizes public videos, playlists, and curriculum tracks with human curation and AI support, turning discovery into practical study.",
+      "primaryCta": "Explore videos",
+      "secondaryCta": "Submit a video",
+      "railTitle": "Featured now"
+    },
+    "empty": {
+      "hero": "Public curation has not returned videos yet.",
+      "categories": "Categories appear here when public videos are connected to them.",
+      "playlists": "Featured public playlists will appear here soon.",
+      "facodi": "FACODI evidence appears here when public curriculum tracks are active."
+    },
+    "metrics": {
+      "videos_total": "Public videos",
+      "playlists_total": "Public playlists",
+      "categories_total": "Live categories",
+      "videos_with_summaries": "AI summaries"
+    },
+    "categories": {
+      "title": "Live categories",
+      "description": "Real collection areas connected to published videos and ready to explore by topic.",
+      "videoCount": "{{count}} video",
+      "videoCount_plural": "{{count}} videos"
+    },
+    "actions": {
+      "viewAllVideos": "View all videos",
+      "viewAllPlaylists": "View playlists"
+    },
+    "playlists": {
+      "title": "Featured playlists",
+      "description": "Public sequences that help learners move beyond a single video and follow a learning line."
+    },
+    "facodi": {
+      "title": "FACODI in practice",
+      "description": "Curriculum tracks showing how Tube O2 supports study paths for FACODI/LESTI.",
+      "cta": "Open track"
+    },
+    "curation": {
+      "title": "AI + human curation",
+      "description": "The platform combines metadata, summaries, tags, transcripts, and editorial review to reduce noise without losing context.",
+      "panelTitle": "How content takes shape",
+      "signals": {
+        "with_summaries": "Videos with summaries",
+        "with_tags": "Videos with tags",
+        "transcripts_completed": "Completed transcripts",
+        "recent_submissions": "Recent submissions"
+      },
+      "steps": {
+        "summary": {
+          "title": "Actionable summary",
+          "description": "Each video can receive a concise synthesis before play."
+        },
+        "tags": {
+          "title": "Tags and categories",
+          "description": "Semantic signals connect topics, languages, and learning goals."
+        },
+        "review": {
+          "title": "Editorial review",
+          "description": "Editors refine relevance, privacy, and collection quality."
+        },
+        "paths": {
+          "title": "Study paths",
+          "description": "Playlists and FACODI tracks turn discovery into progress."
+        }
+      }
+    },
+    "cta": {
+      "title": "Choose the right entry point",
+      "description": "Learn, contribute videos, or help curate the public collection.",
+      "cards": {
+        "learners": {
+          "title": "Start learning",
+          "description": "Explore videos by category, language, duration, and summary before watching."
+        },
+        "contributors": {
+          "title": "Submit a reference",
+          "description": "Suggest public YouTube videos to enrich the collection."
+        },
+        "editors": {
+          "title": "Apply as editor",
+          "description": "Help review, organize, and qualify playlists and tracks."
+        }
+      }
+    },
+    "finalCta": {
+      "title": "Know a video that deserves to become learning?",
+      "description": "Submit a public reference and help Tube O2 grow with context, categories, and curation.",
+      "submit": "Submit video",
+      "editor": "I want to curate"
+    },
+    "error": "Public curation could not be loaded right now. We are showing the page structure while retrying."
+  },
   "notFound": {
     "title": "404",
     "description": "Oops! Page not found",

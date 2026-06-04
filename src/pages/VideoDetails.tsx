@@ -228,7 +228,7 @@ const VideoDetails = () => {
           {/* Main Video Content */}
           <div className="lg:col-span-2 space-y-6">
             {/* Video Player */}
-            <AspectRatio ratio={16 / 9} className="bg-muted rounded-xl overflow-hidden shadow-lg">
+            <AspectRatio ratio={16 / 9} className="overflow-hidden border-2 border-border bg-muted shadow-[10px_10px_0_#000]">
               <iframe
                 className="w-full h-full"
                 src={getYouTubeEmbedUrl(video.youtube_id)}
@@ -343,10 +343,7 @@ const VideoDetails = () => {
                 )}
               </div>
               {assignedPlaylists.length > 0 && (
-                <section
-                  aria-labelledby="assigned-playlists-heading"
-                  className="rounded-md border border-border bg-muted/20 p-4"
-                >
+                <section aria-labelledby="assigned-playlists-heading" className="border-2 border-border bg-muted/20 p-4">
                   <div className="flex items-start gap-3">
                     <ListVideo className="mt-0.5 h-5 w-5 shrink-0 text-primary" />
                     <div>
@@ -390,7 +387,7 @@ const VideoDetails = () => {
 
               {/* AI-generated summary */}
               {video.enrichment && (
-                <Card className="p-6 border border-primary/30 bg-card">
+                <Card className="border-2 border-primary/30 bg-card p-6">
                   <div className="flex items-start gap-3">
                     <div className="bg-primary p-2 flex-shrink-0">
                       <Sparkles className="w-5 h-5 text-white" />
@@ -431,7 +428,7 @@ const VideoDetails = () => {
               )}
 
               {video.transcriptStatus === 'completed' && video.transcriptSummary && (
-                <Card className="p-6 border border-border bg-card">
+                <Card className="border-2 border-border bg-card p-6">
                   <div className="flex items-start gap-3">
                     <div className="bg-muted p-2 flex-shrink-0">
                       <FileText className="w-5 h-5 text-primary" />

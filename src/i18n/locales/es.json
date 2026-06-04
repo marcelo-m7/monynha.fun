@@ -631,6 +631,100 @@
     "communitySpotlightDescription": "Conoce a nuestros principales curadores y contribuidores",
     "noContributorsFound": "Aún no se encontraron contribuidores destacados. ¡Sé el primero en enviar un video!"
   },
+  "homeExhibition": {
+    "hero": {
+      "title": "Vídeos de YouTube convertidos en caminos de aprendizaje",
+      "description": "Tube O2 organiza vídeos públicos, playlists y rutas curriculares con curaduría humana y apoyo de IA para convertir el descubrimiento en estudio práctico.",
+      "primaryCta": "Explorar vídeos",
+      "secondaryCta": "Enviar vídeo",
+      "railTitle": "Destacados ahora"
+    },
+    "empty": {
+      "hero": "La curaduría pública aún no devolvió vídeos.",
+      "categories": "Las categorías aparecen aquí cuando haya vídeos públicos asociados.",
+      "playlists": "Las playlists públicas destacadas aparecerán aquí pronto.",
+      "facodi": "Las evidencias FACODI aparecen aquí cuando haya rutas curriculares públicas activas."
+    },
+    "metrics": {
+      "videos_total": "Vídeos públicos",
+      "playlists_total": "Playlists públicas",
+      "categories_total": "Categorías vivas",
+      "videos_with_summaries": "Resúmenes con IA"
+    },
+    "categories": {
+      "title": "Categorías vivas",
+      "description": "Áreas reales del acervo conectadas a vídeos publicados y listas para explorar por tema.",
+      "videoCount": "{{count}} vídeo",
+      "videoCount_plural": "{{count}} vídeos"
+    },
+    "actions": {
+      "viewAllVideos": "Ver todos los vídeos",
+      "viewAllPlaylists": "Ver playlists"
+    },
+    "playlists": {
+      "title": "Playlists destacadas",
+      "description": "Secuencias públicas que ayudan a salir del vídeo aislado y seguir una línea de aprendizaje."
+    },
+    "facodi": {
+      "title": "FACODI en la práctica",
+      "description": "Rutas curriculares que muestran cómo Tube O2 sostiene trayectos de estudio para FACODI/LESTI.",
+      "cta": "Abrir ruta"
+    },
+    "curation": {
+      "title": "Curaduría con IA + personas",
+      "description": "La plataforma combina metadatos, resúmenes, tags, transcripciones y revisión editorial para reducir ruido sin perder contexto.",
+      "panelTitle": "Cómo el contenido toma forma",
+      "signals": {
+        "with_summaries": "Vídeos con resumen",
+        "with_tags": "Vídeos con tags",
+        "transcripts_completed": "Transcripciones completadas",
+        "recent_submissions": "Envíos recientes"
+      },
+      "steps": {
+        "summary": {
+          "title": "Resumen accionable",
+          "description": "Cada vídeo puede recibir una síntesis breve antes de reproducir."
+        },
+        "tags": {
+          "title": "Tags y categorías",
+          "description": "Señales semánticas conectan temas, idiomas y objetivos de aprendizaje."
+        },
+        "review": {
+          "title": "Revisión editorial",
+          "description": "Editores refinan relevancia, privacidad y calidad del acervo."
+        },
+        "paths": {
+          "title": "Caminos de estudio",
+          "description": "Playlists y rutas FACODI transforman descubrimiento en progreso."
+        }
+      }
+    },
+    "cta": {
+      "title": "Entra por la puerta correcta",
+      "description": "Aprende, contribuye con vídeos o ayuda a curar el acervo público.",
+      "cards": {
+        "learners": {
+          "title": "Aprender ahora",
+          "description": "Explora vídeos por categoría, idioma, duración y resumen antes de mirar."
+        },
+        "contributors": {
+          "title": "Enviar referencia",
+          "description": "Sugiere vídeos públicos de YouTube para enriquecer el acervo."
+        },
+        "editors": {
+          "title": "Postular como editor",
+          "description": "Ayuda a revisar, organizar y cualificar playlists y rutas."
+        }
+      }
+    },
+    "finalCta": {
+      "title": "¿Tienes un vídeo que merece convertirse en aprendizaje?",
+      "description": "Envía una referencia pública y ayuda a Tube O2 a crecer con contexto, categorías y curaduría.",
+      "submit": "Enviar vídeo",
+      "editor": "Quiero curar"
+    },
+    "error": "No fue posible cargar la curaduría pública ahora. Mostramos la estructura de la página mientras intentamos nuevamente."
+  },
   "notFound": {
     "title": "404",
     "description": "¡Ups! Página no encontrada",
