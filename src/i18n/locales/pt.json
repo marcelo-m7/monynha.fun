@@ -825,6 +825,32 @@
         "title": "Coleções abertas da comunidade",
         "description": "Bons links viram percursos públicos, com resumo e categoria antes do play."
       }
+    },
+    "videoRails": {
+      "trendingNow": {
+        "title": "Em alta agora",
+        "description": "Videos em destaque com maior relevancia para descoberta neste momento."
+      },
+      "freshDrops": {
+        "title": "Novidades",
+        "description": "Conteudos recem-publicados que chegaram ao catalogo publico."
+      },
+      "mostViewed": {
+        "title": "Mais assistidos",
+        "description": "Os videos que concentram mais visualizacoes na comunidade."
+      },
+      "communityPicks": {
+        "title": "Escolhas da comunidade",
+        "description": "Videos com mais favoritos e adicoes em playlists de aprendizagem."
+      },
+      "withSummaries": {
+        "title": "Com resumo pronto",
+        "description": "Videos que ja contam com resumo contextual para decidir antes do play."
+      },
+      "quickLessons": {
+        "title": "Aulas rapidas",
+        "description": "Conteudos curtos para sessoes de estudo objetivas e praticas."
+      }
     }
   },
   "notFound": {

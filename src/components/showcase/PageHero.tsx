@@ -8,13 +8,23 @@ interface PageHeroProps {
   actions?: ReactNode;
   aside?: ReactNode;
   className?: string;
+  layoutClassName?: string;
   contentClassName?: string;
 }
 
-export function PageHero({ eyebrow, title, description, actions, aside, className, contentClassName }: PageHeroProps) {
+export function PageHero({
+  eyebrow,
+  title,
+  description,
+  actions,
+  aside,
+  className,
+  layoutClassName,
+  contentClassName,
+}: PageHeroProps) {
   return (
     <section className={cn('border-b-2 border-border bg-background text-foreground', className)}>
-      <div className="container grid gap-10 py-10 md:py-14 lg:grid-cols-[0.92fr_1.08fr] lg:items-center lg:py-20">
+      <div className={cn('container grid gap-10 py-10 md:py-14 lg:grid-cols-[0.92fr_1.08fr] lg:items-center lg:py-20', layoutClassName)}>
         <div className={cn('max-w-3xl space-y-6', contentClassName)}>
           {eyebrow && (
             <p className="text-xs font-black uppercase text-muted-foreground">

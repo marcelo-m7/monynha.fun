@@ -741,6 +741,32 @@
         "title": "Open community collections",
         "description": "Useful links become public paths, with summary and category before play."
       }
+    },
+    "videoRails": {
+      "trendingNow": {
+        "title": "Trending now",
+        "description": "Featured videos with high relevance for the current discovery flow."
+      },
+      "freshDrops": {
+        "title": "Fresh drops",
+        "description": "Recently published content entering the public catalog."
+      },
+      "mostViewed": {
+        "title": "Most viewed",
+        "description": "The videos drawing the most community attention right now."
+      },
+      "communityPicks": {
+        "title": "Community picks",
+        "description": "Videos that received more favorites and playlist saves from learners."
+      },
+      "withSummaries": {
+        "title": "Ready with summary",
+        "description": "Videos that already include contextual AI summary before play."
+      },
+      "quickLessons": {
+        "title": "Quick lessons",
+        "description": "Short-form study videos for fast and practical learning sessions."
+      }
     }
   },
   "notFound": {

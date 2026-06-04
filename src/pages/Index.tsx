@@ -2,6 +2,8 @@ import { ArrowRight, BookOpen, Radio, Send, ShieldCheck, Users } from 'lucide-re
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
+import type { HomeHeroVideo } from '@/entities/home/home.types';
+import type { VideoWithCategory } from '@/entities/video/video.types';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { MainLayout } from '@/components/layout/MainLayout';
@@ -13,9 +15,11 @@ import {
   PageHero,
   PlaylistShowcaseCard,
   SectionHeader,
+  VideoCarouselRail,
   VideoShowcaseCard,
 } from '@/components/showcase';
 import { useHomeExhibition } from '@/features/home/useHomeExhibition';
+import { useFeaturedVideos, useRecentVideos } from '@/features/videos/queries/useVideos';
 
 const metricKeys = [
   'videos_total',
@@ -49,13 +53,116 @@ const ctaCards = [
   },
 ] as const;
 
+const DEFAULT_RAIL_LIMIT = 12;
+
+function mapVideoToShowcase(video: VideoWithCategory): HomeHeroVideo {
+  return {
+    id: video.id,
+    youtube_id: video.youtube_id,
+    title: video.enrichment?.optimized_title || video.title,
+    channel_name: video.channel_name,
+    thumbnail_url: video.thumbnail_url,
+    language: video.transcriptLanguage || video.language || 'N/A',
+    duration_seconds: video.duration_seconds,
+    view_count: video.view_count,
+    favorites_count: video.favorites_count,
+    playlist_add_count: video.playlist_add_count,
+    category_name: video.category?.name || null,
+    category_slug: video.category?.slug || null,
+    category_color: video.category?.color || null,
+    summary: video.enrichment?.short_summary || video.transcriptSummary || null,
+    semantic_tags: video.enrichment?.semantic_tags || null,
+  };
+}
+
+function dedupeVideos(videos: HomeHeroVideo[]) {
+  const seen = new Set<string>();
+  return videos.filter((video) => {
+    if (seen.has(video.id)) return false;
+    seen.add(video.id);
+    return true;
+  });
+}
+
+function pickVideos(primary: HomeHeroVideo[], fallback: HomeHeroVideo[], limit = DEFAULT_RAIL_LIMIT) {
+  const merged = dedupeVideos([...primary, ...fallback]);
+  return merged.slice(0, limit);
+}
+
 const Index = () => {
   const { i18n, t } = useTranslation();
   const navigate = useNavigate();
   const { data: home, isLoading, isError } = useHomeExhibition();
+  const { data: featuredVideosData = [], isLoading: isFeaturedLoading } = useFeaturedVideos(24, 0);
+  const { data: recentVideosData = [], isLoading: isRecentLoading } = useRecentVideos(24);
 
   const heroFeature = home?.hero_videos[0];
   const heroTiles = useMemo(() => home?.hero_videos.slice(1, 7) ?? [], [home?.hero_videos]);
+  const featuredVideos = useMemo(() => featuredVideosData.map(mapVideoToShowcase), [featuredVideosData]);
+  const recentVideos = useMemo(() => recentVideosData.map(mapVideoToShowcase), [recentVideosData]);
+  const homeVideos = useMemo(() => home?.hero_videos ?? [], [home?.hero_videos]);
+  const allRailsPool = useMemo(
+    () => dedupeVideos([...homeVideos, ...featuredVideos, ...recentVideos]),
+    [homeVideos, featuredVideos, recentVideos],
+  );
+  const railsLoading = isLoading || isFeaturedLoading || isRecentLoading;
+
+  const videoRails = useMemo(() => {
+    const withSummaries = allRailsPool.filter((video) => !!video.summary);
+    const quickLessons = allRailsPool
+      .filter((video) => !!video.duration_seconds && (video.duration_seconds || 0) <= 900)
+      .sort((a, b) => (a.duration_seconds || 0) - (b.duration_seconds || 0));
+    const mostViewed = [...allRailsPool].sort((a, b) => b.view_count - a.view_count);
+    const communityFavorites = [...allRailsPool].sort(
+      (a, b) => b.favorites_count + b.playlist_add_count - (a.favorites_count + a.playlist_add_count),
+    );
+
+    return [
+      {
+        key: 'trendingNow',
+        title: t('homeExhibition.videoRails.trendingNow.title'),
+        description: t('homeExhibition.videoRails.trendingNow.description'),
+        videos: pickVideos(featuredVideos, allRailsPool),
+        variant: 'dark' as const,
+      },
+      {
+        key: 'freshDrops',
+        title: t('homeExhibition.videoRails.freshDrops.title'),
+        description: t('homeExhibition.videoRails.freshDrops.description'),
+        videos: pickVideos(recentVideos, allRailsPool),
+        variant: 'light' as const,
+      },
+      {
+        key: 'mostViewed',
+        title: t('homeExhibition.videoRails.mostViewed.title'),
+        description: t('homeExhibition.videoRails.mostViewed.description'),
+        videos: pickVideos(mostViewed, allRailsPool),
+        variant: 'dark' as const,
+      },
+      {
+        key: 'communityPicks',
+        title: t('homeExhibition.videoRails.communityPicks.title'),
+        description: t('homeExhibition.videoRails.communityPicks.description'),
+        videos: pickVideos(communityFavorites, allRailsPool),
+        variant: 'light' as const,
+      },
+      {
+        key: 'withSummaries',
+        title: t('homeExhibition.videoRails.withSummaries.title'),
+        description: t('homeExhibition.videoRails.withSummaries.description'),
+        videos: pickVideos(withSummaries, allRailsPool),
+        variant: 'dark' as const,
+      },
+      {
+        key: 'quickLessons',
+        title: t('homeExhibition.videoRails.quickLessons.title'),
+        description: t('homeExhibition.videoRails.quickLessons.description'),
+        videos: pickVideos(quickLessons, allRailsPool),
+        variant: 'light' as const,
+      },
+    ];
+  }, [allRailsPool, featuredVideos, recentVideos, t]);
+
   const learningRails = useMemo(() => {
     const facodi = home?.facodi_highlights ?? [];
     const featured = home?.featured_playlists ?? [];
@@ -94,6 +201,7 @@ const Index = () => {
   return (
     <MainLayout>
       <PageHero
+        layoutClassName="lg:grid-cols-[1fr_2fr]"
         title={t('homeExhibition.hero.monynhaTitle')}
         description={t('homeExhibition.hero.description')}
         actions={
@@ -162,6 +270,22 @@ const Index = () => {
           ))}
         </div>
       </section>
+
+      <div className="space-y-0">
+        {videoRails.map((rail) => (
+          <VideoCarouselRail
+            key={rail.key}
+            title={rail.title}
+            description={rail.description}
+            videos={rail.videos}
+            isLoading={railsLoading}
+            emptyMessage={t('homeExhibition.empty.hero')}
+            actionLabel={t('homeExhibition.actions.viewAllVideos')}
+            onAction={() => navigate('/videos')}
+            variant={rail.variant}
+          />
+        ))}
+      </div>
 
       <section className="bg-background py-16 text-foreground md:py-20">
         <div className="container">
