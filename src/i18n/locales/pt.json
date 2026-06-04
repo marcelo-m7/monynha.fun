@@ -545,6 +545,48 @@
         "title": "Processamento precisa de nova tentativa",
         "description": "A submissão foi salva, mas o enriquecimento pode ser tentado novamente."
       }
+    },
+    "curation": {
+      "fastTitle": "Curadoria rápida concluída",
+      "fastDescription": "O vídeo foi publicado com categoria automática, resumo simples e tags determinísticas."
+    },
+    "deepAnalysis": {
+      "title": "Análise avançada",
+      "description": "A análise profunda {{provider}} está registrada para este vídeo.",
+      "statusLabels": {
+        "pending": "Pendente",
+        "processing": "Processando",
+        "completed": "Completa",
+        "failed": "Falhou",
+        "recoverable_error": "Precisa tentar novamente",
+        "skipped": "Ignorada"
+      },
+      "states": {
+        "pending": {
+          "title": "Análise avançada em fila",
+          "description": "A curadoria rápida terminou; a análise profunda {{provider}} pode rodar depois."
+        },
+        "processing": {
+          "title": "Análise avançada em curso",
+          "description": "A análise profunda {{provider}} está processando sinais adicionais."
+        },
+        "completed": {
+          "title": "Análise completa disponível",
+          "description": "A análise profunda {{provider}} terminou e pode complementar a curadoria."
+        },
+        "failed": {
+          "title": "Análise avançada falhou",
+          "description": "A curadoria rápida continua disponível; a análise profunda {{provider}} falhou."
+        },
+        "recoverable_error": {
+          "title": "Análise avançada pode ser repetida",
+          "description": "A curadoria rápida continua disponível; a análise profunda {{provider}} pode ser tentada novamente."
+        },
+        "skipped": {
+          "title": "Análise avançada ignorada",
+          "description": "A curadoria rápida continua disponível; a análise profunda {{provider}} foi ignorada."
+        }
+      }
     }
   },
   "videos": {
@@ -597,7 +639,13 @@
       "deleteError": "Não foi possível remover o vídeo.",
       "confirmDeleteTitle": "Remover vídeo?",
       "confirmDeleteDescription": "Esta ação não pode ser desfeita. O vídeo '{{title}}' será removido permanentemente."
-    }
+    },
+    "summarySource": {
+      "fast": "Curadoria rápida",
+      "deep": "Análise completa",
+      "editorial": "Revisão editorial"
+    },
+    "deepAnalysisStatus": "Análise avançada"
   },
   "index": {
     "categoriesTitle": "Categorias",
@@ -843,7 +891,15 @@
     "stats": {
       "editableTotal": "Playlists editáveis",
       "facodiTotal": "Playlists FACODI",
-      "withUnitCode": "Com código de unidade"
+      "withUnitCode": "Com código de unidade",
+      "analysisQueue": "Análises pendentes"
+    },
+    "analysisQueue": {
+      "title": "Fila de análise e revisão",
+      "description": "Acompanhe vídeos com curadoria rápida e análise profunda pendente.",
+      "unknownVideo": "Vídeo sem título",
+      "reviewVideo": "Revisar vídeo",
+      "empty": "Nenhum vídeo aguardando análise no momento."
     }
   },
   "playlistDetails": {

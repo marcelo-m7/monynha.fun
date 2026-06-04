@@ -2,6 +2,13 @@
 
 This file is the fast-start guide for AI coding agents in this repository. Keep changes small, follow existing patterns, and prefer linking to docs over duplicating them.
 
+## Fast Facts
+
+- Product: Tube O2, the cultural video curation platform.
+- Stack: React 19, TypeScript, Vite, Tailwind, shadcn/ui, Supabase, TanStack Query.
+- Work from the frontend root: [src/tube02-frontend](.).
+- Source of truth: [README.md](README.md), [docs/CODEBASE.md](docs/CODEBASE.md), [CONTRIBUTING.md](CONTRIBUTING.md), and [AI_RULES.md](AI_RULES.md).
+
 ## Quick Start
 
 - Product: Tube O2 (https://tube.open2.tech)
@@ -20,6 +27,9 @@ Run from repository root:
 | Type check | `pnpm typecheck` |
 | Tests | `pnpm test` |
 | Coverage | `pnpm test:coverage` |
+
+- Prefer targeted checks on the touched slice before broad test runs.
+- Use `pnpm dev` for UI verification and `pnpm build` before final handoff.
 
 Supabase/backend commands:
 
@@ -68,6 +78,15 @@ Use these boundaries when deciding where code belongs:
 - `server/*`: Bun runtime server for serving `dist/` and injecting dynamic OG/Twitter tags
 
 Reference architecture details in [docs/CODEBASE.md](docs/CODEBASE.md).
+
+## Frontend Guardrails
+
+- Keep UI components provider-agnostic; put data access in entity/API modules and orchestration in features.
+- Reuse shared validation from [src/shared/lib/validation.ts](src/shared/lib/validation.ts) instead of redefining schemas.
+- Keep locale files aligned when adding user-facing strings.
+- Avoid creating extra Supabase clients; use the shared client in [src/shared/api/supabase/supabaseClient.ts](src/shared/api/supabase/supabaseClient.ts).
+- Do not reintroduce legacy local catalog mock fallbacks.
+- Preserve the current brand direction: Tube O2 / Open 2 Technology, not the old Monynha naming.
 
 ## Non-Negotiable Conventions
 
@@ -162,6 +181,17 @@ All global context providers (QueryClient, Auth, i18n, ThemeProvider, Helmet, To
 
 - Do not edit [dist](dist) by hand; it is build output.
 - The canonical generic social preview image is [public/placeholder.png](public/placeholder.png). Documentation copies may be refreshed from it when needed.
+
+## Where To Look First
+
+- Router and page registration: [src/App.tsx](src/App.tsx)
+- Shared validation: [src/shared/lib/validation.ts](src/shared/lib/validation.ts)
+- Query key behavior: [src/entities/queryKeys.test.ts](src/entities/queryKeys.test.ts)
+- API pattern example: [src/entities/video/video.api.ts](src/entities/video/video.api.ts)
+- Form pattern example: [src/components/comment/CommentForm.tsx](src/components/comment/CommentForm.tsx)
+- Frontend-specific rules: [.github/instructions/frontend.instructions.md](.github/instructions/frontend.instructions.md)
+
+If a task touches a file covered by an `applyTo` instruction, follow that instruction file as authoritative.
 
 ## Branding Migration Notes
 

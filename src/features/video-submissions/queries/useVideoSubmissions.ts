@@ -1,5 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { getVideoSubmissionById, markVideoSubmissionClientError } from '@/entities/video_submission/video_submission.api';
+import { videoAnalysisJobKeys } from '@/entities/video_analysis_job/video_analysis_job.keys';
 import { videoSubmissionKeys } from '@/entities/video_submission/video_submission.keys';
 import type { VideoSubmission, VideoSubmissionStatus } from '@/entities/video_submission/video_submission.types';
 import { getEdgeFunctionErrorDetails, invokeEdgeFunction } from '@/shared/api/supabase/edgeFunctions';
@@ -67,6 +68,8 @@ export function useStartSubmissionProcessing() {
     onSettled: (_data, _error, variables) => {
       if (variables) {
         queryClient.invalidateQueries({ queryKey: videoSubmissionKeys.detail(variables.submissionId) });
+        queryClient.invalidateQueries({ queryKey: videoAnalysisJobKeys.bySubmission(variables.submissionId) });
+        queryClient.invalidateQueries({ queryKey: videoAnalysisJobKeys.byVideo(variables.videoId) });
       }
     },
   });

@@ -1,4 +1,5 @@
 # Tube O2 – Cultural Video Curation Platform 🎬
+<img width="1914" height="1027" alt="image" src="https://github.com/user-attachments/assets/9d6f01f1-4110-4cf5-8f83-87701d8f3a11" />
 
 ![Tube O2 Hero](./docs/readme-homepage.png)
 
@@ -43,6 +44,7 @@ To keep onboarding and AI-assisted edits consistent, treat these as the primary 
 
 ### Homepage – Where Magic Happens ✨
 ![Homepage Screenshot](./docs/readme-homepage.png)
+<img width="1914" height="1027" alt="image" src="https://github.com/user-attachments/assets/968fec58-1f1f-4e33-8020-86ac3fada8fc" />
 
 Your first impression matters, né? Clean hero section, easy access to what's hot right now, and categories that actually make sense. No fluff.
 

@@ -3,10 +3,12 @@ import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { MainLayout } from '@/components/layout/MainLayout';
 import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Skeleton } from '@/components/ui/skeleton';
 import { PlaylistCard } from '@/components/playlist/PlaylistCard';
 import { useAuth } from '@/features/auth/useAuth';
+import { useVideoAnalysisJobs } from '@/features/video-analysis/useVideoAnalysisJob';
 import { usePlaylists } from '@/features/playlists/queries/usePlaylists';
 import { useIsEditor } from '@/features/profile/queries/useProfile';
 import { ArrowLeft, ListVideo, Plus, Search } from 'lucide-react';
@@ -17,6 +19,7 @@ const EditorialPortal = () => {
   const { user, loading: authLoading } = useAuth();
   const { isEditor, isLoading: roleLoading } = useIsEditor();
   const { data: playlists, isLoading: playlistsLoading, isError } = usePlaylists();
+  const { data: analysisJobs, isLoading: analysisJobsLoading } = useVideoAnalysisJobs({ limit: 6 });
   const [query, setQuery] = useState('');
 
   useEffect(() => {
@@ -39,6 +42,11 @@ const EditorialPortal = () => {
         .includes(normalized),
     );
   }, [playlists, query]);
+
+  const pendingAnalysisCount = useMemo(
+    () => (analysisJobs || []).filter((job) => ['pending', 'processing', 'recoverable_error'].includes(job.status)).length,
+    [analysisJobs],
+  );
 
   if (authLoading || roleLoading || playlistsLoading) {
     return (
@@ -100,7 +108,7 @@ const EditorialPortal = () => {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           <div className="bg-card border rounded-xl p-4">
             <p className="text-sm text-muted-foreground">{t('editorialPortal.stats.editableTotal')}</p>
             <p className="text-2xl font-bold mt-1">{playlists?.length || 0}</p>
@@ -113,7 +121,72 @@ const EditorialPortal = () => {
             <p className="text-sm text-muted-foreground">{t('editorialPortal.stats.withUnitCode')}</p>
             <p className="text-2xl font-bold mt-1">{facodiPlaylists.filter((p) => !!p.unit_code).length}</p>
           </div>
+          <div className="bg-card border rounded-xl p-4">
+            <p className="text-sm text-muted-foreground">{t('editorialPortal.stats.analysisQueue')}</p>
+            <p className="text-2xl font-bold mt-1">{pendingAnalysisCount}</p>
+          </div>
         </div>
+
+        <section className="space-y-4">
+          <div className="flex flex-col gap-1 sm:flex-row sm:items-end sm:justify-between">
+            <div>
+              <h2 className="text-xl font-bold">{t('editorialPortal.analysisQueue.title')}</h2>
+              <p className="text-sm text-muted-foreground">{t('editorialPortal.analysisQueue.description')}</p>
+            </div>
+          </div>
+          {analysisJobsLoading ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {Array.from({ length: 2 }).map((_, index) => (
+                <Skeleton key={index} className="h-28 rounded-xl" />
+              ))}
+            </div>
+          ) : analysisJobs && analysisJobs.length > 0 ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {analysisJobs.map((job) => (
+                <div key={job.id} className="rounded-xl border bg-card p-4">
+                  <div className="flex items-start gap-3">
+                    {job.video?.thumbnail_url ? (
+                      <img
+                        src={job.video.thumbnail_url}
+                        alt=""
+                        className="h-16 w-24 shrink-0 object-cover"
+                        loading="lazy"
+                      />
+                    ) : null}
+                    <div className="min-w-0 flex-1">
+                      <div className="flex flex-wrap items-center gap-2">
+                        <Badge variant="secondary">
+                          {t(`submitStatus.deepAnalysis.statusLabels.${job.status}`, { defaultValue: job.status })}
+                        </Badge>
+                        <Badge variant="outline">{job.provider}</Badge>
+                      </div>
+                      <p className="mt-2 truncate text-sm font-medium">
+                        {job.video?.title || t('editorialPortal.analysisQueue.unknownVideo')}
+                      </p>
+                      <p className="mt-1 text-xs text-muted-foreground">
+                        {job.video?.category?.name || t('common.none')}
+                      </p>
+                    </div>
+                  </div>
+                  {job.video_id && (
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="mt-3"
+                      onClick={() => navigate(`/videos/${job.video_id}`)}
+                    >
+                      {t('editorialPortal.analysisQueue.reviewVideo')}
+                    </Button>
+                  )}
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="rounded-xl border bg-card p-6 text-sm text-muted-foreground">
+              {t('editorialPortal.analysisQueue.empty')}
+            </div>
+          )}
+        </section>
 
         {isError ? (
           <div className="text-center py-12 text-muted-foreground">

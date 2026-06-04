@@ -452,6 +452,48 @@
         "title": "Processing needs another try",
         "description": "The submission was saved, but enrichment can be retried."
       }
+    },
+    "curation": {
+      "fastTitle": "Fast curation complete",
+      "fastDescription": "The video was published with automatic category, simple summary, and deterministic tags."
+    },
+    "deepAnalysis": {
+      "title": "Advanced analysis",
+      "description": "Deep analysis {{provider}} is registered for this video.",
+      "statusLabels": {
+        "pending": "Pending",
+        "processing": "Processing",
+        "completed": "Complete",
+        "failed": "Failed",
+        "recoverable_error": "Needs retry",
+        "skipped": "Skipped"
+      },
+      "states": {
+        "pending": {
+          "title": "Advanced analysis queued",
+          "description": "Fast curation is complete; deep analysis {{provider}} can run later."
+        },
+        "processing": {
+          "title": "Advanced analysis in progress",
+          "description": "Deep analysis {{provider}} is processing additional signals."
+        },
+        "completed": {
+          "title": "Complete analysis available",
+          "description": "Deep analysis {{provider}} finished and can complement curation."
+        },
+        "failed": {
+          "title": "Advanced analysis failed",
+          "description": "Fast curation remains available; deep analysis {{provider}} failed."
+        },
+        "recoverable_error": {
+          "title": "Advanced analysis can be retried",
+          "description": "Fast curation remains available; deep analysis {{provider}} can be tried again."
+        },
+        "skipped": {
+          "title": "Advanced analysis skipped",
+          "description": "Fast curation remains available; deep analysis {{provider}} was skipped."
+        }
+      }
     }
   },
   "videos": {
@@ -504,7 +546,13 @@
       "deleteError": "Could not remove the video.",
       "confirmDeleteTitle": "Remove video?",
       "confirmDeleteDescription": "This action cannot be undone. The video '{{title}}' will be permanently removed."
-    }
+    },
+    "summarySource": {
+      "fast": "Fast curation",
+      "deep": "Complete analysis",
+      "editorial": "Editorial review"
+    },
+    "deepAnalysisStatus": "Deep analysis"
   },
   "favorites": {
     "title": "My Favorites",
@@ -843,7 +891,15 @@
     "stats": {
       "editableTotal": "Editable playlists",
       "facodiTotal": "FACODI playlists",
-      "withUnitCode": "With unit code"
+      "withUnitCode": "With unit code",
+      "analysisQueue": "Pending analyses"
+    },
+    "analysisQueue": {
+      "title": "Analysis and review queue",
+      "description": "Track videos with fast curation and pending deep analysis.",
+      "unknownVideo": "Untitled video",
+      "reviewVideo": "Review video",
+      "empty": "No videos are waiting for analysis right now."
     }
   },
   "playlistDetails": {

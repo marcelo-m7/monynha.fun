@@ -9,6 +9,7 @@ const navigateMock = vi.fn();
 const useAuthMock = vi.fn();
 const useVideoSubmissionMock = vi.fn();
 const useStartSubmissionProcessingMock = vi.fn();
+const useLatestVideoAnalysisJobMock = vi.fn();
 const startProcessingMock = vi.fn();
 const refetchMock = vi.fn();
 
@@ -33,6 +34,10 @@ vi.mock('@/features/video-submissions/queries/useVideoSubmissions', () => ({
   useStartSubmissionProcessing: () => useStartSubmissionProcessingMock(),
 }));
 
+vi.mock('@/features/video-analysis/useVideoAnalysisJob', () => ({
+  useLatestVideoAnalysisJob: () => useLatestVideoAnalysisJobMock(),
+}));
+
 const baseSubmission = {
   id: 'submission-1',
   user_id: 'user-1',
@@ -50,6 +55,7 @@ beforeEach(() => {
   navigateMock.mockReset();
   startProcessingMock.mockReset();
   refetchMock.mockReset();
+  useLatestVideoAnalysisJobMock.mockReturnValue({ data: null, isLoading: false });
   useAuthMock.mockReturnValue({ user: { id: 'user-1' }, loading: false });
   useVideoSubmissionMock.mockReturnValue({
     data: baseSubmission,
@@ -103,6 +109,33 @@ describe('SubmitStatus page', () => {
     expect(screen.getByText('Portuguese')).toBeInTheDocument();
     expect(screen.getByRole('link', { name: 'View video' })).toHaveAttribute('href', '/videos/video-1');
     expect(startProcessingMock).not.toHaveBeenCalled();
+  });
+
+  it('shows fast curation and pending deep analysis when available', () => {
+    useLatestVideoAnalysisJobMock.mockReturnValue({
+      data: { id: 'job-1', status: 'pending', provider: 'v2' },
+      isLoading: false,
+    });
+    useVideoSubmissionMock.mockReturnValue({
+      data: {
+        ...baseSubmission,
+        status: 'success',
+        metadata: {
+          detectedLanguage: 'pt',
+          enrichmentId: 'enrichment-1',
+          enrichment: { provider: 'legacy_fast' },
+          analysisJob: { id: 'job-1', status: 'pending', provider: 'v2' },
+        },
+      },
+      isLoading: false,
+      isError: false,
+      refetch: refetchMock,
+    });
+
+    renderWithProviders(<SubmitStatus />, { route: '/submit/status/submission-1' });
+
+    expect(screen.getByText('Fast curation complete')).toBeInTheDocument();
+    expect(screen.getByText('Advanced analysis queued')).toBeInTheDocument();
   });
 
   it('shows the assigned playlist when assignment audit metadata is present', () => {

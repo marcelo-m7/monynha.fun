@@ -41,6 +41,11 @@ export type VideoSubmissionAssignment = {
 export type VideoSubmissionMetadata = {
   enrichmentId?: string | null;
   detectedLanguage?: string | null;
+  analysisJob?: {
+    id?: string | null;
+    status?: string | null;
+    provider?: string | null;
+  };
   processing?: {
     requestId?: string | null;
     stage?: string | null;

@@ -4,6 +4,7 @@ import { playlistKeys } from './playlist/playlist.keys';
 import { profileKeys } from './profile/profile.keys';
 import { categoryKeys } from './category/category.keys';
 import { videoSubmissionKeys } from './video_submission/video_submission.keys';
+import { videoAnalysisJobKeys } from './video_analysis_job/video_analysis_job.keys';
 
 describe('query key factories', () => {
   it('creates stable video keys', () => {
@@ -29,6 +30,19 @@ describe('query key factories', () => {
       'video-submissions',
       'detail',
       'submission-1',
+    ]);
+  });
+
+  it('creates stable video analysis job keys', () => {
+    expect(videoAnalysisJobKeys.byVideo('video-1')).toEqual([
+      'video-analysis-jobs',
+      'by-video',
+      'video-1',
+    ]);
+    expect(videoAnalysisJobKeys.list({ status: 'pending', limit: 10 })).toEqual([
+      'video-analysis-jobs',
+      'list',
+      { status: 'pending', limit: 10 },
     ]);
   });
 });

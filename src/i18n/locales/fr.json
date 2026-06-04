@@ -545,6 +545,48 @@
         "title": "Le traitement doit être réessayé",
         "description": "La soumission a été enregistrée, mais l'enrichissement peut être relancé."
       }
+    },
+    "curation": {
+      "fastTitle": "Curation rapide terminée",
+      "fastDescription": "La vidéo a été publiée avec catégorie automatique, résumé simple et tags déterministes."
+    },
+    "deepAnalysis": {
+      "title": "Analyse avancée",
+      "description": "L'analyse approfondie {{provider}} est enregistrée pour cette vidéo.",
+      "statusLabels": {
+        "pending": "En attente",
+        "processing": "Traitement",
+        "completed": "Terminée",
+        "failed": "Échec",
+        "recoverable_error": "À réessayer",
+        "skipped": "Ignorée"
+      },
+      "states": {
+        "pending": {
+          "title": "Analyse avancée en file",
+          "description": "La curation rapide est terminée ; l'analyse approfondie {{provider}} peut s'exécuter plus tard."
+        },
+        "processing": {
+          "title": "Analyse avancée en cours",
+          "description": "L'analyse approfondie {{provider}} traite des signaux supplémentaires."
+        },
+        "completed": {
+          "title": "Analyse complète disponible",
+          "description": "L'analyse approfondie {{provider}} est terminée et peut compléter la curation."
+        },
+        "failed": {
+          "title": "L'analyse avancée a échoué",
+          "description": "La curation rapide reste disponible ; l'analyse approfondie {{provider}} a échoué."
+        },
+        "recoverable_error": {
+          "title": "L'analyse avancée peut être relancée",
+          "description": "La curation rapide reste disponible ; l'analyse approfondie {{provider}} peut être réessayée."
+        },
+        "skipped": {
+          "title": "Analyse avancée ignorée",
+          "description": "La curation rapide reste disponible ; l'analyse approfondie {{provider}} a été ignorée."
+        }
+      }
     }
   },
   "videos": {
@@ -597,7 +639,13 @@
       "deleteError": "Impossible de supprimer la vidéo.",
       "confirmDeleteTitle": "Supprimer la vidéo ?",
       "confirmDeleteDescription": "Cette action est irréversible. La vidéo '{{title}}' sera supprimée définitivement."
-    }
+    },
+    "summarySource": {
+      "fast": "Curation rapide",
+      "deep": "Analyse complète",
+      "editorial": "Révision éditoriale"
+    },
+    "deepAnalysisStatus": "Analyse avancée"
   },
   "favorites": {
     "title": "Mes Favoris",
@@ -843,7 +891,15 @@
     "stats": {
       "editableTotal": "Playlists modifiables",
       "facodiTotal": "Playlists FACODI",
-      "withUnitCode": "Avec code d'unité"
+      "withUnitCode": "Avec code d'unité",
+      "analysisQueue": "Analyses en attente"
+    },
+    "analysisQueue": {
+      "title": "File d'analyse et de révision",
+      "description": "Suivez les vidéos avec curation rapide et analyse approfondie en attente.",
+      "unknownVideo": "Vidéo sans titre",
+      "reviewVideo": "Réviser la vidéo",
+      "empty": "Aucune vidéo n'attend d'analyse pour le moment."
     }
   },
   "playlistDetails": {
