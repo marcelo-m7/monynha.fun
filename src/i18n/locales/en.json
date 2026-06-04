@@ -38,7 +38,9 @@
     "switchToDark": "Switch to dark mode",
     "switchToLight": "Switch to light mode",
     "community": "Community",
-    "editorialPortal": "Editorial Portal"
+    "editorialPortal": "Editorial Portal",
+    "facodi": "FACODI",
+    "curation": "Curation"
   },
   "footer": {
     "description": "Tube O2 enriches YouTube videos and organizes them into educational playlists for faster learning.",
@@ -53,7 +55,44 @@
     "contact": "Contact",
     "faq": "FAQ",
     "madeWithLove": "Made with",
-    "byOpen2Technology": "by Open 2 Technology"
+    "byOpen2Technology": "by Open 2 Technology",
+    "monynhaStatement": "Human curation. Deep analysis. Learning with direction.",
+    "columns": {
+      "explore": {
+        "title": "Explore",
+        "allPaths": "All paths",
+        "facodi": "FACODI",
+        "lesti": "LESTI",
+        "byTheme": "By theme",
+        "curation": "How we curate"
+      },
+      "about": {
+        "title": "About",
+        "howItWorks": "How it works",
+        "whoWeAre": "Who we are",
+        "editorial": "Editorial",
+        "rules": "Methodology",
+        "faq": "FAQ"
+      },
+      "contribute": {
+        "title": "Contribute",
+        "submit": "Submit a link",
+        "editor": "Become a curator",
+        "community": "Community",
+        "contact": "Contact"
+      }
+    },
+    "live": {
+      "title": "Live on Tube O2"
+    },
+    "finalCta": {
+      "title": "Got a valuable link?",
+      "description": "Send it in. We will handle the rest with care and taste.",
+      "action": "Submit a link now"
+    },
+    "privacy": "Privacy",
+    "terms": "Terms",
+    "cookies": "Cookies"
   },
   "labels": {
     "featured": "Featured"
@@ -219,7 +258,9 @@
       "confirmEmail": "Check your email to confirm your registration",
       "passwordResetEmailSent": "Password reset email sent!",
       "checkEmailForReset": "Check your inbox for the password reset link."
-    }
+    },
+    "termsAgreementPrefix": "By continuing, you agree to the",
+    "termsAgreementAnd": "and"
   },
   "account": {
     "settings": {
@@ -592,7 +633,8 @@
       "description": "Tube O2 organizes public videos, playlists, and curriculum tracks with human curation and AI support, turning discovery into practical study.",
       "primaryCta": "Explore videos",
       "secondaryCta": "Submit a video",
-      "railTitle": "Featured now"
+      "railTitle": "Featured now",
+      "monynhaTitle": "Good videos should not vanish into the algorithm"
     },
     "empty": {
       "hero": "Public curation has not returned videos yet.",
@@ -652,7 +694,8 @@
           "title": "Study paths",
           "description": "Playlists and FACODI tracks turn discovery into progress."
         }
-      }
+      },
+      "cta": "See how it works"
     },
     "cta": {
       "title": "Choose the right entry point",
@@ -678,7 +721,27 @@
       "submit": "Submit video",
       "editor": "I want to curate"
     },
-    "error": "Public curation could not be loaded right now. We are showing the page structure while retrying."
+    "error": "Public curation could not be loaded right now. We are showing the page structure while retrying.",
+    "live": {
+      "label": "Live"
+    },
+    "learningRails": {
+      "title": "Learning paths",
+      "description": "Tracks with real thumbnails, curriculum context, and sequence so study does not get lost in the feed.",
+      "cta": "Open FACODI",
+      "facodi": {
+        "title": "Academic foundations for sharper thinking",
+        "description": "FACODI routes with curation, course, and unit in one place."
+      },
+      "lesti": {
+        "title": "Technology with purpose and future vision",
+        "description": "LESTI paths for programming, data, and systems with intention."
+      },
+      "open": {
+        "title": "Open community collections",
+        "description": "Useful links become public paths, with summary and category before play."
+      }
+    }
   },
   "notFound": {
     "title": "404",
@@ -1101,7 +1164,8 @@
         "motivationPlaceholder": "Share your motivation and editorial experience (optional)",
         "portfolioLinksLabel": "Portfolio links",
         "portfolioLinksPlaceholder": "One link per line (optional)",
-        "consentLabel": "I agree to the privacy policy and consent to data processing for this application."
+        "consentLabel": "I agree to the privacy policy and consent to data processing for this application.",
+        "consentPrefix": "I agree to the"
       },
       "submitButton": "Send application",
       "successTitle": "Application received",
@@ -1134,5 +1198,249 @@
       "noAccessDescription": "Only editors and admins can access this page.",
       "backToEditorial": "Back to editorial portal"
     }
+  },
+  "curationPage": {
+    "hero": {
+      "title": "From loose link to meaningful path",
+      "description": "Every Tube O2 video gets fast curation, can receive deep analysis, and stays ready for human review without blocking submission.",
+      "primaryCta": "Submit a link",
+      "secondaryCta": "I want to curate",
+      "panelTitle": "Arriving at the desk"
+    },
+    "pipeline": {
+      "title": "From link to path",
+      "description": "A human editorial process that turns video into real learning.",
+      "steps": {
+        "link": {
+          "title": "Link received",
+          "description": "We receive the video and check whether it can become useful material."
+        },
+        "fast": {
+          "title": "Fast curation",
+          "description": "Summary, language, tags, and category run without external AI dependency."
+        },
+        "category": {
+          "title": "Categorization",
+          "description": "The content gets a theme, context, and a place to be found."
+        },
+        "deep": {
+          "title": "Deep analysis",
+          "description": "The v2 step runs later, calmly, without blocking publishing."
+        },
+        "review": {
+          "title": "Editorial review",
+          "description": "People refine summary, category, tags, and curriculum fit."
+        },
+        "path": {
+          "title": "Learning path",
+          "description": "The video enters tracks and collections only when it truly fits."
+        }
+      }
+    },
+    "modes": {
+      "fast": {
+        "title": "Fast curation complete",
+        "description": "The production path is light, reliable, and enough to publish with category and summary."
+      },
+      "deep": {
+        "title": "Advanced analysis later",
+        "description": "Deep analysis is asynchronous. It improves content after submission without making people wait."
+      },
+      "editorial": {
+        "title": "People finish the work",
+        "description": "Editors verify context, tone, relevance, and playlist fit."
+      }
+    },
+    "editorial": {
+      "title": "Editorial desk",
+      "description": "Good curation is not just publishing. It checks category, summary, tags, and path with care.",
+      "cta": "Apply as editor",
+      "checklist": {
+        "category": "Category makes sense",
+        "summary": "Summary helps before play",
+        "tags": "Tags connect ideas",
+        "playlist": "Playlist fit is real"
+      }
+    }
+  },
+  "facodiPage": {
+    "hero": {
+      "title": "FACODI shows Tube O2 in serious study mode",
+      "description": "LESTI tracks prove it in practice: scattered YouTube videos can become curriculum paths with unit, sequence, and intention.",
+      "primaryCta": "View LESTI tracks",
+      "secondaryCta": "Submit reference"
+    },
+    "metrics": {
+      "curricular": "Curriculum playlists",
+      "publicPaths": "Public paths",
+      "videos": "Cataloged videos"
+    },
+    "rails": {
+      "title": "Tracks with direction",
+      "description": "FACODI/LESTI paths organized by course, unit, and context.",
+      "facodi": {
+        "title": "FACODI foundations",
+        "description": "Academic base for sequenced, careful learning."
+      },
+      "lesti": {
+        "title": "LESTI in practice",
+        "description": "Technology, data, and systems in project-aware routes."
+      }
+    },
+    "featured": {
+      "title": "Also in the open collection",
+      "description": "Beyond curriculum, the community organizes public collections with useful videos and context."
+    },
+    "categories": {
+      "title": "Themes feeding the tracks",
+      "description": "Categories help every video find the right shelf."
+    }
+  },
+  "legal": {
+    "eyebrow": "Transparency and trust",
+    "lastUpdated": "Last updated",
+    "reviewNotice": "This page documents Tube O2 current practices and should be reviewed as the product evolves.",
+    "summaryTitle": "Quick summary",
+    "contactTitle": "Questions or requests",
+    "contactDescription": "To request information, correction, deletion, or clarification, use the official contact channel.",
+    "contactAction": "Contact the team"
+  },
+  "privacy": {
+    "title": "Privacy Policy",
+    "description": "How Tube O2 collects, uses, protects, and lets you control personal data used in the platform.",
+    "updatedAt": "June 4, 2026",
+    "metaImageAlt": "Tube O2 Privacy Policy",
+    "highlights": [
+      "We collect only data needed for accounts, curation, security, and community features.",
+      "Authentication and profile data are operated with Supabase and protected by access controls.",
+      "You can request access, correction, or deletion through the contact channel."
+    ],
+    "sections": [
+      {
+        "title": "Data we collect",
+        "body": "We collect information you provide and technical data required to keep the platform secure and functional.",
+        "items": [
+          "Account data such as email and authentication identifiers.",
+          "Profile data such as public name, username, bio, and avatar.",
+          "Submitted videos, playlists, favorites, comments, and editorial applications.",
+          "Basic technical signals such as language, visual preferences, session data, and security events."
+        ]
+      },
+      {
+        "title": "How we use data",
+        "body": "We use data to deliver Tube O2, organize educational content, and protect the community.",
+        "items": [
+          "Authenticate users and keep sessions secure.",
+          "Display profiles, contributions, playlists, and public interactions chosen by the user.",
+          "Process submitted videos, metadata, and curation signals.",
+          "Respond to support requests, moderate abuse, and meet applicable obligations."
+        ]
+      },
+      {
+        "title": "Sharing and processors",
+        "body": "We do not sell personal data. We may use technical processors for hosting, authentication, database, email, and content enrichment.",
+        "items": [
+          "Supabase for database, authentication, and backend functions.",
+          "AI and email services only when needed for content processing or communications.",
+          "YouTube/Google when you submit or view content hosted on those platforms."
+        ]
+      },
+      {
+        "title": "Your rights",
+        "body": "You can request access, correction, portability, restriction, or deletion of personal data, subject to legal and anti-abuse obligations.",
+        "items": [
+          "Use the contact page for privacy-related requests.",
+          "Some public contributions may remain anonymized or aggregated when needed for editorial integrity.",
+          "We may ask for identity verification before handling sensitive requests."
+        ]
+      }
+    ]
+  },
+  "terms": {
+    "title": "Terms of Use",
+    "description": "The essential rules for using Tube O2, contributing content, and participating in the community.",
+    "updatedAt": "June 4, 2026",
+    "metaImageAlt": "Tube O2 Terms of Use",
+    "highlights": [
+      "Use the platform respectfully, in good faith, and with editorial responsibility.",
+      "Submit only links and information you have the right to share.",
+      "We may moderate, remove, or limit content that harms the community."
+    ],
+    "sections": [
+      {
+        "title": "Acceptance",
+        "body": "By accessing or using Tube O2, you agree to these terms, the Privacy Policy, and community rules.",
+        "items": [
+          "If you do not agree, do not use authenticated areas or submit content.",
+          "Some features may require an account, verification, or specific permissions."
+        ]
+      },
+      {
+        "title": "Allowed use",
+        "body": "Tube O2 exists for discovery, curation, and organization of cultural and educational videos.",
+        "items": [
+          "Do not use the platform for spam, abuse, harassment, fraud, rights violations, or security bypass attempts.",
+          "Keep comments, profiles, and submissions aligned with editorial rules.",
+          "Respect copyright and the terms of linked external platforms."
+        ]
+      },
+      {
+        "title": "Content and contributions",
+        "body": "You remain responsible for the content you submit, comment on, or organize. By contributing, you authorize Tube O2 to display, classify, enrich, and organize that information within the platform.",
+        "items": [
+          "We may adjust metadata, tags, and descriptions to improve curation and quality.",
+          "We may reject or remove content that violates rules, laws, or editorial criteria.",
+          "YouTube links remain subject to YouTube availability and policies."
+        ]
+      },
+      {
+        "title": "Availability and changes",
+        "body": "The platform may evolve, change, or be temporarily unavailable. We make reasonable efforts to maintain stability and clear communication.",
+        "items": [
+          "Experimental features may change without prior notice.",
+          "We may update these terms when the product, risks, or legal requirements change."
+        ]
+      }
+    ]
+  },
+  "cookies": {
+    "title": "Cookie Policy",
+    "description": "How we use cookies, localStorage, and similar technologies for sessions, preferences, and experience quality.",
+    "updatedAt": "June 4, 2026",
+    "metaImageAlt": "Tube O2 Cookie Policy",
+    "highlights": [
+      "We use essential storage for login, language, theme, and application behavior.",
+      "We do not rely on cookies to sell personal data.",
+      "You can clear cookies and local data in your browser, but this may end sessions and reset preferences."
+    ],
+    "sections": [
+      {
+        "title": "Technologies used",
+        "body": "Tube O2 may use cookies, localStorage, sessionStorage, and tokens managed by providers such as Supabase to keep the app working.",
+        "items": [
+          "Authentication session and security.",
+          "Language, theme, and interface state preferences.",
+          "Local cache and technical data for performance."
+        ]
+      },
+      {
+        "title": "Purposes",
+        "body": "These technologies help authenticate users, remember preferences, and provide a faster, more consistent experience.",
+        "items": [
+          "Keep you securely signed in.",
+          "Avoid asking for the same preferences repeatedly.",
+          "Support technical diagnostics and abuse prevention."
+        ]
+      },
+      {
+        "title": "Management",
+        "body": "You can block or delete cookies and local data in your browser settings.",
+        "items": [
+          "Blocking essential storage may prevent login or authenticated features.",
+          "When local data is cleared, language, theme, and session may reset.",
+          "If granular consent tools are introduced later, this policy will be updated."
+        ]
+      }
+    ]
   }
 }

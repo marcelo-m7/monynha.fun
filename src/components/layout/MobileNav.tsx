@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { 
   Search, Plus, LogOut, Heart, Globe, ListVideo, 
   User as UserIcon, Settings, KeyRound, Home, 
-  Info, BookOpen, Mail, HelpCircle, Users, Bell, MessageCircle, ShieldCheck
+  Info, BookOpen, Mail, HelpCircle, Users, Bell, MessageCircle, ShieldCheck, GraduationCap, Sparkles, Scale, Cookie
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -53,11 +53,16 @@ export const MobileNav: React.FC<MobileNavProps> = ({
     { to: "/", label: t('header.home'), icon: Home },
     { to: "/videos", label: t('header.videos'), icon: ListVideo },
     { to: "/playlists", label: t('header.playlists'), icon: ListVideo },
+    { to: "/facodi", label: t('header.facodi'), icon: GraduationCap },
+    { to: "/curadoria", label: t('header.curation'), icon: Sparkles },
     { to: "/community", label: t('footer.community'), icon: Users },
     { to: "/about", label: t('footer.about'), icon: Info },
     { to: "/rules", label: t('footer.rules'), icon: BookOpen },
     { to: "/contact", label: t('footer.contact'), icon: Mail },
     { to: "/faq", label: t('footer.faq'), icon: HelpCircle },
+    { to: "/privacy", label: t('footer.privacy'), icon: ShieldCheck },
+    { to: "/terms", label: t('footer.terms'), icon: Scale },
+    { to: "/cookies", label: t('footer.cookies'), icon: Cookie },
   ];
 
   return (

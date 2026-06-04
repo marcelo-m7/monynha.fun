@@ -1,5 +1,20 @@
+/// <reference types="node" />
+
 import { extname, join, normalize, resolve } from 'node:path';
 import { createClient } from '@supabase/supabase-js';
+
+type BunStaticFile = {
+  exists(): Promise<boolean>;
+  text(): Promise<string>;
+};
+
+declare const Bun: {
+  file(path: string): BunStaticFile;
+  serve(options: {
+    port: number;
+    fetch(request: Request): Response | Promise<Response>;
+  }): unknown;
+};
 
 const DIST_DIR = resolve(process.cwd(), 'dist');
 const INDEX_PATH = join(DIST_DIR, 'index.html');
@@ -40,6 +55,9 @@ const trimSummary = (value: string | null | undefined, maxLength = 160): string 
   return `${text.slice(0, maxLength - 1).trimEnd()}...`;
 };
 
+const toJsonLd = (value: Record<string, unknown>): string =>
+  JSON.stringify(value).replace(/</g, '\\u003c');
+
 const isSafePath = (pathname: string): boolean => {
   if (pathname.includes('\0')) return false;
   const normalized = normalize(pathname);
@@ -64,22 +82,50 @@ const buildMetaBlock = (params: {
   description: string;
   image: string;
   url: string;
+  youtubeId: string;
 }): string => {
-  const { title, description, image, url } = params;
+  const { title, description, image, url, youtubeId } = params;
+  const imageType = image.endsWith('.png') ? 'image/png' : 'image/jpeg';
+  const jsonLd = toJsonLd({
+    '@context': 'https://schema.org',
+    '@type': 'VideoObject',
+    name: title.replace(/ \| Tube O2$/, ''),
+    description,
+    thumbnailUrl: [image],
+    url,
+    embedUrl: `https://www.youtube.com/embed/${youtubeId}`,
+    publisher: {
+      '@type': 'Organization',
+      name: 'Open 2 Technology',
+      url: 'https://open2.tech',
+      logo: {
+        '@type': 'ImageObject',
+        url: 'https://tube.open2.tech/favicon.svg',
+      },
+    },
+  });
 
   return [
     `<title>${escapeHtml(title)}</title>`,
     `<meta name="description" content="${escapeHtml(description)}" />`,
+    `<link rel="canonical" href="${escapeHtml(url)}" />`,
     `<meta property="og:title" content="${escapeHtml(title)}" />`,
     `<meta property="og:description" content="${escapeHtml(description)}" />`,
     `<meta property="og:image" content="${escapeHtml(image)}" />`,
+    `<meta property="og:image:alt" content="${escapeHtml(title)}" />`,
+    `<meta property="og:image:width" content="1200" />`,
+    `<meta property="og:image:height" content="630" />`,
+    `<meta property="og:image:type" content="${imageType}" />`,
     `<meta property="og:url" content="${escapeHtml(url)}" />`,
     `<meta property="og:type" content="video.other" />`,
     `<meta property="og:site_name" content="Tube O2" />`,
+    `<meta property="og:locale" content="pt_PT" />`,
     `<meta name="twitter:card" content="summary_large_image" />`,
     `<meta name="twitter:title" content="${escapeHtml(title)}" />`,
     `<meta name="twitter:description" content="${escapeHtml(description)}" />`,
     `<meta name="twitter:image" content="${escapeHtml(image)}" />`,
+    `<meta name="twitter:image:alt" content="${escapeHtml(title)}" />`,
+    `<script type="application/ld+json">${jsonLd}</script>`,
   ].join('\n');
 };
 
@@ -87,16 +133,24 @@ const stripManagedHeadTags = (html: string): string => {
   const patterns = [
     /<title>[\s\S]*?<\/title>/gi,
     /<meta[^>]*name=["']description["'][^>]*>/gi,
+    /<link[^>]*rel=["']canonical["'][^>]*>/gi,
     /<meta[^>]*property=["']og:title["'][^>]*>/gi,
     /<meta[^>]*property=["']og:description["'][^>]*>/gi,
     /<meta[^>]*property=["']og:image["'][^>]*>/gi,
+    /<meta[^>]*property=["']og:image:alt["'][^>]*>/gi,
+    /<meta[^>]*property=["']og:image:width["'][^>]*>/gi,
+    /<meta[^>]*property=["']og:image:height["'][^>]*>/gi,
+    /<meta[^>]*property=["']og:image:type["'][^>]*>/gi,
     /<meta[^>]*property=["']og:url["'][^>]*>/gi,
     /<meta[^>]*property=["']og:type["'][^>]*>/gi,
     /<meta[^>]*property=["']og:site_name["'][^>]*>/gi,
+    /<meta[^>]*property=["']og:locale["'][^>]*>/gi,
     /<meta[^>]*name=["']twitter:card["'][^>]*>/gi,
     /<meta[^>]*name=["']twitter:title["'][^>]*>/gi,
     /<meta[^>]*name=["']twitter:description["'][^>]*>/gi,
     /<meta[^>]*name=["']twitter:image["'][^>]*>/gi,
+    /<meta[^>]*name=["']twitter:image:alt["'][^>]*>/gi,
+    /<script[^>]*type=["']application\/ld\+json["'][^>]*>[\s\S]*?<\/script>/gi,
   ];
 
   return patterns.reduce((acc, pattern) => acc.replace(pattern, ''), html);
@@ -128,6 +182,7 @@ const fetchVideoMeta = async (videoIdOrYoutubeId: string): Promise<{
   title: string;
   description: string;
   image: string;
+  youtubeId: string;
 } | null> => {
   if (!supabaseClient) {
     return null;
@@ -165,7 +220,8 @@ const fetchVideoMeta = async (videoIdOrYoutubeId: string): Promise<{
   return {
     title: `${video.title} | Tube O2`,
     description: shortSummary || fallbackDescription || 'Watch this video on Tube O2.',
-    image: video.thumbnail_url || 'https://tube.open2.tech/placeholder.png',
+    image: video.thumbnail_url || 'https://tube.open2.tech/social-preview-default.png',
+    youtubeId: video.youtube_id,
   };
 };
 
@@ -203,6 +259,7 @@ const serveIndex = async (url: URL): Promise<Response> => {
       description: metadata.description,
       image: metadata.image,
       url: url.toString(),
+      youtubeId: metadata.youtubeId,
     });
 
     return new Response(injectMetaIntoHtml(template, metaBlock), {

@@ -28,10 +28,15 @@ const VideoDetails = lazy(() => import("./pages/VideoDetails"));
 const Videos = lazy(() => import("./pages/Videos"));
 const Favorites = lazy(() => import("./pages/Favorites"));
 const Community = lazy(() => import("./pages/Community"));
+const Curation = lazy(() => import("./pages/Curation"));
+const Facodi = lazy(() => import("./pages/Facodi"));
 const About = lazy(() => import("./pages/About"));
 const Rules = lazy(() => import("./pages/Rules"));
 const Contact = lazy(() => import("./pages/Contact"));
 const FAQ = lazy(() => import("./pages/FAQ"));
+const PrivacyPolicy = lazy(() => import("./pages/PrivacyPolicy"));
+const TermsOfService = lazy(() => import("./pages/TermsOfService"));
+const CookiePolicy = lazy(() => import("./pages/CookiePolicy"));
 const Playlists = lazy(() => import("./pages/Playlists"));
 const PlaylistDetails = lazy(() => import("./pages/PlaylistDetails"));
 const CreateEditPlaylist = lazy(() => import("./pages/CreateEditPlaylist"));
@@ -71,10 +76,15 @@ const App = () => (
         <Route path="/videos" element={<Videos />} />
         <Route path="/favorites" element={<Favorites />} />
         <Route path="/community" element={<Community />} />
+        <Route path="/curadoria" element={<Curation />} />
+        <Route path="/facodi" element={<Facodi />} />
         <Route path="/about" element={<About />} />
         <Route path="/rules" element={<Rules />} />
         <Route path="/contact" element={<Contact />} />
         <Route path="/faq" element={<FAQ />} />
+        <Route path="/privacy" element={<PrivacyPolicy />} />
+        <Route path="/terms" element={<TermsOfService />} />
+        <Route path="/cookies" element={<CookiePolicy />} />
         <Route path="/playlists" element={<Playlists />} />
         <Route path="/playlists/new" element={<CreateEditPlaylist />} />
         <Route path="/playlists/:playlistId" element={<PlaylistDetails />} />

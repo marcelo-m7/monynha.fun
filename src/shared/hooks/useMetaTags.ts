@@ -13,12 +13,22 @@ interface MetaTagsProps {
   imageWidth?: number;
   imageHeight?: number;
   imageType?: string;
+  locale?: string;
+  alternateLocales?: string[];
+  alternates?: Array<{ hrefLang: string; href: string }>;
+  jsonLd?: Record<string, unknown> | Array<Record<string, unknown>>;
 }
+
+const DEFAULT_ALTERNATE_LOCALES = ['en_US', 'es_ES', 'fr_FR'];
+const DEFAULT_HREFLANG_ALTERNATES = [
+  { hrefLang: 'pt-PT', href: 'https://tube.open2.tech/' },
+  { hrefLang: 'x-default', href: 'https://tube.open2.tech/' },
+];
 
 export const useMetaTags = ({
   title,
   description,
-  image = 'https://tube.open2.tech/placeholder.png',
+  image = 'https://tube.open2.tech/social-preview-default.png',
   url,
   type = 'website',
   imageAlt = 'Pré-visualização do Tube O2',
@@ -27,6 +37,10 @@ export const useMetaTags = ({
   imageWidth,
   imageHeight,
   imageType,
+  locale = 'pt_PT',
+  alternateLocales = DEFAULT_ALTERNATE_LOCALES,
+  alternates = DEFAULT_HREFLANG_ALTERNATES,
+  jsonLd,
 }: MetaTagsProps) => {
   const location = useLocation();
 
@@ -73,6 +87,16 @@ export const useMetaTags = ({
     }
     canonicalLink.setAttribute('href', canonicalUrl);
 
+    document.querySelectorAll('link[data-managed-hreflang="true"]').forEach((node) => node.remove());
+    for (const alternate of alternates) {
+      const alternateLink = document.createElement('link');
+      alternateLink.setAttribute('rel', 'alternate');
+      alternateLink.setAttribute('hreflang', alternate.hrefLang);
+      alternateLink.setAttribute('href', alternate.href);
+      alternateLink.setAttribute('data-managed-hreflang', 'true');
+      document.head.appendChild(alternateLink);
+    }
+
     // Open Graph tags
     upsertMetaTag('property', 'og:title', title);
     upsertMetaTag('property', 'og:description', description);
@@ -84,6 +108,15 @@ export const useMetaTags = ({
     upsertMetaTag('property', 'og:image:width', imageWidth?.toString());
     upsertMetaTag('property', 'og:image:height', imageHeight?.toString());
     upsertMetaTag('property', 'og:image:type', imageType);
+    upsertMetaTag('property', 'og:locale', locale);
+    document.querySelectorAll('meta[data-managed-og-locale-alternate="true"]').forEach((node) => node.remove());
+    for (const alternateLocale of alternateLocales) {
+      const tag = document.createElement('meta');
+      tag.setAttribute('property', 'og:locale:alternate');
+      tag.setAttribute('content', alternateLocale);
+      tag.setAttribute('data-managed-og-locale-alternate', 'true');
+      document.head.appendChild(tag);
+    }
 
     // Twitter tags
     upsertMetaTag('name', 'twitter:title', title);
@@ -92,6 +125,20 @@ export const useMetaTags = ({
     upsertMetaTag('name', 'twitter:image:alt', twitterImageAlt ?? imageAlt);
     upsertMetaTag('name', 'twitter:card', 'summary_large_image');
     upsertMetaTag('name', 'twitter:url', canonicalUrl);
+
+    const jsonLdScriptId = 'managed-json-ld';
+    const existingJsonLd = document.getElementById(jsonLdScriptId);
+    if (!jsonLd) {
+      existingJsonLd?.remove();
+    } else {
+      const target = existingJsonLd ?? document.createElement('script');
+      target.id = jsonLdScriptId;
+      target.setAttribute('type', 'application/ld+json');
+      target.textContent = JSON.stringify(jsonLd);
+      if (!existingJsonLd) {
+        document.head.appendChild(target);
+      }
+    }
   }, [
     title,
     description,
@@ -104,6 +151,10 @@ export const useMetaTags = ({
     imageWidth,
     imageHeight,
     imageType,
+    locale,
+    alternateLocales,
+    alternates,
+    jsonLd,
     location,
   ]);
 };

@@ -80,6 +80,20 @@ export const Header = () => {
             {t('header.playlists')}
           </NavLink>
           <NavLink
+            to="/facodi"
+            className="px-3 py-1.5 text-sm font-semibold rounded-md text-muted-foreground hover:text-foreground hover:bg-muted/60 transition-all"
+            activeClassName="text-foreground bg-primary/12 hover:bg-primary/16"
+          >
+            {t('header.facodi')}
+          </NavLink>
+          <NavLink
+            to="/curadoria"
+            className="px-3 py-1.5 text-sm font-semibold rounded-md text-muted-foreground hover:text-foreground hover:bg-muted/60 transition-all"
+            activeClassName="text-foreground bg-primary/12 hover:bg-primary/16"
+          >
+            {t('header.curation')}
+          </NavLink>
+          <NavLink
             to="/community"
             className="px-3 py-1.5 text-sm font-semibold rounded-md text-muted-foreground hover:text-foreground hover:bg-muted/60 transition-all"
             activeClassName="text-foreground bg-primary/12 hover:bg-primary/16"

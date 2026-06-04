@@ -38,7 +38,9 @@
     "switchToDark": "Mudar para modo escuro",
     "switchToLight": "Mudar para modo claro",
     "community": "Comunidade",
-    "editorialPortal": "Portal Editorial"
+    "editorialPortal": "Portal Editorial",
+    "facodi": "FACODI",
+    "curation": "Curadoria"
   },
   "footer": {
     "description": "O Tube O2 enriquece vídeos do YouTube e organiza-os em playlists educacionais para acelerar a aprendizagem.",
@@ -53,7 +55,44 @@
     "contact": "Contato",
     "faq": "FAQ",
     "madeWithLove": "Feito com",
-    "byOpen2Technology": "pela Open 2 Technology"
+    "byOpen2Technology": "pela Open 2 Technology",
+    "monynhaStatement": "Curadoria humana. Análise profunda. Aprendizagem com direção.",
+    "columns": {
+      "explore": {
+        "title": "Explorar",
+        "allPaths": "Todos os caminhos",
+        "facodi": "FACODI",
+        "lesti": "LESTI",
+        "byTheme": "Por tema",
+        "curation": "Como curamos"
+      },
+      "about": {
+        "title": "Sobre",
+        "howItWorks": "Como funciona",
+        "whoWeAre": "Quem somos",
+        "editorial": "Editorial",
+        "rules": "Metodologia",
+        "faq": "Perguntas frequentes"
+      },
+      "contribute": {
+        "title": "Contribuir",
+        "submit": "Enviar um link",
+        "editor": "Ser curador",
+        "community": "Comunidade",
+        "contact": "Contacto"
+      }
+    },
+    "live": {
+      "title": "Ao vivo no Tube O2"
+    },
+    "finalCta": {
+      "title": "Tens um link com valor?",
+      "description": "Envia-nos. Nós fazemos o resto com carinho e critério.",
+      "action": "Enviar um link agora"
+    },
+    "privacy": "Privacidade",
+    "terms": "Termos",
+    "cookies": "Cookies"
   },
   "labels": {
     "featured": "Destaque"
@@ -219,7 +258,9 @@
       "confirmEmail": "Verifique seu email para confirmar o cadastro",
       "passwordResetEmailSent": "Email de redefinição enviado!",
       "checkEmailForReset": "Verifique sua caixa de entrada para o link de redefinição de senha."
-    }
+    },
+    "termsAgreementPrefix": "Ao continuar, voce concorda com os",
+    "termsAgreementAnd": "e a"
   },
   "account": {
     "settings": {
@@ -681,7 +722,8 @@
       "description": "Descubra, salve e organize vídeos reais em trilhas com contexto, resumo e curadoria humana.",
       "primaryCta": "Explorar vídeos",
       "secondaryCta": "Enviar vídeo",
-      "railTitle": "Em curadoria"
+      "railTitle": "Em curadoria",
+      "monynhaTitle": "Vídeos bons não ficam perdidos no algoritmo"
     },
     "metrics": {
       "videos_total": "Vídeos catalogados",
@@ -731,7 +773,8 @@
           "title": "Caminhos públicos",
           "description": "Playlists ordenadas preservam contexto, sequência e intenção de aprendizagem."
         }
-      }
+      },
+      "cta": "Ver como funciona"
     },
     "cta": {
       "title": "Escolha como participar",
@@ -762,6 +805,26 @@
       "categories": "Nenhuma categoria pública encontrada.",
       "playlists": "Nenhuma playlist pública com vídeos encontrada.",
       "facodi": "Nenhuma trilha curricular pública encontrada."
+    },
+    "live": {
+      "label": "Ao vivo"
+    },
+    "learningRails": {
+      "title": "Caminhos de aprendizagem",
+      "description": "Trilhas com thumbnails reais, contexto curricular e sequência para estudar sem se perder no feed.",
+      "cta": "Abrir FACODI",
+      "facodi": {
+        "title": "Fundamentos acadêmicos para pensar melhor",
+        "description": "Roteiros FACODI com curadoria, curso e unidade no mesmo lugar."
+      },
+      "lesti": {
+        "title": "Tecnologia com propósito e visão de futuro",
+        "description": "Caminhos LESTI para programar, analisar dados e construir sistemas com cabeça."
+      },
+      "open": {
+        "title": "Coleções abertas da comunidade",
+        "description": "Bons links viram percursos públicos, com resumo e categoria antes do play."
+      }
     }
   },
   "notFound": {
@@ -1101,7 +1164,8 @@
         "motivationPlaceholder": "Compartilhe sua motivação e experiência editorial (opcional)",
         "portfolioLinksLabel": "Links de portfólio",
         "portfolioLinksPlaceholder": "Um link por linha (opcional)",
-        "consentLabel": "Concordo com a política de privacidade e autorizo o tratamento dos meus dados para esta candidatura."
+        "consentLabel": "Concordo com a política de privacidade e autorizo o tratamento dos meus dados para esta candidatura.",
+        "consentPrefix": "Concordo com a"
       },
       "submitButton": "Enviar candidatura",
       "successTitle": "Candidatura recebida",
@@ -1134,5 +1198,249 @@
       "noAccessDescription": "Apenas editoras e administradoras podem acessar esta página.",
       "backToEditorial": "Voltar para o portal editorial"
     }
+  },
+  "curationPage": {
+    "hero": {
+      "title": "Do link solto ao caminho com sentido",
+      "description": "No Tube O2, cada vídeo passa por uma curadoria rápida, pode ganhar análise profunda e fica pronto para revisão humana. Sem drama, sem bloquear o envio.",
+      "primaryCta": "Enviar um link",
+      "secondaryCta": "Quero curar",
+      "panelTitle": "Chegando agora à bancada"
+    },
+    "pipeline": {
+      "title": "Do link ao caminho",
+      "description": "Um processo editorial humano para transformar vídeo em aprendizagem real.",
+      "steps": {
+        "link": {
+          "title": "Link recebido",
+          "description": "Recebemos o vídeo e validamos se ele tem cara de material útil."
+        },
+        "fast": {
+          "title": "Curadoria rápida",
+          "description": "Resumo simples, idioma, tags e categoria saem sem depender de IA externa."
+        },
+        "category": {
+          "title": "Categorização",
+          "description": "O conteúdo ganha tema, contexto e lugar para começar a ser encontrado."
+        },
+        "deep": {
+          "title": "Análise profunda",
+          "description": "A etapa v2 roda depois, com calma, sem travar a publicação."
+        },
+        "review": {
+          "title": "Revisão editorial",
+          "description": "Pessoas ajustam resumo, categoria, tags e aderência curricular."
+        },
+        "path": {
+          "title": "Caminho de aprendizagem",
+          "description": "O vídeo entra em trilhas e coleções quando faz sentido de verdade."
+        }
+      }
+    },
+    "modes": {
+      "fast": {
+        "title": "Curadoria rápida concluída",
+        "description": "É o caminho de produção: leve, confiável e suficiente para publicar o vídeo com categoria e resumo."
+      },
+      "deep": {
+        "title": "Análise avançada sem pressa",
+        "description": "A análise profunda é assíncrona. Ela melhora o conteúdo depois, sem deixar a pessoa esperando na porta."
+      },
+      "editorial": {
+        "title": "Pessoas dão o acabamento",
+        "description": "Editoras e curadores verificam contexto, tom, relevância e lugar certo nas playlists."
+      }
+    },
+    "editorial": {
+      "title": "A bancada editorial",
+      "description": "Uma boa curadoria não é só clicar em publicar. É olhar para categoria, resumo, tags e caminho com critério.",
+      "cta": "Candidatar-me a editor",
+      "checklist": {
+        "category": "Categoria faz sentido",
+        "summary": "Resumo ajuda antes do play",
+        "tags": "Tags conectam ideias",
+        "playlist": "Playlist tem aderência real"
+      }
+    }
+  },
+  "facodiPage": {
+    "hero": {
+      "title": "FACODI mostra o Tube O2 em modo estudo sério",
+      "description": "As trilhas LESTI dão prova real: vídeos dispersos do YouTube podem virar percurso curricular, com unidade, sequência e intenção.",
+      "primaryCta": "Ver trilhas LESTI",
+      "secondaryCta": "Enviar referência"
+    },
+    "metrics": {
+      "curricular": "Playlists curriculares",
+      "publicPaths": "Caminhos públicos",
+      "videos": "Vídeos catalogados"
+    },
+    "rails": {
+      "title": "Trilhas com direção",
+      "description": "Caminhos FACODI/LESTI organizados para estudar por curso, unidade e contexto.",
+      "facodi": {
+        "title": "Fundamentos FACODI",
+        "description": "Base acadêmica para aprender com sequência e cuidado."
+      },
+      "lesti": {
+        "title": "LESTI em prática",
+        "description": "Tecnologia, dados e sistemas em roteiros que respiram projeto real."
+      }
+    },
+    "featured": {
+      "title": "Também no acervo aberto",
+      "description": "Além do currículo, a comunidade organiza coleções públicas com bons vídeos e contexto."
+    },
+    "categories": {
+      "title": "Temas que alimentam as trilhas",
+      "description": "Categorias ajudam cada vídeo a encontrar a sua prateleira certa."
+    }
+  },
+  "legal": {
+    "eyebrow": "Transparencia e confianca",
+    "lastUpdated": "Ultima atualizacao",
+    "reviewNotice": "Este texto organiza as praticas atuais do Tube O2 e deve ser revisto periodicamente conforme o produto evolui.",
+    "summaryTitle": "Resumo rapido",
+    "contactTitle": "Duvidas ou pedidos",
+    "contactDescription": "Para solicitar informacoes, correcao, exclusao ou esclarecimentos, use o canal de contato oficial.",
+    "contactAction": "Falar com a equipe"
+  },
+  "privacy": {
+    "title": "Politica de Privacidade",
+    "description": "Como o Tube O2 coleta, usa, protege e permite controlar os dados pessoais usados na plataforma.",
+    "updatedAt": "4 de junho de 2026",
+    "metaImageAlt": "Politica de Privacidade do Tube O2",
+    "highlights": [
+      "Coletamos apenas dados necessarios para conta, curadoria, seguranca e funcionamento da comunidade.",
+      "Dados de autenticacao e perfis sao operados com Supabase e protegidos por controles de acesso.",
+      "Voce pode pedir acesso, correcao ou exclusao dos seus dados pelo canal de contato."
+    ],
+    "sections": [
+      {
+        "title": "Dados que coletamos",
+        "body": "Coletamos informacoes fornecidas por voce e dados tecnicos necessarios para manter a plataforma funcionando com seguranca.",
+        "items": [
+          "Dados de conta, como email e identificadores de autenticacao.",
+          "Dados de perfil, como nome publico, username, bio e avatar.",
+          "Videos enviados, playlists, favoritos, comentarios e candidaturas editoriais.",
+          "Sinais tecnicos basicos, como idioma, preferencia visual, sessao e eventos necessarios de seguranca."
+        ]
+      },
+      {
+        "title": "Como usamos os dados",
+        "body": "Usamos os dados para entregar a experiencia do Tube O2, organizar conteudo educacional e proteger a comunidade.",
+        "items": [
+          "Autenticar usuarios e manter sessoes seguras.",
+          "Exibir perfis, contribuicoes, playlists e interacoes publicas escolhidas pelo usuario.",
+          "Processar videos enviados, metadados e sinais de curadoria.",
+          "Responder pedidos de suporte, moderar abusos e cumprir obrigacoes aplicaveis."
+        ]
+      },
+      {
+        "title": "Compartilhamento e operadores",
+        "body": "Nao vendemos dados pessoais. Podemos usar operadores tecnicos para hospedagem, autenticacao, banco de dados, email e enriquecimento de conteudo.",
+        "items": [
+          "Supabase para banco de dados, autenticacao e funcoes de backend.",
+          "Servicos de IA e email apenas quando necessarios para processar conteudo ou comunicacoes.",
+          "YouTube/Google quando voce envia ou acessa conteudo hospedado nessas plataformas."
+        ]
+      },
+      {
+        "title": "Seus direitos",
+        "body": "Voce pode solicitar acesso, correcao, portabilidade, limitacao ou exclusao de dados pessoais, sujeito a obrigacoes legais e antifraude.",
+        "items": [
+          "Use a pagina de contato para abrir pedidos relacionados a privacidade.",
+          "Algumas contribuicoes publicas podem permanecer anonimizadas ou agregadas quando necessarias para integridade editorial.",
+          "Podemos pedir verificacao de identidade antes de atender pedidos sensiveis."
+        ]
+      }
+    ]
+  },
+  "terms": {
+    "title": "Termos de Uso",
+    "description": "As regras essenciais para usar o Tube O2, contribuir com conteudo e participar da comunidade.",
+    "updatedAt": "4 de junho de 2026",
+    "metaImageAlt": "Termos de Uso do Tube O2",
+    "highlights": [
+      "Use a plataforma com respeito, boa-fe e responsabilidade editorial.",
+      "Envie apenas links e informacoes que voce tem direito de compartilhar.",
+      "Podemos moderar, remover ou limitar conteudo que prejudique a comunidade."
+    ],
+    "sections": [
+      {
+        "title": "Aceitacao dos termos",
+        "body": "Ao acessar ou usar o Tube O2, voce concorda com estes termos, com a Politica de Privacidade e com as regras da comunidade.",
+        "items": [
+          "Se voce nao concorda, nao deve usar areas autenticadas ou enviar conteudo.",
+          "Algumas funcionalidades podem exigir conta, verificacao ou permissoes especificas."
+        ]
+      },
+      {
+        "title": "Uso permitido",
+        "body": "O Tube O2 existe para descoberta, curadoria e organizacao de videos culturais e educacionais.",
+        "items": [
+          "Nao use a plataforma para spam, abuso, assedio, fraude, violacao de direitos ou tentativa de burlar seguranca.",
+          "Mantenha comentarios, perfis e submissões alinhados com as regras editoriais.",
+          "Respeite direitos autorais e os termos das plataformas externas vinculadas."
+        ]
+      },
+      {
+        "title": "Conteudo e contribuicoes",
+        "body": "Voce continua responsavel pelo conteudo que envia, comenta ou organiza. Ao contribuir, autoriza o Tube O2 a exibir, classificar, enriquecer e organizar essas informacoes dentro da plataforma.",
+        "items": [
+          "Podemos ajustar metadados, tags e descricoes para melhorar curadoria e qualidade.",
+          "Podemos rejeitar ou remover conteudo que viole regras, leis ou criterios editoriais.",
+          "Links do YouTube continuam sujeitos a disponibilidade e politicas do YouTube."
+        ]
+      },
+      {
+        "title": "Disponibilidade e mudancas",
+        "body": "A plataforma pode evoluir, mudar ou ficar indisponivel temporariamente. Faremos esforcos razoaveis para manter estabilidade e comunicacao clara.",
+        "items": [
+          "Funcionalidades experimentais podem mudar sem aviso previo.",
+          "Podemos atualizar estes termos quando o produto, riscos ou exigencias legais mudarem."
+        ]
+      }
+    ]
+  },
+  "cookies": {
+    "title": "Politica de Cookies",
+    "description": "Como usamos cookies, localStorage e tecnologias semelhantes para manter a sessao, preferencias e qualidade da experiencia.",
+    "updatedAt": "4 de junho de 2026",
+    "metaImageAlt": "Politica de Cookies do Tube O2",
+    "highlights": [
+      "Usamos armazenamento essencial para login, idioma, tema e funcionamento da aplicacao.",
+      "Nao dependemos de cookies para vender dados pessoais.",
+      "Voce pode limpar cookies e dados locais no navegador, mas isso pode encerrar sessoes e preferencias."
+    ],
+    "sections": [
+      {
+        "title": "Tecnologias usadas",
+        "body": "O Tube O2 pode usar cookies, localStorage, sessionStorage e tokens gerenciados por provedores como Supabase para manter a aplicacao funcionando.",
+        "items": [
+          "Sessao de autenticacao e seguranca.",
+          "Preferencia de idioma, tema e estado de interface.",
+          "Cache local e dados tecnicos para desempenho."
+        ]
+      },
+      {
+        "title": "Finalidades",
+        "body": "Essas tecnologias ajudam a autenticar usuarios, lembrar preferencias e oferecer uma experiencia mais rapida e consistente.",
+        "items": [
+          "Manter voce conectado com seguranca.",
+          "Evitar solicitar as mesmas preferencias repetidamente.",
+          "Apoiar diagnostico tecnico e prevencao de abuso."
+        ]
+      },
+      {
+        "title": "Gerenciamento",
+        "body": "Voce pode bloquear ou apagar cookies e dados locais nas configuracoes do navegador.",
+        "items": [
+          "Bloquear armazenamento essencial pode impedir login ou funcionalidades autenticadas.",
+          "Ao limpar dados locais, idioma, tema e sessao podem ser redefinidos.",
+          "Se houver futuras ferramentas de consentimento granular, esta politica sera atualizada."
+        ]
+      }
+    ]
   }
 }

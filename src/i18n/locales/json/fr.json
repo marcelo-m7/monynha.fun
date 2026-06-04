@@ -53,7 +53,10 @@
     "contact": "Contact",
     "faq": "FAQ",
     "madeWithLove": "Fait avec",
-    "byMonynhaSoftwares": "par Open 2 Technology"
+    "byMonynhaSoftwares": "par Open 2 Technology",
+    "privacy": "Confidentialité",
+    "terms": "Conditions",
+    "cookies": "Cookies"
   },
   "labels": {
     "featured": "En Vedette"
@@ -138,7 +141,9 @@
       "confirmEmail": "Vérifiez votre email pour confirmer votre inscription",
       "passwordResetEmailSent": "Email de réinitialisation du mot de passe envoyé !",
       "checkEmailForReset": "Vérifiez votre boîte de réception pour le lien de réinitialisation du mot de passe."
-    }
+    },
+    "termsAgreementPrefix": "En continuant, vous acceptez les",
+    "termsAgreementAnd": "et la"
   },
   "account": {
     "settings": {
@@ -629,7 +634,8 @@
         "motivationPlaceholder": "Partagez votre motivation et votre expérience éditoriale (optionnel)",
         "portfolioLinksLabel": "Liens de portfolio",
         "portfolioLinksPlaceholder": "Un lien par ligne (optionnel)",
-        "consentLabel": "J'accepte la politique de confidentialité et j'autorise le traitement de mes données pour cette candidature."
+        "consentLabel": "J'accepte la politique de confidentialité et j'autorise le traitement de mes données pour cette candidature.",
+        "consentPrefix": "J’accepte la"
       },
       "submitButton": "Envoyer la candidature",
       "successTitle": "Candidature reçue",
@@ -885,5 +891,152 @@
     "noPlaylistsTitle": "Aucune playlist créée pour le moment",
     "noPlaylistsDescription": "Les playlists de ce profil apparaîtront ici.",
     "createFirstPlaylist": "Créer la première playlist"
+  },
+  "legal": {
+    "eyebrow": "Transparence et confiance",
+    "lastUpdated": "Dernière mise à jour",
+    "reviewNotice": "Cette page documente les pratiques actuelles de Tube O2 et doit être révisée à mesure que le produit évolue.",
+    "summaryTitle": "Résumé rapide",
+    "contactTitle": "Questions ou demandes",
+    "contactDescription": "Pour demander des informations, une correction, une suppression ou des précisions, utilisez le canal de contact officiel.",
+    "contactAction": "Contacter l'équipe"
+  },
+  "privacy": {
+    "title": "Politique de Confidentialité",
+    "description": "Comment Tube O2 collecte, utilise, protège et permet de contrôler les données personnelles utilisées dans la plateforme.",
+    "updatedAt": "4 juin 2026",
+    "metaImageAlt": "Politique de Confidentialité de Tube O2",
+    "highlights": [
+      "Nous collectons uniquement les données nécessaires aux comptes, à la curation, à la sécurité et aux fonctions communautaires.",
+      "Les données d'authentification et de profil sont opérées avec Supabase et protégées par des contrôles d'accès.",
+      "Vous pouvez demander accès, correction ou suppression via le canal de contact."
+    ],
+    "sections": [
+      {
+        "title": "Données collectées",
+        "body": "Nous collectons les informations que vous fournissez et les données techniques nécessaires au fonctionnement sécurisé de la plateforme.",
+        "items": [
+          "Données de compte, comme l'email et les identifiants d'authentification.",
+          "Données de profil, comme nom public, username, bio et avatar.",
+          "Vidéos soumises, playlists, favoris, commentaires et candidatures éditoriales.",
+          "Signaux techniques de base, comme langue, préférence visuelle, session et événements de sécurité."
+        ]
+      },
+      {
+        "title": "Utilisation des données",
+        "body": "Nous utilisons les données pour fournir Tube O2, organiser le contenu éducatif et protéger la communauté.",
+        "items": [
+          "Authentifier les utilisateurs et sécuriser les sessions.",
+          "Afficher profils, contributions, playlists et interactions publiques choisies par l'utilisateur.",
+          "Traiter vidéos soumises, métadonnées et signaux de curation.",
+          "Répondre au support, modérer les abus et respecter les obligations applicables."
+        ]
+      },
+      {
+        "title": "Partage et prestataires",
+        "body": "Nous ne vendons pas de données personnelles. Nous pouvons utiliser des prestataires techniques pour hébergement, authentification, base de données, email et enrichissement de contenu.",
+        "items": [
+          "Supabase pour base de données, authentification et fonctions backend.",
+          "Services IA et email uniquement lorsque nécessaire au traitement du contenu ou des communications.",
+          "YouTube/Google lorsque vous envoyez ou consultez du contenu hébergé sur ces plateformes."
+        ]
+      },
+      {
+        "title": "Vos droits",
+        "body": "Vous pouvez demander accès, correction, portabilité, limitation ou suppression de données personnelles, sous réserve des obligations légales et antiabus.",
+        "items": [
+          "Utilisez la page de contact pour les demandes liées à la confidentialité.",
+          "Certaines contributions publiques peuvent rester anonymisées ou agrégées si nécessaire à l'intégrité éditoriale.",
+          "Nous pouvons demander une vérification d’identité avant les demandes sensibles."
+        ]
+      }
+    ]
+  },
+  "terms": {
+    "title": "Conditions d'Utilisation",
+    "description": "Les règles essentielles pour utiliser Tube O2, contribuer du contenu et participer à la communauté.",
+    "updatedAt": "4 juin 2026",
+    "metaImageAlt": "Conditions d'Utilisation de Tube O2",
+    "highlights": [
+      "Utilisez la plateforme avec respect, bonne foi et responsabilité éditoriale.",
+      "Soumettez uniquement des liens et informations que vous avez le droit de partager.",
+      "Nous pouvons modérer, supprimer ou limiter le contenu nuisible à la communauté."
+    ],
+    "sections": [
+      {
+        "title": "Acceptation",
+        "body": "En accédant à Tube O2 ou en l'utilisant, vous acceptez ces conditions, la Politique de Confidentialité et les règles communautaires.",
+        "items": [
+          "Si vous n'acceptez pas, n'utilisez pas les zones authentifiées et ne soumettez pas de contenu.",
+          "Certaines fonctions peuvent exiger un compte, une vérification ou des permissions spécifiques."
+        ]
+      },
+      {
+        "title": "Usage autorisé",
+        "body": "Tube O2 sert à découvrir, sélectionner et organiser des vidéos culturelles et éducatives.",
+        "items": [
+          "N'utilisez pas la plateforme pour spam, abus, harcèlement, fraude, violation de droits ou tentative de contournement de sécurité.",
+          "Gardez commentaires, profils et soumissions alignés avec les règles éditoriales.",
+          "Respectez les droits d’auteur et les conditions des plateformes externes liées."
+        ]
+      },
+      {
+        "title": "Contenu et contributions",
+        "body": "Vous restez responsable du contenu que vous soumettez, commentez ou organisez. En contribuant, vous autorisez Tube O2 à afficher, classer, enrichir et organiser ces informations dans la plateforme.",
+        "items": [
+          "Nous pouvons ajuster métadonnées, tags et descriptions pour améliorer curation et qualité.",
+          "Nous pouvons refuser ou supprimer du contenu qui viole règles, lois ou critères éditoriaux.",
+          "Les liens YouTube restent soumis à la disponibilité et aux politiques de YouTube."
+        ]
+      },
+      {
+        "title": "Disponibilité et changements",
+        "body": "La plateforme peut évoluer, changer ou être temporairement indisponible. Nous faisons des efforts raisonnables pour maintenir stabilité et communication claire.",
+        "items": [
+          "Les fonctionnalités expérimentales peuvent changer sans préavis.",
+          "Nous pouvons mettre à jour ces conditions lorsque le produit, les risques ou les exigences légales changent."
+        ]
+      }
+    ]
+  },
+  "cookies": {
+    "title": "Politique de Cookies",
+    "description": "Comment nous utilisons cookies, localStorage et technologies similaires pour sessions, préférences et qualité d’expérience.",
+    "updatedAt": "4 juin 2026",
+    "metaImageAlt": "Politique de Cookies de Tube O2",
+    "highlights": [
+      "Nous utilisons un stockage essentiel pour connexion, langue, thème et fonctionnement de l'application.",
+      "Nous ne dépendons pas des cookies pour vendre des données personnelles.",
+      "Vous pouvez effacer cookies et données locales dans le navigateur, mais cela peut fermer les sessions et réinitialiser les préférences."
+    ],
+    "sections": [
+      {
+        "title": "Technologies utilisées",
+        "body": "Tube O2 peut utiliser cookies, localStorage, sessionStorage et tokens gérés par des fournisseurs comme Supabase pour faire fonctionner l'application.",
+        "items": [
+          "Session d'authentification et sécurité.",
+          "Préférences de langue, thème et état d'interface.",
+          "Cache local et données techniques pour la performance."
+        ]
+      },
+      {
+        "title": "Finalités",
+        "body": "Ces technologies aident à authentifier les utilisateurs, mémoriser les préférences et offrir une expérience plus rapide et cohérente.",
+        "items": [
+          "Vous garder connecté en sécurité.",
+          "Éviter de demander plusieurs fois les mêmes préférences.",
+          "Soutenir diagnostic technique et prévention des abus."
+        ]
+      },
+      {
+        "title": "Gestion",
+        "body": "Vous pouvez bloquer ou supprimer cookies et données locales dans les paramètres du navigateur.",
+        "items": [
+          "Bloquer le stockage essentiel peut empêcher la connexion ou les fonctionnalités authentifiées.",
+          "Lorsque les données locales sont effacées, langue, thème et session peuvent être réinitialisés.",
+          "Si des outils de consentement granulaire sont ajoutés plus tard, cette politique sera mise à jour."
+        ]
+      }
+    ]
   }
 }
