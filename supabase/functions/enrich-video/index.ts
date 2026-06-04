@@ -1,12 +1,7 @@
-import { serve } from "https://deno.land/std@0.190.0/http/server.ts"
+﻿import { serve } from "https://deno.land/std@0.190.0/http/server.ts"
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.45.0'
-import { createOpenAIClient, type VideoEnrichmentParams, type VideoEnrichmentResult } from '../_shared/openai-client.ts'
-import {
-  assignPlaylist,
-  PLAYLIST_ASSIGNMENT_ALGORITHM_VERSION,
-  type PlaylistAssignmentPlaylist,
-  type PlaylistAssignmentResult,
-} from '../_shared/playlist-assignment.ts'
+import { createGeminiClient, type GeminiError, type GeminiVideoAnalysisResult } from '../_shared/gemini-client.ts'
+import { assignPlaylist, type PlaylistAssignmentResult } from '../_shared/playlist-assignment.ts'
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -17,25 +12,22 @@ declare const EdgeRuntime: {
   waitUntil: (promise: Promise<unknown>) => void;
 };
 
-type CategoryRow = {
+type PlaylistRow = {
   id: string;
   name: string;
-  slug: string;
-};
-
-type PlaylistRow = PlaylistAssignmentPlaylist;
-
-type VideoProcessingVideo = {
-  youtube_id: string;
-  title: string | null;
   description: string | null;
-  channel_name: string | null;
-  language: string | null;
-  category_id: string | null;
+  language: string;
+  is_public: boolean;
+  is_ordered: boolean;
+  course_code: string | null;
+  unit_code: string | null;
 };
 
-type AssignmentWithError = PlaylistAssignmentResult & {
-  providerError: string | null;
+type EnhancedAssignmentResult = {
+  assignedPlaylistId: string | null;
+  playlistAssignment: PlaylistAssignmentResult | null;
+  reliability: 'high' | 'low';
+  reason: string;
 };
 
 class HttpError extends Error {
@@ -53,16 +45,57 @@ class HttpError extends Error {
   }
 }
 
+type ProcessingErrorPayload = {
+  code: string;
+  message: string;
+  stage: string;
+  recoverable: boolean;
+  requestId: string;
+};
+
+type TranscriptProcessingResult = {
+  id: string | null;
+  provider: 'gemini';
+  providerModel: string;
+  status: 'completed' | 'unavailable' | 'failed';
+  language: string | null;
+  summary: string | null;
+  confidence: number;
+  errorMessage: string | null;
+  analysis: GeminiVideoAnalysisResult;
+};
+
+type VideoProcessingVideo = {
+  youtube_id: string;
+  title: string | null;
+  description: string | null;
+  channel_name: string | null;
+  language: string | null;
+  category_id: string | null;
+};
+
 function createRequestId() {
   return crypto.randomUUID();
 }
 
 function logProcessing(requestId: string, stage: string, message: string, details: Record<string, unknown> = {}) {
-  console.log(JSON.stringify({ source: 'enrich-video', requestId, stage, message, ...details }));
+  console.log(JSON.stringify({
+    source: 'enrich-video',
+    requestId,
+    stage,
+    message,
+    ...details,
+  }));
 }
 
 function logProcessingError(requestId: string, stage: string, message: string, details: Record<string, unknown> = {}) {
-  console.error(JSON.stringify({ source: 'enrich-video', requestId, stage, message, ...details }));
+  console.error(JSON.stringify({
+    source: 'enrich-video',
+    requestId,
+    stage,
+    message,
+    ...details,
+  }));
 }
 
 function extractYouTubeId(url: string): string | null {
@@ -73,19 +106,32 @@ function extractYouTubeId(url: string): string | null {
 
   for (const pattern of patterns) {
     const match = url.match(pattern);
-    if (match?.[1]) return match[1];
+    if (match?.[1]) {
+      return match[1];
+    }
   }
 
   return null;
 }
 
 function isRecoverableExternalError(error: unknown) {
-  if (error instanceof HttpError) return error.recoverable;
   if (!(error instanceof Error)) return true;
-  return /timeout|aborted|rate limit|429|500|502|503|504|network|fetch/i.test(error.message);
+  const message = error.message.toLowerCase();
+  return (
+    message.includes('timeout') ||
+    message.includes('aborted') ||
+    message.includes('rate limit') ||
+    message.includes('429') ||
+    message.includes('500') ||
+    message.includes('502') ||
+    message.includes('503') ||
+    message.includes('504') ||
+    message.includes('network') ||
+    message.includes('fetch')
+  );
 }
 
-function toProcessingErrorPayload(error: unknown, requestId: string, fallbackStage = 'processing') {
+function toProcessingErrorPayload(error: unknown, requestId: string, fallbackStage = 'processing'): ProcessingErrorPayload {
   if (error instanceof HttpError) {
     return {
       code: error.code,
@@ -96,38 +142,92 @@ function toProcessingErrorPayload(error: unknown, requestId: string, fallbackSta
     };
   }
 
-  const message = error instanceof Error ? error.message : 'Unknown error occurred';
-  const recoverable = isRecoverableExternalError(error);
+  const maybeGeminiError = error as Partial<GeminiError>;
+  if (maybeGeminiError.code && error instanceof Error) {
+    return {
+      code: maybeGeminiError.code,
+      message: error.message,
+      stage: fallbackStage,
+      recoverable: maybeGeminiError.recoverable ?? isRecoverableExternalError(error),
+      requestId,
+    };
+  }
+
+  if (error instanceof Error) {
+    const recoverable = isRecoverableExternalError(error);
+    return {
+      code: recoverable ? 'EXTERNAL_PROCESSING_ERROR' : 'PROCESSING_ERROR',
+      message: error.message,
+      stage: fallbackStage,
+      recoverable,
+      requestId,
+    };
+  }
+
   return {
-    code: recoverable ? 'EXTERNAL_PROCESSING_ERROR' : 'PROCESSING_ERROR',
-    message,
+    code: 'UNKNOWN_PROCESSING_ERROR',
+    message: 'Unknown error occurred',
     stage: fallbackStage,
-    recoverable,
+    recoverable: true,
     requestId,
   };
 }
 
 function normalizeLanguage(value: string | null | undefined): string | null {
   const normalized = (value ?? '').trim().toLowerCase();
-  return normalized.length >= 2 ? normalized.slice(0, 12) : null;
+  return normalized.length >= 2 ? normalized : null;
 }
 
-function normalizeText(value: string | null | undefined): string {
-  return (value ?? '')
-    .normalize('NFD')
-    .replace(/[\u0300-\u036f]/g, '')
-    .toLowerCase()
-    .trim();
-}
+async function assignVideoToPlaylist(
+  supabaseServiceRole: ReturnType<typeof createClient>,
+  playlistId: string,
+  videoId: string,
+  addedBy: string,
+) {
+  const { data: existing, error: existingError } = await supabaseServiceRole
+    .from('playlist_videos')
+    .select('id')
+    .eq('playlist_id', playlistId)
+    .eq('video_id', videoId)
+    .maybeSingle();
 
-function processingMetadata(requestId: string, stage: string) {
-  return {
-    processing: {
-      requestId,
-      stage,
-      updatedAt: new Date().toISOString(),
-    },
-  };
+  if (existingError) {
+    throw new Error(`Failed to check existing playlist assignment: ${existingError.message}`);
+  }
+
+  if (existing) {
+    return;
+  }
+
+  const { data: lastPositionRows, error: positionError } = await supabaseServiceRole
+    .from('playlist_videos')
+    .select('position')
+    .eq('playlist_id', playlistId)
+    .order('position', { ascending: false })
+    .limit(1);
+
+  if (positionError) {
+    throw new Error(`Failed to calculate playlist position: ${positionError.message}`);
+  }
+
+  const nextPosition =
+    lastPositionRows && lastPositionRows.length > 0
+      ? Number(lastPositionRows[0].position ?? 0) + 1
+      : 0;
+
+  const { error: insertError } = await supabaseServiceRole
+    .from('playlist_videos')
+    .insert({
+      playlist_id: playlistId,
+      video_id: videoId,
+      position: nextPosition,
+      added_by: addedBy,
+      notes: null,
+    });
+
+  if (insertError) {
+    throw new Error(`Failed to add video to playlist: ${insertError.message}`);
+  }
 }
 
 async function updateSubmissionStatus(
@@ -140,7 +240,9 @@ async function updateSubmissionStatus(
     .update(values)
     .eq('id', submissionId);
 
-  if (error) throw new Error(`Failed to update submission status: ${error.message}`);
+  if (error) {
+    throw new Error(`Failed to update submission status: ${error.message}`);
+  }
 }
 
 async function updateSubmissionStatusWithMetadataPatch(
@@ -155,11 +257,14 @@ async function updateSubmissionStatusWithMetadataPatch(
     .eq('id', submissionId)
     .single();
 
-  if (currentError) throw new Error(`Failed to load submission metadata: ${currentError.message}`);
+  if (currentError) {
+    throw new Error(`Failed to load submission metadata: ${currentError.message}`);
+  }
 
-  const currentMetadata = current?.metadata && typeof current.metadata === 'object' && !Array.isArray(current.metadata)
-    ? current.metadata as Record<string, unknown>
-    : {};
+  const currentMetadata =
+    current?.metadata && typeof current.metadata === 'object' && !Array.isArray(current.metadata)
+      ? current.metadata as Record<string, unknown>
+      : {};
 
   await updateSubmissionStatus(supabaseServiceRole, submissionId, {
     ...values,
@@ -176,13 +281,28 @@ async function safeUpdateSubmissionStatusWithMetadataPatch(
   values: Record<string, unknown>,
   metadataPatch: Record<string, unknown>,
 ) {
-  if (!supabaseServiceRole || !submissionId) return;
+  if (!supabaseServiceRole || !submissionId) {
+    return;
+  }
 
   try {
     await updateSubmissionStatusWithMetadataPatch(supabaseServiceRole, submissionId, values, metadataPatch);
   } catch (statusError) {
-    console.error(`[enrich-video] ${statusError instanceof Error ? statusError.message : 'Unknown submission status update error'}`);
+    const statusErrorMessage = statusError instanceof Error
+      ? statusError.message
+      : 'Unknown submission status update error';
+    console.error(`[enrich-video] ${statusErrorMessage}`);
   }
+}
+
+function processingMetadata(requestId: string, stage: string) {
+  return {
+    processing: {
+      requestId,
+      stage,
+      updatedAt: new Date().toISOString(),
+    },
+  };
 }
 
 async function updateSubmissionStage(
@@ -199,220 +319,243 @@ async function updateSubmissionStage(
   );
 }
 
-async function assignVideoToPlaylist(
+async function insertTranscriptRecord(
   supabaseServiceRole: ReturnType<typeof createClient>,
-  playlistId: string,
-  videoId: string,
-  addedBy: string,
-) {
-  const { data: existing, error: existingError } = await supabaseServiceRole
-    .from('playlist_videos')
-    .select('id')
-    .eq('playlist_id', playlistId)
-    .eq('video_id', videoId)
-    .maybeSingle();
-
-  if (existingError) throw new Error(`Failed to check existing playlist assignment: ${existingError.message}`);
-  if (existing) return;
-
-  const { data: lastPositionRows, error: positionError } = await supabaseServiceRole
-    .from('playlist_videos')
-    .select('position')
-    .eq('playlist_id', playlistId)
-    .order('position', { ascending: false })
-    .limit(1);
-
-  if (positionError) throw new Error(`Failed to calculate playlist position: ${positionError.message}`);
-
-  const nextPosition = lastPositionRows && lastPositionRows.length > 0
-    ? Number(lastPositionRows[0].position ?? 0) + 1
-    : 0;
-
-  const { error: insertError } = await supabaseServiceRole
-    .from('playlist_videos')
-    .insert({
-      playlist_id: playlistId,
-      video_id: videoId,
-      position: nextPosition,
-      added_by: addedBy,
-      notes: null,
-    });
-
-  if (insertError) throw new Error(`Failed to add video to playlist: ${insertError.message}`);
-}
-
-async function loadCategories(
-  supabaseServiceRole: ReturnType<typeof createClient>,
-  requestId: string,
-): Promise<CategoryRow[]> {
+  params: {
+    videoId: string;
+    providerModel: string;
+    status: 'completed' | 'unavailable' | 'failed';
+    language: string | null;
+    transcriptText: string | null;
+    summary: string | null;
+    confidence: number;
+    errorMessage: string | null;
+    metadata: Record<string, unknown>;
+  },
+): Promise<string> {
   const { data, error } = await supabaseServiceRole
-    .from('categories')
-    .select('id, name, slug');
+    .from('video_transcripts')
+    .insert({
+      video_id: params.videoId,
+      provider: 'gemini',
+      provider_model: params.providerModel,
+      language: params.language,
+      transcript_text: params.transcriptText,
+      summary: params.summary,
+      confidence: params.confidence,
+      status: params.status,
+      error_message: params.errorMessage,
+      metadata: params.metadata,
+    })
+    .select('id')
+    .single();
 
   if (error) {
-    logProcessingError(requestId, 'context_load', 'Failed to load categories; continuing without category context', {
-      error: error.message,
-    });
-    return [];
+    throw new Error(`Failed to save transcript: ${error.message}`);
   }
 
-  return (data ?? []) as CategoryRow[];
+  return data.id as string;
 }
 
-async function loadAssignmentPlaylists(
-  supabaseServiceRole: ReturnType<typeof createClient>,
-  language: string,
-): Promise<PlaylistRow[]> {
-  const { data: playlistsByLanguage, error: playlistFetchError } = await supabaseServiceRole
-    .rpc('list_education_playlists_for_assignment', {
-      p_language: language,
-      p_limit: 160,
-    });
-
-  if (playlistFetchError) throw new Error(`Failed to load playlists: ${playlistFetchError.message}`);
-
-  let playlistsData = Array.isArray(playlistsByLanguage) ? playlistsByLanguage : [];
-  if (playlistsData.length === 0) {
-    const { data: fallbackData, error: fallbackError } = await supabaseServiceRole
-      .rpc('list_education_playlists_for_assignment', {
-        p_language: null,
-        p_limit: 160,
-      });
-
-    if (fallbackError) throw new Error(`Failed to load fallback playlists: ${fallbackError.message}`);
-    playlistsData = Array.isArray(fallbackData) ? fallbackData : [];
-  }
-
-  return (playlistsData ?? []) as PlaylistRow[];
-}
-
-function isUnclassifiedCategory(categoryRows: CategoryRow[], categoryId: string | null | undefined) {
-  if (!categoryId) return true;
-  const category = categoryRows.find((row) => row.id === categoryId);
-  const slug = normalizeText(category?.slug);
-  return slug === 'nao-classificados' || slug === 'unclassified' || slug === 'uncategorized';
-}
-
-async function maybeAssignCategory(params: {
+async function processVideoAnalysis(params: {
   supabaseServiceRole: ReturnType<typeof createClient>;
-  categoryRows: CategoryRow[];
-  enrichment: VideoEnrichmentResult;
-  videoId: string;
-  currentVideoCategoryId: string | null;
-}) {
-  const suggestedCategoryId = params.enrichment.suggested_category_id;
-  const hasValidSuggestion = !!suggestedCategoryId && params.categoryRows.some((category) => category.id === suggestedCategoryId);
-  const shouldAssign =
-    hasValidSuggestion &&
-    params.enrichment.classification_confidence >= 0.55 &&
-    isUnclassifiedCategory(params.categoryRows, params.currentVideoCategoryId);
-
-  if (!shouldAssign || !suggestedCategoryId) {
-    return null;
-  }
-
-  const { error } = await params.supabaseServiceRole
-    .from('videos')
-    .update({ category_id: suggestedCategoryId })
-    .eq('id', params.videoId);
-
-  if (error) throw new Error(`Failed to assign category: ${error.message}`);
-  return suggestedCategoryId;
-}
-
-function createDefaultAssignment(reason: string, providerError: string | null = null): AssignmentWithError {
-  return {
-    algorithmVersion: PLAYLIST_ASSIGNMENT_ALGORITHM_VERSION,
-    assignedPlaylistId: null,
-    score: 0,
-    reliability: 'low',
-    reason,
-    topCandidates: [],
-    rejectedPlaylistId: null,
-    providerConfidence: null,
-    decisionSource: 'none',
-    signals: {
-      math: 0,
-      design: 0,
-      programming: 0,
-      database: 0,
-      business: 0,
-      language: 0,
-      science: 0,
-      humanities: 0,
-    },
-    providerError,
-  };
-}
-
-async function runPlaylistAssignment(params: {
-  supabaseServiceRole: ReturnType<typeof createClient>;
+  geminiClient: ReturnType<typeof createGeminiClient>;
   requestId: string;
   videoId: string;
-  userId: string;
-  video: VideoProcessingVideo;
-  enrichment: VideoEnrichmentResult;
-  playlistRows: PlaylistRow[];
-  playlistLoadError: string | null;
-}): Promise<AssignmentWithError> {
-  if (params.playlistLoadError) {
-    return createDefaultAssignment('Playlist assignment skipped because playlist candidates could not be loaded.', params.playlistLoadError);
-  }
-
-  if (params.playlistRows.length === 0) {
-    return createDefaultAssignment('No educational playlist candidates were available for this language.');
-  }
-
-  const assignment = assignPlaylist({
-    playlists: params.playlistRows,
-    analysis: {
-      title: params.video.title,
-      description: params.video.description,
-      semanticTags: params.enrichment.semantic_tags,
-      summaryDescription: params.enrichment.summary_description,
-      shortSummary: params.enrichment.short_summary,
-      language: params.enrichment.language,
-      suggestedPlaylistId: params.enrichment.suggested_playlist_id,
-      suggestedPlaylistQuery: params.enrichment.suggested_playlist_query,
-      classificationConfidence: params.enrichment.classification_confidence,
-    },
+  youtubeUrl: string;
+  videoTitle: string;
+  videoDescription: string | null;
+  effectiveLanguage: string;
+}): Promise<TranscriptProcessingResult> {
+  const {
+    supabaseServiceRole,
+    geminiClient,
+    requestId,
+    videoId,
+    youtubeUrl,
+    videoTitle,
+    videoDescription,
+    effectiveLanguage,
+  } = params;
+  logProcessing(requestId, 'analysis', 'Starting Gemini video analysis', {
+    videoId,
+    model: geminiClient.modelName,
   });
 
-  const result: AssignmentWithError = {
-    ...assignment,
-    providerError: null,
-  };
-
-  if (!assignment.assignedPlaylistId) {
-    return result;
-  }
-
+  let analysis: GeminiVideoAnalysisResult;
   try {
-    await assignVideoToPlaylist(
-      params.supabaseServiceRole,
-      assignment.assignedPlaylistId,
-      params.videoId,
-      params.userId,
-    );
+    analysis = await geminiClient.analyzeYouTubeVideo({
+      youtubeUrl,
+      title: videoTitle,
+      description: videoDescription,
+      language: effectiveLanguage,
+    });
   } catch (error) {
-    const message = error instanceof Error ? error.message : 'Unknown playlist insert error';
-    logProcessingError(params.requestId, 'assignment', 'Playlist assignment insert failed; enrichment will still complete', {
-      videoId: params.videoId,
-      playlistId: assignment.assignedPlaylistId,
-      error: message,
+    const geminiError = error as Partial<GeminiError>;
+    const errorMessage = error instanceof Error ? error.message : 'Unknown Gemini analysis error';
+    const recoverable = geminiError.recoverable ?? isRecoverableExternalError(error);
+    const transcriptId = await insertTranscriptRecord(supabaseServiceRole, {
+      videoId,
+      providerModel: geminiClient.modelName,
+      status: 'failed',
+      language: normalizeLanguage(effectiveLanguage),
+      transcriptText: null,
+      summary: null,
+      confidence: 0,
+      errorMessage,
+      metadata: {
+        requestId,
+        code: geminiError.code ?? 'GEMINI_ANALYSIS_FAILED',
+        recoverable,
+      },
     });
 
+    logProcessingError(requestId, 'analysis', 'Gemini video analysis failed, continuing without transcript', {
+      videoId,
+      transcriptId,
+      code: geminiError.code ?? 'GEMINI_ANALYSIS_FAILED',
+      error: errorMessage,
+    });
+
+    if (recoverable) {
+      throw new HttpError(`Gemini video analysis failed: ${errorMessage}`, 503, {
+        code: geminiError.code ?? 'GEMINI_ANALYSIS_FAILED',
+        stage: 'analysis',
+        recoverable: true,
+      });
+    }
+
     return {
-      ...result,
-      assignedPlaylistId: null,
-      score: 0,
-      reliability: 'low',
-      reason: 'Playlist match was found but could not be saved. The video enrichment still completed.',
-      providerError: message,
+      id: transcriptId,
+      provider: 'gemini',
+      providerModel: geminiClient.modelName,
+      status: 'failed',
+      language: normalizeLanguage(effectiveLanguage),
+      summary: null,
+      confidence: 0,
+      errorMessage,
+      analysis: {
+        transcriptText: null,
+        transcriptSummary: null,
+        summaryDescription: null,
+        shortSummary: null,
+        semanticTags: [],
+        language: normalizeLanguage(effectiveLanguage),
+        confidence: 0,
+        unavailableReason: errorMessage,
+      },
     };
   }
 
-  return result;
+  const status: 'completed' | 'unavailable' = analysis.transcriptText || analysis.transcriptSummary || analysis.summaryDescription
+    ? 'completed'
+    : 'unavailable';
+  const errorMessage = status === 'unavailable'
+    ? analysis.unavailableReason || 'Transcript unavailable from Gemini'
+    : null;
+
+  const transcriptId = await insertTranscriptRecord(supabaseServiceRole, {
+    videoId,
+    providerModel: geminiClient.modelName,
+    status,
+    language: normalizeLanguage(analysis.language) ?? normalizeLanguage(effectiveLanguage),
+    transcriptText: analysis.transcriptText,
+    summary: analysis.transcriptSummary ?? analysis.summaryDescription,
+    confidence: analysis.confidence,
+    errorMessage,
+    metadata: {
+      requestId,
+      unavailableReason: analysis.unavailableReason,
+      semanticTags: analysis.semanticTags,
+    },
+  });
+
+  logProcessing(requestId, 'analysis', 'Gemini video analysis completed', {
+    videoId,
+    transcriptId,
+    status,
+    confidence: analysis.confidence,
+  });
+
+  return {
+    id: transcriptId,
+    provider: 'gemini',
+    providerModel: geminiClient.modelName,
+    status,
+    language: normalizeLanguage(analysis.language) ?? normalizeLanguage(effectiveLanguage),
+    summary: analysis.transcriptSummary ?? analysis.summaryDescription,
+    confidence: analysis.confidence,
+    errorMessage,
+    analysis,
+  };
+}
+
+async function runEnhancedAssignments(params: {
+  supabaseServiceRole: ReturnType<typeof createClient>;
+  geminiClient: ReturnType<typeof createGeminiClient>;
+  analysis: GeminiVideoAnalysisResult;
+  playlistRows: PlaylistRow[];
+  videoId: string;
+  userId: string;
+}): Promise<EnhancedAssignmentResult> {
+  const {
+    supabaseServiceRole,
+    geminiClient,
+    analysis,
+    playlistRows,
+    videoId,
+    userId,
+  } = params;
+
+  const geminiAssignment = await geminiClient.assignPlaylistFromAnalysis({
+    analysis,
+    playlists: playlistRows,
+  });
+
+  const playlistAssignment = assignPlaylist({
+    playlists: playlistRows,
+    analysis: {
+      semanticTags: analysis.semanticTags,
+      summaryDescription: analysis.summaryDescription,
+      shortSummary: analysis.shortSummary,
+      language: analysis.language,
+      geminiAssignedPlaylistId: geminiAssignment.assignedPlaylistId,
+      geminiConfidence: geminiAssignment.confidence,
+      geminiReason: geminiAssignment.reason,
+    },
+  });
+
+  let assignedPlaylistId: string | null = null;
+  if (playlistAssignment.assignedPlaylistId) {
+    await assignVideoToPlaylist(
+      supabaseServiceRole,
+      playlistAssignment.assignedPlaylistId,
+      videoId,
+      userId,
+    );
+    assignedPlaylistId = playlistAssignment.assignedPlaylistId;
+  }
+
+  const reliable = !!assignedPlaylistId;
+  const reason = assignedPlaylistId
+    ? playlistAssignment.reason
+    : playlistAssignment.reason;
+
+  return {
+    assignedPlaylistId,
+    playlistAssignment,
+    reliability: reliable ? 'high' : 'low',
+    reason,
+  };
+}
+
+function hasProcessedAnalysisContent(analysis: GeminiVideoAnalysisResult): boolean {
+  return (
+    analysis.semanticTags.length > 0 ||
+    !!analysis.summaryDescription ||
+    !!analysis.shortSummary ||
+    !!analysis.transcriptSummary
+  );
 }
 
 async function runVideoProcessingTask(params: {
@@ -420,52 +563,68 @@ async function runVideoProcessingTask(params: {
   requestId: string;
   submissionId: string | null;
   videoId: string;
+  youtubeUrl: string;
   userId: string;
   video: VideoProcessingVideo;
 }) {
-  const { supabaseServiceRole, requestId, submissionId, videoId, userId, video } = params;
+  const {
+    supabaseServiceRole,
+    requestId,
+    submissionId,
+    videoId,
+    youtubeUrl,
+    userId,
+    video,
+  } = params;
   let currentStage = 'background_start';
 
   try {
     currentStage = 'context_load';
-    if (submissionId) await updateSubmissionStage(supabaseServiceRole, submissionId, requestId, currentStage);
-
-    const effectiveLanguage = video.language && video.language !== 'und' ? video.language : 'pt';
-    const categoryRows = await loadCategories(supabaseServiceRole, requestId);
-
-    let playlistRows: PlaylistRow[] = [];
-    let playlistLoadError: string | null = null;
-    try {
-      playlistRows = await loadAssignmentPlaylists(supabaseServiceRole, effectiveLanguage);
-    } catch (error) {
-      playlistLoadError = error instanceof Error ? error.message : 'Unknown playlist loading error';
-      logProcessingError(requestId, currentStage, 'Failed to load playlist candidates; enrichment will continue', {
-        videoId,
-        error: playlistLoadError,
-      });
+    if (submissionId) {
+      await updateSubmissionStage(supabaseServiceRole, submissionId, requestId, currentStage);
     }
 
-    currentStage = 'enrichment';
-    if (submissionId) await updateSubmissionStage(supabaseServiceRole, submissionId, requestId, currentStage);
+    const effectiveLanguage = video.language && video.language !== 'und' ? video.language : 'pt';
+    const { data: playlistsByLanguage, error: playlistFetchError } = await supabaseServiceRole
+      .rpc('list_education_playlists_for_assignment', {
+        p_language: effectiveLanguage,
+        p_limit: 120,
+      });
+    if (playlistFetchError) {
+      throw new Error(`Failed to load playlists: ${playlistFetchError.message}`);
+    }
 
-    const openaiClient = createOpenAIClient();
-    logProcessing(requestId, currentStage, 'Starting OpenAI video enrichment', {
+    let playlistsData = playlistsByLanguage;
+    if (!playlistsData || playlistsData.length === 0) {
+      const { data: fallbackData, error: fallbackError } = await supabaseServiceRole
+        .rpc('list_education_playlists_for_assignment', {
+          p_language: null,
+          p_limit: 120,
+        });
+      if (fallbackError) {
+        throw new Error(`Failed to load fallback playlists: ${fallbackError.message}`);
+      }
+      playlistsData = fallbackData;
+    }
+    const playlistRows = (playlistsData ?? []) as PlaylistRow[];
+    const geminiClient = createGeminiClient();
+
+    currentStage = 'analysis';
+    if (submissionId) {
+      await updateSubmissionStage(supabaseServiceRole, submissionId, requestId, currentStage);
+    }
+    const transcriptResult = await processVideoAnalysis({
+      supabaseServiceRole,
+      geminiClient,
+      requestId,
       videoId,
-      model: openaiClient.modelName,
-      playlistCandidateCount: playlistRows.length,
+      youtubeUrl,
+      videoTitle: video.title || '',
+      videoDescription: video.description ?? null,
+      effectiveLanguage,
     });
 
-    const enrichmentParams: VideoEnrichmentParams = {
-      title: video.title || '',
-      description: video.description || '',
-      language: effectiveLanguage,
-      channelName: video.channel_name,
-      categories: categoryRows,
-      playlists: playlistRows.slice(0, 60),
-    };
-    const enrichment = await openaiClient.enrichVideo(enrichmentParams);
-    const detectedLanguage = normalizeLanguage(enrichment.language) ?? normalizeLanguage(effectiveLanguage) ?? 'pt';
-
+    currentStage = 'assignment';
     if (submissionId) {
       await updateSubmissionStatusWithMetadataPatch(
         supabaseServiceRole,
@@ -473,90 +632,114 @@ async function runVideoProcessingTask(params: {
         {},
         {
           ...processingMetadata(requestId, currentStage),
-          analysis: {
-            provider: 'openai',
-            model: openaiClient.modelName,
-            status: 'completed',
-            summary: enrichment.summary_description || enrichment.short_summary,
-            language: detectedLanguage,
-            confidence: enrichment.classification_confidence,
-            semanticTags: enrichment.semantic_tags,
-            optimizedTitle: enrichment.optimized_title,
+          transcription: {
+            transcriptId: transcriptResult.id,
+            provider: transcriptResult.provider,
+            model: transcriptResult.providerModel,
+            status: transcriptResult.status,
+            summary: transcriptResult.summary,
+            language: transcriptResult.language,
+            confidence: transcriptResult.confidence,
+            errorMessage: transcriptResult.errorMessage,
           },
         },
       );
     }
 
-    currentStage = 'assignment';
-    if (submissionId) await updateSubmissionStage(supabaseServiceRole, submissionId, requestId, currentStage);
+    let enhancedAssignment: EnhancedAssignmentResult = {
+      assignedPlaylistId: null,
+      playlistAssignment: null,
+      reliability: 'low',
+      reason: 'No playlist assigned because the video analysis did not provide enough educational signals',
+    };
 
-    let assignedCategoryId: string | null = null;
     try {
-      assignedCategoryId = await maybeAssignCategory({
-        supabaseServiceRole,
-        categoryRows,
-        enrichment,
-        videoId,
-        currentVideoCategoryId: video.category_id ?? null,
+      if (playlistRows.length > 0 && hasProcessedAnalysisContent(transcriptResult.analysis)) {
+        enhancedAssignment = await runEnhancedAssignments({
+          supabaseServiceRole,
+          geminiClient,
+          analysis: transcriptResult.analysis,
+          playlistRows,
+          videoId,
+          userId,
+        });
+      } else {
+        logProcessing(requestId, currentStage, 'Skipping playlist assignment because processed analysis is empty', {
+          videoId,
+          playlistCount: playlistRows.length,
+          semanticTagCount: transcriptResult.analysis.semanticTags.length,
+        });
+      }
+    } catch (assignmentError) {
+      const assignmentErrorMessage = assignmentError instanceof Error
+        ? assignmentError.message
+        : 'Unknown playlist assignment error';
+      const geminiError = assignmentError as Partial<GeminiError>;
+      const recoverable = geminiError.recoverable ?? isRecoverableExternalError(assignmentError);
+
+      logProcessingError(requestId, currentStage, 'Playlist assignment failed', {
+        error: assignmentErrorMessage,
+        recoverable,
       });
-    } catch (error) {
-      logProcessingError(requestId, currentStage, 'Category assignment failed; enrichment will continue', {
-        videoId,
-        error: error instanceof Error ? error.message : 'Unknown category assignment error',
-      });
+
+      if (recoverable) {
+        throw new HttpError(`Playlist assignment failed: ${assignmentErrorMessage}`, 503, {
+          code: geminiError.code ?? 'PLAYLIST_ASSIGNMENT_FAILED',
+          stage: currentStage,
+          recoverable: true,
+        });
+      }
+
+      enhancedAssignment = {
+        assignedPlaylistId: null,
+        playlistAssignment: null,
+        reliability: 'low',
+        reason: `Playlist assignment skipped after error: ${assignmentErrorMessage}`,
+      };
     }
 
-    const assignment = await runPlaylistAssignment({
-      supabaseServiceRole,
-      requestId,
-      videoId,
-      userId,
-      video,
-      enrichment,
-      playlistRows,
-      playlistLoadError,
-    });
-
     currentStage = 'storage';
-    if (submissionId) await updateSubmissionStage(supabaseServiceRole, submissionId, requestId, currentStage);
-
+    if (submissionId) {
+      await updateSubmissionStage(supabaseServiceRole, submissionId, requestId, currentStage);
+    }
     const { data, error } = await supabaseServiceRole
       .from('ai_enrichments')
       .insert({
         video_id: videoId,
-        optimized_title: enrichment.optimized_title,
-        summary_description: enrichment.summary_description,
-        semantic_tags: enrichment.semantic_tags,
-        suggested_category_id: assignedCategoryId,
-        language: detectedLanguage,
-        cultural_relevance: enrichment.cultural_relevance,
-        short_summary: enrichment.short_summary,
+        optimized_title: null,
+        summary_description: transcriptResult.analysis.summaryDescription ?? transcriptResult.analysis.transcriptSummary,
+        semantic_tags: transcriptResult.analysis.semanticTags,
+        suggested_category_id: null,
+        language: normalizeLanguage(transcriptResult.analysis.language) ?? normalizeLanguage(effectiveLanguage),
+        cultural_relevance: null,
+        short_summary: transcriptResult.analysis.shortSummary ?? transcriptResult.analysis.summaryDescription ?? transcriptResult.analysis.transcriptSummary,
       })
       .select()
       .single();
 
-    if (error) throw new Error(`Failed to save AI enrichment: ${error.message}`);
+    if (error) {
+      throw new Error(`Failed to save AI enrichment: ${error.message}`);
+    }
 
+    const detectedLanguage = normalizeLanguage(transcriptResult.analysis.language) ?? normalizeLanguage(effectiveLanguage);
     if (detectedLanguage && detectedLanguage !== 'und') {
       const { error: updateLanguageError } = await supabaseServiceRole
         .from('videos')
         .update({ language: detectedLanguage })
         .eq('id', videoId);
 
-      if (updateLanguageError) throw new Error(`Failed to update detected language: ${updateLanguageError.message}`);
+      if (updateLanguageError) {
+        throw new Error(`Failed to update detected language: ${updateLanguageError.message}`);
+      }
     }
 
     if (submissionId) {
-      await updateSubmissionStatusWithMetadataPatch(
-        supabaseServiceRole,
-        submissionId,
-        {
-          status: 'success',
-          error_message: null,
-          recoverable: false,
-          completed_at: new Date().toISOString(),
-        },
-        {
+      await updateSubmissionStatus(supabaseServiceRole, submissionId, {
+        status: 'success',
+        error_message: null,
+        recoverable: false,
+        completed_at: new Date().toISOString(),
+        metadata: {
           processing: {
             requestId,
             stage: 'success',
@@ -564,59 +747,41 @@ async function runVideoProcessingTask(params: {
           },
           enrichmentId: data.id,
           detectedLanguage,
-          analysis: {
-            provider: 'openai',
-            model: openaiClient.modelName,
-            status: 'completed',
-            summary: enrichment.summary_description || enrichment.short_summary,
-            language: detectedLanguage,
-            confidence: enrichment.classification_confidence,
-            semanticTags: enrichment.semantic_tags,
-            optimizedTitle: enrichment.optimized_title,
-          },
-          enrichment: {
-            provider: 'openai',
-            model: openaiClient.modelName,
-            optimizedTitle: enrichment.optimized_title,
-            summaryDescription: enrichment.summary_description,
-            shortSummary: enrichment.short_summary,
-            semanticTags: enrichment.semantic_tags,
-            classificationConfidence: enrichment.classification_confidence,
-            suggestedCategoryId: enrichment.suggested_category_id,
-            suggestedCategory: enrichment.suggested_category,
-            suggestedPlaylistId: enrichment.suggested_playlist_id,
-            suggestedPlaylistQuery: enrichment.suggested_playlist_query,
-            culturalRelevance: enrichment.cultural_relevance,
+          transcription: {
+            transcriptId: transcriptResult.id,
+            provider: transcriptResult.provider,
+            model: transcriptResult.providerModel,
+            status: transcriptResult.status,
+            summary: transcriptResult.summary,
+            language: transcriptResult.language,
+            confidence: transcriptResult.confidence,
+            errorMessage: transcriptResult.errorMessage,
           },
           assignment: {
-            fallbackUsed: assignment.reliability === 'low',
-            reliability: assignment.reliability,
-            reason: assignment.reason,
-            assignedCategoryId,
-            assignedPlaylistId: assignment.assignedPlaylistId,
-            algorithmVersion: assignment.algorithmVersion,
-            score: assignment.score,
-            provider: 'openai',
-            providerConfidence: assignment.providerConfidence,
-            decisionSource: assignment.decisionSource,
-            providerError: assignment.providerError,
-            signals: assignment.signals,
-            topCandidates: assignment.topCandidates,
-            rejectedPlaylistId: assignment.rejectedPlaylistId,
-            rejectedAiPlaylistId: assignment.rejectedPlaylistId,
+            fallbackUsed: enhancedAssignment.reliability === 'low',
+            reliability: enhancedAssignment.reliability,
+            reason: enhancedAssignment.reason,
+            assignedCategoryId: null,
+            assignedPlaylistId: enhancedAssignment.assignedPlaylistId,
+            algorithmVersion: enhancedAssignment.playlistAssignment?.algorithmVersion ?? null,
+            score: enhancedAssignment.playlistAssignment?.score ?? null,
+            geminiConfidence: enhancedAssignment.playlistAssignment?.geminiConfidence ?? null,
+            signals: enhancedAssignment.playlistAssignment?.signals ?? null,
+            topCandidates: enhancedAssignment.playlistAssignment?.topCandidates ?? [],
+            rejectedPlaylistId: enhancedAssignment.playlistAssignment?.rejectedPlaylistId ?? null,
+            rejectedAiPlaylistId: enhancedAssignment.playlistAssignment?.rejectedPlaylistId ?? null,
           },
         },
-      );
+      });
     }
 
     logProcessing(requestId, 'success', 'Video processing completed', {
       videoId,
       submissionId: submissionId ?? 'none',
       enrichmentId: data.id,
-      provider: 'openai',
-      assignedCategoryId,
-      assignedPlaylistId: assignment.assignedPlaylistId,
-      decisionSource: assignment.decisionSource,
+      transcriptId: transcriptResult.id,
+      transcriptStatus: transcriptResult.status,
+      assignedPlaylistId: enhancedAssignment.assignedPlaylistId,
     });
   } catch (error) {
     const errorPayload = toProcessingErrorPayload(error, requestId, currentStage);
@@ -638,7 +803,13 @@ async function runVideoProcessingTask(params: {
       },
       {
         ...processingMetadata(requestId, errorPayload.stage),
-        error: errorPayload,
+        error: {
+          code: errorPayload.code,
+          message: errorPayload.message,
+          stage: errorPayload.stage,
+          recoverable: errorPayload.recoverable,
+          requestId,
+        },
       },
     );
   }
@@ -648,14 +819,14 @@ serve(async (req) => {
   const requestId = createRequestId();
 
   if (req.method === 'OPTIONS') {
-    return new Response(null, { headers: corsHeaders });
+    return new Response(null, { headers: corsHeaders })
   }
 
   const requiredEnv = {
     SUPABASE_URL: Deno.env.get('SUPABASE_URL'),
     SUPABASE_ANON_KEY: Deno.env.get('SUPABASE_ANON_KEY'),
     SUPABASE_SERVICE_ROLE_KEY: Deno.env.get('SUPABASE_SERVICE_ROLE_KEY'),
-    OPENAI_API_KEY: Deno.env.get('OPENAI_API_KEY'),
+    GEMINI_API_KEY: Deno.env.get('GEMINI_API_KEY'),
   };
   const missingEnv = Object.entries(requiredEnv)
     .filter(([, value]) => !value)
@@ -678,7 +849,7 @@ serve(async (req) => {
     });
   }
 
-  const authHeader = req.headers.get('Authorization');
+  const authHeader = req.headers.get('Authorization')
   if (!authHeader) {
     const errorPayload = {
       error: {
@@ -693,17 +864,17 @@ serve(async (req) => {
     return new Response(JSON.stringify(errorPayload), {
       status: 401,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-    });
+    })
   }
 
-  const token = authHeader.replace('Bearer ', '');
+  const token = authHeader.replace('Bearer ', '')
   const supabase = createClient(
     requiredEnv.SUPABASE_URL ?? '',
     requiredEnv.SUPABASE_ANON_KEY ?? '',
-    { global: { headers: { Authorization: `Bearer ${token}` } } },
-  );
+    { global: { headers: { Authorization: `Bearer ${token}` } } }
+  )
 
-  const { data: { user }, error: userError } = await supabase.auth.getUser();
+  const { data: { user }, error: userError } = await supabase.auth.getUser()
 
   if (userError || !user) {
     const errorPayload = {
@@ -721,7 +892,7 @@ serve(async (req) => {
     return new Response(JSON.stringify(errorPayload), {
       status: 401,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-    });
+    })
   }
 
   let submissionId: string | null = null;
@@ -767,7 +938,7 @@ serve(async (req) => {
 
     supabaseServiceRole = createClient(
       requiredEnv.SUPABASE_URL ?? '',
-      requiredEnv.SUPABASE_SERVICE_ROLE_KEY ?? '',
+      requiredEnv.SUPABASE_SERVICE_ROLE_KEY ?? ''
     );
 
     currentStage = 'submission_validation';
@@ -801,19 +972,15 @@ serve(async (req) => {
 
       submissionBelongsToUser = true;
 
-      await updateSubmissionStatusWithMetadataPatch(
-        supabaseServiceRole,
-        submissionId,
-        {
-          video_id: videoId,
-          status: 'processing',
-          error_message: null,
-          recoverable: false,
-          processing_started_at: new Date().toISOString(),
-          completed_at: null,
-        },
-        processingMetadata(requestId, currentStage),
-      );
+      await updateSubmissionStatus(supabaseServiceRole, submissionId, {
+        video_id: videoId,
+        status: 'processing',
+        error_message: null,
+        recoverable: false,
+        processing_started_at: new Date().toISOString(),
+        completed_at: null,
+        metadata: processingMetadata(requestId, currentStage),
+      });
     }
 
     currentStage = 'video_load';
@@ -837,7 +1004,9 @@ serve(async (req) => {
       });
     }
 
-    if (submissionId) await updateSubmissionStage(supabaseServiceRole, submissionId, requestId, currentStage);
+    if (submissionId) {
+      await updateSubmissionStage(supabaseServiceRole, submissionId, requestId, currentStage);
+    }
 
     if (typeof EdgeRuntime === 'undefined' || typeof EdgeRuntime.waitUntil !== 'function') {
       throw new HttpError('Edge background processing is unavailable', 500, {
@@ -848,13 +1017,16 @@ serve(async (req) => {
     }
 
     currentStage = 'queued';
-    if (submissionId) await updateSubmissionStage(supabaseServiceRole, submissionId, requestId, currentStage);
+    if (submissionId) {
+      await updateSubmissionStage(supabaseServiceRole, submissionId, requestId, currentStage);
+    }
 
     EdgeRuntime.waitUntil(runVideoProcessingTask({
       supabaseServiceRole,
       requestId,
       submissionId,
       videoId,
+      youtubeUrl,
       userId: user.id,
       video: video as VideoProcessingVideo,
     }));
@@ -873,18 +1045,16 @@ serve(async (req) => {
     }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       status: 202,
-    });
+    })
   } catch (error) {
     const errorPayload = toProcessingErrorPayload(error, requestId, currentStage);
     const status = error instanceof HttpError ? error.status : errorPayload.recoverable ? 503 : 500;
-
     logProcessingError(requestId, errorPayload.stage, 'Video processing failed', {
       code: errorPayload.code,
       error: errorPayload.message,
       recoverable: errorPayload.recoverable,
       submissionId: submissionId ?? 'none',
     });
-
     if (submissionBelongsToUser) {
       await safeUpdateSubmissionStatusWithMetadataPatch(
         supabaseServiceRole,
@@ -897,14 +1067,19 @@ serve(async (req) => {
         },
         {
           ...processingMetadata(requestId, errorPayload.stage),
-          error: errorPayload,
+          error: {
+            code: errorPayload.code,
+            message: errorPayload.message,
+            stage: errorPayload.stage,
+            recoverable: errorPayload.recoverable,
+            requestId,
+          },
         },
       );
     }
-
     return new Response(JSON.stringify({ error: errorPayload }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       status,
-    });
+    })
   }
-});
+})
