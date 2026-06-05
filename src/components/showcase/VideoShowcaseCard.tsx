@@ -66,7 +66,7 @@ export function VideoShowcaseCard({ video, variant = 'tile', className }: VideoS
         <h3 className={cn('font-black uppercase leading-tight', variant === 'feature' ? 'text-xl md:text-2xl' : 'text-sm', variant === 'row' && 'line-clamp-2')}>
           {video.title}
         </h3>
-        {variant !== 'row' && video.summary && <p className="line-clamp-2 text-sm leading-6 text-muted-foreground">{video.summary}</p>}
+        {variant !== 'row' && video.summary && <p className="line-clamp-2 text-sm leading-6 text-foreground/80">{video.summary}</p>}
         <div className="flex min-w-0 flex-wrap items-center gap-3 text-[0.7rem] font-bold uppercase text-muted-foreground">
           <span className="max-w-full truncate">{video.channel_name}</span>
           <span>{formatViewCount(video.view_count)}</span>

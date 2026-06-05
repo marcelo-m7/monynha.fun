@@ -60,18 +60,18 @@ export default function Facodi() {
               </Button>
             </div>
           </div>
-          <div className="grid gap-4 border-2 border-border bg-black p-4 text-white shadow-[12px_12px_0_#efff00] sm:grid-cols-3">
+          <div className="grid gap-4 border-2 border-border bg-card p-4 text-card-foreground shadow-[12px_12px_0_#efff00] sm:grid-cols-3">
             <div>
               <p className="text-4xl font-black leading-none">{formatNumber(home?.metrics.curricular_playlists ?? 0)}</p>
-              <p className="mt-3 text-[0.65rem] font-black uppercase text-white/70">{t('facodiPage.metrics.curricular')}</p>
+              <p className="mt-3 text-[0.65rem] font-black uppercase text-card-foreground/70">{t('facodiPage.metrics.curricular')}</p>
             </div>
             <div>
               <p className="text-4xl font-black leading-none">{formatNumber(home?.metrics.public_non_empty_playlists ?? 0)}</p>
-              <p className="mt-3 text-[0.65rem] font-black uppercase text-white/70">{t('facodiPage.metrics.publicPaths')}</p>
+              <p className="mt-3 text-[0.65rem] font-black uppercase text-card-foreground/70">{t('facodiPage.metrics.publicPaths')}</p>
             </div>
             <div>
               <p className="text-4xl font-black leading-none">{formatNumber(home?.metrics.videos_total ?? 0)}</p>
-              <p className="mt-3 text-[0.65rem] font-black uppercase text-white/70">{t('facodiPage.metrics.videos')}</p>
+              <p className="mt-3 text-[0.65rem] font-black uppercase text-card-foreground/70">{t('facodiPage.metrics.videos')}</p>
             </div>
           </div>
         </div>
@@ -103,13 +103,13 @@ export default function Facodi() {
         </div>
       </section>
 
-      <section className="border-y-2 border-border bg-black py-16 text-white md:py-20">
+      <section className="border-y-2 border-border bg-secondary py-16 text-secondary-foreground md:py-20">
         <div className="container">
           <SectionHeader
             title={t('facodiPage.featured.title')}
             description={t('facodiPage.featured.description')}
             action={
-              <Button variant="outline" className="border-white bg-black text-white hover:bg-[#efff00] hover:text-black" onClick={() => navigate('/playlists')}>
+              <Button variant="outline" className="border-border bg-background text-foreground hover:bg-primary hover:text-primary-foreground" onClick={() => navigate('/playlists')}>
                 {t('homeExhibition.actions.viewAllPlaylists')}
                 <ArrowRight className="h-4 w-4" />
               </Button>
@@ -117,7 +117,7 @@ export default function Facodi() {
           />
           <div className="grid gap-5 md:grid-cols-3">
             {(home?.featured_playlists ?? []).slice(0, 6).map((playlist) => (
-              <PlaylistShowcaseCard key={playlist.id} playlist={playlist} className="border-white/40 bg-black text-white hover:border-[#efff00]" />
+              <PlaylistShowcaseCard key={playlist.id} playlist={playlist} className="border-border bg-card text-card-foreground hover:border-primary" />
             ))}
           </div>
         </div>

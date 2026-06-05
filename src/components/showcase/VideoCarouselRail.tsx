@@ -1,3 +1,5 @@
+import { useRef } from 'react';
+import Autoplay from 'embla-carousel-autoplay';
 import { ArrowRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel';
@@ -29,8 +31,17 @@ export function VideoCarouselRail({
 }: VideoCarouselRailProps) {
   const isDark = variant === 'dark';
 
+  const autoplayPlugin = useRef(
+    Autoplay({
+      delay: 4000,
+      stopOnInteraction: false,
+      stopOnMouseEnter: true,
+      stopOnFocusIn: true,
+    })
+  );
+
   return (
-    <section className={cn('overflow-x-clip border-y-2 border-border py-14 md:py-20', isDark ? 'bg-black text-white' : 'bg-background text-foreground')}>
+    <section className={cn('overflow-x-clip border-y-2 border-border py-14 md:py-20', isDark ? 'bg-secondary text-secondary-foreground' : 'bg-background text-foreground')}>
       <div className="container">
         <SectionHeader
           title={title}
@@ -39,7 +50,7 @@ export function VideoCarouselRail({
             <Button
               variant="outline"
               className={cn(
-                isDark && 'border-white bg-black text-white hover:bg-[#efff00] hover:text-black',
+                isDark && 'border-border bg-background text-foreground hover:bg-primary hover:text-primary-foreground',
               )}
               onClick={onAction}
             >
@@ -56,17 +67,21 @@ export function VideoCarouselRail({
                 key={index}
                 className={cn(
                   'aspect-video border-2 animate-pulse',
-                  isDark ? 'border-white/30 bg-white/10' : 'border-border bg-muted/60',
+                  isDark ? 'border-border bg-muted/30' : 'border-border bg-muted/60',
                 )}
               />
             ))}
           </div>
         ) : videos.length ? (
-          <Carousel opts={{ align: 'start', dragFree: true }} className="px-1 md:px-2">
+          <Carousel
+            opts={{ align: 'start', dragFree: true }}
+            plugins={[autoplayPlugin.current]}
+            className="px-1 md:px-2"
+          >
             <CarouselPrevious
               className={cn(
                 'left-0 top-1/2 h-10 w-10 -translate-y-1/2 border-2 lg:-left-12',
-                isDark && 'border-white bg-black text-white hover:bg-[#efff00] hover:text-black',
+                isDark && 'border-border bg-background text-foreground hover:bg-primary hover:text-primary-foreground',
               )}
             />
             <CarouselContent>
@@ -77,7 +92,7 @@ export function VideoCarouselRail({
                     variant="tile"
                     className={cn(
                       'h-full',
-                      isDark && 'border-white/40 bg-black text-white hover:border-[#efff00] [&_p]:text-white/70 [&_.text-muted-foreground]:text-white/70',
+                      isDark && 'border-border bg-card text-card-foreground hover:border-primary [&_p]:text-card-foreground/80 [&_.text-muted-foreground]:text-card-foreground/70',
                     )}
                   />
                 </CarouselItem>
@@ -86,12 +101,12 @@ export function VideoCarouselRail({
             <CarouselNext
               className={cn(
                 'right-0 top-1/2 h-10 w-10 -translate-y-1/2 border-2 lg:-right-12',
-                isDark && 'border-white bg-black text-white hover:bg-[#efff00] hover:text-black',
+                isDark && 'border-border bg-background text-foreground hover:bg-primary hover:text-primary-foreground',
               )}
             />
           </Carousel>
         ) : (
-          <div className={cn('border-2 p-8', isDark ? 'border-white/30 text-white/70' : 'border-border text-muted-foreground')}>
+          <div className={cn('border-2 p-8', isDark ? 'border-border text-card-foreground/70' : 'border-border text-muted-foreground')}>
             {emptyMessage}
           </div>
         )}

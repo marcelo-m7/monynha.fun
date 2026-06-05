@@ -62,7 +62,7 @@ export function PlaylistShowcaseCard({ playlist, className, compact = false }: P
           )}
         </div>
         <h3 className="line-clamp-2 text-lg font-black uppercase leading-tight">{title}</h3>
-        {description && <p className="line-clamp-2 text-sm leading-6 text-muted-foreground">{description}</p>}
+        {description && <p className="line-clamp-2 text-sm leading-6 text-foreground/80">{description}</p>}
         <span className="mt-auto inline-flex items-center gap-2 text-xs font-black uppercase">
           <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
         </span>

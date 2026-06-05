@@ -41,21 +41,21 @@ export default function Curation() {
               </Button>
             </div>
           </div>
-          <div className="border-2 border-border bg-black p-3 text-white shadow-[12px_12px_0_#efff00]">
-            <div className="mb-3 flex items-center justify-between text-[0.65rem] font-black uppercase text-white/70">
+          <div className="border-2 border-border bg-card p-3 text-card-foreground shadow-[12px_12px_0_hsl(var(--primary))]">
+            <div className="mb-3 flex items-center justify-between text-[0.65rem] font-black uppercase text-card-foreground/70">
               <span>{t('curationPage.hero.panelTitle')}</span>
-              <Sparkles className="h-4 w-4 text-[#efff00]" />
+              <Sparkles className="h-4 w-4 text-primary" />
             </div>
             {isLoading ? (
               <div className="grid gap-3 md:grid-cols-2">
                 {Array.from({ length: 4 }).map((_, index) => (
-                  <Skeleton key={index} className="aspect-video border border-white/30 bg-white/10" />
+                  <Skeleton key={index} className="aspect-video border border-border" />
                 ))}
               </div>
             ) : (
               <div className="grid gap-3 md:grid-cols-2">
                 {videos.slice(0, 4).map((video) => (
-                  <VideoShowcaseCard key={video.id} video={video} className="border-white/30 bg-black text-white hover:border-[#efff00]" />
+                  <VideoShowcaseCard key={video.id} video={video} className="border-border bg-secondary text-secondary-foreground hover:border-primary" />
                 ))}
               </div>
             )}
@@ -83,15 +83,15 @@ export default function Curation() {
         </div>
       </section>
 
-      <section className="border-y-2 border-border bg-black py-16 text-white md:py-20">
+      <section className="border-y-2 border-border bg-secondary py-16 text-secondary-foreground md:py-20">
         <div className="container grid gap-8 lg:grid-cols-3">
           {(['fast', 'deep', 'editorial'] as const).map((key) => {
             const Icon = key === 'fast' ? CheckCircle2 : key === 'deep' ? BrainCircuit : Clock3;
             return (
-              <article key={key} className="border-2 border-white/30 p-6 shadow-[8px_8px_0_#efff00]">
-                <Icon className="mb-10 h-9 w-9 text-[#efff00]" />
+              <article key={key} className="border-2 border-border bg-card p-6 shadow-[8px_8px_0_#efff00]">
+                <Icon className="mb-10 h-9 w-9 text-primary" />
                 <h2 className="text-2xl font-black uppercase leading-tight">{t(`curationPage.modes.${key}.title`)}</h2>
-                <p className="mt-4 text-sm font-medium leading-7 text-white/70">{t(`curationPage.modes.${key}.description`)}</p>
+                <p className="mt-4 text-sm font-medium leading-7 text-card-foreground/75">{t(`curationPage.modes.${key}.description`)}</p>
               </article>
             );
           })}

@@ -227,11 +227,11 @@ const Index = () => {
             {isLoading ? (
               <>
                 <Skeleton className="aspect-[4/5] border-2 border-border bg-muted/60" />
-                <div className="border-2 border-border bg-black p-2">
-                  <Skeleton className="mb-2 h-4 w-24 bg-white/20" />
+                <div className="border-2 border-border bg-secondary p-2">
+                  <Skeleton className="mb-2 h-4 w-24 bg-muted/20" />
                   <div className="space-y-2">
                     {Array.from({ length: 3 }).map((_, index) => (
-                      <Skeleton key={index} className="aspect-video border border-white/30 bg-white/10" />
+                      <Skeleton key={index} className="aspect-video border border-border bg-muted/10" />
                     ))}
                   </div>
                 </div>
@@ -241,39 +241,39 @@ const Index = () => {
                 <VideoShowcaseCard
                   video={heroFeature}
                   variant="feature"
-                  className="border-white/40 bg-black text-white hover:border-[#efff00]"
+                  className="border-border bg-card text-card-foreground hover:border-primary"
                 />
-                <div className="border-2 border-white/40 bg-black p-2 shadow-[8px_8px_0_#efff00]">
-                  <p className="mb-2 px-1 text-[0.62rem] font-black uppercase text-white/70">{t('homeExhibition.hero.railTitle')}</p>
+                <div className="border-2 border-border bg-card p-2 shadow-[8px_8px_0_hsl(var(--primary))]">
+                  <p className="mb-2 px-1 text-[0.62rem] font-black uppercase text-card-foreground/70">{t('homeExhibition.hero.railTitle')}</p>
                   <div className="space-y-2">
                     {heroTiles.map((video) => (
                       <VideoShowcaseCard
                         key={video.id}
                         video={video}
                         variant="tile"
-                        className="border-white/40 bg-black text-white hover:border-[#efff00] [&_h3]:line-clamp-2 [&_h3]:text-xs [&_p]:hidden [&_.text-muted-foreground]:hidden"
+                        className="border-border bg-secondary text-secondary-foreground hover:border-primary [&_h3]:line-clamp-2 [&_h3]:text-xs [&_p]:hidden [&_.text-muted-foreground]:hidden"
                       />
                     ))}
                   </div>
                 </div>
               </>
             ) : (
-              <div className="border-2 border-white/30 p-8 text-white/70 lg:col-span-2">{t('homeExhibition.empty.hero')}</div>
+              <div className="border-2 border-border p-8 text-muted-foreground lg:col-span-2">{t('homeExhibition.empty.hero')}</div>
             )}
           </div>
         }
       />
 
-      <section className="border-y-2 border-border bg-black py-5 text-white">
+      <section className="border-y-2 border-border bg-secondary py-5 text-secondary-foreground">
         <div className="container grid gap-4 md:grid-cols-[auto_repeat(4,1fr)] md:items-center">
-          <div className="animate-signal-pulse inline-flex w-fit items-center gap-2 bg-[#efff00] px-3 py-2 text-xs font-black uppercase text-black">
+          <div className="animate-signal-pulse inline-flex w-fit items-center gap-2 bg-primary px-3 py-2 text-xs font-black uppercase text-primary-foreground">
             <Radio className="h-4 w-4" />
             {t('homeExhibition.live.label')}
           </div>
           {liveSignalKeys.map((key) => (
-            <div key={key} className="flex items-end justify-between gap-4 border-white/20 py-1 md:border-r md:pr-5 last:md:border-r-0">
+            <div key={key} className="flex items-end justify-between gap-4 border-border/20 py-1 md:border-r md:pr-5 last:md:border-r-0">
               <span className="text-3xl font-black leading-none">{formatNumber(home?.curation_signals[key] ?? 0)}</span>
-              <span className="max-w-36 text-right text-[0.65rem] font-black uppercase text-white/70">
+              <span className="max-w-36 text-right text-[0.65rem] font-black uppercase text-secondary-foreground/70">
                 {t(`homeExhibition.curation.signals.${key}`)}
               </span>
             </div>
@@ -338,13 +338,13 @@ const Index = () => {
         </div>
       </section>
 
-      <section className="border-y-2 border-border bg-black py-16 text-white md:py-20">
+      <section className="border-y-2 border-border bg-secondary py-16 text-secondary-foreground md:py-20">
         <div className="container">
           <SectionHeader
             title={t('homeExhibition.playlists.title')}
             description={t('homeExhibition.playlists.description')}
             action={
-              <Button variant="outline" className="border-white bg-black text-white hover:bg-[#efff00] hover:text-black" onClick={() => navigate('/playlists')}>
+              <Button variant="outline" className="border-border bg-background text-foreground hover:bg-primary hover:text-primary-foreground" onClick={() => navigate('/playlists')}>
                 {t('homeExhibition.actions.viewAllPlaylists')}
                 <ArrowRight className="h-4 w-4" />
               </Button>
@@ -353,17 +353,17 @@ const Index = () => {
           {isLoading ? (
             <div className="grid gap-5 md:grid-cols-3">
               {Array.from({ length: 6 }).map((_, index) => (
-                <Skeleton key={index} className="h-72 border-2 border-white/40 bg-white/10" />
+                <Skeleton key={index} className="h-72 border-2 border-border" />
               ))}
             </div>
           ) : home?.featured_playlists.length ? (
             <div className="grid gap-5 md:grid-cols-3">
               {home.featured_playlists.map((playlist) => (
-                <PlaylistShowcaseCard key={playlist.id} playlist={playlist} className="border-white/40 bg-black text-white hover:border-[#efff00]" />
+                <PlaylistShowcaseCard key={playlist.id} playlist={playlist} className="border-border bg-card text-card-foreground hover:border-primary" />
               ))}
             </div>
           ) : (
-            <div className="border-2 border-white/30 p-8 text-white/70">{t('homeExhibition.empty.playlists')}</div>
+            <div className="border-2 border-border p-8 text-secondary-foreground/70">{t('homeExhibition.empty.playlists')}</div>
           )}
         </div>
       </section>
