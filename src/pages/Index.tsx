@@ -201,6 +201,7 @@ const Index = () => {
   return (
     <MainLayout>
       <PageHero
+        animateEntrance
         className="overflow-x-clip"
         contentClassName="lg:max-w-4xl"
         title={t('homeExhibition.hero.monynhaTitle')}
