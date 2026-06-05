@@ -207,14 +207,14 @@ const Index = () => {
         description={t('homeExhibition.hero.description')}
         actions={
           <>
-            <Button size="xl" className="h-14 justify-between px-6 text-sm" onClick={() => navigate('/videos')}>
+            <Button size="xl" className="h-14 justify-between px-6 text-sm transition-transform duration-200 hover:scale-[1.03] active:scale-[0.97]" onClick={() => navigate('/videos')}>
               {t('homeExhibition.hero.primaryCta')}
               <ArrowRight className="h-5 w-5" />
             </Button>
             <Button
               variant="outline"
               size="xl"
-              className="h-14 justify-between border-border bg-background px-6 text-sm"
+              className="h-14 justify-between border-border bg-background px-6 text-sm transition-transform duration-200 hover:scale-[1.03] active:scale-[0.97]"
               onClick={() => navigate('/submit')}
             >
               {t('homeExhibition.hero.secondaryCta')}
@@ -420,7 +420,7 @@ const Index = () => {
                 key={key}
                 type="button"
                 onClick={() => navigate(href)}
-                className="group min-h-56 border-2 border-border p-5 text-left transition-transform hover:-translate-y-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                className="group min-h-56 border-2 border-border p-5 text-left transition-all duration-300 hover:scale-[1.03] active:scale-[0.97] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
               >
                 <div className="mb-10 flex items-center justify-between">
                   <Icon className="h-7 w-7" />
@@ -439,11 +439,11 @@ const Index = () => {
         description={t('homeExhibition.finalCta.description')}
         actions={
           <>
-            <Button variant="outline" className="border-black bg-white text-black hover:bg-black hover:text-white" onClick={() => navigate('/submit')}>
+            <Button variant="outline" className="border-black bg-white text-black hover:bg-black hover:text-white transition-transform duration-200 hover:scale-[1.03] active:scale-[0.97]" onClick={() => navigate('/submit')}>
               {t('homeExhibition.finalCta.submit')}
               <Send className="h-4 w-4" />
             </Button>
-            <Button variant="outline" className="border-black bg-[#efff00] text-black hover:bg-black hover:text-white" onClick={() => navigate('/editor/apply')}>
+            <Button variant="outline" className="border-black bg-[#efff00] text-black hover:bg-black hover:text-white transition-transform duration-200 hover:scale-[1.03] active:scale-[0.97]" onClick={() => navigate('/editor/apply')}>
               {t('homeExhibition.finalCta.editor')}
               <Users className="h-4 w-4" />
             </Button>

@@ -11,7 +11,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { notify } from '@/shared/lib/notify';
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { emailSchema } from '@/shared/lib/validation';
 import { submitContactForm } from '@/shared/api/contact.api';
 
@@ -29,6 +29,7 @@ const Contact = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const nameRef = useRef<HTMLInputElement>(null);
 
   const { register, handleSubmit, formState: { errors }, reset } = useForm<ContactFormValues>({
     resolver: zodResolver(contactFormSchema),
@@ -39,6 +40,13 @@ const Contact = () => {
       message: '',
     },
   });
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      nameRef.current?.focus();
+    }, 50);
+    return () => clearTimeout(timer);
+  }, []);
 
   const onSubmit = async (values: ContactFormValues) => {
     setIsSubmitting(true);
@@ -87,6 +95,10 @@ const Contact = () => {
                   type="text"
                   placeholder={t('contactPage.form.namePlaceholder')}
                   {...register('name')}
+                  ref={(e) => {
+                    register('name').ref(e);
+                    nameRef.current = e;
+                  }}
                   aria-invalid={errors.name ? "true" : "false"}
                 />
                 {errors.name && (

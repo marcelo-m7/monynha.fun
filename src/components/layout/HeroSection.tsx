@@ -182,7 +182,7 @@ export const HeroSection = () => {
               <Button
                 type="submit"
                 variant="default"
-                className="h-10 md:h-12 px-6"
+                className="h-10 md:h-12 px-6 transition-transform duration-200 hover:scale-[1.03] active:scale-[0.97]"
                 disabled={isSubmittingForm || authLoading}
               >
                 {isSubmittingForm || authLoading ? (
@@ -204,7 +204,7 @@ export const HeroSection = () => {
             <Button
               variant="secondary"
               size="lg"
-              className="w-full sm:w-auto"
+              className="w-full sm:w-auto transition-transform duration-200 hover:scale-[1.03] active:scale-[0.97]"
               onClick={handleHowItWorksClick}
             >
               {t('home.howItWorks.title')}
@@ -212,7 +212,7 @@ export const HeroSection = () => {
             <Button
               variant="outline"
               size="lg"
-              className="w-full sm:w-auto"
+              className="w-full sm:w-auto transition-transform duration-200 hover:scale-[1.03] active:scale-[0.97]"
               onClick={() => navigate('/videos')}
             >
               {t('hero.exploreVideosButton')}
@@ -220,7 +220,7 @@ export const HeroSection = () => {
             <Button
               variant="ghost"
               size="lg"
-              className="w-full sm:w-auto text-muted-foreground hover:text-foreground"
+              className="w-full sm:w-auto text-muted-foreground hover:text-foreground transition-transform duration-200 hover:scale-[1.03] active:scale-[0.97]"
               onClick={handleDirectSubmitClick}
             >
               {t('hero.submitVideoButton')}

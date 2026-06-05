@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate, useLocation, useSearchParams } from 'react-router-dom';
 import { useAuth } from '@/features/auth/useAuth';
 import { Button } from '@/components/ui/button';
@@ -40,6 +40,9 @@ export default function Auth() {
   const navigate = useNavigate();
   const location = useLocation();
   const [searchParams] = useSearchParams();
+
+  const emailRef = useRef<HTMLInputElement>(null);
+  const usernameRef = useRef<HTMLInputElement>(null);
 
   // Form setup for login/signup
   const { register, handleSubmit, formState: { errors, isSubmitting }, reset, watch } = useForm<z.infer<typeof loginSchema> | z.infer<typeof signupSchema>>({
@@ -103,7 +106,19 @@ export default function Auth() {
 
   useEffect(() => {
     reset(); // Reset form fields when switching between login/signup
-  }, [isLogin, reset]);
+    
+    // Focus appropriate field
+    const timer = setTimeout(() => {
+      if (!showForgotPassword && !showResetPassword) {
+        if (isLogin) {
+          emailRef.current?.focus();
+        } else {
+          usernameRef.current?.focus();
+        }
+      }
+    }, 50);
+    return () => clearTimeout(timer);
+  }, [isLogin, showForgotPassword, showResetPassword, reset]);
 
   const onSubmit = async (values: z.infer<typeof loginSchema> | z.infer<typeof signupSchema>) => {
     try {
@@ -311,6 +326,10 @@ export default function Auth() {
                         type="text"
                         placeholder={t('auth.usernamePlaceholder')}
                         {...register('username')}
+                        ref={(e) => {
+                          register('username').ref(e);
+                          usernameRef.current = e;
+                        }}
                         className="pl-10"
                       />
                     </div>
@@ -331,6 +350,10 @@ export default function Auth() {
                       type="email"
                       placeholder={t('auth.emailPlaceholder')}
                       {...register('email')}
+                      ref={(e) => {
+                        register('email').ref(e);
+                        emailRef.current = e;
+                      }}
                       className="pl-10"
                     />
                   </div>
