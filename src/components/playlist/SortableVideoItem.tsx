@@ -8,6 +8,7 @@ import { GripVertical, X, Check } from 'lucide-react';
 import type { PlaylistVideo } from '@/features/playlists';
 import { Button } from '@/components/ui/button';
 import { VideoDurationBadge } from '@/components/video/VideoDurationBadge';
+import { getVideoRoute } from '@/entities/video/video.routes';
 import { cn } from '@/lib/utils';
 
 interface SortableVideoItemProps {
@@ -96,7 +97,7 @@ export function SortableVideoItem({
 
       {/* Thumbnail */}
       <Link
-        to={`/videos/${item.video?.id}`}
+        to={item.video ? getVideoRoute(item.video) : '/videos'}
         className="relative w-24 h-14 rounded-lg overflow-hidden shrink-0 group-hover:ring-2 ring-primary/50 transition-all"
       >
         <img
@@ -114,7 +115,7 @@ export function SortableVideoItem({
 
       {/* Video info */}
       <Link
-        to={`/videos/${item.video?.id}`}
+        to={item.video ? getVideoRoute(item.video) : '/videos'}
         className="flex-1 min-w-0"
       >
         <h3 className={cn(

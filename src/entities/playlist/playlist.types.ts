@@ -19,7 +19,7 @@ export type PlaylistUpdate = Database['public']['Tables']['playlists']['Update']
 export type PlaylistVideo = Database['public']['Tables']['playlist_videos']['Row'] & {
   video?: Pick<
     Video,
-    'id' | 'title' | 'youtube_id' | 'thumbnail_url' | 'channel_name' | 'duration_seconds'
+    'id' | 'slug' | 'title' | 'youtube_id' | 'thumbnail_url' | 'channel_name' | 'duration_seconds'
   > | null;
 };
 

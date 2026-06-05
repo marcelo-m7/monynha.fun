@@ -1,6 +1,7 @@
 "use client";
 
 import type { VideoWithCategory } from "@/entities/video/video.types";
+import { getVideoRoute } from "@/entities/video/video.routes";
 import { formatViewCount } from "@/shared/lib/format";
 import { Play, Eye, Heart, ListPlus } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
@@ -32,7 +33,7 @@ export const VideoCard = ({ video, onClick, variant = 'default' }: VideoCardProp
     if (onClick) {
       onClick();
     } else {
-      navigate(`/videos/${video.id}`);
+      navigate(getVideoRoute(video));
     }
   };
 

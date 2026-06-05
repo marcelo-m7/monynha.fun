@@ -4,6 +4,7 @@ import type { Video } from '@/entities/video/video.types';
 import { createVideoSubmission } from '@/entities/video_submission/video_submission.api';
 import type { VideoSubmission } from '@/entities/video_submission/video_submission.types';
 import type { YouTubeMetadata } from './useYouTubeMetadata';
+import { generateSlug } from '@/shared/lib/slug';
 
 export interface SubmitVideoPayload {
   metadata: YouTubeMetadata;
@@ -38,6 +39,7 @@ export function useSubmitVideo() {
 
       const newVideo = await createVideo({
         youtube_id: payload.metadata.videoId,
+        slug: generateSlug(payload.metadata.title),
         title: payload.metadata.title,
         description: payload.description || payload.metadata.description || null,
         channel_name: payload.metadata.channelName,

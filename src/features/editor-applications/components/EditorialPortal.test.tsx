@@ -84,9 +84,11 @@ describe('EditorialPortal access control', () => {
           updated_at: new Date().toISOString(),
           video: {
             id: 'video-1',
+            slug: 'async-analysis-video',
             title: 'Async analysis video',
             youtube_id: 'abc123DEF45',
             thumbnail_url: 'https://example.com/thumb.jpg',
+            duration_seconds: 125,
             category: { id: 'cat-1', name: 'Education', slug: 'education' },
           },
         },

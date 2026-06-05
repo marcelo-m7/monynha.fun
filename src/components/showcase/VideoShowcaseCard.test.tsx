@@ -6,6 +6,7 @@ import { VideoShowcaseCard } from './VideoShowcaseCard';
 
 const video: HomeHeroVideo = {
   id: 'video-1',
+  slug: 'aprender-com-calma',
   youtube_id: 'abc123DEF45',
   title: 'Aprender com calma',
   channel_name: 'Tube O2',

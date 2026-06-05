@@ -84,6 +84,7 @@ function mapSignals(value: unknown): HomeCurationSignals {
 function mapHeroVideo(item: Record<string, unknown>): HomeHeroVideo {
   return {
     id: stringValue(item.id),
+    slug: stringValue(item.slug),
     youtube_id: stringValue(item.youtube_id),
     title: stringValue(item.title),
     channel_name: stringValue(item.channel_name),

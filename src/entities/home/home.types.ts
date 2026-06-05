@@ -12,6 +12,7 @@ export interface HomeMetricSummary {
 
 export interface HomeHeroVideo {
   id: string;
+  slug: string;
   youtube_id: string;
   title: string;
   channel_name: string;

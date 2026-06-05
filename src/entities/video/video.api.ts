@@ -105,6 +105,15 @@ export interface ListVideosParams {
   includeEnrichment?: boolean;
 }
 
+const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+const YOUTUBE_ID_REGEX = /^[a-zA-Z0-9_-]{11}$/;
+
+export function getVideoLookupColumn(value: string): 'id' | 'youtube_id' | 'slug' {
+  if (UUID_REGEX.test(value)) return 'id';
+  if (YOUTUBE_ID_REGEX.test(value)) return 'youtube_id';
+  return 'slug';
+}
+
 export async function listVideos(params: ListVideosParams = {}) {
   const includeEnrichment = params.includeEnrichment !== false; // Default true
   
@@ -153,30 +162,32 @@ export async function listVideos(params: ListVideosParams = {}) {
 }
 
 export async function getVideoById(id: string) {
-  // Check if the provided ID is a UUID or a YouTube ID
-  const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id);
-  
-  let query = supabase
-    .from('videos')
-    .select(
-      `
-      *,
-        category:categories(id, name, slug, color),
-        ai_enrichments!video_id(*),
-        playlist_videos!playlist_videos_video_id_fkey(
-          playlist:playlists(id, name, slug, is_ordered, course_code, unit_code)
-        )
-    `,
+  const lookupColumn = getVideoLookupColumn(id);
+
+  const selectVideo = () =>
+    supabase
+      .from('videos')
+      .select(
+        `
+        *,
+          category:categories(id, name, slug, color),
+          ai_enrichments!video_id(*),
+          playlist_videos!playlist_videos_video_id_fkey(
+            playlist:playlists(id, name, slug, is_ordered, course_code, unit_code)
+          )
+      `,
       )
       .order('created_at', { foreignTable: 'ai_enrichments', ascending: false });
 
-  if (isUuid) {
-    query = query.eq('id', id);
-  } else {
-    query = query.eq('youtube_id', id);
-  }
+  let resolvedLookupColumn = lookupColumn;
+  let { data, error } = await selectVideo().eq(lookupColumn, id).maybeSingle();
 
-  const { data, error } = await query.maybeSingle();
+  if (!error && !data && lookupColumn !== 'slug') {
+    const fallback = await selectVideo().eq('slug', id).maybeSingle();
+    data = fallback.data;
+    error = fallback.error;
+    resolvedLookupColumn = 'slug';
+  }
 
   if (error) throw error;
   
@@ -186,7 +197,7 @@ export async function getVideoById(id: string) {
       const { data: exhibitionRow } = await supabase
         .from('v_video_exhibition')
         .select('id, transcript_summary, transcript_language, transcript_status')
-        .eq(isUuid ? 'id' : 'youtube_id', id)
+        .eq(resolvedLookupColumn, id)
         .maybeSingle();
       const transcriptData = exhibitionRow as Pick<
         VideoExhibitionRow,
@@ -359,12 +370,12 @@ export async function deleteVideo(videoId: string) {
 export async function findVideoByYoutubeId(youtubeId: string) {
   const { data, error } = await supabase
     .from('videos')
-    .select('id')
+    .select('id, slug')
     .eq('youtube_id', youtubeId)
     .maybeSingle();
 
   if (error) throw error;
-  return data as { id: string } | null;
+  return data as { id: string; slug: string } | null;
 }
 
 export async function getVideoCount() {

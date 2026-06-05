@@ -8,6 +8,7 @@ import { Input } from '@/components/ui/input';
 import { Skeleton } from '@/components/ui/skeleton';
 import { PlaylistCard } from '@/components/playlist/PlaylistCard';
 import { VideoDurationBadge } from '@/components/video/VideoDurationBadge';
+import { getVideoRoute } from '@/entities/video/video.routes';
 import { useAuth } from '@/features/auth/useAuth';
 import { useVideoAnalysisJobs } from '@/features/video-analysis/useVideoAnalysisJob';
 import { usePlaylists } from '@/features/playlists/queries/usePlaylists';
@@ -177,7 +178,7 @@ const EditorialPortal = () => {
                       variant="outline"
                       size="sm"
                       className="mt-3"
-                      onClick={() => navigate(`/videos/${job.video_id}`)}
+                      onClick={() => navigate(job.video ? getVideoRoute(job.video) : `/videos/${job.video_id}`)}
                     >
                       {t('editorialPortal.analysisQueue.reviewVideo')}
                     </Button>

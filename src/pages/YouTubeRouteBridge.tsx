@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { findVideoByYoutubeId } from '@/entities/video/video.api';
+import { getVideoRoute } from '@/entities/video/video.routes';
 import { extractYouTubeId } from '@/shared/lib/youtube';
 
 const YouTubeRouteBridge = () => {
@@ -28,7 +29,7 @@ const YouTubeRouteBridge = () => {
         if (cancelled) return;
 
         if (existingVideo?.id) {
-          navigate(`/videos/${existingVideo.id}${location.search}`, { replace: true });
+          navigate(`${getVideoRoute(existingVideo)}${location.search}`, { replace: true });
           return;
         }
 

@@ -32,6 +32,7 @@ describe('getHomeExhibition', () => {
         hero_videos: [
           {
             id: 'video-1',
+            slug: 'learning-video',
             youtube_id: 'abc123',
             title: 'Learning video',
             channel_name: 'Open 2',

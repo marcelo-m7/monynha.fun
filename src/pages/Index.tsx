@@ -58,6 +58,7 @@ const DEFAULT_RAIL_LIMIT = 12;
 function mapVideoToShowcase(video: VideoWithCategory): HomeHeroVideo {
   return {
     id: video.id,
+    slug: video.slug,
     youtube_id: video.youtube_id,
     title: video.enrichment?.optimized_title || video.title,
     channel_name: video.channel_name,

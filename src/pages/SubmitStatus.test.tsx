@@ -10,6 +10,7 @@ const useAuthMock = vi.fn();
 const useVideoSubmissionMock = vi.fn();
 const useStartSubmissionProcessingMock = vi.fn();
 const useLatestVideoAnalysisJobMock = vi.fn();
+const useVideoByIdMock = vi.fn();
 const startProcessingMock = vi.fn();
 const refetchMock = vi.fn();
 
@@ -38,6 +39,10 @@ vi.mock('@/features/video-analysis/useVideoAnalysisJob', () => ({
   useLatestVideoAnalysisJob: () => useLatestVideoAnalysisJobMock(),
 }));
 
+vi.mock('@/features/videos/queries/useVideos', () => ({
+  useVideoById: (id?: string) => useVideoByIdMock(id),
+}));
+
 const baseSubmission = {
   id: 'submission-1',
   user_id: 'user-1',
@@ -56,6 +61,10 @@ beforeEach(() => {
   startProcessingMock.mockReset();
   refetchMock.mockReset();
   useLatestVideoAnalysisJobMock.mockReturnValue({ data: null, isLoading: false });
+  useVideoByIdMock.mockImplementation((id?: string) => ({
+    data: id ? { id, slug: id === 'existing-video-1' ? 'existing-video' : 'learning-react' } : null,
+    isLoading: false,
+  }));
   useAuthMock.mockReturnValue({ user: { id: 'user-1' }, loading: false });
   useVideoSubmissionMock.mockReturnValue({
     data: baseSubmission,
@@ -107,7 +116,7 @@ describe('SubmitStatus page', () => {
 
     expect(screen.getByText('Video ready')).toBeInTheDocument();
     expect(screen.getByText('Portuguese')).toBeInTheDocument();
-    expect(screen.getByRole('link', { name: 'View video' })).toHaveAttribute('href', '/videos/video-1');
+    expect(screen.getByRole('link', { name: 'View video' })).toHaveAttribute('href', '/videos/learning-react');
     expect(startProcessingMock).not.toHaveBeenCalled();
   });
 
@@ -299,7 +308,7 @@ describe('SubmitStatus page', () => {
     renderWithProviders(<SubmitStatus />, { route: '/submit/status/submission-1' });
 
     expect(screen.getByText('Duplicate detected')).toBeInTheDocument();
-    expect(screen.getByRole('link', { name: 'View video' })).toHaveAttribute('href', '/videos/existing-video-1');
+    expect(screen.getByRole('link', { name: 'View video' })).toHaveAttribute('href', '/videos/existing-video');
   });
 
   it('allows retry for recoverable errors', async () => {

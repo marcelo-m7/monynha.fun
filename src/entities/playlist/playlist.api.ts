@@ -140,7 +140,7 @@ export async function listPlaylistVideos(playlistId: string) {
     .select(
       `
       *,
-      video:videos!playlist_videos_video_id_fkey(id, title, youtube_id, thumbnail_url, channel_name, duration_seconds)
+      video:videos!playlist_videos_video_id_fkey(id, slug, title, youtube_id, thumbnail_url, channel_name, duration_seconds)
     `,
     )
     .eq('playlist_id', playlistId)

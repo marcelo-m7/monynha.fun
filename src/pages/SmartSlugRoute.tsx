@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { Skeleton } from '@/components/ui/skeleton';
 import { findVideoByYoutubeId } from '@/entities/video/video.api';
+import { getVideoRoute } from '@/entities/video/video.routes';
 import Profile from './Profile';
 
 const YOUTUBE_ID_REGEX = /^[a-zA-Z0-9_-]{11}$/;
@@ -29,7 +30,7 @@ const SmartSlugRoute = () => {
         if (cancelled) return;
 
         if (existingVideo?.id) {
-          navigate(`/videos/${existingVideo.id}${location.search}`, { replace: true });
+          navigate(`${getVideoRoute(existingVideo)}${location.search}`, { replace: true });
           return;
         }
 

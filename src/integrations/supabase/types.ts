@@ -907,6 +907,7 @@ export type Database = {
           is_featured: boolean
           language: string
           playlist_add_count: number
+          slug: string
           submitted_by: string | null
           thumbnail_url: string
           title: string
@@ -925,6 +926,7 @@ export type Database = {
           is_featured?: boolean
           language?: string
           playlist_add_count?: number
+          slug?: string
           submitted_by?: string | null
           thumbnail_url: string
           title: string
@@ -943,6 +945,7 @@ export type Database = {
           is_featured?: boolean
           language?: string
           playlist_add_count?: number
+          slug?: string
           submitted_by?: string | null
           thumbnail_url?: string
           title?: string
@@ -1002,6 +1005,7 @@ export type Database = {
       v_video_exhibition: {
         Row: {
           id: string | null
+          slug: string | null
           youtube_id: string | null
           title: string | null
           description: string | null

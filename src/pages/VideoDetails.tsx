@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { useParams, useNavigate, Link } from 'react-router-dom';
+import { useEffect, useState } from 'react';
+import { useParams, useNavigate, Link, useLocation } from 'react-router-dom';
 import { useDeleteVideo, useUpdateVideo, useVideoById, useRelatedVideos } from '@/features/videos/queries/useVideos';
 import { useCategories } from '@/features/categories/queries/useCategories';
 import { useLatestVideoAnalysisJob } from '@/features/video-analysis/useVideoAnalysisJob';
@@ -12,6 +12,7 @@ import { useMetaTags } from '@/shared/hooks/useMetaTags';
 import { Header } from '@/components/layout/Header';
 import { Footer } from '@/components/layout/Footer';
 import { VideoCard } from '@/components/video/VideoCard';
+import { getVideoRoute } from '@/entities/video/video.routes';
 import { AspectRatio } from '@/components/ui/aspect-ratio';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Badge } from '@/components/ui/badge'; // Import Badge component
@@ -47,6 +48,7 @@ const VideoDetails = () => {
   const { t } = useTranslation();
   const { videoId } = useParams<{ videoId: string }>();
   const navigate = useNavigate();
+  const location = useLocation();
   const { user, loading: authLoading } = useAuth();
   const { data: video, isLoading, isError } = useVideoById(videoId);
   const { data: analysisJob } = useLatestVideoAnalysisJob({ videoId: video?.id });
@@ -68,6 +70,12 @@ const VideoDetails = () => {
   const [editDescription, setEditDescription] = useState('');
   const [editCategoryId, setEditCategoryId] = useState('none');
   const [editLanguage, setEditLanguage] = useState('pt');
+
+  useEffect(() => {
+    if (!video || !videoId || !video.slug || videoId === video.slug) return;
+
+    navigate(`${getVideoRoute(video)}${location.search}`, { replace: true });
+  }, [location.search, navigate, video, videoId]);
 
   const trimDescription = (text?: string | null, maxLength = 160) => {
     const value = (text ?? '').trim();
@@ -502,7 +510,7 @@ const VideoDetails = () => {
                     key={relatedVideo.id} 
                     video={relatedVideo} 
                     variant="compact" 
-                    onClick={() => navigate(`/videos/${relatedVideo.id}`)}
+                    onClick={() => navigate(getVideoRoute(relatedVideo))}
                   />
                 ))}
               </div>

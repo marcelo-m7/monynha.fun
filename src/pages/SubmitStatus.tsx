@@ -12,6 +12,8 @@ import { useAuth } from '@/features/auth/useAuth';
 import { useLatestVideoAnalysisJob } from '@/features/video-analysis/useVideoAnalysisJob';
 import { useStartSubmissionProcessing, useVideoSubmission } from '@/features/video-submissions/queries/useVideoSubmissions';
 import { getVideoSubmissionMetadata } from '@/entities/video_submission/video_submission.types';
+import { useVideoById } from '@/features/videos/queries/useVideos';
+import { getVideoRoute } from '@/entities/video/video.routes';
 
 const terminalStatuses = new Set(['success', 'failed', 'duplicate', 'recoverable_error']);
 
@@ -69,6 +71,7 @@ export default function SubmitStatus() {
   const detectedLanguage = metadata.detectedLanguage;
   const detectedLanguageKey = languageLabelKey(detectedLanguage);
   const videoId = submission?.video_id ?? submission?.duplicate_video_id;
+  const { data: linkedVideo } = useVideoById(videoId);
   const { data: analysisJob } = useLatestVideoAnalysisJob({
     videoId: submission?.video_id,
     submissionId: submission?.id,
@@ -374,7 +377,7 @@ export default function SubmitStatus() {
             <div className="flex flex-col gap-3 sm:flex-row">
               {videoId && (status === 'success' || status === 'duplicate') && (
                 <Button asChild>
-                  <Link to={`/videos/${videoId}`}>{t('submitStatus.viewVideo')}</Link>
+                  <Link to={linkedVideo ? getVideoRoute(linkedVideo) : `/videos/${videoId}`}>{t('submitStatus.viewVideo')}</Link>
                 </Button>
               )}
               {(status === 'recoverable_error' || startProcessing.isError) && (

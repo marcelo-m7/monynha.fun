@@ -38,6 +38,7 @@ const sampleCategories: Category[] = [
 const sampleVideos: VideoWithCategory[] = [
   {
     id: 'video-1',
+    slug: 'learning-react',
     youtube_id: 'abc123DEF45',
     title: 'Learning React',
     description: 'React basics',
@@ -64,6 +65,7 @@ const sampleVideos: VideoWithCategory[] = [
   },
   {
     id: 'video-2',
+    slug: 'advanced-react',
     youtube_id: 'xyz987',
     title: 'Advanced React',
     description: 'Hooks and more',

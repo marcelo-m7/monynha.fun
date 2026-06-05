@@ -25,6 +25,7 @@ export type VideoAnalysisJobMetadata = {
 export type VideoAnalysisJobWithVideo = VideoAnalysisJob & {
   video?: {
     id: string;
+    slug: string;
     title: string;
     youtube_id: string;
     thumbnail_url: string;

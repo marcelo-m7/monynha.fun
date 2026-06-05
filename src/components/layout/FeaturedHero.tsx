@@ -1,6 +1,7 @@
 "use client";
 
 import type { VideoWithCategory } from "@/entities/video/video.types";
+import { getVideoRoute } from "@/entities/video/video.routes";
 import { formatViewCount } from "@/shared/lib/format";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -22,7 +23,7 @@ export const FeaturedHero = ({ video }: FeaturedHeroProps) => {
 
   const handleClick = () => {
     handleViewIncrement(video.id);
-    navigate(`/videos/${video.id}`);
+    navigate(getVideoRoute(video));
   };
 
   const handleKeyDown = (event: KeyboardEvent<HTMLElement>) => {

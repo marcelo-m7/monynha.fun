@@ -13,6 +13,7 @@ vi.mock('@/entities/video/video.api', () => ({
 
 const sampleVideo: VideoWithCategory = {
   id: 'video-1',
+  slug: 'learning-react',
   youtube_id: 'abc123DEF45',
   title: 'Learning React',
   description: 'React basics',

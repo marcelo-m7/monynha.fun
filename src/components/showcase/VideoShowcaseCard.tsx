@@ -2,6 +2,7 @@ import { Heart, ListPlus, Play, Tag } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { VideoDurationBadge } from '@/components/video/VideoDurationBadge';
 import type { HomeHeroVideo } from '@/entities/home/home.types';
+import { getVideoRoute } from '@/entities/video/video.routes';
 import { LazyImage } from '@/shared/components/LazyImage';
 import { formatViewCount } from '@/shared/lib/format';
 import { cn } from '@/lib/utils';
@@ -20,7 +21,7 @@ export function VideoShowcaseCard({ video, variant = 'tile', className }: VideoS
   return (
     <button
       type="button"
-      onClick={() => navigate(`/videos/${video.id}`)}
+      onClick={() => navigate(getVideoRoute(video))}
       className={cn(
         'group block w-full border-2 border-border bg-card text-left text-card-foreground transition-transform hover:-translate-y-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
         variant === 'row' && 'grid grid-cols-[7.5rem_minmax(0,1fr)] gap-3 overflow-hidden p-2',
