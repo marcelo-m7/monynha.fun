@@ -74,7 +74,7 @@ describe('PlaylistImportDialog', () => {
           body: expect.objectContaining({
             playlist_url: 'https://youtube.com/playlist?list=PL7iAT8C5wumpQWB8AFW7CwK2nlzh8ZdP9',
             language: 'und',
-            max_videos: 200,
+            max_videos: 50,
           }),
         }),
       );

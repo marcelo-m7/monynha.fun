@@ -9,7 +9,7 @@
     "build:dev": "vite build --mode development",
     "build:analyze": "vite build && open dist/stats.html || start dist/stats.html",
     "edge:functions:list": "supabase functions list --project-ref wvkjainfwsyiyfcmbtid",
-    "edge:deploy:enrich-video": "supabase functions deploy enrich-video --project-ref wvkjainfwsyiyfcmbtid --no-verify-jwt --use-api --yes",
+    "edge:deploy:enrich-video": "supabase functions deploy enrich-video --project-ref wvkjainfwsyiyfcmbtid --use-api --yes",
     "edge:test:enrich-video": "node scripts/edge-test-enrich-video.mjs",
     "videos:durations:dry-run": "node scripts/backfill-video-durations.mjs --dry-run",
     "videos:durations:backfill": "node scripts/backfill-video-durations.mjs --write",

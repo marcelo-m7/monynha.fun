@@ -4,7 +4,7 @@ Tube O2 uses a fast, blocking-safe `enrich-video` function plus optional deep an
 
 ## Frontend-Invoked Functions
 
-- `enrich-video`: fast required submit path. Must stay `legacy_fast`, must not import OpenAI or Gemini, and must deploy with `--no-verify-jwt`.
+- `enrich-video`: fast required submit path. Must stay `legacy_fast`, must not import OpenAI or Gemini, and must deploy with JWT verification enabled.
 - `import-youtube-playlist`: imports playlist videos and dispatches `enrich-video` for queued submissions.
 - `send-contact-message`: contact form email flow.
 - `send-editor-application-confirmation`: editor application confirmation email flow.
@@ -27,14 +27,13 @@ The deploy command expands to:
 ```bash
 supabase functions deploy enrich-video \
   --project-ref wvkjainfwsyiyfcmbtid \
-  --no-verify-jwt \
   --use-api \
   --yes
 ```
 
 ## Smoke Test
 
-Unauthenticated smoke test should reach the function and return a function-generated 401:
+Unauthenticated smoke test should be rejected with 401/403 before processing starts:
 
 ```bash
 curl -i -X POST https://wvkjainfwsyiyfcmbtid.supabase.co/functions/v1/enrich-video \
@@ -42,7 +41,7 @@ curl -i -X POST https://wvkjainfwsyiyfcmbtid.supabase.co/functions/v1/enrich-vid
   --data '{}'
 ```
 
-Expected body includes `UNAUTHORIZED_NO_AUTH_HEADER`.
+Expected body includes an authentication error and no submission/video updates.
 
 ## Real Video Test
 

@@ -125,7 +125,7 @@ export const PlaylistImportDialog: React.FC<PlaylistImportDialogProps> = ({ chil
         body: {
           playlist_url: values.playlistUrl,
           language: 'und',
-          max_videos: 200,
+          max_videos: 50,
         },
         headers: { 'Content-Type': 'application/json' },
       });

@@ -107,20 +107,22 @@ describe('enrich-video Edge Function', () => {
 
     it('should handle database insert errors', async () => {
       // Mock database error (e.g., constraint violation)
-      // Expected: 500 error with database error message
+      // Expected: 500 error with a generic client-facing message
       expect(true).toBe(true) // Placeholder
     })
   })
 
   describe('Request/Response Format', () => {
-    it('should accept videoId and youtubeUrl in request body', async () => {
+    it('should accept videoId, youtubeUrl and submissionId in request body', async () => {
       const requestBody = {
         videoId: testVideoId,
         youtubeUrl: testYoutubeUrl,
+        submissionId: 'submission-uuid',
       }
       
       expect(requestBody).toHaveProperty('videoId')
       expect(requestBody).toHaveProperty('youtubeUrl')
+      expect(requestBody).toHaveProperty('submissionId')
     })
 
     it('should return enrichment data in response', async () => {

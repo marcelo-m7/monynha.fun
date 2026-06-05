@@ -1,9 +1,11 @@
 import { createClient } from "npm:@supabase/supabase-js@2.45.4";
+import { errorResponse, jsonResponse, optionsResponse } from "../_shared/http.ts";
+import { checkEdgeRateLimit } from "../_shared/rate-limit.ts";
 
-const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
-};
+const IMPORT_RATE_LIMIT_WINDOWS = [
+  { windowSeconds: 60 * 60, maxRequests: 2 },
+  { windowSeconds: 24 * 60 * 60, maxRequests: 10 },
+];
 
 type VideoRow = {
   id: string;
@@ -54,13 +56,6 @@ type VideoMetadata = {
   thumbnailUrl: string;
 };
 
-function json(payload: Record<string, unknown>, status = 200) {
-  return new Response(JSON.stringify(payload), {
-    status,
-    headers: { ...corsHeaders, "Content-Type": "application/json" },
-  });
-}
-
 function extractPlaylistListParam(inputUrl: string): string | null {
   try {
     return new URL(inputUrl).searchParams.get("list");
@@ -92,7 +87,7 @@ function extractVideoIdsFromPlaylistHtml(html: string): string[] {
 
 function parseLimit(value: unknown) {
   const parsed = Number(value);
-  return Number.isFinite(parsed) ? Math.max(1, Math.min(Math.trunc(parsed), 500)) : 200;
+  return Number.isFinite(parsed) ? Math.max(1, Math.min(Math.trunc(parsed), 100)) : 50;
 }
 
 function safeLanguage(value: unknown) {
@@ -213,34 +208,59 @@ async function getAuthenticatedUser(req: Request, supabaseUrl: string, anonKey: 
 }
 
 Deno.serve(async (req: Request) => {
-  if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
-  if (req.method !== "POST") return json({ error: "Method not allowed" }, 405);
+  const requestId = crypto.randomUUID();
+
+  if (req.method === "OPTIONS") return optionsResponse(req);
+  if (req.method !== "POST") return errorResponse(req, 405, "METHOD_NOT_ALLOWED", "Method not allowed", { requestId });
 
   const supabaseUrl = Deno.env.get("SUPABASE_URL");
   const anonKey = Deno.env.get("SUPABASE_ANON_KEY");
   const serviceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
   if (!supabaseUrl || !anonKey || !serviceRoleKey) {
-    return json({ error: "Missing Supabase environment variables" }, 500);
+    return errorResponse(req, 500, "MISSING_SUPABASE_ENV", "Missing Supabase environment variables", { requestId });
   }
 
   const { user, error: authError } = await getAuthenticatedUser(req, supabaseUrl, anonKey);
-  if (!user) return json({ error: "Unauthorized", details: authError }, 401);
+  if (!user) {
+    if (authError) console.warn(`[import-youtube-playlist] ${requestId} auth failed: ${authError}`);
+    return errorResponse(req, 401, "UNAUTHORIZED", "Invalid or expired authorization token", { requestId });
+  }
 
   let body: ImportBody;
   try {
     body = await req.json();
   } catch {
-    return json({ error: "Invalid JSON" }, 400);
+    return errorResponse(req, 400, "INVALID_JSON", "Invalid JSON body", { requestId });
   }
 
   const playlistUrl = typeof body.playlist_url === "string" ? body.playlist_url.trim() : "";
-  if (!playlistUrl) return json({ error: "playlist_url is required" }, 400);
+  if (!playlistUrl) return errorResponse(req, 400, "INVALID_PAYLOAD", "playlist_url is required", { requestId });
 
   const listParam = extractPlaylistListParam(playlistUrl);
   const canonicalUrl = normalizeYoutubePlaylistUrl(playlistUrl);
-  if (!listParam || !canonicalUrl) return json({ error: "Invalid YouTube playlist_url" }, 400);
+  if (!listParam || !canonicalUrl) {
+    return errorResponse(req, 400, "INVALID_PLAYLIST_URL", "Invalid YouTube playlist_url", { requestId });
+  }
 
   const supabase = createClient(supabaseUrl, serviceRoleKey, { auth: { persistSession: false } });
+
+  try {
+    const rateLimit = await checkEdgeRateLimit(supabase, {
+      functionName: "import-youtube-playlist",
+      userId: user.id,
+      windows: IMPORT_RATE_LIMIT_WINDOWS,
+    });
+
+    if (!rateLimit.allowed) {
+      return errorResponse(req, 429, "RATE_LIMITED", "Too many playlist imports. Try again later.", {
+        requestId,
+        retryAfterSeconds: rateLimit.retryAfterSeconds,
+      });
+    }
+  } catch (error) {
+    console.error(`[import-youtube-playlist] ${requestId} rate-limit check failed: ${error instanceof Error ? error.message : "unknown"}`);
+    return errorResponse(req, 500, "RATE_LIMIT_CHECK_FAILED", "Could not start playlist import", { requestId });
+  }
 
   const htmlRes = await fetch(canonicalUrl, {
     headers: {
@@ -248,12 +268,17 @@ Deno.serve(async (req: Request) => {
       "accept-language": "en-US,en;q=0.9,pt;q=0.8",
     },
   });
-  if (!htmlRes.ok) return json({ error: "Failed to fetch YouTube playlist HTML", status: htmlRes.status, playlist_list: listParam }, 502);
+  if (!htmlRes.ok) {
+    console.warn(`[import-youtube-playlist] ${requestId} YouTube playlist fetch failed: ${htmlRes.status}`);
+    return errorResponse(req, 502, "YOUTUBE_PLAYLIST_FETCH_FAILED", "Could not fetch YouTube playlist", { requestId });
+  }
 
   const html = await htmlRes.text();
   const uniqueIds = [...new Set(extractVideoIdsFromPlaylistHtml(html).filter((id) => id.length === 11))]
     .slice(0, parseLimit(body.max_videos));
-  if (uniqueIds.length === 0) return json({ error: "No videos found in playlist HTML", playlist_list: listParam }, 404);
+  if (uniqueIds.length === 0) {
+    return errorResponse(req, 404, "NO_PLAYLIST_VIDEOS_FOUND", "No videos found in playlist", { requestId });
+  }
 
   const language = safeLanguage(body.language);
   const metadataRows = await mapWithConcurrency(uniqueIds, 6, fetchVideoMetadata);
@@ -275,14 +300,20 @@ Deno.serve(async (req: Request) => {
     const { error } = await supabase
       .from("videos")
       .upsert(videoRowsToUpsert.slice(i, i + 100), { onConflict: "youtube_id", ignoreDuplicates: true });
-    if (error) return json({ error: "Failed upserting videos", details: error.message }, 500);
+    if (error) {
+      console.error(`[import-youtube-playlist] ${requestId} video upsert failed: ${error.message}`);
+      return errorResponse(req, 500, "VIDEO_UPSERT_FAILED", "Could not import playlist videos", { requestId });
+    }
   }
 
   const { data: videoRows, error: videoRowsError } = await supabase
     .from("videos")
     .select("id,youtube_id,title,description,channel_name,thumbnail_url")
     .in("youtube_id", uniqueIds);
-  if (videoRowsError) return json({ error: "Failed fetching video ids", details: videoRowsError.message }, 500);
+  if (videoRowsError) {
+    console.error(`[import-youtube-playlist] ${requestId} video id lookup failed: ${videoRowsError.message}`);
+    return errorResponse(req, 500, "VIDEO_LOOKUP_FAILED", "Could not import playlist videos", { requestId });
+  }
 
   const rows = (videoRows ?? []) as VideoRow[];
 
@@ -309,7 +340,10 @@ Deno.serve(async (req: Request) => {
         thumbnail_url: row.thumbnail_url,
       })
       .eq("id", row.id);
-    if (error) return json({ error: "Failed refreshing video metadata", details: error.message }, 500);
+    if (error) {
+      console.error(`[import-youtube-playlist] ${requestId} metadata refresh failed: ${error.message}`);
+      return errorResponse(req, 500, "VIDEO_METADATA_REFRESH_FAILED", "Could not refresh video metadata", { requestId });
+    }
   }
 
   const byYoutubeId = new Map(rows.map((row) => [row.youtube_id, row.id]));
@@ -319,7 +353,10 @@ Deno.serve(async (req: Request) => {
     .from("ai_enrichments")
     .select("video_id")
     .in("video_id", videoIds);
-  if (enrichmentsError) return json({ error: "Failed checking existing enrichments", details: enrichmentsError.message }, 500);
+  if (enrichmentsError) {
+    console.error(`[import-youtube-playlist] ${requestId} enrichment lookup failed: ${enrichmentsError.message}`);
+    return errorResponse(req, 500, "ENRICHMENT_LOOKUP_FAILED", "Could not import playlist videos", { requestId });
+  }
 
   const enrichedVideoIds = new Set((enrichments ?? []).map((row: { video_id: string }) => row.video_id));
 
@@ -330,7 +367,8 @@ Deno.serve(async (req: Request) => {
     .in("youtube_id", uniqueIds)
     .in("status", ["pending", "processing", "recoverable_error"]);
   if (existingSubmissionsError) {
-    return json({ error: "Failed checking existing video_submissions", details: existingSubmissionsError.message }, 500);
+    console.error(`[import-youtube-playlist] ${requestId} submission lookup failed: ${existingSubmissionsError.message}`);
+    return errorResponse(req, 500, "SUBMISSION_LOOKUP_FAILED", "Could not import playlist videos", { requestId });
   }
 
   const existingImportSubmissionByYoutubeId = new Map<string, SubmissionRow>();
@@ -393,7 +431,10 @@ Deno.serve(async (req: Request) => {
       .from("video_submissions")
       .insert(submissions)
       .select("id, video_id, youtube_id, youtube_url, status");
-    if (subErr) return json({ error: "Failed inserting video_submissions", details: subErr.message }, 500);
+    if (subErr) {
+      console.error(`[import-youtube-playlist] ${requestId} submission insert failed: ${subErr.message}`);
+      return errorResponse(req, 500, "SUBMISSION_INSERT_FAILED", "Could not queue playlist videos", { requestId });
+    }
 
     insertedSubmissions = insertedSubmissionRows ?? [];
     for (const submission of insertedSubmissions) {
@@ -414,9 +455,10 @@ Deno.serve(async (req: Request) => {
     status: submission.status,
   }));
 
-  return json({
+  return jsonResponse(req, {
     playlist_list: listParam,
     youtube_playlist_url: canonicalUrl,
+    requestId,
     fetched_video_count: uniqueIds.length,
     created_video_count: rows.length,
     skipped_existing_enriched_count: results.filter((result) => result.status === "skipped_existing_enriched").length,

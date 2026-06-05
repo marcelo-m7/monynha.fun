@@ -1,1 +1,10 @@
 project_id = "wvkjainfwsyiyfcmbtid"
+
+[functions.enrich-video]
+verify_jwt = true
+
+[functions.import-youtube-playlist]
+verify_jwt = true
+
+[functions.mark-top-featured]
+verify_jwt = true

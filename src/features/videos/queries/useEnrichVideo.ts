@@ -6,6 +6,7 @@ import { getEdgeFunctionErrorDetails, invokeEdgeFunction } from '@/shared/api/su
 export interface EnrichVideoRequest {
   videoId: string;
   youtubeUrl: string;
+  submissionId: string;
 }
 
 export interface EnrichVideoResponse {
@@ -42,7 +43,7 @@ export interface EnrichVideoResponse {
  * const { mutate: enrichVideo, isPending } = useEnrichVideo();
  * 
  * enrichVideo(
- *   { videoId: 'abc123', youtubeUrl: 'https://youtube.com/watch?v=test' },
+ *   { videoId: 'abc123', youtubeUrl: 'https://youtube.com/watch?v=test', submissionId: 'submission-uuid' },
  *   {
  *     onSuccess: (data) => {
  *       console.log('Enrichment complete:', data);

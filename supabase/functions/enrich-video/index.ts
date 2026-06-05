@@ -12,11 +12,13 @@ import {
   type PlaylistAssignmentPlaylist,
   type PlaylistAssignmentResult,
 } from '../_shared/playlist-assignment.ts'
+import { errorResponse, jsonResponse, optionsResponse } from '../_shared/http.ts'
+import { checkEdgeRateLimit } from '../_shared/rate-limit.ts'
 
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-}
+const ENRICH_RATE_LIMIT_WINDOWS = [
+  { windowSeconds: 60, maxRequests: 5 },
+  { windowSeconds: 24 * 60 * 60, maxRequests: 50 },
+]
 
 class HttpError extends Error {
   status: number;
@@ -391,21 +393,16 @@ serve(async (req) => {
   const requestId = crypto.randomUUID();
 
   if (req.method === 'OPTIONS') {
-    return new Response(null, { headers: corsHeaders });
+    return optionsResponse(req);
+  }
+
+  if (req.method !== 'POST') {
+    return errorResponse(req, 405, 'METHOD_NOT_ALLOWED', 'Method not allowed', { requestId });
   }
 
   const authHeader = req.headers.get('Authorization');
   if (!authHeader) {
-    return new Response(JSON.stringify({
-      error: {
-        code: 'UNAUTHORIZED_NO_AUTH_HEADER',
-        message: 'Missing authorization header',
-        requestId,
-      },
-    }), {
-      status: 401,
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-    });
+    return errorResponse(req, 401, 'UNAUTHORIZED_NO_AUTH_HEADER', 'Missing authorization header', { requestId });
   }
 
   const supabaseUrl = Deno.env.get('SUPABASE_URL') ?? '';
@@ -413,16 +410,7 @@ serve(async (req) => {
   const serviceRoleKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '';
 
   if (!supabaseUrl || !supabaseAnonKey || !serviceRoleKey) {
-    return new Response(JSON.stringify({
-      error: {
-        code: 'MISSING_ENVIRONMENT',
-        message: 'Missing required Supabase environment variables',
-        requestId,
-      },
-    }), {
-      status: 500,
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-    });
+    return errorResponse(req, 500, 'MISSING_ENVIRONMENT', 'Missing required Supabase environment variables', { requestId });
   }
 
   const token = authHeader.replace('Bearer ', '');
@@ -434,16 +422,7 @@ serve(async (req) => {
 
   const { data: { user }, error: userError } = await supabase.auth.getUser();
   if (userError || !user) {
-    return new Response(JSON.stringify({
-      error: {
-        code: 'UNAUTHORIZED_INVALID_TOKEN',
-        message: 'Invalid or expired authorization token',
-        requestId,
-      },
-    }), {
-      status: 401,
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-    });
+    return errorResponse(req, 401, 'UNAUTHORIZED_INVALID_TOKEN', 'Invalid or expired authorization token', { requestId });
   }
 
   let submissionId: string | null = null;
@@ -460,8 +439,8 @@ serve(async (req) => {
     const requestedSubmissionId = typeof requestBody?.submissionId === 'string' ? requestBody.submissionId.trim() : '';
     submissionId = requestedSubmissionId || null;
 
-    if (!videoId || !youtubeUrl) {
-      throw new HttpError('videoId and youtubeUrl are required', 400, { code: 'INVALID_PAYLOAD', recoverable: false });
+    if (!videoId || !youtubeUrl || !submissionId) {
+      throw new HttpError('videoId, youtubeUrl and submissionId are required', 400, { code: 'INVALID_PAYLOAD', recoverable: false });
     }
 
     const requestYoutubeId = extractYouTubeId(youtubeUrl);
@@ -472,17 +451,33 @@ serve(async (req) => {
       });
     }
 
-    supabaseServiceRole = createClient(supabaseUrl, serviceRoleKey);
+    supabaseServiceRole = createClient(supabaseUrl, serviceRoleKey, { auth: { persistSession: false } });
+
+    const rateLimit = await checkEdgeRateLimit(supabaseServiceRole, {
+      functionName: 'enrich-video',
+      userId: user.id,
+      windows: ENRICH_RATE_LIMIT_WINDOWS,
+    });
+
+    if (!rateLimit.allowed) {
+      return errorResponse(req, 429, 'RATE_LIMITED', 'Too many enrichment requests. Try again later.', {
+        requestId,
+        retryAfterSeconds: rateLimit.retryAfterSeconds,
+      });
+    }
 
     if (submissionId) {
       const { data: submission, error: submissionError } = await supabaseServiceRole
         .from('video_submissions')
-        .select('id, user_id, youtube_id')
+        .select('id, user_id, video_id, youtube_id')
         .eq('id', submissionId)
         .single();
 
       if (submissionError || !submission) {
-        throw new HttpError(`Submission not found: ${submissionError?.message || 'Unknown error'}`, 404, {
+        if (submissionError) {
+          console.error(`[enrich-video] ${requestId} submission lookup failed: ${submissionError.message}`);
+        }
+        throw new HttpError('Submission not found', 404, {
           code: 'SUBMISSION_NOT_FOUND',
           recoverable: false,
         });
@@ -498,6 +493,13 @@ serve(async (req) => {
       if (submission.youtube_id && submission.youtube_id !== requestYoutubeId) {
         throw new HttpError('Submission YouTube ID does not match request URL', 400, {
           code: 'YOUTUBE_ID_MISMATCH',
+          recoverable: false,
+        });
+      }
+
+      if (submission.video_id && submission.video_id !== videoId) {
+        throw new HttpError('Submission video ID does not match request video', 400, {
+          code: 'VIDEO_ID_MISMATCH',
           recoverable: false,
         });
       }
@@ -527,7 +529,10 @@ serve(async (req) => {
       .single();
 
     if (videoError || !video) {
-      throw new HttpError(`Video not found: ${videoError?.message || 'Unknown error'}`, 404, {
+      if (videoError) {
+        console.error(`[enrich-video] ${requestId} video lookup failed: ${videoError.message}`);
+      }
+      throw new HttpError('Video not found', 404, {
         code: 'VIDEO_NOT_FOUND',
         recoverable: false,
       });
@@ -718,20 +723,22 @@ serve(async (req) => {
       });
     }
 
-    return new Response(JSON.stringify({
+    return jsonResponse(req, {
       message: 'AI enrichment saved successfully',
       data: enrichment,
       provider: 'legacy_fast',
       requestId,
-    }), {
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      status: 200,
     });
   } catch (error) {
     const status = error instanceof HttpError ? error.status : 500;
     const recoverable = error instanceof HttpError ? error.recoverable : true;
     const code = error instanceof HttpError ? error.code : 'PROCESSING_ERROR';
-    const message = error instanceof Error ? error.message : 'Unknown error occurred';
+    const internalMessage = error instanceof Error ? error.message : 'Unknown error occurred';
+    const message = error instanceof HttpError ? error.message : 'Video enrichment failed';
+
+    if (!(error instanceof HttpError)) {
+      console.error(`[enrich-video] ${requestId} failed: ${internalMessage}`);
+    }
 
     if (submissionBelongsToUser) {
       await safeUpdateSubmissionStatus(supabaseServiceRole, submissionId, {
@@ -755,16 +762,6 @@ serve(async (req) => {
       });
     }
 
-    return new Response(JSON.stringify({
-      error: {
-        code,
-        message,
-        recoverable,
-        requestId,
-      },
-    }), {
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      status,
-    });
+    return errorResponse(req, status, code, message, { recoverable, requestId });
   }
 })

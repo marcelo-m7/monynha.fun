@@ -308,8 +308,8 @@ Great video about management! Very insightful discussion.
 3. AI enrichment is an optional background process that doesn't block video submissions
 
 **Next Steps for AI Testing:**
-1. Deploy Edge Function: `npx supabase functions deploy enrich-video --no-verify-jwt`
-2. Set OpenAI API key: `npx supabase secrets set OPENAI_API_KEY=sk-proj-xxxxx`
+1. Deploy Edge Function: `npx supabase functions deploy enrich-video`
+2. Set OpenAI API key, if testing the archived Phase 2 AI path: `npx supabase secrets set OPENAI_API_KEY=<value>`
 3. Test manually by calling the enrichment endpoint after video submission
 4. Monitor Supabase logs for enrichment results
 
