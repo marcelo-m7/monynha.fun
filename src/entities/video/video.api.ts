@@ -203,10 +203,10 @@ export async function getVideoById(id: string) {
         transcriptStatus: transcriptData?.transcript_status ?? null,
         ai_enrichments: undefined,
         playlist_videos: undefined,
-      } as VideoWithCategory;
+      } as unknown as VideoWithCategory;
     }
   
-    return data as VideoWithCategory;
+    return data as unknown as VideoWithCategory;
 }
 
 export async function listFeaturedVideos(limit = 4, offset = 0) {
@@ -313,10 +313,10 @@ export async function listRelatedVideos(currentVideoId: string, categoryId: stri
         ...video,
         enrichment: getLatestEnrichment(video.ai_enrichments),
         ai_enrichments: undefined,
-      })) as VideoWithCategory[];
+      })) as unknown as VideoWithCategory[];
     }
   
-    return data as VideoWithCategory[];
+    return data as unknown as VideoWithCategory[];
 }
 
 export async function incrementVideoViewCount(videoId: string, sessionId?: string | null) {

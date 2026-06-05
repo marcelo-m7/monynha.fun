@@ -220,14 +220,14 @@ export async function listPlaylistCollaborators(playlistId: string) {
     .select(
       `
       *,
-      profile:profiles(id, username, display_name, avatar_url)
+      profile:profiles!playlist_collaborators_user_id_fkey(id, username, display_name, avatar_url)
       `,
     )
     .eq('playlist_id', playlistId);
 
   if (error) throw error;
 
-  return (data || []) as PlaylistCollaborator[];
+  return (data || []) as unknown as PlaylistCollaborator[];
 }
 
 export async function addCollaborator(payload: { playlistId: string; userId: string; role?: 'editor' | 'viewer' }) {
