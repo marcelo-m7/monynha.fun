@@ -1,8 +1,9 @@
 import { Heart, ListPlus, Play, Tag } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { VideoDurationBadge } from '@/components/video/VideoDurationBadge';
 import type { HomeHeroVideo } from '@/entities/home/home.types';
 import { LazyImage } from '@/shared/components/LazyImage';
-import { formatDuration, formatViewCount } from '@/shared/lib/format';
+import { formatViewCount } from '@/shared/lib/format';
 import { cn } from '@/lib/utils';
 
 interface VideoShowcaseCardProps {
@@ -35,9 +36,7 @@ export function VideoShowcaseCard({ video, variant = 'tile', className }: VideoS
         )}
       >
         <LazyImage src={image} fallbackSrc="/placeholder.png" alt={video.title} className="object-cover" />
-        <span className="absolute bottom-2 right-2 bg-black px-2 py-1 text-[0.65rem] font-black text-white">
-          {formatDuration(video.duration_seconds)}
-        </span>
+        <VideoDurationBadge durationSeconds={video.duration_seconds} className="font-black" />
         <span className="absolute left-2 top-2 border border-black bg-[#efff00] px-2 py-1 text-[0.62rem] font-black uppercase text-black">
           {video.language}
         </span>

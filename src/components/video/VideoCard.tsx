@@ -1,7 +1,7 @@
 "use client";
 
 import type { VideoWithCategory } from "@/entities/video/video.types";
-import { formatDuration, formatViewCount } from "@/shared/lib/format";
+import { formatViewCount } from "@/shared/lib/format";
 import { Play, Eye, Heart, ListPlus } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
@@ -13,6 +13,7 @@ import { KeyboardEvent } from "react";
 import { LazyImage } from "@/shared/components/LazyImage";
 import { SemanticTagBadge } from "./SemanticTagBadge";
 import { EnrichmentIndicator } from "./EnrichmentIndicator";
+import { VideoDurationBadge } from "./VideoDurationBadge";
 
 interface VideoCardProps {
   video: VideoWithCategory;
@@ -66,14 +67,22 @@ export const VideoCard = ({ video, onClick, variant = 'default' }: VideoCardProp
           className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
         />
 
-        {/* Featured badge */}
-        {video.is_featured && variant === 'default' && (
-          <div className="absolute left-2 top-2 z-10">
+        <div className="absolute left-2 top-2 z-20 flex max-w-[calc(100%-1rem)] flex-wrap items-center gap-1.5">
+          {video.is_featured && variant === 'default' && (
             <Badge variant="secondary" className="uppercase px-2 py-1 text-xs">
               {t('labels.featured')}
             </Badge>
-          </div>
-        )}
+          )}
+          <Badge
+            variant="secondary"
+            className={cn(
+              "bg-background/90 text-[0.65rem] font-bold uppercase tracking-widest",
+              variant === 'compact' && "px-1.5 py-0 text-[0.55rem]"
+            )}
+          >
+            {video.language}
+          </Badge>
+        </div>
 
           {/* Enrichment indicator */}
           {video.enrichment && variant === 'default' && (
@@ -95,23 +104,7 @@ export const VideoCard = ({ video, onClick, variant = 'default' }: VideoCardProp
           </div>
         </div>
 
-        {/* Duration badge */}
-        {variant === 'default' && video.duration_seconds && video.duration_seconds > 0 && (
-          <div className="absolute bottom-2 right-2 px-2 py-1 bg-foreground/80 text-background text-xs font-medium">
-            {formatDuration(video.duration_seconds)}
-          </div>
-        )}
-
-        {/* Language badge */}
-        <Badge
-          variant="secondary"
-          className={cn(
-            "absolute top-2 left-2 text-[0.65rem] font-bold bg-background/90 uppercase tracking-widest",
-            variant === 'compact' && "hidden"
-          )}
-        >
-          {video.language}
-        </Badge>
+        <VideoDurationBadge durationSeconds={video.duration_seconds} className={variant === 'compact' ? 'bottom-1 right-1 min-w-9 px-1.5 py-0.5 text-[0.58rem]' : undefined} />
       </div>
 
       {/* Content */}

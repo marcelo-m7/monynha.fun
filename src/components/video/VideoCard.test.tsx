@@ -46,7 +46,21 @@ describe('VideoCard', () => {
 
     expect(screen.getByText('Learning React')).toBeInTheDocument();
     expect(screen.getByText('Monynha')).toBeInTheDocument();
+    expect(screen.getByText('2:05')).toBeInTheDocument();
     expect(article).toHaveClass('min-h-[320px]');
+  });
+
+  it('renders duration in compact cards', () => {
+    renderWithProviders(<VideoCard video={sampleVideo} variant="compact" />);
+
+    expect(screen.getByText('2:05')).toBeInTheDocument();
+  });
+
+  it('hides duration when it is missing', () => {
+    renderWithProviders(<VideoCard video={{ ...sampleVideo, duration_seconds: null }} />);
+
+    expect(screen.queryByText('0:00')).not.toBeInTheDocument();
+    expect(screen.queryByText('2:05')).not.toBeInTheDocument();
   });
 
   it('increments view count with session id on click', async () => {

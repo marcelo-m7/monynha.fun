@@ -7,8 +7,8 @@ import { Link } from 'react-router-dom';
 import { GripVertical, X, Check } from 'lucide-react';
 import type { PlaylistVideo } from '@/features/playlists';
 import { Button } from '@/components/ui/button';
+import { VideoDurationBadge } from '@/components/video/VideoDurationBadge';
 import { cn } from '@/lib/utils';
-import { formatDuration } from '@/shared/lib/format'; // Import shared formatDuration
 
 interface SortableVideoItemProps {
   item: PlaylistVideo;
@@ -109,11 +109,7 @@ export function SortableVideoItem({
             target.onerror = null;
           }}
         />
-        {item.video?.duration_seconds && item.video.duration_seconds > 0 && (
-          <span className="absolute bottom-1 right-1 px-1.5 py-0.5 bg-black/80 text-white text-xs rounded">
-            {formatDuration(item.video.duration_seconds)}
-          </span>
-        )}
+        <VideoDurationBadge durationSeconds={item.video?.duration_seconds} className="bottom-1 right-1 min-w-9 rounded px-1.5 py-0.5 text-[0.6rem]" />
       </Link>
 
       {/* Video info */}

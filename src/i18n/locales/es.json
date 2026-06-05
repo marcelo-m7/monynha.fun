@@ -18,6 +18,9 @@
     "none": "Ninguno",
     "loading": "Cargando..."
   },
+  "video": {
+    "durationLabel": "Duración: {{duration}}"
+  },
   "header": {
     "searchPlaceholder": "Buscar videos, canales...",
     "videos": "Videos",
@@ -646,6 +649,7 @@
     "backToHome": "Volver a la página de inicio",
     "views": "{{count}} visualizaciones",
     "viewsLabel": "visualizaciones",
+    "durationProcessing": "Duración en procesamiento",
     "descriptionTitle": "Descripción",
     "noDescription": "No se proporcionó ninguna descripción para este video.",
     "addedBy": "Agregado por",

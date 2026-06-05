@@ -2,7 +2,7 @@ import { supabase } from '@/shared/api/supabase/supabaseClient';
 import { getSupabaseErrorMessage } from '@/shared/api/supabase/supabaseErrors';
 import type { VideoAnalysisJob, VideoAnalysisJobUpdate, VideoAnalysisJobWithVideo } from './video_analysis_job.types';
 
-const baseJobSelect = '*, video:videos(id, title, youtube_id, thumbnail_url, category:categories(id, name, slug))';
+const baseJobSelect = '*, video:videos(id, title, youtube_id, thumbnail_url, duration_seconds, category:categories(id, name, slug))';
 
 export async function getLatestVideoAnalysisJobByVideoId(videoId: string) {
   const { data, error } = await supabase

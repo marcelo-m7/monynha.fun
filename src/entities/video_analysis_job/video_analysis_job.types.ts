@@ -28,6 +28,7 @@ export type VideoAnalysisJobWithVideo = VideoAnalysisJob & {
     title: string;
     youtube_id: string;
     thumbnail_url: string;
+    duration_seconds: number | null;
     category?: {
       id: string;
       name: string;

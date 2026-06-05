@@ -11,6 +11,7 @@ import {
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { VideoDurationBadge } from '@/components/video/VideoDurationBadge';
 import { useAddVideoToPlaylist, PlaylistVideo } from '@/features/playlists';
 import { useVideos } from '@/features/videos/queries/useVideos';
 import { toast } from 'sonner';
@@ -82,11 +83,14 @@ export function AddVideoDialog({ playlistId, existingVideos }: AddVideoDialogPro
                   key={video.id}
                   className="flex items-center gap-3 p-2 rounded-lg hover:bg-muted/50 transition-colors"
                 >
-                  <img
-                    src={video.thumbnail_url}
-                    alt={video.title}
-                    className="w-20 h-12 object-cover rounded-lg"
-                  />
+                  <div className="relative h-12 w-20 shrink-0 overflow-hidden rounded-lg bg-muted">
+                    <img
+                      src={video.thumbnail_url}
+                      alt={video.title}
+                      className="h-full w-full object-cover"
+                    />
+                    <VideoDurationBadge durationSeconds={video.duration_seconds} className="bottom-1 right-1 min-w-8 px-1 py-0.5 text-[0.55rem]" />
+                  </div>
                   <div className="flex-1 min-w-0">
                     <p className="font-medium text-sm line-clamp-1">{video.title}</p>
                     <p className="text-xs text-muted-foreground line-clamp-1">

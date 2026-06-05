@@ -7,6 +7,7 @@ import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Skeleton } from '@/components/ui/skeleton';
 import { PlaylistCard } from '@/components/playlist/PlaylistCard';
+import { VideoDurationBadge } from '@/components/video/VideoDurationBadge';
 import { useAuth } from '@/features/auth/useAuth';
 import { useVideoAnalysisJobs } from '@/features/video-analysis/useVideoAnalysisJob';
 import { usePlaylists } from '@/features/playlists/queries/usePlaylists';
@@ -146,12 +147,15 @@ const EditorialPortal = () => {
                 <div key={job.id} className="rounded-xl border bg-card p-4">
                   <div className="flex items-start gap-3">
                     {job.video?.thumbnail_url ? (
-                      <img
-                        src={job.video.thumbnail_url}
-                        alt=""
-                        className="h-16 w-24 shrink-0 object-cover"
-                        loading="lazy"
-                      />
+                      <div className="relative h-16 w-24 shrink-0 overflow-hidden rounded-md bg-muted">
+                        <img
+                          src={job.video.thumbnail_url}
+                          alt=""
+                          className="h-full w-full object-cover"
+                          loading="lazy"
+                        />
+                        <VideoDurationBadge durationSeconds={job.video.duration_seconds} className="bottom-1 right-1 min-w-9 px-1.5 py-0.5 text-[0.6rem]" />
+                      </div>
                     ) : null}
                     <div className="min-w-0 flex-1">
                       <div className="flex flex-wrap items-center gap-2">

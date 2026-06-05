@@ -1,10 +1,10 @@
 "use client";
 
 import type { VideoWithCategory } from "@/entities/video/video.types";
-import { formatDuration, formatViewCount } from "@/shared/lib/format";
-import { Play } from "lucide-react";
+import { formatViewCount } from "@/shared/lib/format";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { VideoDurationBadge } from "@/components/video/VideoDurationBadge";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from 'react-i18next';
 import { useVideoViewIncrement } from '@/shared/hooks/useVideoViewIncrement';
@@ -54,6 +54,7 @@ export const FeaturedHero = ({ video }: FeaturedHeroProps) => {
           alt={video.title}
           className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
         />
+        <VideoDurationBadge durationSeconds={video.duration_seconds} className="bottom-4 right-4" />
 
         <div className="absolute inset-0 bg-foreground/0 group-hover:bg-foreground/5 transition-colors" />
         <div className="absolute inset-0 flex items-end p-6" style={{ background: 'linear-gradient(to top, rgba(0,0,0,0.85) 0%, transparent 60%)' }}>
@@ -61,12 +62,6 @@ export const FeaturedHero = ({ video }: FeaturedHeroProps) => {
             <h3 className="text-2xl md:text-3xl font-bold uppercase tracking-[0.08em] line-clamp-2 font-mono">{video.title}</h3>
             <p className="mt-2 text-xs max-w-2xl line-clamp-2 text-white/90 uppercase tracking-widest">{video.description}</p>
             <div className="mt-4 flex items-center gap-4">
-              {video.duration_seconds && video.duration_seconds > 0 && (
-                <div className="flex items-center gap-2 text-sm text-white/90">
-                  <Play className="w-4 h-4" aria-hidden="true" />
-                  <span>{formatDuration(video.duration_seconds)}</span>
-                </div>
-              )}
               <div className="relative text-sm text-white/90">
                 <span className="font-semibold">{formatViewCount(viewCount)}</span>
                 {showPlus && (
