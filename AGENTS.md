@@ -5,9 +5,10 @@ This file is the fast-start guide for AI coding agents in this repository. Keep 
 ## Fast Facts
 
 - Product: Tube O2, the cultural video curation platform.
-- Stack: React 19, TypeScript, Vite, Tailwind, shadcn/ui, Supabase, TanStack Query.
+- Stack: React 18, TypeScript, Vite, Tailwind, shadcn/ui, Supabase, TanStack Query.
 - Work from the frontend root: [src/tube02-frontend](.).
 - Source of truth: [README.md](README.md), [docs/CODEBASE.md](docs/CODEBASE.md), [CONTRIBUTING.md](CONTRIBUTING.md), and [AI_RULES.md](AI_RULES.md).
+- Supabase project ref: `wvkjainfwsyiyfcmbtid`.
 
 ## Quick Start
 
@@ -27,6 +28,7 @@ Run from repository root:
 | Type check | `pnpm typecheck` |
 | Tests | `pnpm test` |
 | Coverage | `pnpm test:coverage` |
+| E2E tests | `pnpm test:e2e` |
 
 - Prefer targeted checks on the touched slice before broad test runs.
 - Use `pnpm dev` for UI verification and `pnpm build` before final handoff.
@@ -39,6 +41,9 @@ Supabase/backend commands:
 | Serve an Edge Function locally | `supabase functions serve <function-name> --env-file .env` |
 | Create a migration | `supabase migration new <descriptive-name>` |
 | Apply local migrations | `supabase migration up` |
+| Push Supabase config | `pnpx supabase config push --project-ref wvkjainfwsyiyfcmbtid` |
+
+Never run `supabase config push --yes` for this project. Inspect every prompt and accept only the intended diff. Local [supabase/config.toml](supabase/config.toml) must preserve remote API schemas/search paths, Auth URLs/redirects/MFA/email settings, and Storage settings before pushing template changes.
 
 There is currently no `backend/` FastAPI service in this tree. Backend work lives in [supabase/functions](supabase/functions), [supabase/migrations](supabase/migrations), and the Bun SSR preview server in [server/server.ts](server/server.ts).
 
@@ -87,6 +92,16 @@ Reference architecture details in [docs/CODEBASE.md](docs/CODEBASE.md).
 - Avoid creating extra Supabase clients; use the shared client in [src/shared/api/supabase/supabaseClient.ts](src/shared/api/supabase/supabaseClient.ts).
 - Do not reintroduce legacy local catalog mock fallbacks.
 - Preserve the current brand direction: Tube O2 / Open 2 Technology, not the old Monynha naming.
+
+## Supabase Operational Guardrails
+
+- Treat [supabase/config.toml](supabase/config.toml) as deployment-as-code for hosted Supabase settings, including Auth email templates under [supabase/email-templates](supabase/email-templates).
+- Push config with `pnpx supabase config push --project-ref wvkjainfwsyiyfcmbtid` and confirm the CLI diff before answering prompts.
+- Keep `api.schemas` and `api.extra_search_path` aligned with the remote project, including the `facodi` schema.
+- Keep production Auth settings intact: `site_url`, redirect URLs, manual linking, MFA TOTP, email confirmations, and OTP length.
+- Edge Functions that are user-triggered should keep `verify_jwt = true`, use shared CORS/JSON helpers from [supabase/functions/_shared/http.ts](supabase/functions/_shared/http.ts), and apply shared rate limiting after auth but before expensive work.
+- Do not use wildcard CORS on deployed functions unless the task explicitly calls for a public unauthenticated endpoint.
+- In Vitest, avoid opening Supabase realtime sockets. Guard realtime hooks with `import.meta.env.MODE === 'test'` or mock the client.
 
 ## Non-Negotiable Conventions
 
@@ -148,6 +163,7 @@ Reference architecture details in [docs/CODEBASE.md](docs/CODEBASE.md).
 - Bypassing access constraints in mutations instead of respecting RLS-compatible patterns.
 - Putting business logic utilities in `src/lib/` instead of `src/shared/lib/`.
 - Calling `supabase.functions.invoke` directly instead of using `invokeEdgeFunction()`.
+- Running `supabase config push --yes` and accidentally overwriting production settings.
 - Updating one locale file but leaving other locales missing the same key.
 - Running `pnpm test -- --testPathPattern=...` (unsupported by Vitest in this repo).
 
@@ -175,6 +191,7 @@ All global context providers (QueryClient, Auth, i18n, ThemeProvider, Helmet, To
 - Async submission status API: [src/entities/video_submission/video_submission.api.ts](src/entities/video_submission/video_submission.api.ts)
 - SSR preview server: [server/server.ts](server/server.ts)
 - Supabase functions: [supabase/functions](supabase/functions), especially [supabase/functions/enrich-video/index.ts](supabase/functions/enrich-video/index.ts) and [supabase/functions/import-youtube-playlist/index.ts](supabase/functions/import-youtube-playlist/index.ts)
+- Supabase project config and Auth templates: [supabase/config.toml](supabase/config.toml) and [supabase/email-templates](supabase/email-templates)
 - Supabase contract notes: [docs/features/supabase-db-02-03-04.md](docs/features/supabase-db-02-03-04.md)
 
 ## Generated Artifacts

@@ -4,12 +4,38 @@
 
 > **Pro Tip**: If you're reading this because you broke something, take a deep breath. We've all been there. Check git history, run the tests, and remember: `pnpm run build` is your friend. 🧘
 
-## Documentation Status (Updated May 17, 2026)
+## Documentation Status (Updated June 6, 2026)
 
 - This file includes **current guidance + historical change logs**.
 - Current architectural source of truth is: `AGENTS.md` + `.github/instructions/*.md`.
 - If you see older examples referencing `src/hooks/*` or previous naming snapshots, treat them as historical context unless they match the live tree.
 - There is no active `backend/` FastAPI service. Backend code currently means Supabase migrations, Supabase Edge Functions, and the Bun runtime server.
+- Hosted Supabase project config is versioned in `supabase/config.toml`; Auth email templates live in `supabase/email-templates/` and are deployed with `supabase config push` after inspecting prompts.
+
+---
+
+## Recent Changes & Improvements (June 6, 2026 - Security, FACODI + Email Templates)
+
+### FACODI Health Surface
+- Added public `security_invoker` views for FACODI playlist/course health.
+- `/facodi` renders live remote health counters and grouped backlog data without requiring privileged browser access.
+
+### Secure Direct Messages
+- Direct messages now use secure RPCs and RLS-compatible reads instead of direct browser writes.
+- Realtime subscriptions are disabled in Vitest to avoid websocket side effects during unit tests.
+
+### Edge Function Hardening
+- Shared HTTP helpers centralize allow-listed CORS, JSON responses, and error handling.
+- User-triggered functions keep JWT verification enabled and apply shared rate limiting before expensive work.
+- `mark-top-featured`, `enrich-video`, and `import-youtube-playlist` are expected to remain protected unless a task explicitly changes their exposure model.
+
+### Auth Email Templates
+- Hosted Supabase Auth templates are stored under `supabase/email-templates/` and referenced by `[auth.email.template.*]` blocks in `supabase/config.toml`.
+- Deploy with `pnpx supabase config push --project-ref wvkjainfwsyiyfcmbtid` and inspect every prompt. Do not use `--yes` for config pushes because local drift can overwrite production API/Auth/Storage settings.
+- Final sync should report remote API, DB, Auth, and Storage config as up to date.
+
+### Validation Baseline
+- Latest full release pass covered lint, typecheck, Vitest, production build, Playwright E2E, Supabase migration application, Edge Function deployment, and browser checks for FACODI/messages flows.
 
 ---
 
@@ -235,6 +261,8 @@ tube-o2/
 │   ├── lib/utils.ts          # shadcn cn() helper only
 │   └── i18n/locales/         # PT, EN, ES, FR resources
 ├── supabase/
+│   ├── config.toml          # Hosted Supabase project config and Auth email template references
+│   ├── email-templates/     # Auth templates: invite, confirmation, recovery, email change
 │   ├── functions/            # Edge Functions
 │   ├── functions/_shared/    # Shared Deno helpers
 │   └── migrations/           # Postgres schema, RLS, functions, and data fixes

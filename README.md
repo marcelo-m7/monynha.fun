@@ -24,7 +24,7 @@ We're creating a space where **human taste matters**. A place where curators (li
 
 ---
 
-## 📌 Documentation & Instructions (Updated May 17, 2026)
+## 📌 Documentation & Instructions (Updated June 6, 2026)
 
 To keep onboarding and AI-assisted edits consistent, treat these as the primary references:
 
@@ -33,6 +33,7 @@ To keep onboarding and AI-assisted edits consistent, treat these as the primary 
 - Team/agent rules: [`AGENTS.md`](AGENTS.md) and [`AI_RULES.md`](AI_RULES.md)
 - Frontend instruction profile: [`.github/instructions/frontend.instructions.md`](.github/instructions/frontend.instructions.md)
 - Supabase/backend instruction profile: [`.github/instructions/backend.instructions.md`](.github/instructions/backend.instructions.md)
+- Supabase hosted config and Auth email templates: [`supabase/config.toml`](supabase/config.toml) and [`supabase/email-templates/`](supabase/email-templates/)
 - i18n consistency rules: [`.github/instructions/i18n.instructions.md`](.github/instructions/i18n.instructions.md)
 - Testing rules: [`.github/instructions/testing.instructions.md`](.github/instructions/testing.instructions.md)
 
@@ -218,6 +219,8 @@ src/
 └── main.tsx                 # Entry point
 
 supabase/
+├── config.toml              # Hosted Supabase config, including Auth email template deployment
+├── email-templates/         # Supabase Auth email templates: invite, confirmation, recovery, email change
 ├── functions/               # Edge Functions: enrich-video, import-youtube-playlist, email flows
 ├── functions/_shared/       # Shared Deno helpers and enrichment clients
 └── migrations/              # Postgres schema, RLS, functions, and data fixes
@@ -281,6 +284,9 @@ pnpm test:watch
 
 # Run tests with coverage
 pnpm test:coverage
+
+# Run Playwright E2E tests
+pnpm test:e2e
 
 # Generate bundle analysis report
 pnpm build:analyze
@@ -350,6 +356,8 @@ There is no active `backend/` FastAPI service in this repository. The backend su
 
 ### Edge Functions
 
+Supabase project ref: `wvkjainfwsyiyfcmbtid`.
+
 | Function | Purpose |
 |---|---|
 | `enrich-video` | Enriches video metadata, updates `video_submissions`, and assigns eligible playlists |
@@ -359,6 +367,25 @@ There is no active `backend/` FastAPI service in this repository. The backend su
 | `send-editor-application-confirmation` | Sends editor-application confirmation email |
 
 Frontend code invokes Edge Functions through [`src/shared/api/supabase/edgeFunctions.ts`](src/shared/api/supabase/edgeFunctions.ts). Do not call `supabase.functions.invoke` directly in components or feature hooks.
+
+User-triggered functions should keep JWT verification enabled, use shared CORS/JSON helpers from [`supabase/functions/_shared/http.ts`](supabase/functions/_shared/http.ts), and apply shared rate limiting before expensive work. Avoid wildcard CORS on deployed functions unless an endpoint is intentionally public and unauthenticated.
+
+### Hosted Supabase Config & Auth Email Templates
+
+Hosted Supabase project settings that must be reproducible live in [`supabase/config.toml`](supabase/config.toml). Auth email HTML lives in [`supabase/email-templates/`](supabase/email-templates/):
+
+- `invite.html`
+- `confirm-signup.html`
+- `recovery.html`
+- `email-change.html`
+
+Deploy config changes from this repository root:
+
+```bash
+pnpx supabase config push --project-ref wvkjainfwsyiyfcmbtid
+```
+
+Do not use `--yes` for config pushes. The CLI may propose changes to production API/Auth/Storage settings when local config drifts; inspect prompts and accept only the intended diff. A successful verification should report API, DB, Auth, and Storage config as up to date.
 
 ### Async Submission Pipeline
 
@@ -417,6 +444,8 @@ I designed the database with security and simplicity in mind:
 - **playlist_follows** – Follow public playlists
 - **editor_applications** – Editorial access requests
 - **contact_messages** – Contact form messages and delivery tracking
+- **direct_messages** – Private messages through secure RPCs and RLS-compatible reads
+- **edge_rate_limits** – Server-side rate limiting for user-triggered Edge Functions
 
 ### Security First 🔒
 Every table has Row-Level Security (RLS) enabled. Users can only see/edit their own data. Period.
