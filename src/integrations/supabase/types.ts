@@ -999,6 +999,144 @@ export type Database = {
         }
         Relationships: []
       }
+      v_video_exhibition: {
+        Row: {
+          id: string | null
+          youtube_id: string | null
+          title: string | null
+          description: string | null
+          channel_name: string | null
+          duration_seconds: number | null
+          thumbnail_url: string | null
+          language: string | null
+          category_id: string | null
+          submitted_by: string | null
+          view_count: number | null
+          is_featured: boolean | null
+          created_at: string | null
+          updated_at: string | null
+          favorites_count: number | null
+          playlist_add_count: number | null
+          category_name: string | null
+          category_slug: string | null
+          category_color: string | null
+          submitted_by_username: string | null
+          submitted_by_display_name: string | null
+          submitted_by_avatar_url: string | null
+          enrichment_optimized_title: string | null
+          enrichment_short_summary: string | null
+          enrichment_summary_description: string | null
+          enrichment_cultural_relevance: string | null
+          enrichment_semantic_tags: string[] | null
+          enrichment_language: string | null
+          playlist_count: number | null
+          comment_count: number | null
+          detected_language: string | null
+          effective_language: string | null
+          transcript_summary: string | null
+          transcript_language: string | null
+          transcript_status: string | null
+        }
+        Insert: {
+          [key: string]: never
+        }
+        Update: {
+          [key: string]: never
+        }
+        Relationships: []
+      }
+      v_playlist_exhibition: {
+        Row: {
+          id: string | null
+          name: string | null
+          slug: string | null
+          description: string | null
+          author_id: string | null
+          thumbnail_url: string | null
+          course_code: string | null
+          unit_code: string | null
+          language: string | null
+          is_public: boolean | null
+          is_ordered: boolean | null
+          created_at: string | null
+          updated_at: string | null
+          video_count: number | null
+          total_duration_seconds: number | null
+          author_username: string | null
+          author_display_name: string | null
+          author_avatar_url: string | null
+          collaborator_count: number | null
+          preview_video_id: string | null
+          preview_video_title: string | null
+          preview_video_thumbnail_url: string | null
+          preview_video_channel_name: string | null
+          activity_at: string | null
+        }
+        Insert: {
+          [key: string]: never
+        }
+        Update: {
+          [key: string]: never
+        }
+        Relationships: []
+      }
+      v_course_playlist_summary: {
+        Row: {
+          course_code: string | null
+          course_name: string | null
+          playlists_total: number | null
+          public_playlists_total: number | null
+          learning_paths_total: number | null
+          collections_total: number | null
+          units_total: number | null
+          empty_playlists_total: number | null
+          videos_total: number | null
+          total_duration_seconds: number | null
+          first_playlist_created_at: string | null
+          last_playlist_updated_at: string | null
+          languages: string[] | null
+          semesters: string[] | null
+          playlists: Json | null
+        }
+        Insert: {
+          [key: string]: never
+        }
+        Update: {
+          [key: string]: never
+        }
+        Relationships: []
+      }
+      v_course_playlist_catalog: {
+        Row: {
+          playlist_id: string | null
+          course_code: string | null
+          course_name: string | null
+          unit_code: string | null
+          playlist_name: string | null
+          playlist_slug: string | null
+          playlist_description: string | null
+          language: string | null
+          is_public: boolean | null
+          is_ordered: boolean | null
+          video_count: number | null
+          total_duration_seconds: number | null
+          thumbnail_url: string | null
+          author_id: string | null
+          created_at: string | null
+          updated_at: string | null
+          semester_label: string | null
+          video_range: string | null
+          collaborators_count: number | null
+          playlist_videos_rows: number | null
+        }
+        Insert: {
+          [key: string]: never
+        }
+        Update: {
+          [key: string]: never
+        }
+        Relationships: []
+      }
     }
     Functions: {
       add_video_to_default_education_playlist: {
