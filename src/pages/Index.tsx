@@ -2,6 +2,8 @@ import { ArrowRight, BookOpen, Radio, Send, ShieldCheck, Users } from 'lucide-re
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
+import type { HomeHeroVideo } from '@/entities/home/home.types';
+import type { VideoWithCategory } from '@/entities/video/video.types';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { MainLayout } from '@/components/layout/MainLayout';
@@ -13,9 +15,11 @@ import {
   PageHero,
   PlaylistShowcaseCard,
   SectionHeader,
+  VideoCarouselRail,
   VideoShowcaseCard,
 } from '@/components/showcase';
 import { useHomeExhibition } from '@/features/home/useHomeExhibition';
+import { useFeaturedVideos, useRecentVideos } from '@/features/videos/queries/useVideos';
 
 const metricKeys = [
   'videos_total',
@@ -49,13 +53,116 @@ const ctaCards = [
   },
 ] as const;
 
+const DEFAULT_RAIL_LIMIT = 12;
+
+function mapVideoToShowcase(video: VideoWithCategory): HomeHeroVideo {
+  return {
+    id: video.id,
+    youtube_id: video.youtube_id,
+    title: video.enrichment?.optimized_title || video.title,
+    channel_name: video.channel_name,
+    thumbnail_url: video.thumbnail_url,
+    language: video.transcriptLanguage || video.language || 'N/A',
+    duration_seconds: video.duration_seconds,
+    view_count: video.view_count,
+    favorites_count: video.favorites_count,
+    playlist_add_count: video.playlist_add_count,
+    category_name: video.category?.name || null,
+    category_slug: video.category?.slug || null,
+    category_color: video.category?.color || null,
+    summary: video.enrichment?.short_summary || video.transcriptSummary || null,
+    semantic_tags: video.enrichment?.semantic_tags || null,
+  };
+}
+
+function dedupeVideos(videos: HomeHeroVideo[]) {
+  const seen = new Set<string>();
+  return videos.filter((video) => {
+    if (seen.has(video.id)) return false;
+    seen.add(video.id);
+    return true;
+  });
+}
+
+function pickVideos(primary: HomeHeroVideo[], fallback: HomeHeroVideo[], limit = DEFAULT_RAIL_LIMIT) {
+  const merged = dedupeVideos([...primary, ...fallback]);
+  return merged.slice(0, limit);
+}
+
 const Index = () => {
   const { i18n, t } = useTranslation();
   const navigate = useNavigate();
   const { data: home, isLoading, isError } = useHomeExhibition();
+  const { data: featuredVideosData = [], isLoading: isFeaturedLoading } = useFeaturedVideos(24, 0);
+  const { data: recentVideosData = [], isLoading: isRecentLoading } = useRecentVideos(24);
 
   const heroFeature = home?.hero_videos[0];
-  const heroTiles = useMemo(() => home?.hero_videos.slice(1, 7) ?? [], [home?.hero_videos]);
+  const heroTiles = useMemo(() => home?.hero_videos.slice(1, 4) ?? [], [home?.hero_videos]);
+  const featuredVideos = useMemo(() => featuredVideosData.map(mapVideoToShowcase), [featuredVideosData]);
+  const recentVideos = useMemo(() => recentVideosData.map(mapVideoToShowcase), [recentVideosData]);
+  const homeVideos = useMemo(() => home?.hero_videos ?? [], [home?.hero_videos]);
+  const allRailsPool = useMemo(
+    () => dedupeVideos([...homeVideos, ...featuredVideos, ...recentVideos]),
+    [homeVideos, featuredVideos, recentVideos],
+  );
+  const railsLoading = isLoading || isFeaturedLoading || isRecentLoading;
+
+  const videoRails = useMemo(() => {
+    const withSummaries = allRailsPool.filter((video) => !!video.summary);
+    const quickLessons = allRailsPool
+      .filter((video) => !!video.duration_seconds && (video.duration_seconds || 0) <= 900)
+      .sort((a, b) => (a.duration_seconds || 0) - (b.duration_seconds || 0));
+    const mostViewed = [...allRailsPool].sort((a, b) => b.view_count - a.view_count);
+    const communityFavorites = [...allRailsPool].sort(
+      (a, b) => b.favorites_count + b.playlist_add_count - (a.favorites_count + a.playlist_add_count),
+    );
+
+    return [
+      {
+        key: 'trendingNow',
+        title: t('homeExhibition.videoRails.trendingNow.title'),
+        description: t('homeExhibition.videoRails.trendingNow.description'),
+        videos: pickVideos(featuredVideos, allRailsPool),
+        variant: 'dark' as const,
+      },
+      {
+        key: 'freshDrops',
+        title: t('homeExhibition.videoRails.freshDrops.title'),
+        description: t('homeExhibition.videoRails.freshDrops.description'),
+        videos: pickVideos(recentVideos, allRailsPool),
+        variant: 'light' as const,
+      },
+      {
+        key: 'mostViewed',
+        title: t('homeExhibition.videoRails.mostViewed.title'),
+        description: t('homeExhibition.videoRails.mostViewed.description'),
+        videos: pickVideos(mostViewed, allRailsPool),
+        variant: 'dark' as const,
+      },
+      {
+        key: 'communityPicks',
+        title: t('homeExhibition.videoRails.communityPicks.title'),
+        description: t('homeExhibition.videoRails.communityPicks.description'),
+        videos: pickVideos(communityFavorites, allRailsPool),
+        variant: 'light' as const,
+      },
+      {
+        key: 'withSummaries',
+        title: t('homeExhibition.videoRails.withSummaries.title'),
+        description: t('homeExhibition.videoRails.withSummaries.description'),
+        videos: pickVideos(withSummaries, allRailsPool),
+        variant: 'dark' as const,
+      },
+      {
+        key: 'quickLessons',
+        title: t('homeExhibition.videoRails.quickLessons.title'),
+        description: t('homeExhibition.videoRails.quickLessons.description'),
+        videos: pickVideos(quickLessons, allRailsPool),
+        variant: 'light' as const,
+      },
+    ];
+  }, [allRailsPool, featuredVideos, recentVideos, t]);
+
   const learningRails = useMemo(() => {
     const facodi = home?.facodi_highlights ?? [];
     const featured = home?.featured_playlists ?? [];
@@ -94,6 +201,8 @@ const Index = () => {
   return (
     <MainLayout>
       <PageHero
+        className="overflow-x-clip"
+        contentClassName="lg:max-w-4xl"
         title={t('homeExhibition.hero.monynhaTitle')}
         description={t('homeExhibition.hero.description')}
         actions={
@@ -114,22 +223,42 @@ const Index = () => {
           </>
         }
         aside={
-          <div className="grid gap-2 border-2 border-border bg-black p-2 shadow-[12px_12px_0_#efff00] md:grid-cols-3">
+          <div className="grid gap-3 lg:ml-auto lg:grid-cols-[minmax(0,1fr)_14rem] lg:items-start xl:grid-cols-[minmax(0,1fr)_15rem]">
             {isLoading ? (
               <>
-                {Array.from({ length: 9 }).map((_, index) => (
-                  <Skeleton key={index} className="aspect-video border border-white/30 bg-white/10" />
-                ))}
+                <Skeleton className="aspect-[4/5] border-2 border-border bg-muted/60" />
+                <div className="border-2 border-border bg-black p-2">
+                  <Skeleton className="mb-2 h-4 w-24 bg-white/20" />
+                  <div className="space-y-2">
+                    {Array.from({ length: 3 }).map((_, index) => (
+                      <Skeleton key={index} className="aspect-video border border-white/30 bg-white/10" />
+                    ))}
+                  </div>
+                </div>
               </>
             ) : heroFeature ? (
               <>
-                <VideoShowcaseCard video={heroFeature} variant="tile" className="md:col-span-2 md:row-span-2 border-white/40 bg-black text-white hover:border-[#efff00]" />
-                {heroTiles.slice(0, 7).map((video) => (
-                  <VideoShowcaseCard key={video.id} video={video} variant="tile" className="border-white/40 bg-black text-white hover:border-[#efff00] [&_p]:hidden" />
-                ))}
+                <VideoShowcaseCard
+                  video={heroFeature}
+                  variant="feature"
+                  className="border-white/40 bg-black text-white hover:border-[#efff00]"
+                />
+                <div className="border-2 border-white/40 bg-black p-2 shadow-[8px_8px_0_#efff00]">
+                  <p className="mb-2 px-1 text-[0.62rem] font-black uppercase text-white/70">{t('homeExhibition.hero.railTitle')}</p>
+                  <div className="space-y-2">
+                    {heroTiles.map((video) => (
+                      <VideoShowcaseCard
+                        key={video.id}
+                        video={video}
+                        variant="tile"
+                        className="border-white/40 bg-black text-white hover:border-[#efff00] [&_h3]:line-clamp-2 [&_h3]:text-xs [&_p]:hidden [&_.text-muted-foreground]:hidden"
+                      />
+                    ))}
+                  </div>
+                </div>
               </>
             ) : (
-              <div className="border-2 border-white/30 p-8 text-white/70 md:col-span-3">{t('homeExhibition.empty.hero')}</div>
+              <div className="border-2 border-white/30 p-8 text-white/70 lg:col-span-2">{t('homeExhibition.empty.hero')}</div>
             )}
           </div>
         }
@@ -162,6 +291,22 @@ const Index = () => {
           ))}
         </div>
       </section>
+
+      <div className="space-y-0">
+        {videoRails.map((rail) => (
+          <VideoCarouselRail
+            key={rail.key}
+            title={rail.title}
+            description={rail.description}
+            videos={rail.videos}
+            isLoading={railsLoading}
+            emptyMessage={t('homeExhibition.empty.hero')}
+            actionLabel={t('homeExhibition.actions.viewAllVideos')}
+            onAction={() => navigate('/videos')}
+            variant={rail.variant}
+          />
+        ))}
+      </div>
 
       <section className="bg-background py-16 text-foreground md:py-20">
         <div className="container">

@@ -11,7 +11,15 @@ interface PageHeroProps {
   contentClassName?: string;
 }
 
-export function PageHero({ eyebrow, title, description, actions, aside, className, contentClassName }: PageHeroProps) {
+export function PageHero({
+  eyebrow,
+  title,
+  description,
+  actions,
+  aside,
+  className,
+  contentClassName,
+}: PageHeroProps) {
   return (
     <section className={cn('border-b-2 border-border bg-background text-foreground', className)}>
       <div className="container grid gap-10 py-10 md:py-14 lg:grid-cols-[0.92fr_1.08fr] lg:items-center lg:py-20">
