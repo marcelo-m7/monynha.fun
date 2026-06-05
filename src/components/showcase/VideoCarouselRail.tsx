@@ -1,4 +1,3 @@
-import Autoplay from 'embla-carousel-autoplay';
 import { ArrowRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel';
@@ -63,11 +62,7 @@ export function VideoCarouselRail({
             ))}
           </div>
         ) : videos.length ? (
-          <Carousel
-            opts={{ align: 'start', dragFree: true, loop: true }}
-            plugins={[Autoplay({ delay: 4000, stopOnInteraction: true, stopOnMouseEnter: true })]}
-            className="px-1 md:px-2"
-          >
+          <Carousel opts={{ align: 'start', dragFree: true }} className="px-1 md:px-2">
             <CarouselPrevious
               className={cn(
                 'left-0 top-1/2 h-10 w-10 -translate-y-1/2 border-2 lg:-left-12',
