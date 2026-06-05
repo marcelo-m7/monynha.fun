@@ -10,7 +10,7 @@ export interface ListCourseCatalogParams {
 
 export async function listCoursePlaylistSummary() {
   const { data, error } = await supabase
-    .from('v_course_playlist_summary')
+    .from('v_course_playlist_summary' as any)
     .select(
       `
       course_code,
@@ -37,7 +37,7 @@ export async function listCoursePlaylistSummary() {
 
 export async function listCoursePlaylistCatalog(params: ListCourseCatalogParams = {}) {
   let query = supabase
-    .from('v_course_playlist_catalog')
+    .from('v_course_playlist_catalog' as any)
     .select(
       `
       playlist_id,

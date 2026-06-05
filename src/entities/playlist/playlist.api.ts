@@ -39,7 +39,7 @@ function toPlaylistEntity(row: PlaylistExhibitionRow): Playlist {
 export async function listPlaylists(params: ListPlaylistsParams = {}) {
   const buildQuery = () => {
     let query = supabase
-      .from('v_playlist_exhibition')
+      .from('v_playlist_exhibition' as any)
       .select('*')
       .order('activity_at', { ascending: false, nullsFirst: false });
 
@@ -100,7 +100,7 @@ export async function listPlaylists(params: ListPlaylistsParams = {}) {
 
 export async function getPlaylistById(id: string) {
   const { data, error } = await supabase
-    .from('v_playlist_exhibition')
+    .from('v_playlist_exhibition' as any)
     .select('*')
     .eq('id', id)
     .maybeSingle();
