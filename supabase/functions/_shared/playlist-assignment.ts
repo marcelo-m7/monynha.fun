@@ -207,6 +207,13 @@ function tokenOverlapScore(left: string | null | undefined, right: string | null
   return score;
 }
 
+function meaningfulSemanticTags(tags: string[]): string[] {
+  const placeholderTags = new Set(['monynha', 'fun', 'ia', 'curadoria', 'youtube', 'und']);
+  return tags
+    .map((tag) => tag.trim())
+    .filter((tag) => tag.length > 0 && !placeholderTags.has(normalizeText(tag)));
+}
+
 function subjectSignalScore(text: string, subject: SubjectSignal): number {
   const normalized = normalizeText(text);
   return subjectKeywords[subject].reduce(
@@ -242,7 +249,7 @@ function analysisText(analysis: PlaylistAssignmentAnalysis): string {
     analysis.title ?? '',
     analysis.description ?? '',
     analysis.suggestedPlaylistQuery ?? '',
-    analysis.semanticTags.join(' '),
+    meaningfulSemanticTags(analysis.semanticTags).join(' '),
     analysis.summaryDescription ?? '',
     analysis.shortSummary ?? '',
   ].join(' ');
@@ -313,7 +320,7 @@ function scorePlaylist(params: {
   let score = 0;
 
   score += Math.min(7, tokenOverlapScore(sourceText, text));
-  score += Math.min(5, tokenOverlapScore(analysis.semanticTags.join(' '), text));
+  score += Math.min(5, tokenOverlapScore(meaningfulSemanticTags(analysis.semanticTags).join(' '), text));
   score += Math.min(6, tokenOverlapScore(analysis.suggestedPlaylistQuery, text));
 
   for (const subject of Object.keys(signals) as SubjectSignal[]) {

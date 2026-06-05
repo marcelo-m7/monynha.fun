@@ -56,7 +56,7 @@ describe('legacy fast enrichment helpers', () => {
       semanticTags,
     });
 
-    expect(semanticTags).toEqual(expect.arrayContaining(['dados', 'educacao']));
+    expect(semanticTags).toEqual(expect.arrayContaining(['banco de dados', 'educação']));
     expect(selected?.id).toBe('cat-educacao');
   });
 

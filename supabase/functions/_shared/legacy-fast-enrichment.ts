@@ -46,13 +46,14 @@ export function deriveTags(params: {
   language: string;
 }) {
   const source = `${params.title ?? ''} ${params.description ?? ''} ${params.channelName ?? ''}`.toLowerCase();
-  const tags = new Set<string>(['youtube', 'curadoria', params.language]);
+  const tags = new Set<string>();
   const signals: Array<[string, string[]]> = [
-    ['matematica', ['matem', 'calculo', 'algebra', 'equacao', 'estatistica']],
-    ['programacao', ['programa', 'javascript', 'python', 'codigo', 'software']],
-    ['design', ['design', 'visual', 'grafico', 'tipografia']],
-    ['dados', ['sql', 'database', 'dados', 'banco de dados']],
-    ['educacao', ['aula', 'curso', 'aprenda', 'tutorial', 'facodi']],
+    ['matemática', ['matem', 'calculo', 'cálculo', 'algebra', 'álgebra', 'equacao', 'equação', 'estatistica', 'estatística', 'integral', 'derivada']],
+    ['programação', ['programa', 'javascript', 'typescript', 'python', 'codigo', 'código', 'software', 'react', 'node', 'fastapi']],
+    ['design', ['design', 'visual', 'grafico', 'gráfico', 'tipografia', 'indesign', 'composição visual']],
+    ['banco de dados', ['sql', 'database', 'dados', 'banco de dados', 'base de dados', 'normalização', 'normalizacao']],
+    ['Odoo', ['odoo', 'erp', 'human resources', 'employees', 'expenses', 'fleet', 'time off']],
+    ['educação', ['aula', 'curso', 'aprenda', 'tutorial', 'facodi', 'ensino']],
   ];
 
   for (const [tag, keywords] of signals) {
@@ -74,9 +75,11 @@ function scoreCategory(category: LegacyFastCategory, source: string, semanticTag
   const keywordMap: Record<string, string[]> = {
     cultura: ['cultura', 'historia', 'sociedade', 'arte', 'tradicao', 'antropologia'],
     educacao: ['educacao', 'aula', 'curso', 'aprenda', 'tutorial', 'ensino', 'estudo', 'facodi', 'universidade', 'escola'],
+    matematica: ['matematica', 'calculo', 'integral', 'derivada', 'algebra', 'equacao', 'vetorial', 'coordenadas', 'estatistica'],
+    design: ['design', 'tipografia', 'grafico', 'comunicacao visual', 'indesign', 'composicao visual', 'ilustracao'],
     'memes-iconicos': ['meme', 'memes', 'viral', 'humor', 'engracado'],
     musica: ['musica', 'music', 'audio', 'som', 'cantor', 'banda', 'instrumento'],
-    tech: ['tech', 'tecnologia', 'programacao', 'programa', 'codigo', 'software', 'javascript', 'python', 'sql', 'database', 'dados', 'ia', 'inteligencia artificial'],
+    tech: ['tech', 'tecnologia', 'programacao', 'programa', 'codigo', 'software', 'javascript', 'typescript', 'python', 'sql', 'database', 'dados', 'ia', 'inteligencia artificial', 'odoo', 'erp', 'supabase', 'linux'],
     'tutoriais-antigos': ['tutorial', 'como fazer', 'passo a passo', 'guia', 'dica', 'aprenda'],
     receitas: ['receita', 'receitas', 'cozinha', 'culinaria', 'comida', 'bolo', 'prato'],
     'receitas-tradicionais': ['receita', 'receitas', 'cozinha', 'culinaria', 'comida', 'bolo', 'prato'],
@@ -108,7 +111,8 @@ export function pickCategory(categories: LegacyFastCategory[], params: {
 }) {
   const currentCategory = categories.find((category) => category.id === params.currentCategoryId) ?? null;
   const unclassifiedCategory = categories.find((category) => normalizeText(category.slug) === 'nao-classificados') ?? null;
-  if (currentCategory && currentCategory.id !== unclassifiedCategory?.id) return currentCategory;
+  const genericCategorySlugs = new Set(['nao-classificados', 'educacao']);
+  if (currentCategory && !genericCategorySlugs.has(normalizeText(currentCategory.slug))) return currentCategory;
 
   const source = normalizeText([
     params.title,
@@ -124,7 +128,7 @@ export function pickCategory(categories: LegacyFastCategory[], params: {
     if (score > best.score) best = { category, score };
   }
 
-  if (best.category && best.score >= 3) return best.category;
+  if (best.category && best.score >= 6) return best.category;
 
   return categories.find((category) => normalizeText(category.slug) === 'educacao')
     ?? unclassifiedCategory
