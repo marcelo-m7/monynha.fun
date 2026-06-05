@@ -16,7 +16,8 @@
     "delete": "Supprimer",
     "anonymous": "Anonyme",
     "none": "Aucun",
-    "loading": "Chargement..."
+    "loading": "Chargement...",
+    "retry": "Réessayer"
   },
   "video": {
     "durationLabel": "Durée : {{duration}}"
@@ -1211,6 +1212,11 @@
     "selectConversation": "Sélectionnez une conversation pour commencer.",
     "emptyConversation": "Aucun message pour le moment. Dites bonjour.",
     "inputPlaceholder": "Écrire un message...",
+    "send": "Envoyer le message",
+    "errorInbox": "Impossible de charger les conversations.",
+    "errorConversation": "Impossible de charger cette conversation.",
+    "selfConversation": "Vous ne pouvez pas vous envoyer un message à vous-même.",
+    "charactersRemaining": "{{count}} caractères restants",
     "tipPrefix": "Astuce :",
     "tipLink": "visitez les profils de la communauté"
   },
@@ -1304,6 +1310,37 @@
       "curricular": "Playlists curriculaires",
       "publicPaths": "Parcours publics",
       "videos": "Vidéos cataloguées"
+    },
+    "curriculum": {
+      "title": "Carte curriculaire en curation",
+      "description": "Suivez l'état des playlists par cours, semestre et unité curriculaire. Les playlists vides apparaissent comme travail en cours, avec LESTI en priorité.",
+      "focus": "Focus {{course}}",
+      "courseSelectorLabel": "Sélectionner le cours FACODI",
+      "playlistCount_one": "{{count}} parcours",
+      "playlistCount_other": "{{count}} parcours",
+      "videoCount_one": "{{count}} vidéo",
+      "videoCount_other": "{{count}} vidéos",
+      "durationLabel": "{{duration}} de vidéo",
+      "unitCode": "UC {{code}}",
+      "fallbackSemester": "Semestre à organiser",
+      "groupSummary": "{{units}} UCs · {{videos}} vidéos · {{duration}}",
+      "openPlaylist": "Ouvrir le parcours",
+      "submitVideo": "Envoyer une vidéo",
+      "ordered": "Ordonnée",
+      "empty": "Il n'y a pas encore de playlists curriculaires publiques pour ce cours.",
+      "loadError": "Impossible de charger l'état curriculaire pour le moment.",
+      "status": {
+        "empty": "En curation",
+        "thin": "Initial",
+        "healthy": "Sain",
+        "overloaded": "Réordonner"
+      },
+      "statusDescription": {
+        "empty": "Cette UC existe dans le curriculum, mais elle a encore besoin de bonnes vidéos initiales.",
+        "thin": "Il existe déjà du contenu, mais le parcours doit encore être renforcé éditorialement.",
+        "healthy": "Le parcours a déjà assez de substance pour l'étude publique.",
+        "overloaded": "Il y a beaucoup de contenu ; le prochain gain est de placer les meilleures vidéos en premier."
+      }
     },
     "rails": {
       "title": "Parcours avec direction",

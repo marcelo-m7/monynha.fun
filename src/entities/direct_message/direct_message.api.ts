@@ -84,9 +84,20 @@ export async function getConversationByUsername(otherUsername: string) {
 }
 
 export async function sendDirectMessageByUsername(receiverUsername: string, content: string) {
+  const trimmedContent = content.trim();
+  if (!receiverUsername.trim()) {
+    throw new Error('Receiver username is required');
+  }
+  if (!trimmedContent) {
+    throw new Error('Message content cannot be empty');
+  }
+  if (trimmedContent.length > 1000) {
+    throw new Error('Message content is too long');
+  }
+
   const { data, error } = await supabase.rpc('send_direct_message_by_username_secure', {
-    p_receiver_username: receiverUsername,
-    p_content: content,
+    p_receiver_username: receiverUsername.trim(),
+    p_content: trimmedContent,
   });
 
   if (error) throw error;
@@ -120,13 +131,9 @@ export async function markConversationAsReadByUsername(otherUsername: string) {
   return Number(data || 0);
 }
 
-export async function getUnreadMessagesCount(userId: string) {
-  const { count, error } = await supabase
-    .from('direct_messages')
-    .select('id', { count: 'exact', head: true })
-    .eq('receiver_id', userId)
-    .eq('is_read', false);
+export async function getUnreadMessagesCount() {
+  const { data, error } = await supabase.rpc('get_unread_messages_count_secure');
 
   if (error) throw error;
-  return Number(count || 0);
+  return Number(data || 0);
 }

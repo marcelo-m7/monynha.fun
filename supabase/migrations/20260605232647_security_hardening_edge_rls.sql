@@ -1,7 +1,8 @@
 -- Security hardening for user-triggered Edge Function flows and public policies.
 
--- Keep the public AI-enrichment policy aligned with its documented contract:
--- anonymous reads are allowed only for enrichments whose video is public.
+-- Keep the public AI-enrichment policy aligned with the current video contract:
+-- videos are globally readable, so anonymous enrichment reads are limited to
+-- enrichments attached to existing video rows.
 drop policy if exists "Public can read AI enrichment for public videos" on public.ai_enrichments;
 
 create policy "Public can read AI enrichment for public videos"
@@ -13,7 +14,6 @@ using (
     select 1
     from public.videos
     where videos.id = ai_enrichments.video_id
-      and videos.is_public is true
   )
 );
 

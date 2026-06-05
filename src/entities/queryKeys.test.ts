@@ -5,6 +5,7 @@ import { profileKeys } from './profile/profile.keys';
 import { categoryKeys } from './category/category.keys';
 import { videoSubmissionKeys } from './video_submission/video_submission.keys';
 import { videoAnalysisJobKeys } from './video_analysis_job/video_analysis_job.keys';
+import { courseKeys } from './course/course.keys';
 
 describe('query key factories', () => {
   it('creates stable video keys', () => {
@@ -44,5 +45,14 @@ describe('query key factories', () => {
       'list',
       { status: 'pending', limit: 10 },
     ]);
+  });
+
+  it('creates stable course health keys', () => {
+    expect(courseKeys.healthList({ courseCode: 'LESTI' })).toEqual([
+      'courses',
+      'health',
+      { courseCode: 'LESTI' },
+    ]);
+    expect(courseKeys.healthList()).toEqual(['courses', 'health', { courseCode: '' }]);
   });
 });

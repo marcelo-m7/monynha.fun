@@ -16,7 +16,8 @@
     "delete": "Delete",
     "anonymous": "Anonymous",
     "loading": "Loading...",
-    "none": "None"
+    "none": "None",
+    "retry": "Try again"
   },
   "video": {
     "durationLabel": "Duration: {{duration}}"
@@ -1129,6 +1130,11 @@
     "selectConversation": "Select a conversation to start chatting.",
     "emptyConversation": "No messages yet. Say hello!",
     "inputPlaceholder": "Write a message...",
+    "send": "Send message",
+    "errorInbox": "Could not load conversations.",
+    "errorConversation": "Could not load this conversation.",
+    "selfConversation": "You cannot send a message to yourself.",
+    "charactersRemaining": "{{count}} characters remaining",
     "tipPrefix": "Tip:",
     "tipLink": "visit community profiles"
   },
@@ -1304,6 +1310,37 @@
       "curricular": "Curriculum playlists",
       "publicPaths": "Public paths",
       "videos": "Cataloged videos"
+    },
+    "curriculum": {
+      "title": "Curriculum map in curation",
+      "description": "Follow playlist health by course, semester, and curricular unit. Empty playlists are shown as work in progress, with LESTI first.",
+      "focus": "{{course}} focus",
+      "courseSelectorLabel": "Select FACODI course",
+      "playlistCount_one": "{{count}} track",
+      "playlistCount_other": "{{count}} tracks",
+      "videoCount_one": "{{count}} video",
+      "videoCount_other": "{{count}} videos",
+      "durationLabel": "{{duration}} of video",
+      "unitCode": "Unit {{code}}",
+      "fallbackSemester": "Semester to organize",
+      "groupSummary": "{{units}} units · {{videos}} videos · {{duration}}",
+      "openPlaylist": "Open track",
+      "submitVideo": "Submit video",
+      "ordered": "Ordered",
+      "empty": "There are no public curriculum playlists for this course yet.",
+      "loadError": "Could not load curriculum health right now.",
+      "status": {
+        "empty": "In curation",
+        "thin": "Starting",
+        "healthy": "Healthy",
+        "overloaded": "Reorder"
+      },
+      "statusDescription": {
+        "empty": "This unit exists in the curriculum, but still needs strong initial videos.",
+        "thin": "Some material exists, but the track still needs editorial reinforcement.",
+        "healthy": "The track already has enough substance for public study.",
+        "overloaded": "There is a lot of content; the next gain is ordering the best videos first."
+      }
     },
     "rails": {
       "title": "Tracks with direction",

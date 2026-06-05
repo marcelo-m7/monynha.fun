@@ -1,5 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import {
+  listFacodiPlaylistHealth,
   listCoursePlaylistCatalog,
   listCoursePlaylistSummary,
 } from '@/entities/course/course.api';
@@ -7,6 +8,7 @@ import { courseKeys } from '@/entities/course/course.keys';
 import type {
   CoursePlaylistCatalogItem,
   CoursePlaylistSummaryItem,
+  FacodiPlaylistHealthItem,
 } from '@/entities/course/course.types';
 
 interface UseCourseCatalogOptions {
@@ -28,6 +30,16 @@ export function useCoursePlaylistCatalog(options: UseCourseCatalogOptions = {}) 
   return useQuery<CoursePlaylistCatalogItem[], Error>({
     queryKey: courseKeys.catalogList({ courseCode }),
     queryFn: () => listCoursePlaylistCatalog({ courseCode }),
+    enabled,
+  });
+}
+
+export function useFacodiPlaylistHealth(options: UseCourseCatalogOptions = {}) {
+  const { courseCode, enabled = true } = options;
+
+  return useQuery<FacodiPlaylistHealthItem[], Error>({
+    queryKey: courseKeys.healthList({ courseCode }),
+    queryFn: () => listFacodiPlaylistHealth({ courseCode }),
     enabled,
   });
 }

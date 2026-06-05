@@ -16,7 +16,8 @@
     "delete": "Eliminar",
     "anonymous": "Anónimo",
     "none": "Ninguno",
-    "loading": "Cargando..."
+    "loading": "Cargando...",
+    "retry": "Intentar de nuevo"
   },
   "video": {
     "durationLabel": "Duración: {{duration}}"
@@ -1211,6 +1212,11 @@
     "selectConversation": "Selecciona una conversación para empezar.",
     "emptyConversation": "Aún no hay mensajes. Saluda.",
     "inputPlaceholder": "Escribe un mensaje...",
+    "send": "Enviar mensaje",
+    "errorInbox": "No se pudieron cargar las conversaciones.",
+    "errorConversation": "No se pudo cargar esta conversación.",
+    "selfConversation": "No puedes enviarte un mensaje a ti mismo.",
+    "charactersRemaining": "{{count}} caracteres restantes",
     "tipPrefix": "Consejo:",
     "tipLink": "visita perfiles de la comunidad"
   },
@@ -1304,6 +1310,37 @@
       "curricular": "Playlists curriculares",
       "publicPaths": "Caminos públicos",
       "videos": "Videos catalogados"
+    },
+    "curriculum": {
+      "title": "Mapa curricular en curaduría",
+      "description": "Sigue el estado de las playlists por curso, semestre y unidad curricular. Las playlists vacías aparecen como trabajo en curso, con prioridad LESTI.",
+      "focus": "Foco {{course}}",
+      "courseSelectorLabel": "Seleccionar curso FACODI",
+      "playlistCount_one": "{{count}} ruta",
+      "playlistCount_other": "{{count}} rutas",
+      "videoCount_one": "{{count}} video",
+      "videoCount_other": "{{count}} videos",
+      "durationLabel": "{{duration}} de video",
+      "unitCode": "UC {{code}}",
+      "fallbackSemester": "Semestre por organizar",
+      "groupSummary": "{{units}} UCs · {{videos}} videos · {{duration}}",
+      "openPlaylist": "Abrir ruta",
+      "submitVideo": "Enviar video",
+      "ordered": "Ordenada",
+      "empty": "Todavía no hay playlists curriculares públicas para este curso.",
+      "loadError": "No fue posible cargar la salud curricular ahora.",
+      "status": {
+        "empty": "En curaduría",
+        "thin": "Inicial",
+        "healthy": "Saludable",
+        "overloaded": "Reordenar"
+      },
+      "statusDescription": {
+        "empty": "Esta UC ya existe en el currículo, pero aún necesita buenos videos iniciales.",
+        "thin": "Hay algo de material, pero la ruta todavía necesita refuerzo editorial.",
+        "healthy": "La ruta ya tiene masa crítica para estudio público.",
+        "overloaded": "Hay mucho contenido; el siguiente avance es ordenar primero los mejores videos."
+      }
     },
     "rails": {
       "title": "Rutas con dirección",

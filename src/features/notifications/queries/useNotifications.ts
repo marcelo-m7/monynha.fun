@@ -24,10 +24,11 @@ export function useUnreadNotificationsCount() {
     queryKey: notificationKeys.unreadCount(),
     queryFn: async () => {
       if (!user) return 0;
-      return getUnreadNotificationsCount(user.id);
+      return getUnreadNotificationsCount();
     },
     enabled: !!user,
     staleTime: 15000,
+    refetchInterval: user ? 30000 : false,
   });
 }
 

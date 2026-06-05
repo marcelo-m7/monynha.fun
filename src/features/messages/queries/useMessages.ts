@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import {
@@ -10,36 +11,94 @@ import {
 import { directMessageKeys } from '@/entities/direct_message/direct_message.keys';
 import type { ConversationSummary, DirectMessage } from '@/entities/direct_message/direct_message.types';
 import { useAuth } from '@/features/auth/useAuth';
+import { supabase } from '@/shared/api/supabase/supabaseClient';
+
+function useDirectMessagesRealtime(otherUsername?: string) {
+  const { user } = useAuth();
+  const queryClient = useQueryClient();
+
+  useEffect(() => {
+    if (!user?.id || import.meta.env.MODE === 'test') return;
+
+    const invalidateMessages = () => {
+      queryClient.invalidateQueries({ queryKey: directMessageKeys.inbox() });
+      queryClient.invalidateQueries({ queryKey: directMessageKeys.unreadCount() });
+      if (otherUsername) {
+        queryClient.invalidateQueries({ queryKey: directMessageKeys.conversation(otherUsername) });
+      }
+    };
+
+    const channel = supabase
+      .channel(`direct-messages:${user.id}:${otherUsername ?? 'all'}`)
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'direct_messages',
+          filter: `receiver_id=eq.${user.id}`,
+        },
+        invalidateMessages,
+      )
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'direct_messages',
+          filter: `sender_id=eq.${user.id}`,
+        },
+        invalidateMessages,
+      )
+      .subscribe();
+
+    return () => {
+      void supabase.removeChannel(channel);
+    };
+  }, [otherUsername, queryClient, user?.id]);
+}
 
 export function useInboxConversations() {
+  const { user } = useAuth();
+
   return useQuery<ConversationSummary[], Error>({
     queryKey: directMessageKeys.inbox(),
     queryFn: () => listInboxConversations(),
+    enabled: !!user,
+    staleTime: 10000,
+    refetchInterval: user ? 45000 : false,
   });
 }
 
 export function useConversation(otherUsername: string | undefined) {
+  const { user } = useAuth();
+  useDirectMessagesRealtime(otherUsername);
+
   return useQuery<DirectMessage[], Error>({
     queryKey: directMessageKeys.conversation(otherUsername || ''),
     queryFn: async () => {
       if (!otherUsername) return [];
       return getConversationByUsername(otherUsername);
     },
-    enabled: !!otherUsername,
+    enabled: !!user && !!otherUsername,
+    staleTime: 5000,
+    refetchInterval: user && otherUsername ? 15000 : false,
   });
 }
 
 export function useUnreadMessagesCount() {
   const { user } = useAuth();
+  useDirectMessagesRealtime();
 
   return useQuery<number, Error>({
     queryKey: directMessageKeys.unreadCount(),
     queryFn: async () => {
       if (!user) return 0;
-      return getUnreadMessagesCount(user.id);
+      return getUnreadMessagesCount();
     },
     enabled: !!user,
-    staleTime: 15000,
+    staleTime: 10000,
+    refetchInterval: user ? 30000 : false,
   });
 }
 
@@ -68,6 +127,9 @@ export function useMarkConversationAsRead() {
       queryClient.invalidateQueries({ queryKey: directMessageKeys.inbox() });
       queryClient.invalidateQueries({ queryKey: directMessageKeys.unreadCount() });
       queryClient.invalidateQueries({ queryKey: directMessageKeys.conversation(variables.otherUsername) });
+    },
+    onError: (error) => {
+      toast.error('Nao foi possivel marcar a conversa como lida.', { description: error.message });
     },
   });
 }

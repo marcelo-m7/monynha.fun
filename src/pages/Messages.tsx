@@ -1,6 +1,6 @@
-import { FormEvent, useEffect, useMemo, useState } from 'react';
+import { FormEvent, useEffect, useMemo, useRef, useState } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
-import { Loader2, MessageCircle, Send } from 'lucide-react';
+import { AlertCircle, Loader2, MessageCircle, RefreshCw, Send } from 'lucide-react';
 import { Header } from '@/components/layout/Header';
 import { Footer } from '@/components/layout/Footer';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -16,6 +16,7 @@ import {
   useMarkConversationAsRead,
   useSendDirectMessage,
 } from '@/features/messages';
+import { useCurrentUserProfile } from '@/features/profile/queries/useProfile';
 import { useTranslation } from 'react-i18next';
 
 const MAX_MESSAGE_LENGTH = 1000;
@@ -27,12 +28,26 @@ const Messages = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const selectedUsername = searchParams.get('with') || undefined;
 
-  const { data: conversations = [], isLoading: conversationsLoading } = useInboxConversations();
-  const { data: messages = [], isLoading: messagesLoading } = useConversation(selectedUsername);
+  const {
+    data: conversations = [],
+    isLoading: conversationsLoading,
+    isError: conversationsError,
+    error: conversationsErrorDetails,
+    refetch: refetchConversations,
+  } = useInboxConversations();
+  const {
+    data: messages = [],
+    isLoading: messagesLoading,
+    isError: messagesError,
+    error: messagesErrorDetails,
+    refetch: refetchMessages,
+  } = useConversation(selectedUsername);
+  const { data: currentProfile } = useCurrentUserProfile();
   const sendMessage = useSendDirectMessage();
   const markConversationAsRead = useMarkConversationAsRead();
 
   const [content, setContent] = useState('');
+  const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     if (!authLoading && !user) {
@@ -53,18 +68,29 @@ const Messages = () => {
     () => conversations.find((conversation) => conversation.partnerUsername === selectedUsername),
     [conversations, selectedUsername],
   );
+  const isSelfConversation =
+    !!selectedUsername &&
+    !!currentProfile?.username &&
+    selectedUsername.toLowerCase() === currentProfile.username.toLowerCase();
+  const selectedLabel = selectedConversation?.partnerDisplayName || selectedConversation?.partnerUsername || selectedUsername;
+  const remainingCharacters = MAX_MESSAGE_LENGTH - content.length;
 
   const onSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
-    if (!selectedUsername || !content.trim()) return;
+    if (!selectedUsername || !content.trim() || isSelfConversation) return;
 
-    await sendMessage.mutateAsync({
-      receiverUsername: selectedUsername,
-      content: content.trim(),
-    });
+    try {
+      await sendMessage.mutateAsync({
+        receiverUsername: selectedUsername,
+        content: content.trim(),
+      });
 
-    setContent('');
+      setContent('');
+      inputRef.current?.focus();
+    } catch {
+      inputRef.current?.focus();
+    }
   };
 
   if (authLoading) {
@@ -98,6 +124,22 @@ const Messages = () => {
               <ScrollArea className="h-[calc(70vh-74px)]">
                 {conversationsLoading ? (
                   <div className="p-6 text-muted-foreground text-sm">{t('common.loading')}</div>
+                ) : conversationsError ? (
+                  <div className="space-y-4 p-6 text-sm">
+                    <div className="flex items-start gap-3 text-destructive">
+                      <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" />
+                      <div>
+                        <p className="font-medium">{t('messages.errorInbox')}</p>
+                        {conversationsErrorDetails?.message && (
+                          <p className="mt-1 text-muted-foreground">{conversationsErrorDetails.message}</p>
+                        )}
+                      </div>
+                    </div>
+                    <Button type="button" variant="outline" size="sm" onClick={() => refetchConversations()}>
+                      <RefreshCw className="h-4 w-4" />
+                      {t('common.retry')}
+                    </Button>
+                  </div>
                 ) : conversations.length === 0 ? (
                   <div className="p-6 text-muted-foreground text-sm">{t('messages.emptyInbox')}</div>
                 ) : (
@@ -143,11 +185,11 @@ const Messages = () => {
           <Card className="h-[70vh] flex flex-col">
             <CardHeader>
               <CardTitle className="text-lg">
-                {selectedConversation ? (
+                {selectedUsername ? (
                   <span>
-                    {selectedConversation.partnerDisplayName || selectedConversation.partnerUsername}
+                    {selectedLabel}
                     <span className="text-sm font-normal text-muted-foreground ml-2">
-                      @{selectedConversation.partnerUsername}
+                      @{selectedUsername}
                     </span>
                   </span>
                 ) : (
@@ -167,6 +209,24 @@ const Messages = () => {
                   <ScrollArea className="flex-1 px-4 py-4">
                     {messagesLoading ? (
                       <div className="text-sm text-muted-foreground">{t('common.loading')}</div>
+                    ) : messagesError ? (
+                      <div className="space-y-4 text-sm">
+                        <div className="flex items-start gap-3 text-destructive">
+                          <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" />
+                          <div>
+                            <p className="font-medium">{t('messages.errorConversation')}</p>
+                            {messagesErrorDetails?.message && (
+                              <p className="mt-1 text-muted-foreground">{messagesErrorDetails.message}</p>
+                            )}
+                          </div>
+                        </div>
+                        <Button type="button" variant="outline" size="sm" onClick={() => refetchMessages()}>
+                          <RefreshCw className="h-4 w-4" />
+                          {t('common.retry')}
+                        </Button>
+                      </div>
+                    ) : isSelfConversation ? (
+                      <div className="text-sm text-muted-foreground">{t('messages.selfConversation')}</div>
                     ) : messages.length === 0 ? (
                       <div className="text-sm text-muted-foreground">{t('messages.emptyConversation')}</div>
                     ) : (
@@ -191,18 +251,29 @@ const Messages = () => {
                     )}
                   </ScrollArea>
                   <Separator />
-                  <form onSubmit={onSubmit} className="p-4 flex gap-2">
-                    <Input
-                      value={content}
-                      onChange={(event) => setContent(event.target.value.slice(0, MAX_MESSAGE_LENGTH))}
-                      placeholder={t('messages.inputPlaceholder')}
-                      maxLength={MAX_MESSAGE_LENGTH}
-                      disabled={sendMessage.isPending}
-                    />
-                    <Button type="submit" disabled={!content.trim() || sendMessage.isPending}>
-                      {sendMessage.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
-                    </Button>
-                  </form>
+                  <div className="p-4">
+                    <form onSubmit={onSubmit} className="flex gap-2">
+                      <Input
+                        ref={inputRef}
+                        value={content}
+                        onChange={(event) => setContent(event.target.value.slice(0, MAX_MESSAGE_LENGTH))}
+                        placeholder={isSelfConversation ? t('messages.selfConversation') : t('messages.inputPlaceholder')}
+                        maxLength={MAX_MESSAGE_LENGTH}
+                        disabled={sendMessage.isPending || isSelfConversation}
+                        aria-describedby="message-character-count"
+                      />
+                      <Button
+                        type="submit"
+                        aria-label={t('messages.send')}
+                        disabled={!content.trim() || sendMessage.isPending || isSelfConversation}
+                      >
+                        {sendMessage.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
+                      </Button>
+                    </form>
+                    <p id="message-character-count" className="mt-2 text-right text-xs text-muted-foreground">
+                      {t('messages.charactersRemaining', { count: remainingCharacters })}
+                    </p>
+                  </div>
                 </>
               )}
             </CardContent>

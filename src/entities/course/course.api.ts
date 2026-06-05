@@ -2,6 +2,7 @@ import { supabase } from '@/shared/api/supabase/supabaseClient';
 import type {
   CoursePlaylistCatalogItem,
   CoursePlaylistSummaryItem,
+  FacodiPlaylistHealthItem,
 } from './course.types';
 
 export interface ListCourseCatalogParams {
@@ -73,4 +74,46 @@ export async function listCoursePlaylistCatalog(params: ListCourseCatalogParams 
 
   if (error) throw error;
   return (data || []) as CoursePlaylistCatalogItem[];
+}
+
+export async function listFacodiPlaylistHealth(params: ListCourseCatalogParams = {}) {
+  let query = supabase
+    .from('v_facodi_playlist_health')
+    .select(
+      `
+      playlist_id,
+      course_code,
+      course_name,
+      unit_code,
+      playlist_name,
+      playlist_slug,
+      playlist_description,
+      language,
+      is_public,
+      is_ordered,
+      video_count,
+      total_duration_seconds,
+      thumbnail_url,
+      semester_label,
+      video_range,
+      collaborators_count,
+      playlist_videos_rows,
+      health_status,
+      priority_rank,
+      priority_reason,
+      recommended_action
+      `,
+    )
+    .order('priority_rank', { ascending: true })
+    .order('course_code', { ascending: true })
+    .order('unit_code', { ascending: true });
+
+  if (params.courseCode) {
+    query = query.eq('course_code', params.courseCode);
+  }
+
+  const { data, error } = await query;
+
+  if (error) throw error;
+  return (data || []) as FacodiPlaylistHealthItem[];
 }

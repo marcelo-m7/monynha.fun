@@ -37,3 +37,42 @@ export interface CoursePlaylistSummaryItem {
   languages: string[] | null;
   semesters: string[] | null;
 }
+
+export type FacodiPlaylistHealthStatus = 'empty' | 'thin' | 'healthy' | 'overloaded';
+
+export type FacodiPlaylistRecommendedAction =
+  | 'seed_initial_videos'
+  | 'add_quality_videos'
+  | 'curate_order'
+  | 'maintain';
+
+export interface FacodiPlaylistHealthItem {
+  playlist_id: string;
+  course_code: string;
+  course_name: string;
+  unit_code: string | null;
+  playlist_name: string;
+  playlist_slug: string;
+  playlist_description: string | null;
+  language: string;
+  is_public: boolean;
+  is_ordered: boolean;
+  video_count: number;
+  total_duration_seconds: number;
+  thumbnail_url: string | null;
+  semester_label: string | null;
+  video_range: 'empty' | 'small' | 'medium' | 'large';
+  collaborators_count: number;
+  playlist_videos_rows: number;
+  health_status: FacodiPlaylistHealthStatus;
+  priority_rank: number;
+  priority_reason: string;
+  recommended_action: FacodiPlaylistRecommendedAction;
+}
+
+export interface FacodiPlaylistHealthGroup {
+  semesterLabel: string;
+  items: FacodiPlaylistHealthItem[];
+  videoCount: number;
+  durationSeconds: number;
+}

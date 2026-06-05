@@ -30,6 +30,7 @@ describe('email renderer', () => {
 
     expect(html).toContain('&lt;User&gt;');
     expect(html).toContain('&lt;Help&gt;');
+    expect(html).not.toContain('&amp;lt;Help&amp;gt;');
     expect(html).toContain('&lt;script&gt;alert(1)&lt;/script&gt;');
     expect(html).not.toContain('<script>alert(1)</script>');
   });
