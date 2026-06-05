@@ -76,6 +76,7 @@ export async function deleteUserAccount() {
   // For self-service deletion, we use the auth.admin API or a custom edge function
   // This implementation assumes you have RLS policies that cascade delete user data
   
+  // @ts-expect-error: delete_user_account is not yet in generated types
   const { error } = await supabase.rpc('delete_user_account');
   
   return { error: error as Error | null };
