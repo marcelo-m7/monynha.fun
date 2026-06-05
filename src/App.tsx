@@ -4,6 +4,9 @@ import { lazy, Suspense } from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { Skeleton } from "@/components/ui/skeleton";
 import ScrollToTop from "./components/ScrollToTop";
+import { SplashScreen } from "./components/SplashScreen";
+import { CustomCursor } from "./components/CustomCursor";
+import { PageTransition } from "./components/PageTransition";
 
 // Fallback component for Suspense
 const PageLoader = () => (
@@ -53,16 +56,20 @@ const YouTubeRouteBridge = lazy(() => import("./pages/YouTubeRouteBridge"));
 const SmartSlugRoute = lazy(() => import("./pages/SmartSlugRoute"));
 
 const App = () => (
-  <BrowserRouter
-    future={{
-      v7_startTransition: true,
-      v7_relativeSplatPath: true,
-    }}
-  >
-    <ScrollToTop />
-    <Suspense fallback={<PageLoader />}>
-      <Routes>
-        <Route path="/" element={<Index />} />
+  <>
+    <SplashScreen />
+    <CustomCursor />
+    <BrowserRouter
+      future={{
+        v7_startTransition: true,
+        v7_relativeSplatPath: true,
+      }}
+    >
+      <ScrollToTop />
+      <Suspense fallback={<PageLoader />}>
+        <PageTransition>
+          <Routes>
+            <Route path="/" element={<Index />} />
         <Route path="/auth" element={<Auth />} />
         <Route path="/auth/verify-email" element={<VerifyEmail />} />
         <Route path="/submit" element={<Submit />} />
@@ -100,8 +107,10 @@ const App = () => (
         <Route path="/:username" element={<SmartSlugRoute />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
+      </PageTransition>
     </Suspense>
   </BrowserRouter>
+  </>
 );
 
 export default App;

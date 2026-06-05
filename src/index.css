@@ -208,6 +208,80 @@
   .card-hover {
     @apply transition-colors border border-border hover:border-primary;
   }
+
+  /* --- New Utilities for Animations --- */
+  .animate-page-enter {
+    animation: pageEnter 280ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+
+  /* Custom Cursor */
+  .cursor-dot {
+    @apply fixed top-0 left-0 w-2 h-2 rounded-full pointer-events-none z-[9999];
+    background-color: hsl(var(--primary));
+    transform: translate(-50%, -50%);
+    /* Use will-change to force hardware acceleration */
+    will-change: transform;
+  }
+
+  .cursor-ring {
+    @apply fixed top-0 left-0 w-8 h-8 rounded-full pointer-events-none z-[9998] flex items-center justify-center transition-[width,height,background-color] duration-300 ease-out;
+    border: 2px solid hsl(var(--primary));
+    transform: translate(-50%, -50%);
+    will-change: transform, width, height;
+  }
+
+  .cursor-ring.cursor-hover {
+    @apply w-12 h-12;
+    background-color: hsla(var(--primary), 0.15);
+  }
+
+  .cursor-ring.cursor-click {
+    animation: cursorPulse 300ms ease-out forwards;
+  }
+
+  /* Splash Screen */
+  .splash-path {
+    stroke: hsl(var(--primary));
+    stroke-width: 8;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    fill: none;
+    stroke-dasharray: 1000;
+    stroke-dashoffset: 1000;
+    animation: splashDraw 1s cubic-bezier(0.8, 0, 0.2, 1) forwards,
+               splashGlow 0.8s ease-in-out 0.8s forwards;
+  }
+
+  .splash-container.zoom-out {
+    animation: splashZoomOut 0.6s cubic-bezier(0.8, 0, 0.2, 1) forwards;
+  }
+}
+
+@keyframes pageEnter {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes cursorPulse {
+  0% { transform: translate(-50%, -50%) scale(1); }
+  50% { transform: translate(-50%, -50%) scale(0.8); }
+  100% { transform: translate(-50%, -50%) scale(1); }
+}
+
+@keyframes splashDraw {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes splashGlow {
+  0% { filter: drop-shadow(0 0 0px hsl(var(--primary))); fill: transparent; }
+  100% { filter: drop-shadow(0 0 40px hsl(var(--primary))); fill: hsl(var(--primary)); }
+}
+
+@keyframes splashZoomOut {
+  0% { transform: scale(1); opacity: 1; }
+  100% { transform: scale(30); opacity: 0; }
 }
 
 @keyframes fadeUp {
@@ -241,7 +315,11 @@
   .animate-scale-in,
   .animate-signal-pulse,
   .animate-home-hero-item,
-  .animate-home-hero-aside {
+  .animate-home-hero-aside,
+  .animate-page-enter,
+  .splash-path,
+  .splash-container.zoom-out,
+  .cursor-ring.cursor-click {
     animation: none !important;
     opacity: 1 !important;
     transform: none !important;
