@@ -2,9 +2,9 @@ import React from 'react';
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from 'react-i18next';
 import { 
-  Search, Plus, LogOut, Heart, Globe, ListVideo, 
-  User as UserIcon, Settings, KeyRound, Home, 
-  Info, BookOpen, Mail, HelpCircle, Users, Bell, MessageCircle, ShieldCheck, GraduationCap, Sparkles, Scale, Cookie
+  Search, Plus, LogOut, Heart,
+  User as UserIcon, Settings,
+  Bell, MessageCircle, ShieldCheck
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -13,10 +13,9 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
 import { Label } from "@/components/ui/label";
 import { NavLink } from "@/components/NavLink";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import i18n from 'i18next';
 import { User } from '@supabase/supabase-js';
 import { Profile } from '@/entities/profile/profile.types';
+import { mobileNavigationItems } from './navigationItems';
 
 interface MobileNavProps {
   user: User | null;
@@ -28,6 +27,8 @@ interface MobileNavProps {
   searchQuery: string;
   setSearchQuery: (query: string) => void;
   onSearchSubmit: (e: React.FormEvent) => void;
+  languageSwitcher: React.ReactNode;
+  themeToggle: React.ReactNode;
 }
 
 export const MobileNav: React.FC<MobileNavProps> = ({
@@ -39,31 +40,12 @@ export const MobileNav: React.FC<MobileNavProps> = ({
   onSignOut,
   searchQuery,
   setSearchQuery,
-  onSearchSubmit
+  onSearchSubmit,
+  languageSwitcher,
+  themeToggle
 }) => {
   const { t } = useTranslation();
   const navigate = useNavigate();
-
-  const changeLanguage = (lng: string) => {
-    i18n.changeLanguage(lng);
-    localStorage.setItem('i18nextLng', lng);
-  };
-
-  const navLinks = [
-    { to: "/", label: t('header.home'), icon: Home },
-    { to: "/videos", label: t('header.videos'), icon: ListVideo },
-    { to: "/playlists", label: t('header.playlists'), icon: ListVideo },
-    { to: "/facodi", label: t('header.facodi'), icon: GraduationCap },
-    { to: "/curadoria", label: t('header.curation'), icon: Sparkles },
-    { to: "/community", label: t('footer.community'), icon: Users },
-    { to: "/about", label: t('footer.about'), icon: Info },
-    { to: "/rules", label: t('footer.rules'), icon: BookOpen },
-    { to: "/contact", label: t('footer.contact'), icon: Mail },
-    { to: "/faq", label: t('footer.faq'), icon: HelpCircle },
-    { to: "/privacy", label: t('footer.privacy'), icon: ShieldCheck },
-    { to: "/terms", label: t('footer.terms'), icon: Scale },
-    { to: "/cookies", label: t('footer.cookies'), icon: Cookie },
-  ];
 
   return (
     <div className="flex flex-col flex-1 h-full overflow-hidden">
@@ -89,7 +71,7 @@ export const MobileNav: React.FC<MobileNavProps> = ({
               {t('footer.navigation')}
             </p>
             <div className="grid gap-1">
-              {navLinks.map((link) => (
+              {mobileNavigationItems.map((link) => (
                 <NavLink
                   key={link.to}
                   to={link.to}
@@ -98,7 +80,7 @@ export const MobileNav: React.FC<MobileNavProps> = ({
                   onClick={onClose}
                 >
                   <link.icon className="h-5 w-5" />
-                  <span className="text-sm">{link.label}</span>
+                  <span className="text-sm">{t(link.labelKey)}</span>
                 </NavLink>
               ))}
             </div>
@@ -170,6 +152,15 @@ export const MobileNav: React.FC<MobileNavProps> = ({
                       {unreadNotificationsCount > 99 ? '99+' : unreadNotificationsCount}
                     </span>
                   )}
+                </NavLink>
+                <NavLink
+                  to="/profile/edit"
+                  className="flex items-center gap-3 px-4 py-3 text-muted-foreground hover:text-foreground hover:bg-muted/50 rounded-2xl transition-colors duration-150"
+                  activeClassName="bg-primary/8 text-foreground font-medium"
+                  onClick={onClose}
+                >
+                  <Settings className="h-5 w-5" />
+                  <span className="text-sm">{t('header.editProfile')}</span>
                 </NavLink>
                 <NavLink
                   to="/account/settings"
@@ -249,18 +240,12 @@ export const MobileNav: React.FC<MobileNavProps> = ({
             <Label htmlFor="mobile-language-switcher" className="text-[10px] font-bold text-muted-foreground uppercase tracking-[0.2em] opacity-70">
               {t('header.languageLabel')}
             </Label>
-            <Select value={i18n.language} onValueChange={changeLanguage}>
-              <SelectTrigger id="mobile-language-switcher" className="w-full h-12 bg-muted/50 border-transparent focus:ring-primary/30 rounded-2xl shadow-sm">
-                <Globe className="w-5 h-5 mr-2 text-muted-foreground" />
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent className="rounded-2xl border-border/50 elevation-dialog">
-                <SelectItem value="pt" className="rounded-xl">Português (PT)</SelectItem>
-                <SelectItem value="en" className="rounded-xl">English (EN)</SelectItem>
-                <SelectItem value="es" className="rounded-xl">Español (ES)</SelectItem>
-                <SelectItem value="fr" className="rounded-xl">Français (FR)</SelectItem>
-              </SelectContent>
-            </Select>
+            {languageSwitcher}
+
+            <div className="flex items-center justify-between rounded-2xl bg-muted/40 px-4 py-3">
+              <span className="text-sm font-medium text-muted-foreground">{t('header.switchToDark')}</span>
+              {themeToggle}
+            </div>
           </div>
         </div>
       </ScrollArea>

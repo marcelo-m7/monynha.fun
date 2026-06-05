@@ -1,0 +1,33 @@
+import { defineConfig, devices } from '@playwright/test';
+
+const port = Number(process.env.PLAYWRIGHT_PORT ?? 5177);
+const baseURL = process.env.PLAYWRIGHT_BASE_URL ?? `http://127.0.0.1:${port}`;
+
+export default defineConfig({
+  testDir: './e2e',
+  timeout: 30_000,
+  expect: {
+    timeout: 7_500,
+  },
+  outputDir: 'test-results/playwright',
+  fullyParallel: true,
+  reporter: [['list'], ['html', { open: 'never' }]],
+  use: {
+    baseURL,
+    trace: 'on-first-retry',
+    screenshot: 'only-on-failure',
+    serviceWorkers: 'block',
+  },
+  webServer: {
+    command: `pnpm dev -- --host 127.0.0.1 --port ${port}`,
+    url: baseURL,
+    reuseExistingServer: true,
+    timeout: 120_000,
+  },
+  projects: [
+    {
+      name: 'chromium',
+      use: { ...devices['Desktop Chrome'] },
+    },
+  ],
+});

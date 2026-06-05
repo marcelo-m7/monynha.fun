@@ -13,6 +13,6 @@ export default defineConfig({
     environment: 'jsdom',
     globals: true,
     setupFiles: ['src/shared/test/setup.ts'],
-    exclude: [...configDefaults.exclude, 'supabase/functions/**/*.test.ts'],
+    exclude: [...configDefaults.exclude, 'e2e/**', 'supabase/functions/**/*.test.ts'],
   },
 });
