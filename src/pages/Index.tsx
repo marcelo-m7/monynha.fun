@@ -1,25 +1,38 @@
-import { ArrowRight, BookOpen, BrainCircuit, Send, ShieldCheck, Sparkles, Users } from 'lucide-react';
+import { ArrowRight, BookOpen, Radio, Send, ShieldCheck, Users } from 'lucide-react';
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
+import type { HomeHeroVideo } from '@/entities/home/home.types';
+import type { VideoWithCategory } from '@/entities/video/video.types';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { MainLayout } from '@/components/layout/MainLayout';
 import {
   CategorySwatchCard,
   CtaBand,
+  CurationPipeline,
+  LearningPathRail,
   PageHero,
   PlaylistShowcaseCard,
   SectionHeader,
+  VideoCarouselRail,
   VideoShowcaseCard,
 } from '@/components/showcase';
 import { useHomeExhibition } from '@/features/home/useHomeExhibition';
+import { useFeaturedVideos, useRecentVideos } from '@/features/videos/queries/useVideos';
 
 const metricKeys = [
   'videos_total',
   'playlists_total',
   'categories_total',
   'videos_with_summaries',
+] as const;
+
+const liveSignalKeys = [
+  'recent_submissions',
+  'with_summaries',
+  'with_tags',
+  'transcripts_completed',
 ] as const;
 
 const ctaCards = [
@@ -40,13 +53,146 @@ const ctaCards = [
   },
 ] as const;
 
+const DEFAULT_RAIL_LIMIT = 12;
+
+function mapVideoToShowcase(video: VideoWithCategory): HomeHeroVideo {
+  return {
+    id: video.id,
+    youtube_id: video.youtube_id,
+    title: video.enrichment?.optimized_title || video.title,
+    channel_name: video.channel_name,
+    thumbnail_url: video.thumbnail_url,
+    language: video.transcriptLanguage || video.language || 'N/A',
+    duration_seconds: video.duration_seconds,
+    view_count: video.view_count,
+    favorites_count: video.favorites_count,
+    playlist_add_count: video.playlist_add_count,
+    category_name: video.category?.name || null,
+    category_slug: video.category?.slug || null,
+    category_color: video.category?.color || null,
+    summary: video.enrichment?.short_summary || video.transcriptSummary || null,
+    semantic_tags: video.enrichment?.semantic_tags || null,
+  };
+}
+
+function dedupeVideos(videos: HomeHeroVideo[]) {
+  const seen = new Set<string>();
+  return videos.filter((video) => {
+    if (seen.has(video.id)) return false;
+    seen.add(video.id);
+    return true;
+  });
+}
+
+function pickVideos(primary: HomeHeroVideo[], fallback: HomeHeroVideo[], limit = DEFAULT_RAIL_LIMIT) {
+  const merged = dedupeVideos([...primary, ...fallback]);
+  return merged.slice(0, limit);
+}
+
 const Index = () => {
   const { i18n, t } = useTranslation();
   const navigate = useNavigate();
   const { data: home, isLoading, isError } = useHomeExhibition();
+  const { data: featuredVideosData = [], isLoading: isFeaturedLoading } = useFeaturedVideos(24, 0);
+  const { data: recentVideosData = [], isLoading: isRecentLoading } = useRecentVideos(24);
 
   const heroFeature = home?.hero_videos[0];
-  const heroTiles = useMemo(() => home?.hero_videos.slice(1, 7) ?? [], [home?.hero_videos]);
+  const heroTiles = useMemo(() => home?.hero_videos.slice(1, 4) ?? [], [home?.hero_videos]);
+  const featuredVideos = useMemo(() => featuredVideosData.map(mapVideoToShowcase), [featuredVideosData]);
+  const recentVideos = useMemo(() => recentVideosData.map(mapVideoToShowcase), [recentVideosData]);
+  const homeVideos = useMemo(() => home?.hero_videos ?? [], [home?.hero_videos]);
+  const allRailsPool = useMemo(
+    () => dedupeVideos([...homeVideos, ...featuredVideos, ...recentVideos]),
+    [homeVideos, featuredVideos, recentVideos],
+  );
+  const railsLoading = isLoading || isFeaturedLoading || isRecentLoading;
+
+  const videoRails = useMemo(() => {
+    const withSummaries = allRailsPool.filter((video) => !!video.summary);
+    const quickLessons = allRailsPool
+      .filter((video) => !!video.duration_seconds && (video.duration_seconds || 0) <= 900)
+      .sort((a, b) => (a.duration_seconds || 0) - (b.duration_seconds || 0));
+    const mostViewed = [...allRailsPool].sort((a, b) => b.view_count - a.view_count);
+    const communityFavorites = [...allRailsPool].sort(
+      (a, b) => b.favorites_count + b.playlist_add_count - (a.favorites_count + a.playlist_add_count),
+    );
+
+    return [
+      {
+        key: 'trendingNow',
+        title: t('homeExhibition.videoRails.trendingNow.title'),
+        description: t('homeExhibition.videoRails.trendingNow.description'),
+        videos: pickVideos(featuredVideos, allRailsPool),
+        variant: 'dark' as const,
+      },
+      {
+        key: 'freshDrops',
+        title: t('homeExhibition.videoRails.freshDrops.title'),
+        description: t('homeExhibition.videoRails.freshDrops.description'),
+        videos: pickVideos(recentVideos, allRailsPool),
+        variant: 'light' as const,
+      },
+      {
+        key: 'mostViewed',
+        title: t('homeExhibition.videoRails.mostViewed.title'),
+        description: t('homeExhibition.videoRails.mostViewed.description'),
+        videos: pickVideos(mostViewed, allRailsPool),
+        variant: 'dark' as const,
+      },
+      {
+        key: 'communityPicks',
+        title: t('homeExhibition.videoRails.communityPicks.title'),
+        description: t('homeExhibition.videoRails.communityPicks.description'),
+        videos: pickVideos(communityFavorites, allRailsPool),
+        variant: 'light' as const,
+      },
+      {
+        key: 'withSummaries',
+        title: t('homeExhibition.videoRails.withSummaries.title'),
+        description: t('homeExhibition.videoRails.withSummaries.description'),
+        videos: pickVideos(withSummaries, allRailsPool),
+        variant: 'dark' as const,
+      },
+      {
+        key: 'quickLessons',
+        title: t('homeExhibition.videoRails.quickLessons.title'),
+        description: t('homeExhibition.videoRails.quickLessons.description'),
+        videos: pickVideos(quickLessons, allRailsPool),
+        variant: 'light' as const,
+      },
+    ];
+  }, [allRailsPool, featuredVideos, recentVideos, t]);
+
+  const learningRails = useMemo(() => {
+    const facodi = home?.facodi_highlights ?? [];
+    const featured = home?.featured_playlists ?? [];
+    return [
+      {
+        key: 'facodi',
+        label: 'FACODI',
+        accent: 'facodi' as const,
+        title: t('homeExhibition.learningRails.facodi.title'),
+        description: t('homeExhibition.learningRails.facodi.description'),
+        playlists: facodi.slice(0, 4),
+      },
+      {
+        key: 'lesti',
+        label: 'LESTI',
+        accent: 'lesti' as const,
+        title: t('homeExhibition.learningRails.lesti.title'),
+        description: t('homeExhibition.learningRails.lesti.description'),
+        playlists: facodi.slice(4, 8).length ? facodi.slice(4, 8) : facodi.slice(0, 4),
+      },
+      {
+        key: 'open',
+        label: 'O2',
+        accent: 'open' as const,
+        title: t('homeExhibition.learningRails.open.title'),
+        description: t('homeExhibition.learningRails.open.description'),
+        playlists: featured.slice(0, 4),
+      },
+    ].filter((rail) => rail.playlists.length > 0);
+  }, [home?.facodi_highlights, home?.featured_playlists, t]);
   const formatNumber = useMemo(
     () => new Intl.NumberFormat(i18n.language || 'pt-PT').format,
     [i18n.language],
@@ -55,7 +201,9 @@ const Index = () => {
   return (
     <MainLayout>
       <PageHero
-        title={t('homeExhibition.hero.title')}
+        className="overflow-x-clip"
+        contentClassName="lg:max-w-4xl"
+        title={t('homeExhibition.hero.monynhaTitle')}
         description={t('homeExhibition.hero.description')}
         actions={
           <>
@@ -75,44 +223,90 @@ const Index = () => {
           </>
         }
         aside={
-          <div className="grid gap-4 lg:grid-cols-[1.15fr_0.85fr]">
+          <div className="grid gap-3 lg:ml-auto lg:grid-cols-[minmax(0,1fr)_14rem] lg:items-start xl:grid-cols-[minmax(0,1fr)_15rem]">
             {isLoading ? (
               <>
-                <Skeleton className="aspect-[16/12] border-2 border-border" />
-                <Skeleton className="min-h-80 border-2 border-border" />
+                <Skeleton className="aspect-[4/5] border-2 border-border bg-muted/60" />
+                <div className="border-2 border-border bg-black p-2">
+                  <Skeleton className="mb-2 h-4 w-24 bg-white/20" />
+                  <div className="space-y-2">
+                    {Array.from({ length: 3 }).map((_, index) => (
+                      <Skeleton key={index} className="aspect-video border border-white/30 bg-white/10" />
+                    ))}
+                  </div>
+                </div>
               </>
             ) : heroFeature ? (
               <>
-                <VideoShowcaseCard video={heroFeature} variant="feature" className="shadow-[10px_10px_0_#000]" />
-                <div className="grid gap-3 border-2 border-border bg-black p-3 text-white shadow-[10px_10px_0_#efff00]">
-                  <div className="flex items-center justify-between text-[0.65rem] font-black uppercase text-white/70">
-                    <span>{t('homeExhibition.hero.railTitle')}</span>
-                    <Sparkles className="h-4 w-4 text-[#efff00]" />
+                <VideoShowcaseCard
+                  video={heroFeature}
+                  variant="feature"
+                  className="border-white/40 bg-black text-white hover:border-[#efff00]"
+                />
+                <div className="border-2 border-white/40 bg-black p-2 shadow-[8px_8px_0_#efff00]">
+                  <p className="mb-2 px-1 text-[0.62rem] font-black uppercase text-white/70">{t('homeExhibition.hero.railTitle')}</p>
+                  <div className="space-y-2">
+                    {heroTiles.map((video) => (
+                      <VideoShowcaseCard
+                        key={video.id}
+                        video={video}
+                        variant="tile"
+                        className="border-white/40 bg-black text-white hover:border-[#efff00] [&_h3]:line-clamp-2 [&_h3]:text-xs [&_p]:hidden [&_.text-muted-foreground]:hidden"
+                      />
+                    ))}
                   </div>
-                  {heroTiles.slice(0, 3).map((video) => (
-                    <VideoShowcaseCard key={video.id} video={video} variant="row" className="border-white/30 bg-black text-white hover:border-[#efff00]" />
-                  ))}
                 </div>
               </>
             ) : (
-              <div className="border-2 border-border p-8 text-muted-foreground lg:col-span-2">{t('homeExhibition.empty.hero')}</div>
+              <div className="border-2 border-white/30 p-8 text-white/70 lg:col-span-2">{t('homeExhibition.empty.hero')}</div>
             )}
           </div>
         }
       />
+
+      <section className="border-y-2 border-border bg-black py-5 text-white">
+        <div className="container grid gap-4 md:grid-cols-[auto_repeat(4,1fr)] md:items-center">
+          <div className="animate-signal-pulse inline-flex w-fit items-center gap-2 bg-[#efff00] px-3 py-2 text-xs font-black uppercase text-black">
+            <Radio className="h-4 w-4" />
+            {t('homeExhibition.live.label')}
+          </div>
+          {liveSignalKeys.map((key) => (
+            <div key={key} className="flex items-end justify-between gap-4 border-white/20 py-1 md:border-r md:pr-5 last:md:border-r-0">
+              <span className="text-3xl font-black leading-none">{formatNumber(home?.curation_signals[key] ?? 0)}</span>
+              <span className="max-w-36 text-right text-[0.65rem] font-black uppercase text-white/70">
+                {t(`homeExhibition.curation.signals.${key}`)}
+              </span>
+            </div>
+          ))}
+        </div>
+      </section>
 
       <section className="border-b-2 border-border bg-[#efff00] py-6 text-black">
         <div className="container grid gap-4 md:grid-cols-4">
           {metricKeys.map((key) => (
             <div key={key} className="flex items-end justify-between gap-4 border-black/30 py-2 md:border-r md:pr-6 last:md:border-r-0">
               <span className="text-3xl font-black leading-none">{formatNumber(home?.metrics[key] ?? 0)}</span>
-              <span className="max-w-32 text-right text-[0.65rem] font-black uppercase">
-                {t(`homeExhibition.metrics.${key}`)}
-              </span>
+              <span className="max-w-32 text-right text-[0.65rem] font-black uppercase">{t(`homeExhibition.metrics.${key}`)}</span>
             </div>
           ))}
         </div>
       </section>
+
+      <div className="space-y-0">
+        {videoRails.map((rail) => (
+          <VideoCarouselRail
+            key={rail.key}
+            title={rail.title}
+            description={rail.description}
+            videos={rail.videos}
+            isLoading={railsLoading}
+            emptyMessage={t('homeExhibition.empty.hero')}
+            actionLabel={t('homeExhibition.actions.viewAllVideos')}
+            onAction={() => navigate('/videos')}
+            variant={rail.variant}
+          />
+        ))}
+      </div>
 
       <section className="bg-background py-16 text-foreground md:py-20">
         <div className="container">
@@ -174,70 +368,48 @@ const Index = () => {
         </div>
       </section>
 
-      <section className="bg-background py-16 text-foreground md:py-20">
-        <div className="container grid gap-10 lg:grid-cols-[0.8fr_1.2fr]">
-          <div>
-            <SectionHeader
-              align="start"
-              title={t('homeExhibition.facodi.title')}
-              description={t('homeExhibition.facodi.description')}
-            />
-            <Button onClick={() => navigate('/playlists?course=LESTI')}>
-              {t('homeExhibition.facodi.cta')}
-              <ArrowRight className="h-4 w-4" />
-            </Button>
-          </div>
-          {isLoading ? (
-            <div className="grid gap-4 sm:grid-cols-2">
-              {Array.from({ length: 4 }).map((_, index) => (
-                <Skeleton key={index} className="h-56 border-2 border-border" />
-              ))}
-            </div>
-          ) : home?.facodi_highlights.length ? (
-            <div className="grid gap-4 sm:grid-cols-2">
-              {home.facodi_highlights.map((playlist) => (
-                <PlaylistShowcaseCard key={playlist.playlist_id} playlist={playlist} compact />
-              ))}
-            </div>
-          ) : (
-            <div className="border-2 border-border p-8 text-muted-foreground">{t('homeExhibition.empty.facodi')}</div>
-          )}
+      <section className="border-y-2 border-border bg-background py-16 text-foreground md:py-20">
+        <div className="container">
+          <SectionHeader
+            title={t('homeExhibition.curation.title')}
+            description={t('homeExhibition.curation.description')}
+            action={
+              <Button variant="outline" onClick={() => navigate('/curadoria')}>
+                {t('homeExhibition.curation.cta')}
+                <ArrowRight className="h-4 w-4" />
+              </Button>
+            }
+          />
+          <CurationPipeline />
         </div>
       </section>
 
-      <section className="border-y-2 border-border bg-background py-16 text-foreground md:py-20">
-        <div className="container grid gap-10 lg:grid-cols-[1fr_1fr] lg:items-start">
-          <div>
+      {learningRails.length > 0 && (
+        <section className="bg-background py-16 text-foreground md:py-20">
+          <div className="container space-y-5">
             <SectionHeader
-              align="start"
-              title={t('homeExhibition.curation.title')}
-              description={t('homeExhibition.curation.description')}
+              title={t('homeExhibition.learningRails.title')}
+              description={t('homeExhibition.learningRails.description')}
+              action={
+                <Button variant="outline" onClick={() => navigate('/facodi')}>
+                  {t('homeExhibition.learningRails.cta')}
+                  <ArrowRight className="h-4 w-4" />
+                </Button>
+              }
             />
-            <div className="grid gap-4 sm:grid-cols-2">
-              {(['with_summaries', 'with_tags', 'transcripts_completed', 'recent_submissions'] as const).map((key) => (
-                <div key={key} className="border-2 border-border p-5">
-                  <p className="text-4xl font-black leading-none">{formatNumber(home?.curation_signals[key] ?? 0)}</p>
-                  <p className="mt-3 text-xs font-black uppercase text-muted-foreground">
-                    {t(`homeExhibition.curation.signals.${key}`)}
-                  </p>
-                </div>
-              ))}
-            </div>
+            {learningRails.map((rail) => (
+              <LearningPathRail
+                key={rail.key}
+                label={rail.label}
+                title={rail.title}
+                description={rail.description}
+                accent={rail.accent}
+                playlists={rail.playlists}
+              />
+            ))}
           </div>
-          <div className="border-2 border-border bg-[#efff00] p-5 text-black">
-            <BrainCircuit className="mb-8 h-10 w-10" />
-            <h3 className="text-3xl font-black leading-none">{t('homeExhibition.curation.panelTitle')}</h3>
-            <div className="mt-8 space-y-4">
-              {(['summary', 'tags', 'review', 'paths'] as const).map((key) => (
-                <div key={key} className="border-b-2 border-black pb-4">
-                  <p className="text-sm font-black uppercase">{t(`homeExhibition.curation.steps.${key}.title`)}</p>
-                  <p className="mt-2 text-sm font-semibold leading-6 text-black/75">{t(`homeExhibition.curation.steps.${key}.description`)}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      </section>
+        </section>
+      )}
 
       <section className="bg-background py-16 md:py-20">
         <div className="container">

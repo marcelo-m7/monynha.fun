@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useNavigate, useLocation, useSearchParams } from 'react-router-dom';
+import { Link, useNavigate, useLocation, useSearchParams } from 'react-router-dom';
 import { useAuth } from '@/features/auth/useAuth';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -409,7 +409,15 @@ export default function Auth() {
 
           {/* Tip */}
           <p className="text-center text-xs text-muted-foreground mt-6">
-            {t('auth.termsAgreement')}
+            {t('auth.termsAgreementPrefix')}{' '}
+            <Link to="/terms" className="font-semibold text-foreground underline hover:text-primary">
+              {t('footer.terms')}
+            </Link>{' '}
+            {t('auth.termsAgreementAnd')}{' '}
+            <Link to="/privacy" className="font-semibold text-foreground underline hover:text-primary">
+              {t('footer.privacy')}
+            </Link>
+            .
           </p>
         </div>
       </main>

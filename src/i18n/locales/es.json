@@ -38,7 +38,9 @@
     "community": "Comunidad",
     "editorialPortal": "Portal Editorial",
     "messages": "Mensajes",
-    "notifications": "Notificaciones"
+    "notifications": "Notificaciones",
+    "facodi": "FACODI",
+    "curation": "Curaduría"
   },
   "footer": {
     "description": "Tube O2 enriquece videos de YouTube y los organiza en playlists educativas para aprender más rápido.",
@@ -53,7 +55,44 @@
     "contact": "Contacto",
     "faq": "Preguntas Frecuentes",
     "madeWithLove": "Hecho con",
-    "byOpen2Technology": "por Open 2 Technology"
+    "byOpen2Technology": "por Open 2 Technology",
+    "monynhaStatement": "Curaduría humana. Análisis profundo. Aprendizaje con dirección.",
+    "columns": {
+      "explore": {
+        "title": "Explorar",
+        "allPaths": "Todos los caminos",
+        "facodi": "FACODI",
+        "lesti": "LESTI",
+        "byTheme": "Por tema",
+        "curation": "Cómo curamos"
+      },
+      "about": {
+        "title": "Sobre",
+        "howItWorks": "Cómo funciona",
+        "whoWeAre": "Quiénes somos",
+        "editorial": "Editorial",
+        "rules": "Metodología",
+        "faq": "Preguntas frecuentes"
+      },
+      "contribute": {
+        "title": "Contribuir",
+        "submit": "Enviar un enlace",
+        "editor": "Ser curador",
+        "community": "Comunidad",
+        "contact": "Contacto"
+      }
+    },
+    "live": {
+      "title": "En vivo en Tube O2"
+    },
+    "finalCta": {
+      "title": "¿Tienes un enlace con valor?",
+      "description": "Envíalo. Hacemos el resto con cuidado y criterio.",
+      "action": "Enviar un enlace ahora"
+    },
+    "privacy": "Privacidad",
+    "terms": "Términos",
+    "cookies": "Cookies"
   },
   "labels": {
     "featured": "Destacado"
@@ -219,7 +258,9 @@
       "confirmEmail": "Verifica tu correo electrónico para confirmar el registro",
       "passwordResetEmailSent": "¡Correo de restablecimiento de contraseña enviado!",
       "checkEmailForReset": "Revisa tu bandeja de entrada para el enlace de restablecimiento de contraseña."
-    }
+    },
+    "termsAgreementPrefix": "Al continuar, aceptas los",
+    "termsAgreementAnd": "y la"
   },
   "account": {
     "settings": {
@@ -685,7 +726,8 @@
       "description": "Tube O2 organiza vídeos públicos, playlists y rutas curriculares con curaduría humana y apoyo de IA para convertir el descubrimiento en estudio práctico.",
       "primaryCta": "Explorar vídeos",
       "secondaryCta": "Enviar vídeo",
-      "railTitle": "Destacados ahora"
+      "railTitle": "Destacados ahora",
+      "monynhaTitle": "Los buenos videos no se pierden en el algoritmo"
     },
     "empty": {
       "hero": "La curaduría pública aún no devolvió vídeos.",
@@ -745,7 +787,8 @@
           "title": "Caminos de estudio",
           "description": "Playlists y rutas FACODI transforman descubrimiento en progreso."
         }
-      }
+      },
+      "cta": "Ver cómo funciona"
     },
     "cta": {
       "title": "Entra por la puerta correcta",
@@ -771,7 +814,53 @@
       "submit": "Enviar vídeo",
       "editor": "Quiero curar"
     },
-    "error": "No fue posible cargar la curaduría pública ahora. Mostramos la estructura de la página mientras intentamos nuevamente."
+    "error": "No fue posible cargar la curaduría pública ahora. Mostramos la estructura de la página mientras intentamos nuevamente.",
+    "live": {
+      "label": "En vivo"
+    },
+    "learningRails": {
+      "title": "Caminos de aprendizaje",
+      "description": "Rutas con miniaturas reales, contexto curricular y secuencia para estudiar sin perderse en el feed.",
+      "cta": "Abrir FACODI",
+      "facodi": {
+        "title": "Fundamentos académicos para pensar mejor",
+        "description": "Rutas FACODI con curaduría, curso y unidad en un solo lugar."
+      },
+      "lesti": {
+        "title": "Tecnología con propósito y visión de futuro",
+        "description": "Caminos LESTI para programar, analizar datos y construir sistemas con intención."
+      },
+      "open": {
+        "title": "Colecciones abiertas de la comunidad",
+        "description": "Buenos enlaces se convierten en rutas públicas, con resumen y categoría antes del play."
+      }
+    },
+    "videoRails": {
+      "trendingNow": {
+        "title": "En tendencia ahora",
+        "description": "Videos destacados con mayor relevancia para descubrir en este momento."
+      },
+      "freshDrops": {
+        "title": "Novedades",
+        "description": "Contenido recientemente publicado que llega al catalogo publico."
+      },
+      "mostViewed": {
+        "title": "Mas vistos",
+        "description": "Los videos que concentran mas visualizaciones de la comunidad."
+      },
+      "communityPicks": {
+        "title": "Elegidos por la comunidad",
+        "description": "Videos con mas favoritos y guardados en playlists de aprendizaje."
+      },
+      "withSummaries": {
+        "title": "Con resumen listo",
+        "description": "Videos que ya tienen resumen contextual para decidir antes del play."
+      },
+      "quickLessons": {
+        "title": "Lecciones rapidas",
+        "description": "Contenido corto para sesiones de estudio practicas y objetivas."
+      }
+    }
   },
   "notFound": {
     "title": "404",
@@ -1075,7 +1164,8 @@
         "motivationPlaceholder": "Comparte tu motivación y experiencia editorial (opcional)",
         "portfolioLinksLabel": "Enlaces de portafolio",
         "portfolioLinksPlaceholder": "Un enlace por línea (opcional)",
-        "consentLabel": "Acepto la política de privacidad y autorizo el tratamiento de mis datos para esta solicitud."
+        "consentLabel": "Acepto la política de privacidad y autorizo el tratamiento de mis datos para esta solicitud.",
+        "consentPrefix": "Acepto la"
       },
       "submitButton": "Enviar solicitud",
       "successTitle": "Solicitud recibida",
@@ -1134,5 +1224,249 @@
     "follow": "Follow",
     "unfollow": "Unfollow",
     "sendMessage": "Message"
+  },
+  "curationPage": {
+    "hero": {
+      "title": "Del enlace suelto al camino con sentido",
+      "description": "En Tube O2, cada video pasa por curaduría rápida, puede recibir análisis profundo y queda listo para revisión humana sin bloquear el envío.",
+      "primaryCta": "Enviar un enlace",
+      "secondaryCta": "Quiero curar",
+      "panelTitle": "Llegando a la mesa"
+    },
+    "pipeline": {
+      "title": "Del enlace al camino",
+      "description": "Un proceso editorial humano para convertir video en aprendizaje real.",
+      "steps": {
+        "link": {
+          "title": "Enlace recibido",
+          "description": "Recibimos el video y validamos si puede convertirse en material útil."
+        },
+        "fast": {
+          "title": "Curaduría rápida",
+          "description": "Resumen, idioma, tags y categoría sin depender de IA externa."
+        },
+        "category": {
+          "title": "Categorización",
+          "description": "El contenido gana tema, contexto y lugar para ser encontrado."
+        },
+        "deep": {
+          "title": "Análisis profundo",
+          "description": "La etapa v2 corre después, con calma, sin bloquear la publicación."
+        },
+        "review": {
+          "title": "Revisión editorial",
+          "description": "Personas ajustan resumen, categoría, tags y encaje curricular."
+        },
+        "path": {
+          "title": "Camino de aprendizaje",
+          "description": "El video entra en rutas y colecciones cuando realmente encaja."
+        }
+      }
+    },
+    "modes": {
+      "fast": {
+        "title": "Curaduría rápida completada",
+        "description": "El camino de producción es ligero, confiable y suficiente para publicar con categoría y resumen."
+      },
+      "deep": {
+        "title": "Análisis avanzado sin prisa",
+        "description": "El análisis profundo es asíncrono. Mejora el contenido después sin hacer esperar."
+      },
+      "editorial": {
+        "title": "Las personas dan el acabado",
+        "description": "Editores verifican contexto, tono, relevancia y lugar en playlists."
+      }
+    },
+    "editorial": {
+      "title": "Mesa editorial",
+      "description": "Una buena curaduría no es solo publicar. Revisa categoría, resumen, tags y camino con criterio.",
+      "cta": "Postularme como editor",
+      "checklist": {
+        "category": "La categoría tiene sentido",
+        "summary": "El resumen ayuda antes del play",
+        "tags": "Los tags conectan ideas",
+        "playlist": "La playlist encaja de verdad"
+      }
+    }
+  },
+  "facodiPage": {
+    "hero": {
+      "title": "FACODI muestra Tube O2 en modo estudio serio",
+      "description": "Las rutas LESTI lo prueban: videos dispersos de YouTube pueden convertirse en caminos curriculares con unidad, secuencia e intención.",
+      "primaryCta": "Ver rutas LESTI",
+      "secondaryCta": "Enviar referencia"
+    },
+    "metrics": {
+      "curricular": "Playlists curriculares",
+      "publicPaths": "Caminos públicos",
+      "videos": "Videos catalogados"
+    },
+    "rails": {
+      "title": "Rutas con dirección",
+      "description": "Caminos FACODI/LESTI organizados por curso, unidad y contexto.",
+      "facodi": {
+        "title": "Fundamentos FACODI",
+        "description": "Base académica para aprender con secuencia y cuidado."
+      },
+      "lesti": {
+        "title": "LESTI en práctica",
+        "description": "Tecnología, datos y sistemas en rutas con mirada de proyecto."
+      }
+    },
+    "featured": {
+      "title": "También en el acervo abierto",
+      "description": "Además del currículo, la comunidad organiza colecciones públicas con buenos videos y contexto."
+    },
+    "categories": {
+      "title": "Temas que alimentan las rutas",
+      "description": "Las categorías ayudan a cada video a encontrar su estante correcto."
+    }
+  },
+  "legal": {
+    "eyebrow": "Transparencia y confianza",
+    "lastUpdated": "Última actualización",
+    "reviewNotice": "Esta página documenta las prácticas actuales de Tube O2 y debe revisarse a medida que evolucione el producto.",
+    "summaryTitle": "Resumen rápido",
+    "contactTitle": "Preguntas o solicitudes",
+    "contactDescription": "Para solicitar información, corrección, eliminación o aclaraciones, usa el canal oficial de contacto.",
+    "contactAction": "Contactar al equipo"
+  },
+  "privacy": {
+    "title": "Política de Privacidad",
+    "description": "Cómo Tube O2 recopila, usa, protege y permite controlar los datos personales utilizados en la plataforma.",
+    "updatedAt": "4 de junio de 2026",
+    "metaImageAlt": "Política de Privacidad de Tube O2",
+    "highlights": [
+      "Recopilamos solo datos necesarios para cuentas, curaduría, seguridad y funciones comunitarias.",
+      "Los datos de autenticación y perfiles se operan con Supabase y se protegen mediante controles de acceso.",
+      "Puedes solicitar acceso, corrección o eliminación por el canal de contacto."
+    ],
+    "sections": [
+      {
+        "title": "Datos que recopilamos",
+        "body": "Recopilamos información que proporcionas y datos técnicos necesarios para mantener la plataforma segura y funcional.",
+        "items": [
+          "Datos de cuenta, como email e identificadores de autenticación.",
+          "Datos de perfil, como nombre público, usuario, bio y avatar.",
+          "Videos enviados, playlists, favoritos, comentarios y candidaturas editoriales.",
+          "Señales técnicas básicas, como idioma, preferencias visuales, sesión y eventos de seguridad."
+        ]
+      },
+      {
+        "title": "Cómo usamos los datos",
+        "body": "Usamos los datos para ofrecer Tube O2, organizar contenido educativo y proteger la comunidad.",
+        "items": [
+          "Autenticar usuarios y mantener sesiones seguras.",
+          "Mostrar perfiles, contribuciones, playlists e interacciones públicas elegidas por el usuario.",
+          "Procesar videos enviados, metadatos y señales de curaduría.",
+          "Responder soporte, moderar abusos y cumplir obligaciones aplicables."
+        ]
+      },
+      {
+        "title": "Compartición y proveedores",
+        "body": "No vendemos datos personales. Podemos usar proveedores técnicos para alojamiento, autenticación, base de datos, email y enriquecimiento de contenido.",
+        "items": [
+          "Supabase para base de datos, autenticación y funciones backend.",
+          "Servicios de IA y email solo cuando son necesarios para procesar contenido o comunicaciones.",
+          "YouTube/Google cuando envías o accedes a contenido alojado en esas plataformas."
+        ]
+      },
+      {
+        "title": "Tus derechos",
+        "body": "Puedes solicitar acceso, corrección, portabilidad, limitación o eliminación de datos personales, sujeto a obligaciones legales y antiabuso.",
+        "items": [
+          "Usa la página de contacto para solicitudes de privacidad.",
+          "Algunas contribuciones públicas pueden permanecer anonimizadas o agregadas cuando sea necesario para integridad editorial.",
+          "Podemos solicitar verificación de identidad antes de atender solicitudes sensibles."
+        ]
+      }
+    ]
+  },
+  "terms": {
+    "title": "Términos de Uso",
+    "description": "Las reglas esenciales para usar Tube O2, contribuir contenido y participar en la comunidad.",
+    "updatedAt": "4 de junio de 2026",
+    "metaImageAlt": "Términos de Uso de Tube O2",
+    "highlights": [
+      "Usa la plataforma con respeto, buena fe y responsabilidad editorial.",
+      "Envía solo enlaces e información que tengas derecho a compartir.",
+      "Podemos moderar, eliminar o limitar contenido que perjudique a la comunidad."
+    ],
+    "sections": [
+      {
+        "title": "Aceptación",
+        "body": "Al acceder o usar Tube O2, aceptas estos términos, la Política de Privacidad y las reglas de la comunidad.",
+        "items": [
+          "Si no estás de acuerdo, no debes usar áreas autenticadas ni enviar contenido.",
+          "Algunas funciones pueden requerir cuenta, verificación o permisos específicos."
+        ]
+      },
+      {
+        "title": "Uso permitido",
+        "body": "Tube O2 existe para descubrir, curar y organizar videos culturales y educativos.",
+        "items": [
+          "No uses la plataforma para spam, abuso, acoso, fraude, violación de derechos o intentos de eludir seguridad.",
+          "Mantén comentarios, perfiles y envíos alineados con las reglas editoriales.",
+          "Respeta derechos de autor y términos de plataformas externas vinculadas."
+        ]
+      },
+      {
+        "title": "Contenido y contribuciones",
+        "body": "Sigues siendo responsable del contenido que envías, comentas u organizas. Al contribuir, autorizas a Tube O2 a mostrar, clasificar, enriquecer y organizar esa información dentro de la plataforma.",
+        "items": [
+          "Podemos ajustar metadatos, etiquetas y descripciones para mejorar curaduría y calidad.",
+          "Podemos rechazar o eliminar contenido que viole reglas, leyes o criterios editoriales.",
+          "Los enlaces de YouTube siguen sujetos a disponibilidad y políticas de YouTube."
+        ]
+      },
+      {
+        "title": "Disponibilidad y cambios",
+        "body": "La plataforma puede evolucionar, cambiar o estar temporalmente no disponible. Haremos esfuerzos razonables para mantener estabilidad y comunicación clara.",
+        "items": [
+          "Las funciones experimentales pueden cambiar sin aviso previo.",
+          "Podemos actualizar estos términos cuando cambien el producto, los riesgos o las exigencias legales."
+        ]
+      }
+    ]
+  },
+  "cookies": {
+    "title": "Política de Cookies",
+    "description": "Cómo usamos cookies, localStorage y tecnologías similares para sesiones, preferencias y calidad de experiencia.",
+    "updatedAt": "4 de junio de 2026",
+    "metaImageAlt": "Política de Cookies de Tube O2",
+    "highlights": [
+      "Usamos almacenamiento esencial para login, idioma, tema y funcionamiento de la aplicación.",
+      "No dependemos de cookies para vender datos personales.",
+      "Puedes borrar cookies y datos locales en el navegador, pero esto puede cerrar sesiones y reiniciar preferencias."
+    ],
+    "sections": [
+      {
+        "title": "Tecnologías usadas",
+        "body": "Tube O2 puede usar cookies, localStorage, sessionStorage y tokens gestionados por proveedores como Supabase para mantener la app funcionando.",
+        "items": [
+          "Sesión de autenticación y seguridad.",
+          "Preferencias de idioma, tema y estado de interfaz.",
+          "Caché local y datos técnicos para rendimiento."
+        ]
+      },
+      {
+        "title": "Finalidades",
+        "body": "Estas tecnologías ayudan a autenticar usuarios, recordar preferencias y ofrecer una experiencia más rápida y consistente.",
+        "items": [
+          "Mantener tu sesión segura.",
+          "Evitar pedir las mismas preferencias repetidamente.",
+          "Apoyar diagnóstico técnico y prevención de abuso."
+        ]
+      },
+      {
+        "title": "Gestión",
+        "body": "Puedes bloquear o eliminar cookies y datos locales en la configuración del navegador.",
+        "items": [
+          "Bloquear almacenamiento esencial puede impedir el login o funciones autenticadas.",
+          "Al limpiar datos locales, idioma, tema y sesión pueden reiniciarse.",
+          "Si más adelante hay herramientas de consentimiento granular, esta política se actualizará."
+        ]
+      }
+    ]
   }
 }
