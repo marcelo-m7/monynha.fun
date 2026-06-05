@@ -54,7 +54,7 @@ export function SortableVideoItem({
       ref={setNodeRef}
       style={style}
       className={cn(
-        "group flex items-center gap-3 p-3 bg-card border border-border rounded-xl transition-all",
+        "group flex items-center gap-3 p-3 bg-card border border-border rounded-xl transition-[background-color,border-color,box-shadow,opacity,transform] duration-150",
         isDragging && "opacity-50 shadow-lg scale-[1.02]",
         isWatched && "bg-primary/5 border-primary/20"
       )}
@@ -98,7 +98,7 @@ export function SortableVideoItem({
       {/* Thumbnail */}
       <Link
         to={item.video ? getVideoRoute(item.video) : '/videos'}
-        className="relative w-24 h-14 rounded-lg overflow-hidden shrink-0 group-hover:ring-2 ring-primary/50 transition-all"
+        className="relative w-24 h-14 rounded-lg overflow-hidden shrink-0 group-hover:ring-2 ring-primary/50 transition-shadow duration-150"
       >
         <img
           src={item.video?.thumbnail_url || '/placeholder.svg'}

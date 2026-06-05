@@ -61,41 +61,41 @@ export const Header = () => {
         </Link>
 
         {/* Divider */}
-        <div className="hidden md:block h-5 w-px bg-border shrink-0" />
+        <div className="hidden lg:block h-5 w-px bg-border shrink-0" />
 
         {/* Desktop Nav */}
-        <nav className="hidden md:flex items-center gap-1">
+        <nav className="hidden lg:flex items-center gap-1">
           <NavLink
             to="/videos"
-            className="px-3 py-1.5 text-sm font-semibold rounded-md text-muted-foreground hover:text-foreground hover:bg-muted/60 transition-all"
+            className="px-3 py-1.5 text-sm font-semibold rounded-md text-muted-foreground hover:text-foreground hover:bg-muted/60 transition-colors duration-150"
             activeClassName="text-foreground bg-primary/12 hover:bg-primary/16"
           >
             {t('header.videos')}
           </NavLink>
           <NavLink
             to="/playlists"
-            className="px-3 py-1.5 text-sm font-semibold rounded-md text-muted-foreground hover:text-foreground hover:bg-muted/60 transition-all"
+            className="px-3 py-1.5 text-sm font-semibold rounded-md text-muted-foreground hover:text-foreground hover:bg-muted/60 transition-colors duration-150"
             activeClassName="text-foreground bg-primary/12 hover:bg-primary/16"
           >
             {t('header.playlists')}
           </NavLink>
           <NavLink
             to="/facodi"
-            className="px-3 py-1.5 text-sm font-semibold rounded-md text-muted-foreground hover:text-foreground hover:bg-muted/60 transition-all"
+            className="px-3 py-1.5 text-sm font-semibold rounded-md text-muted-foreground hover:text-foreground hover:bg-muted/60 transition-colors duration-150"
             activeClassName="text-foreground bg-primary/12 hover:bg-primary/16"
           >
             {t('header.facodi')}
           </NavLink>
           <NavLink
             to="/curadoria"
-            className="px-3 py-1.5 text-sm font-semibold rounded-md text-muted-foreground hover:text-foreground hover:bg-muted/60 transition-all"
+            className="px-3 py-1.5 text-sm font-semibold rounded-md text-muted-foreground hover:text-foreground hover:bg-muted/60 transition-colors duration-150"
             activeClassName="text-foreground bg-primary/12 hover:bg-primary/16"
           >
             {t('header.curation')}
           </NavLink>
           <NavLink
             to="/community"
-            className="px-3 py-1.5 text-sm font-semibold rounded-md text-muted-foreground hover:text-foreground hover:bg-muted/60 transition-all"
+            className="px-3 py-1.5 text-sm font-semibold rounded-md text-muted-foreground hover:text-foreground hover:bg-muted/60 transition-colors duration-150"
             activeClassName="text-foreground bg-primary/12 hover:bg-primary/16"
           >
             {t('header.community')}
@@ -106,7 +106,7 @@ export const Header = () => {
         <div className="flex-1" />
 
         {/* Desktop Actions */}
-        <div className="hidden md:flex items-center gap-1">
+        <div className="hidden lg:flex items-center gap-1">
           {user && profile ? (
             <>
               {/* Utility icons */}
@@ -165,7 +165,7 @@ export const Header = () => {
               {/* Avatar Dropdown (replaces separate avatar link + gear icon) */}
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <button className="ml-1 h-9 w-9 rounded-full ring-2 ring-transparent hover:ring-primary/40 focus-visible:ring-primary/50 focus-visible:outline-none transition-all">
+                  <button className="ml-1 h-9 w-9 rounded-full ring-2 ring-transparent hover:ring-primary/40 focus-visible:ring-primary/50 focus-visible:outline-none transition-shadow duration-150">
                     <Avatar className="h-9 w-9">
                       <AvatarImage src={profile.avatar_url || undefined} alt={profile.display_name || profile.username || 'User'} />
                       <AvatarFallback className="bg-primary/10 text-primary font-bold text-sm">
@@ -275,7 +275,7 @@ export const Header = () => {
         </div>
 
         {/* Mobile: theme + menu trigger */}
-        <div className="flex md:hidden items-center gap-1">
+        <div className="flex lg:hidden items-center gap-1">
           <ThemeToggle />
           <SheetTrigger asChild>
             <Button

@@ -5,12 +5,12 @@ import { getVideoRoute } from "@/entities/video/video.routes";
 import { formatViewCount } from "@/shared/lib/format";
 import { Play, Eye, Heart, ListPlus } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { useTranslation } from 'react-i18next';
 import { useVideoViewIncrement } from '@/shared/hooks/useVideoViewIncrement';
-import { KeyboardEvent } from "react";
+import { KeyboardEvent, memo, useCallback } from "react";
 import { LazyImage } from "@/shared/components/LazyImage";
 import { SemanticTagBadge } from "./SemanticTagBadge";
 import { EnrichmentIndicator } from "./EnrichmentIndicator";
@@ -22,12 +22,13 @@ interface VideoCardProps {
   variant?: 'default' | 'compact';
 }
 
-export const VideoCard = ({ video, onClick, variant = 'default' }: VideoCardProps) => {
+const VideoCardComponent = ({ video, onClick, variant = 'default' }: VideoCardProps) => {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const { viewCount, showPlus, handleViewIncrement } = useVideoViewIncrement(video.view_count || 0);
+  const hasOptimizedTitleTooltip = !!video.enrichment?.optimized_title && video.enrichment.optimized_title !== video.title;
 
-  const handleClick = () => {
+  const handleClick = useCallback(() => {
     handleViewIncrement(video.id);
 
     if (onClick) {
@@ -35,14 +36,14 @@ export const VideoCard = ({ video, onClick, variant = 'default' }: VideoCardProp
     } else {
       navigate(getVideoRoute(video));
     }
-  };
+  }, [handleViewIncrement, navigate, onClick, video]);
 
-  const handleKeyDown = (event: KeyboardEvent<HTMLElement>) => {
+  const handleKeyDown = useCallback((event: KeyboardEvent<HTMLElement>) => {
     if (event.key === 'Enter' || event.key === ' ') {
       event.preventDefault();
       handleClick();
     }
-  };
+  }, [handleClick]);
 
   return (
     <article
@@ -65,7 +66,7 @@ export const VideoCard = ({ video, onClick, variant = 'default' }: VideoCardProp
         <LazyImage
           src={video.thumbnail_url}
           alt={video.title}
-          className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+          className="w-full h-full object-cover transition-transform duration-200 motion-safe:group-hover:scale-[1.02]"
         />
 
         <div className="absolute left-2 top-2 z-20 flex max-w-[calc(100%-1rem)] flex-wrap items-center gap-1.5">
@@ -95,7 +96,7 @@ export const VideoCard = ({ video, onClick, variant = 'default' }: VideoCardProp
         {/* Overlay on hover */}
         <div className="absolute inset-0 bg-foreground/0 group-hover:bg-foreground/15 transition-colors duration-300 flex items-center justify-center">
           <div className={cn(
-            "bg-primary flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 scale-75 group-hover:scale-100",
+            "bg-primary flex items-center justify-center opacity-0 scale-90 transition-[opacity,transform] duration-150 motion-safe:group-hover:scale-100 group-hover:opacity-100",
             variant === 'default' ? "w-14 h-14" : "w-10 h-10"
           )}>
             <Play className={cn(
@@ -113,8 +114,8 @@ export const VideoCard = ({ video, onClick, variant = 'default' }: VideoCardProp
         "flex flex-col",
         variant === 'default' ? "flex-1 space-y-3 p-4" : "flex-1 space-y-1"
       )}>
-          <TooltipProvider>
-            <Tooltip delayDuration={300}>
+          {hasOptimizedTitleTooltip ? (
+            <Tooltip delayDuration={200}>
               <TooltipTrigger asChild>
                 <h3 className={cn(
                   "font-semibold leading-snug line-clamp-2 group-hover:opacity-75 transition-opacity uppercase tracking-[0.05em]",
@@ -123,14 +124,19 @@ export const VideoCard = ({ video, onClick, variant = 'default' }: VideoCardProp
                   {video.title}
                 </h3>
               </TooltipTrigger>
-              {video.enrichment?.optimized_title && video.enrichment.optimized_title !== video.title && (
-                <TooltipContent side="top" className="max-w-xs">
-                  <p className="text-xs font-semibold mb-1">AI-Optimized Title:</p>
-                  <p className="text-sm">{video.enrichment.optimized_title}</p>
-                </TooltipContent>
-              )}
+              <TooltipContent side="top" className="max-w-xs">
+                <p className="text-xs font-semibold mb-1">AI-Optimized Title:</p>
+                <p className="text-sm">{video.enrichment?.optimized_title}</p>
+              </TooltipContent>
             </Tooltip>
-          </TooltipProvider>
+          ) : (
+            <h3 className={cn(
+              "font-semibold leading-snug line-clamp-2 group-hover:opacity-75 transition-opacity uppercase tracking-[0.05em]",
+              variant === 'default' ? "text-sm" : "text-xs"
+            )}>
+              {video.title}
+            </h3>
+          )}
         
         <p className={cn(
           "text-muted-foreground line-clamp-1",
@@ -184,3 +190,5 @@ export const VideoCard = ({ video, onClick, variant = 'default' }: VideoCardProp
     </article>
   );
 };
+
+export const VideoCard = memo(VideoCardComponent);

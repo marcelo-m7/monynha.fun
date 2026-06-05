@@ -9,7 +9,16 @@ import i18n from '@/i18n/config';
 import { getEnv } from '@/shared/config/env';
 import { ThemeProvider } from 'next-themes';
 
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 60_000,
+      gcTime: 5 * 60_000,
+      refetchOnWindowFocus: false,
+      retry: 1,
+    },
+  },
+});
 
 export function AppProviders({ children }: { children: ReactNode }) {
   getEnv();

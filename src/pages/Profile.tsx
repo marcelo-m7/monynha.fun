@@ -237,7 +237,7 @@ const Profile = () => {
               <Link
                 key={playlist.id}
                 to={`/playlists/${playlist.id}`}
-                className="group bg-card border border-border rounded-2xl p-6 shadow-sm hover:shadow-lg transition-all duration-300 card-hover animate-fade-up"
+                className="group bg-card border border-border rounded-2xl p-6 shadow-sm transition-colors duration-150 card-hover animate-fade-up"
                 style={{ animationDelay: `${index * 0.05}s` }}
               >
                 <div className="flex items-center gap-4 mb-4">

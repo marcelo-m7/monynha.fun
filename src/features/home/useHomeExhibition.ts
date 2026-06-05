@@ -7,5 +7,6 @@ export function useHomeExhibition() {
   return useQuery<HomeExhibition, Error>({
     queryKey: homeKeys.exhibition(),
     queryFn: getHomeExhibition,
+    staleTime: 5 * 60 * 1000,
   });
 }

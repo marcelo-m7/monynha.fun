@@ -5,7 +5,6 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { Skeleton } from "@/components/ui/skeleton";
 import ScrollToTop from "./components/ScrollToTop";
 import { SplashScreen } from "./components/SplashScreen";
-import { CustomCursor } from "./components/CustomCursor";
 import { PageTransition } from "./components/PageTransition";
 
 // Fallback component for Suspense
@@ -58,7 +57,6 @@ const SmartSlugRoute = lazy(() => import("./pages/SmartSlugRoute"));
 const App = () => (
   <>
     <SplashScreen />
-    <CustomCursor />
     <BrowserRouter
       future={{
         v7_startTransition: true,

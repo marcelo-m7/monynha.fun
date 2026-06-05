@@ -26,6 +26,7 @@ export function useVideos(options: UseVideosOptions = {}) {
     queryKey: videoKeys.list(params),
     queryFn: () => listVideos(params),
     enabled,
+    staleTime: 60_000,
   });
 }
 
@@ -37,6 +38,7 @@ export function useVideoById(id: string | undefined) {
       return getVideoById(id);
     },
     enabled: !!id,
+    staleTime: 60_000,
   });
 }
 
@@ -45,6 +47,7 @@ export function useRelatedVideos(currentVideoId: string, categoryId: string | nu
     queryKey: videoKeys.related(currentVideoId, categoryId, limit),
     queryFn: () => listRelatedVideos(currentVideoId, categoryId, limit),
     enabled: !!categoryId,
+    staleTime: 2 * 60_000,
   });
 }
 
@@ -53,6 +56,7 @@ export function useFeaturedVideos(limit = 4, offset = 0, enabled = true) {
     queryKey: videoKeys.featured(limit, offset),
     queryFn: () => listFeaturedVideos(limit, offset),
     enabled,
+    staleTime: 2 * 60_000,
   });
 }
 
@@ -60,6 +64,7 @@ export function useRecentVideos(limit = 4) {
   return useQuery<VideoWithCategory[], Error>({
     queryKey: videoKeys.recent(limit),
     queryFn: () => listRecentVideos(limit),
+    staleTime: 60_000,
   });
 }
 

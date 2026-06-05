@@ -70,12 +70,11 @@ const Community = () => {
           </div>
         ) : profiles && profiles.length > 0 ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {profiles.map((profile, index) => (
+            {profiles.map((profile) => (
               <Link
                 key={profile.id}
                 to={`/profile/${encodeURIComponent(profile.username || '')}`}
-                className="group flex items-center gap-4 p-4 bg-card border border-border rounded-xl shadow-sm transition-all duration-300 hover:scale-[1.02] hover:shadow-lg"
-                style={{ animationDelay: `${index * 0.05}s` }}
+                className="group flex items-center gap-4 p-4 bg-card border border-border rounded-xl shadow-sm transition-[box-shadow,transform] duration-150 motion-safe:hover:scale-[1.01] hover:shadow-md"
               >
                 <Avatar className="w-12 h-12 border-2 border-primary/50">
                   <AvatarImage src={profile.avatar_url || undefined} alt={profile.display_name || profile.username || 'User'} />

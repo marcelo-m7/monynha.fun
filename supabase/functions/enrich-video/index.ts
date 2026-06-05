@@ -7,6 +7,11 @@ import {
   pickCategory,
   type LegacyFastCategory,
 } from '../_shared/legacy-fast-enrichment.ts'
+import {
+  assignPlaylist,
+  type PlaylistAssignmentPlaylist,
+  type PlaylistAssignmentResult,
+} from '../_shared/playlist-assignment.ts'
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -38,6 +43,162 @@ function extractYouTubeId(url: string): string | null {
   }
 
   return null;
+}
+
+function decodeHtml(value: string | null | undefined): string | null {
+  const decoded = (value ?? '')
+    .replace(/\\u0026/g, '&')
+    .replace(/&amp;/g, '&')
+    .replace(/&quot;/g, '"')
+    .replace(/&#39;/g, "'")
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>')
+    .replace(/\s+/g, ' ')
+    .trim();
+
+  return decoded || null;
+}
+
+function extractMetaContent(html: string, key: string): string | null {
+  const escaped = key.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  const patterns = [
+    new RegExp(`<meta[^>]+name=["']${escaped}["'][^>]+content=["']([^"']*)["']`, 'i'),
+    new RegExp(`<meta[^>]+property=["']${escaped}["'][^>]+content=["']([^"']*)["']`, 'i'),
+    new RegExp(`<meta[^>]+content=["']([^"']*)["'][^>]+name=["']${escaped}["']`, 'i'),
+    new RegExp(`<meta[^>]+content=["']([^"']*)["'][^>]+property=["']${escaped}["']`, 'i'),
+  ];
+
+  for (const pattern of patterns) {
+    const match = html.match(pattern);
+    if (match?.[1]) return decodeHtml(match[1]);
+  }
+
+  return null;
+}
+
+function detectLanguage(...values: Array<string | null | undefined>): string {
+  const text = values
+    .filter(Boolean)
+    .join(' ')
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase();
+
+  const portugueseSignals = [
+    ' voce ',
+    ' aula ',
+    ' curso ',
+    ' como ',
+    ' para ',
+    ' programador',
+    ' calculo',
+    ' integral',
+    ' nessa ',
+    ' por onde',
+  ];
+  const englishSignals = [
+    ' the ',
+    ' and ',
+    ' with ',
+    ' for ',
+    ' beginners',
+    ' course',
+    ' tutorial',
+    ' database',
+    ' management',
+    ' sql ',
+  ];
+
+  const padded = ` ${text} `;
+  const portugueseScore = portugueseSignals.filter((signal) => padded.includes(signal)).length;
+  const englishScore = englishSignals.filter((signal) => padded.includes(signal)).length;
+
+  if (englishScore > portugueseScore) return 'en';
+  if (portugueseScore > 0) return 'pt';
+  return 'pt';
+}
+
+function isGenericYouTubeDescription(value: string | null | undefined): boolean {
+  const normalized = (value ?? '')
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase();
+
+  return normalized.includes('profitez des videos et de la musique') ||
+    normalized.includes('enjoy the videos and music you love') ||
+    normalized.includes('sube videos originales') ||
+    normalized.includes('mettez en ligne des contenus originaux');
+}
+
+async function fetchPublicYouTubeMetadata(youtubeId: string): Promise<{
+  description: string | null;
+  durationSeconds: number | null;
+  language: string | null;
+}> {
+  try {
+    const playerResponse = await fetch('https://www.youtube.com/youtubei/v1/player?prettyPrint=false', {
+      method: 'POST',
+      headers: {
+        'content-type': 'application/json',
+        'user-agent': 'Mozilla/5.0 Tube O2 public metadata fetcher',
+        'x-youtube-client-name': '1',
+        'x-youtube-client-version': '2.20240101.00.00',
+      },
+      body: JSON.stringify({
+        context: { client: { clientName: 'WEB', clientVersion: '2.20240101.00.00' } },
+        videoId: youtubeId,
+      }),
+    });
+    const playerData = await playerResponse.json().catch(() => null) as {
+      videoDetails?: {
+        title?: string;
+        author?: string;
+        shortDescription?: string;
+        lengthSeconds?: string;
+      };
+    } | null;
+    const videoDetails = playerData?.videoDetails;
+    if (videoDetails) {
+      const description = decodeHtml(videoDetails.shortDescription);
+      const durationSeconds = videoDetails.lengthSeconds
+        ? Number.parseInt(videoDetails.lengthSeconds, 10)
+        : null;
+
+      return {
+        description: isGenericYouTubeDescription(description) ? null : description,
+        durationSeconds: Number.isFinite(durationSeconds) ? durationSeconds : null,
+        language: detectLanguage(videoDetails.title, videoDetails.author, description),
+      };
+    }
+
+    const response = await fetch(`https://www.youtube.com/watch?v=${youtubeId}`, {
+      headers: {
+        accept: 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+        'user-agent': 'Mozilla/5.0 Tube O2 public metadata fetcher',
+      },
+    });
+
+    if (!response.ok) {
+      console.warn(`[enrich-video] YouTube public metadata fetch failed for ${youtubeId}: ${response.status}`);
+      return { description: null, durationSeconds: null, language: null };
+    }
+
+    const html = await response.text();
+    const description = extractMetaContent(html, 'description') ?? extractMetaContent(html, 'og:description');
+    const durationRaw = html.match(/"lengthSeconds"\s*:\s*"?(\d+)"?/)?.[1] ?? null;
+    const durationSeconds = durationRaw ? Number.parseInt(durationRaw, 10) : null;
+    const descriptionIsGeneric = isGenericYouTubeDescription(description);
+    const language = descriptionIsGeneric ? null : detectLanguage(description);
+
+    return {
+      description: descriptionIsGeneric ? null : description,
+      durationSeconds: Number.isFinite(durationSeconds) ? durationSeconds : null,
+      language,
+    };
+  } catch (error) {
+    console.warn(`[enrich-video] YouTube public metadata fetch failed for ${youtubeId}: ${error instanceof Error ? error.message : 'unknown error'}`);
+    return { description: null, durationSeconds: null, language: null };
+  }
 }
 
 async function updateSubmissionStatus(
@@ -132,6 +293,98 @@ async function ensureDeepAnalysisJob(params: {
   }
 
   return data;
+}
+
+async function loadPlaylistCandidates(
+  supabaseServiceRole: ReturnType<typeof createClient>,
+  language: string,
+): Promise<PlaylistAssignmentPlaylist[]> {
+  const { data, error } = await supabaseServiceRole.rpc('list_education_playlists_for_assignment', {
+    p_language: language,
+    p_limit: 120,
+  });
+
+  if (error) {
+    throw new Error(`Failed to load playlist assignment candidates: ${error.message}`);
+  }
+
+  return (data ?? []) as PlaylistAssignmentPlaylist[];
+}
+
+async function persistPlaylistAssignment(params: {
+  supabaseServiceRole: ReturnType<typeof createClient>;
+  assignment: PlaylistAssignmentResult;
+  videoId: string;
+  userId: string;
+}) {
+  const { supabaseServiceRole, assignment, videoId, userId } = params;
+  if (!assignment.assignedPlaylistId) {
+    return null;
+  }
+
+  const { data: existing, error: existingError } = await supabaseServiceRole
+    .from('playlist_videos')
+    .select('id, playlist_id, position')
+    .eq('playlist_id', assignment.assignedPlaylistId)
+    .eq('video_id', videoId)
+    .maybeSingle();
+
+  if (existingError) {
+    throw new Error(`Failed to check playlist assignment: ${existingError.message}`);
+  }
+
+  if (existing) {
+    return { ...existing, created: false };
+  }
+
+  const { data: lastItem, error: lastItemError } = await supabaseServiceRole
+    .from('playlist_videos')
+    .select('position')
+    .eq('playlist_id', assignment.assignedPlaylistId)
+    .order('position', { ascending: false })
+    .limit(1)
+    .maybeSingle();
+
+  if (lastItemError) {
+    throw new Error(`Failed to resolve playlist position: ${lastItemError.message}`);
+  }
+
+  const nextPosition = typeof lastItem?.position === 'number' ? lastItem.position + 1 : 0;
+  const notes = [
+    `Assigned by ${assignment.algorithmVersion}`,
+    assignment.reason,
+  ].join(': ');
+
+  const { data: inserted, error: insertError } = await supabaseServiceRole
+    .from('playlist_videos')
+    .insert({
+      playlist_id: assignment.assignedPlaylistId,
+      video_id: videoId,
+      position: nextPosition,
+      added_by: userId,
+      notes,
+    })
+    .select('id, playlist_id, position')
+    .single();
+
+  if (insertError) {
+    if (insertError.code === '23505') {
+      const { data: racedAssignment, error: racedAssignmentError } = await supabaseServiceRole
+        .from('playlist_videos')
+        .select('id, playlist_id, position')
+        .eq('playlist_id', assignment.assignedPlaylistId)
+        .eq('video_id', videoId)
+        .maybeSingle();
+
+      if (!racedAssignmentError && racedAssignment) {
+        return { ...racedAssignment, created: false };
+      }
+    }
+
+    throw new Error(`Failed to persist playlist assignment: ${insertError.message}`);
+  }
+
+  return { ...inserted, created: true };
 }
 
 serve(async (req) => {
@@ -287,6 +540,35 @@ serve(async (req) => {
       });
     }
 
+    const publicMetadata = await fetchPublicYouTubeMetadata(requestYoutubeId);
+    const storedDescriptionIsGeneric = isGenericYouTubeDescription(video.description);
+    const storedDescription = storedDescriptionIsGeneric ? null : video.description;
+    const enrichedDescription = storedDescription || publicMetadata.description;
+    const inferredLanguage = publicMetadata.language ?? detectLanguage(video.title, video.channel_name, enrichedDescription);
+    const enrichedLanguage = normalizeLanguage(inferredLanguage);
+
+    const videoPatch: Record<string, unknown> = {};
+    if (!video.description || storedDescriptionIsGeneric) {
+      videoPatch.description = publicMetadata.description ?? null;
+    }
+    if (publicMetadata.durationSeconds !== null) {
+      videoPatch.duration_seconds = publicMetadata.durationSeconds;
+    }
+    if (!video.language || video.language === 'und' || video.language !== enrichedLanguage) {
+      videoPatch.language = enrichedLanguage;
+    }
+
+    if (Object.keys(videoPatch).length > 0) {
+      const { error: videoMetadataUpdateError } = await supabaseServiceRole
+        .from('videos')
+        .update(videoPatch)
+        .eq('id', videoId);
+
+      if (videoMetadataUpdateError) {
+        throw new Error(`Failed to update video public metadata: ${videoMetadataUpdateError.message}`);
+      }
+    }
+
     const { data: categoriesData, error: categoriesError } = await supabaseServiceRole
       .from('categories')
       .select('id, name, slug');
@@ -296,24 +578,24 @@ serve(async (req) => {
     }
 
     const categoryRows = (categoriesData ?? []) as LegacyFastCategory[];
-    const language = normalizeLanguage(video.language);
+    const language = enrichedLanguage;
     const title = video.title || 'Video do YouTube';
     const summary = buildVideoSummary({
       title: video.title,
-      description: video.description,
+      description: enrichedDescription,
       channelName: video.channel_name,
       youtubeId: requestYoutubeId,
     });
     const semanticTags = deriveTags({
       title: video.title,
-      description: video.description,
+      description: enrichedDescription,
       channelName: video.channel_name,
       language,
     });
     const selectedCategory = pickCategory(categoryRows, {
       currentCategoryId: video.category_id ?? null,
       title: video.title,
-      description: video.description,
+      description: enrichedDescription,
       channelName: video.channel_name,
       semanticTags,
     });
@@ -347,6 +629,28 @@ serve(async (req) => {
     if (enrichmentError) {
       throw new Error(`Failed to save AI enrichment: ${enrichmentError.message}`);
     }
+
+    const playlistCandidates = await loadPlaylistCandidates(supabaseServiceRole, language);
+    const playlistAssignment = assignPlaylist({
+      playlists: playlistCandidates,
+      analysis: {
+        title,
+        description: enrichedDescription,
+        semanticTags,
+        summaryDescription: summary,
+        shortSummary: summary,
+        language,
+        suggestedPlaylistId: null,
+        suggestedPlaylistQuery: semanticTags.join(' '),
+        classificationConfidence: null,
+      },
+    });
+    const persistedPlaylistAssignment = await persistPlaylistAssignment({
+      supabaseServiceRole,
+      assignment: playlistAssignment,
+      videoId,
+      userId: user.id,
+    });
 
     const analysisJob = await ensureDeepAnalysisJob({
       supabaseServiceRole,
@@ -384,20 +688,31 @@ serve(async (req) => {
             semanticTags,
           },
           assignment: {
-            fallbackUsed: true,
-            reliability: 'low',
-            reason: selectedCategory
-              ? `Categoria selecionada automaticamente: ${selectedCategory.name}`
-              : 'Legacy fast enrichment restored; playlist assignment skipped',
+            fallbackUsed: playlistAssignment.assignedPlaylistId === null,
+            reliability: playlistAssignment.reliability,
+            reason: playlistAssignment.assignedPlaylistId
+              ? playlistAssignment.reason
+              : selectedCategory
+                ? `${playlistAssignment.reason} Categoria selecionada automaticamente: ${selectedCategory.name}`
+                : playlistAssignment.reason,
             assignedCategoryId: selectedCategory?.id ?? null,
-            assignedPlaylistId: null,
-            decisionSource: 'none',
+            assignedPlaylistId: playlistAssignment.assignedPlaylistId,
+            decisionSource: playlistAssignment.decisionSource,
             provider: 'legacy_fast',
-            providerConfidence: null,
-            signals: null,
-            topCandidates: [],
-            rejectedPlaylistId: null,
+            providerConfidence: playlistAssignment.providerConfidence,
+            score: playlistAssignment.score,
+            algorithmVersion: playlistAssignment.algorithmVersion,
+            signals: playlistAssignment.signals,
+            topCandidates: playlistAssignment.topCandidates,
+            rejectedPlaylistId: playlistAssignment.rejectedPlaylistId,
             rejectedAiPlaylistId: null,
+            persisted: persistedPlaylistAssignment
+              ? {
+                id: persistedPlaylistAssignment.id,
+                position: persistedPlaylistAssignment.position,
+                created: persistedPlaylistAssignment.created,
+              }
+              : null,
           },
         },
       });

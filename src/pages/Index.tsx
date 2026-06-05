@@ -422,7 +422,7 @@ const Index = () => {
                 key={key}
                 type="button"
                 onClick={() => navigate(href)}
-                className="group min-h-56 border-2 border-border p-5 text-left transition-all duration-300 hover:scale-[1.03] active:scale-[0.97] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                className="group min-h-56 border-2 border-border p-5 text-left transition-transform duration-150 motion-safe:hover:scale-[1.01] active:scale-[0.99] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
               >
                 <div className="mb-10 flex items-center justify-between">
                   <Icon className="h-7 w-7" />

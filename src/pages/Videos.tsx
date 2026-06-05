@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useMemo, useState, useEffect } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { MainLayout } from '@/components/layout/MainLayout';
 import { PageHero } from '@/components/showcase';
@@ -23,11 +23,12 @@ const Videos = () => {
   const isFeatured = searchParams.get('featured') === 'true';
 
   const [searchQuery, setSearchQuery] = useState(initialSearchQuery);
+  const [debouncedSearchQuery, setDebouncedSearchQuery] = useState(initialSearchQuery);
   const [selectedCategory, setSelectedCategory] = useState(initialCategoryId);
   const [selectedLanguage, setSelectedLanguage] = useState(initialLanguage);
 
   const { data: videos, isLoading: videosLoading } = useVideos({
-    searchQuery: searchQuery || undefined,
+    searchQuery: debouncedSearchQuery || undefined,
     categoryId: selectedCategory || undefined,
     language: selectedLanguage || undefined,
     enabled: !isFeatured,
@@ -36,16 +37,25 @@ const Videos = () => {
   const { data: categories, isLoading: categoriesLoading } = useCategories();
 
   useEffect(() => {
+    const timer = window.setTimeout(() => {
+      setDebouncedSearchQuery(searchQuery.trim());
+    }, 250);
+
+    return () => window.clearTimeout(timer);
+  }, [searchQuery]);
+
+  useEffect(() => {
     const newSearchParams = new URLSearchParams();
-    if (searchQuery) newSearchParams.set('query', searchQuery);
+    if (debouncedSearchQuery) newSearchParams.set('query', debouncedSearchQuery);
     if (selectedCategory) newSearchParams.set('category', selectedCategory);
     if (selectedLanguage) newSearchParams.set('language', selectedLanguage);
     if (isFeatured) newSearchParams.set('featured', 'true');
     setSearchParams(newSearchParams);
-  }, [searchQuery, selectedCategory, selectedLanguage, isFeatured, setSearchParams]);
+  }, [debouncedSearchQuery, selectedCategory, selectedLanguage, isFeatured, setSearchParams]);
 
   const handleClearFilters = () => {
     setSearchQuery('');
+    setDebouncedSearchQuery('');
     setSelectedCategory('');
     setSelectedLanguage('');
     const resetParams = new URLSearchParams();
@@ -53,13 +63,16 @@ const Videos = () => {
     setSearchParams(resetParams);
   };
 
-  const availableLanguages = [
+  const availableLanguages = useMemo(() => [
     { value: 'pt', label: t('common.language.pt') },
     { value: 'en', label: t('common.language.en') },
     { value: 'es', label: t('common.language.es') },
     { value: 'fr', label: t('common.language.fr') },
     { value: 'other', label: t('common.language.other') },
-  ];
+  ], [t]);
+
+  const renderedVideos = isFeatured ? featuredVideos : videos;
+  const isVideoListLoading = isFeatured ? featuredLoading : videosLoading;
 
   return (
     <MainLayout>
@@ -133,8 +146,7 @@ const Videos = () => {
         </div>
 
         {/* Video List */}
-        {isFeatured ? (
-          featuredLoading ? (
+        {isVideoListLoading ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
               {Array.from({ length: 8 }).map((_, i) => (
                 <div key={i} className="space-y-3">
@@ -144,48 +156,17 @@ const Videos = () => {
                 </div>
               ))}
             </div>
-          ) : featuredVideos && featuredVideos.length > 0 ? (
+        ) : renderedVideos && renderedVideos.length > 0 ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-              {featuredVideos.map((video, index) => (
-                <div
-                  key={video.id}
-                  className="animate-fade-up"
-                  style={{ animationDelay: `${index * 0.1}s` }}
-                >
+              {renderedVideos.map((video) => (
+                <div key={video.id}>
                   <VideoCard video={video} variant="default" />
                 </div>
               ))}
             </div>
-          ) : (
-            <div className="text-center py-12 text-muted-foreground">
-              {t('index.noFeaturedVideos')}
-            </div>
-          )
-        ) : videosLoading ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {Array.from({ length: 8 }).map((_, i) => (
-              <div key={i} className="space-y-3">
-                <Skeleton className="aspect-video rounded-2xl" />
-                <Skeleton className="h-4 w-3/4" />
-                <Skeleton className="h-3 w-1/2" />
-              </div>
-            ))}
-          </div>
-        ) : videos && videos.length > 0 ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {videos.map((video, index) => (
-              <div
-                key={video.id}
-                className="animate-fade-up"
-                style={{ animationDelay: `${index * 0.1}s` }}
-              >
-                <VideoCard video={video} variant="default" />
-              </div>
-            ))}
-          </div>
         ) : (
           <div className="text-center py-12 text-muted-foreground">
-            {t('videos.noVideosFound')}
+            {isFeatured ? t('index.noFeaturedVideos') : t('videos.noVideosFound')}
           </div>
         )}
       </div>

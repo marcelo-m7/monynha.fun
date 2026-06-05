@@ -75,7 +75,7 @@ export const MobileNav: React.FC<MobileNavProps> = ({
             placeholder={t('header.searchPlaceholder')}
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-10 bg-muted/50 border-transparent focus-visible:ring-primary/30 h-12 rounded-xl transition-all shadow-sm"
+            className="w-full pl-10 bg-muted/50 border-transparent focus-visible:ring-primary/30 h-12 rounded-xl transition-[border-color,box-shadow] shadow-sm"
           />
         </form>
       </div>
@@ -93,7 +93,7 @@ export const MobileNav: React.FC<MobileNavProps> = ({
                 <NavLink
                   key={link.to}
                   to={link.to}
-                  className="flex items-center gap-3 px-4 py-3.5 text-muted-foreground hover:text-foreground hover:bg-muted/50 rounded-2xl transition-all"
+                  className="flex items-center gap-3 px-4 py-3.5 text-muted-foreground hover:text-foreground hover:bg-muted/50 rounded-2xl transition-colors duration-150"
                   activeClassName="bg-primary/8 text-foreground font-bold"
                   onClick={onClose}
                 >
@@ -127,7 +127,7 @@ export const MobileNav: React.FC<MobileNavProps> = ({
               <div className="grid grid-cols-1 gap-1">
                 <NavLink
                   to={`/profile/${profile.username}`}
-                  className="flex items-center gap-3 px-4 py-3 text-muted-foreground hover:text-foreground hover:bg-muted/50 rounded-2xl transition-all"
+                  className="flex items-center gap-3 px-4 py-3 text-muted-foreground hover:text-foreground hover:bg-muted/50 rounded-2xl transition-colors duration-150"
                   activeClassName="bg-primary/8 text-foreground font-medium"
                   onClick={onClose}
                 >
@@ -136,7 +136,7 @@ export const MobileNav: React.FC<MobileNavProps> = ({
                 </NavLink>
                 <NavLink
                   to="/favorites"
-                  className="flex items-center gap-3 px-4 py-3 text-muted-foreground hover:text-foreground hover:bg-muted/50 rounded-2xl transition-all"
+                  className="flex items-center gap-3 px-4 py-3 text-muted-foreground hover:text-foreground hover:bg-muted/50 rounded-2xl transition-colors duration-150"
                   activeClassName="bg-primary/8 text-foreground font-medium"
                   onClick={onClose}
                 >
@@ -145,7 +145,7 @@ export const MobileNav: React.FC<MobileNavProps> = ({
                 </NavLink>
                 <NavLink
                   to="/messages"
-                  className="flex items-center gap-3 px-4 py-3 text-muted-foreground hover:text-foreground hover:bg-muted/50 rounded-2xl transition-all"
+                  className="flex items-center gap-3 px-4 py-3 text-muted-foreground hover:text-foreground hover:bg-muted/50 rounded-2xl transition-colors duration-150"
                   activeClassName="bg-primary/8 text-foreground font-medium"
                   onClick={onClose}
                 >
@@ -159,7 +159,7 @@ export const MobileNav: React.FC<MobileNavProps> = ({
                 </NavLink>
                 <NavLink
                   to="/notifications"
-                  className="flex items-center gap-3 px-4 py-3 text-muted-foreground hover:text-foreground hover:bg-muted/50 rounded-2xl transition-all"
+                  className="flex items-center gap-3 px-4 py-3 text-muted-foreground hover:text-foreground hover:bg-muted/50 rounded-2xl transition-colors duration-150"
                   activeClassName="bg-primary/8 text-foreground font-medium"
                   onClick={onClose}
                 >
@@ -173,7 +173,7 @@ export const MobileNav: React.FC<MobileNavProps> = ({
                 </NavLink>
                 <NavLink
                   to="/account/settings"
-                  className="flex items-center gap-3 px-4 py-3 text-muted-foreground hover:text-foreground hover:bg-muted/50 rounded-2xl transition-all"
+                  className="flex items-center gap-3 px-4 py-3 text-muted-foreground hover:text-foreground hover:bg-muted/50 rounded-2xl transition-colors duration-150"
                   activeClassName="bg-primary/8 text-foreground font-medium"
                   onClick={onClose}
                 >
@@ -184,7 +184,7 @@ export const MobileNav: React.FC<MobileNavProps> = ({
                   <>
                     <NavLink
                       to="/editorial"
-                      className="flex items-center gap-3 px-4 py-3 text-muted-foreground hover:text-foreground hover:bg-muted/50 rounded-2xl transition-all"
+                      className="flex items-center gap-3 px-4 py-3 text-muted-foreground hover:text-foreground hover:bg-muted/50 rounded-2xl transition-colors duration-150"
                       activeClassName="bg-primary/8 text-foreground font-medium"
                       onClick={onClose}
                     >
@@ -193,7 +193,7 @@ export const MobileNav: React.FC<MobileNavProps> = ({
                     </NavLink>
                     <NavLink
                       to="/editor/applications"
-                      className="flex items-center gap-3 px-4 py-3 text-muted-foreground hover:text-foreground hover:bg-muted/50 rounded-2xl transition-all"
+                      className="flex items-center gap-3 px-4 py-3 text-muted-foreground hover:text-foreground hover:bg-muted/50 rounded-2xl transition-colors duration-150"
                       activeClassName="bg-primary/8 text-foreground font-medium"
                       onClick={onClose}
                     >

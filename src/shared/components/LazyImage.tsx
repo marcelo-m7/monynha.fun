@@ -4,6 +4,8 @@ import React, { useState, useEffect, useRef } from 'react';
 import { cn } from '@/lib/utils';
 import { Skeleton } from '@/components/ui/skeleton';
 
+const DEFAULT_OBSERVER_OPTIONS: IntersectionObserverInit = { rootMargin: '120px', threshold: 0.01 };
+
 interface LazyImageProps extends React.ImgHTMLAttributes<HTMLImageElement> {
   fallbackClassName?: string;
   src: string;
@@ -36,7 +38,7 @@ export const LazyImage: React.FC<LazyImageProps> = ({
   className,
   fallbackClassName,
   blurDataURL,
-  observerOptions = { rootMargin: '50px', threshold: 0.01 },
+  observerOptions = DEFAULT_OBSERVER_OPTIONS,
   fallbackSrc,
   onLoadComplete,
   onErrorOccurred,
@@ -46,18 +48,23 @@ export const LazyImage: React.FC<LazyImageProps> = ({
   const [isLoaded, setIsLoaded] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [imageSrc, setImageSrc] = useState<string | null>(null);
-  const [isObserving, setIsObserving] = useState(true);
   const containerRef = useRef<HTMLDivElement>(null);
   const imgRef = useRef<HTMLImageElement>(null);
 
-  // Set up Intersection Observer for lazy loading
   useEffect(() => {
+    setIsLoaded(false);
+    setError(null);
+    setImageSrc(null);
+
+    if (typeof IntersectionObserver === 'undefined') {
+      setImageSrc(src);
+      return;
+    }
+
     const observer = new IntersectionObserver((entries) => {
       entries.forEach((entry) => {
         if (entry.isIntersecting) {
-          // Image entered viewport, start loading
           setImageSrc(src);
-          setIsObserving(false);
           observer.unobserve(entry.target);
         }
       });
@@ -65,7 +72,7 @@ export const LazyImage: React.FC<LazyImageProps> = ({
 
     const currentContainer = containerRef.current;
 
-    if (currentContainer && isObserving) {
+    if (currentContainer) {
       observer.observe(currentContainer);
     }
 
@@ -75,7 +82,7 @@ export const LazyImage: React.FC<LazyImageProps> = ({
       }
       observer.disconnect();
     };
-  }, [src, isObserving, observerOptions]);
+  }, [src, observerOptions]);
 
   const handleLoad = () => {
     setIsLoaded(true);
@@ -124,7 +131,7 @@ export const LazyImage: React.FC<LazyImageProps> = ({
           src={imageSrc}
           alt={alt}
           className={cn(
-            "transition-opacity duration-500 ease-in-out w-full h-full object-cover",
+            "transition-opacity duration-200 ease-out w-full h-full object-cover",
             isLoaded ? "opacity-100" : "opacity-0",
             className
           )}
