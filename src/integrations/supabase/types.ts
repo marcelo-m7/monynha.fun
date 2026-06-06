@@ -622,6 +622,39 @@ export type Database = {
           },
         ]
       }
+      edge_rate_limits: {
+        Row: {
+          created_at: string
+          function_name: string
+          id: string
+          request_count: number
+          subject_id: string
+          updated_at: string
+          window_seconds: number
+          window_start: string
+        }
+        Insert: {
+          created_at?: string
+          function_name: string
+          id?: string
+          request_count?: number
+          subject_id: string
+          updated_at?: string
+          window_seconds: number
+          window_start: string
+        }
+        Update: {
+          created_at?: string
+          function_name?: string
+          id?: string
+          request_count?: number
+          subject_id?: string
+          updated_at?: string
+          window_seconds?: number
+          window_start?: string
+        }
+        Relationships: []
+      }
       editor_applications: {
         Row: {
           availability: string | null
@@ -925,6 +958,20 @@ export type Database = {
             foreignKeyName: "playlist_collaborators_playlist_id_fkey"
             columns: ["playlist_id"]
             isOneToOne: false
+            referencedRelation: "v_facodi_content_backlog"
+            referencedColumns: ["playlist_id"]
+          },
+          {
+            foreignKeyName: "playlist_collaborators_playlist_id_fkey"
+            columns: ["playlist_id"]
+            isOneToOne: false
+            referencedRelation: "v_facodi_playlist_health"
+            referencedColumns: ["playlist_id"]
+          },
+          {
+            foreignKeyName: "playlist_collaborators_playlist_id_fkey"
+            columns: ["playlist_id"]
+            isOneToOne: false
             referencedRelation: "v_playlist_exhibition"
             referencedColumns: ["id"]
           },
@@ -934,6 +981,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "v_playlist_follow_counts"
             referencedColumns: ["playlist_id"]
+          },
+          {
+            foreignKeyName: "playlist_collaborators_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
           },
         ]
       }
@@ -1000,6 +1054,20 @@ export type Database = {
             foreignKeyName: "playlist_editor_requests_playlist_id_fkey"
             columns: ["playlist_id"]
             isOneToOne: false
+            referencedRelation: "v_facodi_content_backlog"
+            referencedColumns: ["playlist_id"]
+          },
+          {
+            foreignKeyName: "playlist_editor_requests_playlist_id_fkey"
+            columns: ["playlist_id"]
+            isOneToOne: false
+            referencedRelation: "v_facodi_playlist_health"
+            referencedColumns: ["playlist_id"]
+          },
+          {
+            foreignKeyName: "playlist_editor_requests_playlist_id_fkey"
+            columns: ["playlist_id"]
+            isOneToOne: false
             referencedRelation: "v_playlist_exhibition"
             referencedColumns: ["id"]
           },
@@ -1055,6 +1123,20 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "v_education_playlist_assignment_candidates"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "playlist_follows_playlist_id_fkey"
+            columns: ["playlist_id"]
+            isOneToOne: false
+            referencedRelation: "v_facodi_content_backlog"
+            referencedColumns: ["playlist_id"]
+          },
+          {
+            foreignKeyName: "playlist_follows_playlist_id_fkey"
+            columns: ["playlist_id"]
+            isOneToOne: false
+            referencedRelation: "v_facodi_playlist_health"
+            referencedColumns: ["playlist_id"]
           },
           {
             foreignKeyName: "playlist_follows_playlist_id_fkey"
@@ -1127,6 +1209,20 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "v_education_playlist_assignment_candidates"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "playlist_progress_playlist_id_fkey"
+            columns: ["playlist_id"]
+            isOneToOne: false
+            referencedRelation: "v_facodi_content_backlog"
+            referencedColumns: ["playlist_id"]
+          },
+          {
+            foreignKeyName: "playlist_progress_playlist_id_fkey"
+            columns: ["playlist_id"]
+            isOneToOne: false
+            referencedRelation: "v_facodi_playlist_health"
+            referencedColumns: ["playlist_id"]
           },
           {
             foreignKeyName: "playlist_progress_playlist_id_fkey"
@@ -1221,6 +1317,20 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "v_education_playlist_assignment_candidates"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "playlist_videos_playlist_id_fkey"
+            columns: ["playlist_id"]
+            isOneToOne: false
+            referencedRelation: "v_facodi_content_backlog"
+            referencedColumns: ["playlist_id"]
+          },
+          {
+            foreignKeyName: "playlist_videos_playlist_id_fkey"
+            columns: ["playlist_id"]
+            isOneToOne: false
+            referencedRelation: "v_facodi_playlist_health"
+            referencedColumns: ["playlist_id"]
           },
           {
             foreignKeyName: "playlist_videos_playlist_id_fkey"
@@ -2162,6 +2272,51 @@ export type Database = {
         }
         Relationships: []
       }
+      v_facodi_content_backlog: {
+        Row: {
+          backlog_kind: string | null
+          course_code: string | null
+          course_name: string | null
+          health_status: string | null
+          playlist_id: string | null
+          playlist_name: string | null
+          playlist_slug: string | null
+          priority_rank: number | null
+          priority_reason: string | null
+          recommended_action: string | null
+          semester_label: string | null
+          total_duration_seconds: number | null
+          unit_code: string | null
+          video_count: number | null
+        }
+        Relationships: []
+      }
+      v_facodi_playlist_health: {
+        Row: {
+          collaborators_count: number | null
+          course_code: string | null
+          course_name: string | null
+          health_status: string | null
+          is_ordered: boolean | null
+          is_public: boolean | null
+          language: string | null
+          playlist_description: string | null
+          playlist_id: string | null
+          playlist_name: string | null
+          playlist_slug: string | null
+          playlist_videos_rows: number | null
+          priority_rank: number | null
+          priority_reason: string | null
+          recommended_action: string | null
+          semester_label: string | null
+          thumbnail_url: string | null
+          total_duration_seconds: number | null
+          unit_code: string | null
+          video_count: number | null
+          video_range: string | null
+        }
+        Relationships: []
+      }
       v_home_exhibition: {
         Row: {
           categories: Json | null
@@ -2312,6 +2467,19 @@ export type Database = {
       add_video_to_default_education_playlist: {
         Args: { p_video_id: string }
         Returns: string
+      }
+      check_edge_rate_limit: {
+        Args: {
+          p_function_name: string
+          p_max_requests: number
+          p_subject_id: string
+          p_window_seconds: number
+        }
+        Returns: {
+          allowed: boolean
+          request_count: number
+          retry_after_seconds: number
+        }[]
       }
       current_profile_can_manage_facodi_playlist: {
         Args: never
