@@ -4,38 +4,7 @@ import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
 import { useHomeExhibition } from '@/features/home/useHomeExhibition';
-
-const footerColumns = [
-  {
-    key: 'explore',
-    links: [
-      { key: 'allPaths', to: '/playlists' },
-      { key: 'facodi', to: '/facodi' },
-      { key: 'lesti', to: '/playlists?course=LESTI' },
-      { key: 'byTheme', to: '/videos' },
-      { key: 'curation', to: '/curadoria' },
-    ],
-  },
-  {
-    key: 'about',
-    links: [
-      { key: 'howItWorks', to: '/curadoria' },
-      { key: 'whoWeAre', to: '/about' },
-      { key: 'editorial', to: '/editorial' },
-      { key: 'rules', to: '/rules' },
-      { key: 'faq', to: '/faq' },
-    ],
-  },
-  {
-    key: 'contribute',
-    links: [
-      { key: 'submit', to: '/submit' },
-      { key: 'editor', to: '/editor/apply' },
-      { key: 'community', to: '/community' },
-      { key: 'contact', to: '/contact' },
-    ],
-  },
-] as const;
+import { footerNavigationSections } from './navigationItems';
 
 const footerMetricKeys = ['recent_submissions', 'with_summaries', 'with_tags', 'transcripts_completed'] as const;
 
@@ -47,7 +16,7 @@ export const Footer = () => {
   return (
     <footer className="border-t-2 border-border bg-black text-white">
       <div className="container py-12 md:py-16">
-        <div className="grid gap-10 lg:grid-cols-[1.1fr_1.4fr_0.9fr]">
+        <div className="grid gap-10 xl:grid-cols-[1fr_1.8fr_0.9fr]">
           <div className="space-y-6">
             <Link to="/" className="flex items-center gap-3">
               <div className="flex h-11 w-11 items-center justify-center bg-primary text-primary-foreground">
@@ -85,17 +54,17 @@ export const Footer = () => {
             </div>
           </div>
 
-          <div className="grid gap-8 sm:grid-cols-3">
-            {footerColumns.map((column) => (
+          <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
+            {footerNavigationSections.map((column) => (
               <div key={column.key} className="space-y-4">
                 <h4 className="text-xs font-black uppercase tracking-widest text-white/50">
-                  {t(`footer.columns.${column.key}.title`)}
+                  {t(column.labelKey)}
                 </h4>
                 <ul className="space-y-3 text-sm font-bold">
                   {column.links.map((link) => (
-                    <li key={link.key}>
+                    <li key={link.to}>
                       <Link to={link.to} className="inline-flex items-center gap-2 text-white/75 transition-colors hover:text-primary">
-                        {t(`footer.columns.${column.key}.${link.key}`)}
+                        {t(link.labelKey)}
                         <ArrowRight className="h-3 w-3" />
                       </Link>
                     </li>

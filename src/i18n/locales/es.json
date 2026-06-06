@@ -36,6 +36,7 @@
     "home": "Inicio",
     "toggleMenu": "Alternar menú",
     "closeMenu": "Cerrar menú",
+    "menuDescription": "Menú principal con búsqueda, navegación, preferencias y acciones de cuenta.",
     "languageLabel": "Idioma",
     "switchToDark": "Cambiar al modo oscuro",
     "switchToLight": "Cambiar al modo claro",
@@ -44,7 +45,15 @@
     "messages": "Mensajes",
     "notifications": "Notificaciones",
     "facodi": "FACODI",
-    "curation": "Curaduría"
+    "curation": "Curaduría",
+    "imports": "Importaciones",
+    "project": "Proyecto",
+    "sections": {
+      "discover": "Descubrir",
+      "learning": "Aprendizaje",
+      "community": "Comunidad",
+      "project": "Proyecto"
+    }
   },
   "footer": {
     "description": "Tube O2 enriquece videos de YouTube y los organiza en playlists educativas para aprender más rápido.",
@@ -62,28 +71,19 @@
     "byOpen2Technology": "por Open 2 Technology",
     "monynhaStatement": "Curaduría humana. Análisis profundo. Aprendizaje con dirección.",
     "columns": {
-      "explore": {
-        "title": "Explorar",
-        "allPaths": "Todos los caminos",
-        "facodi": "FACODI",
+      "platform": {
+        "title": "Plataforma"
+      },
+      "learning": {
+        "title": "Aprendizaje",
         "lesti": "LESTI",
-        "byTheme": "Por tema",
-        "curation": "Cómo curamos"
+        "editor": "Ser curador"
       },
-      "about": {
-        "title": "Sobre",
-        "howItWorks": "Cómo funciona",
-        "whoWeAre": "Quiénes somos",
-        "editorial": "Editorial",
-        "rules": "Metodología",
-        "faq": "Preguntas frecuentes"
+      "community": {
+        "title": "Comunidad"
       },
-      "contribute": {
-        "title": "Contribuir",
-        "submit": "Enviar un enlace",
-        "editor": "Ser curador",
-        "community": "Comunidad",
-        "contact": "Contacto"
+      "institutional": {
+        "title": "Institucional"
       }
     },
     "live": {

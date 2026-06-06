@@ -1,5 +1,5 @@
-import { Link, useNavigate } from "react-router-dom";
-import { Plus, Menu, Heart, Globe, User as UserIcon, Settings, KeyRound, LogOut, Bell, MessageCircle, ShieldCheck } from "lucide-react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import { Plus, Menu, Heart, Globe, User as UserIcon, Settings, KeyRound, LogOut, Bell, MessageCircle, ShieldCheck, ChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { type ReactNode, useState } from "react";
 import { useAuth } from "@/features/auth/useAuth";
@@ -9,13 +9,13 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useProfileById } from "@/features/profile/queries/useProfile";
-import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
+import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { NavLink } from "@/components/NavLink";
 import { MobileNav } from "./MobileNav";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
 import { useUnreadMessagesCount } from "@/features/messages";
 import { useUnreadNotificationsCount } from "@/features/notifications";
-import { languageOptions, primaryNavigationItems } from "./navigationItems";
+import { languageOptions, primaryNavigationItems, projectNavigationItems } from "./navigationItems";
 
 const MOBILE_MENU_ID = "mobile-navigation-menu";
 
@@ -34,19 +34,47 @@ function BrandLogo({ onClick }: { onClick?: () => void }) {
 
 function DesktopNavigation() {
   const { t } = useTranslation();
+  const location = useLocation();
+  const projectSectionIsActive = projectNavigationItems.some((item) => location.pathname === item.to || location.pathname.startsWith(`${item.to}/`));
 
   return (
-    <nav className="hidden min-w-0 items-center gap-0 lg:flex" aria-label={t('footer.navigation')}>
+    <nav className="hidden min-w-0 items-center gap-0 xl:flex" aria-label={t('footer.navigation')}>
       {primaryNavigationItems.map((item) => (
         <NavLink
           key={item.to}
           to={item.to}
-          className="whitespace-nowrap rounded-md px-2 py-1.5 text-sm font-semibold text-muted-foreground transition-colors duration-150 hover:bg-muted/60 hover:text-foreground xl:px-3"
+          end={item.to === '/' || item.to === '/playlists'}
+          className="whitespace-nowrap rounded-md px-2 py-1.5 text-sm font-semibold text-muted-foreground transition-colors duration-150 hover:bg-muted/60 hover:text-foreground 2xl:px-3"
           activeClassName="text-foreground bg-primary/12 hover:bg-primary/16"
         >
           {t(item.labelKey)}
         </NavLink>
       ))}
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button
+            variant="ghost"
+            size="sm"
+            className={projectSectionIsActive
+              ? "h-9 rounded-md bg-primary/12 px-2 text-sm font-semibold text-foreground hover:bg-primary/16 2xl:px-3"
+              : "h-9 rounded-md px-2 text-sm font-semibold text-muted-foreground hover:bg-muted/60 hover:text-foreground 2xl:px-3"}
+            aria-label={t('header.project')}
+          >
+            {t('header.project')}
+            <ChevronDown className="ml-1 h-3.5 w-3.5" aria-hidden="true" />
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="start" className="w-56 rounded-2xl p-1.5">
+          {projectNavigationItems.map((item) => (
+            <DropdownMenuItem key={item.to} asChild className="rounded-xl py-2">
+              <NavLink to={item.to} activeClassName="font-semibold text-foreground">
+                <item.icon className="mr-2 h-4 w-4" aria-hidden="true" />
+                <span>{t(item.labelKey)}</span>
+              </NavLink>
+            </DropdownMenuItem>
+          ))}
+        </DropdownMenuContent>
+      </DropdownMenu>
     </nav>
   );
 }
@@ -109,7 +137,7 @@ function NavigationActions({ user, profile, unreadMessagesCount, unreadNotificat
   const navigate = useNavigate();
 
   return (
-    <div className="hidden shrink-0 items-center gap-1 lg:flex">
+    <div className="hidden shrink-0 items-center gap-1 xl:flex">
       {user && profile ? (
         <>
           <HeaderIconButton label={t('header.favorites')} onClick={() => navigate('/favorites')}>
@@ -282,11 +310,11 @@ export const Header = () => {
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>
-      <div className="container flex h-16 items-center gap-3 lg:gap-4">
+      <div className="container flex h-16 items-center gap-3 xl:gap-4">
         <BrandLogo />
 
         {/* Divider */}
-        <div className="hidden lg:block h-5 w-px bg-border shrink-0" />
+        <div className="hidden xl:block h-5 w-px bg-border shrink-0" />
 
         <DesktopNavigation />
 
@@ -302,7 +330,7 @@ export const Header = () => {
         />
 
         {/* Mobile menu trigger */}
-        <div className="flex shrink-0 items-center lg:hidden">
+        <div className="flex shrink-0 items-center xl:hidden">
           <SheetTrigger asChild>
             <Button
               variant="ghost"
@@ -323,6 +351,9 @@ export const Header = () => {
             <SheetTitle className="text-left">
               <BrandLogo onClick={() => setIsSheetOpen(false)} />
             </SheetTitle>
+            <SheetDescription className="sr-only">
+              {t('header.menuDescription')}
+            </SheetDescription>
           </SheetHeader>
           <MobileNav
             user={user}
