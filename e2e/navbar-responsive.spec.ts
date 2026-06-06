@@ -12,7 +12,9 @@ const viewports = [
   { name: 'desktop-wide', width: 1440, height: 900 },
 ];
 
-const primaryLinks = [/videos/i, /playlists/i, /facodi/i, /curation/i, /community/i];
+const desktopBreakpoint = 1280;
+const desktopPrimaryLinks = [/videos/i, /playlists/i, /imports/i, /facodi/i, /community/i];
+const mobilePrimaryLinks = [/videos/i, /playlists/i, /imports/i, /facodi/i, /curation/i, /community/i];
 
 async function preparePage(page: Page) {
   await page.addInitScript(() => {
@@ -113,7 +115,7 @@ test.describe('responsive top navigation', () => {
 
       const header = page.locator('header');
 
-      if (viewport.width >= 1024) {
+      if (viewport.width >= desktopBreakpoint) {
         await page.screenshot({ path: `${screenshotDir}/${viewport.name}.png`, fullPage: false });
 
         await expect(header.getByRole('navigation', { name: /navigation/i })).toBeVisible();
@@ -124,9 +126,15 @@ test.describe('responsive top navigation', () => {
         await expect(header.getByRole('button', { name: /switch to (dark|light) mode/i })).toBeVisible();
 
         const desktopNavigation = header.getByRole('navigation', { name: /navigation/i });
-        for (const linkName of primaryLinks) {
+        for (const linkName of desktopPrimaryLinks) {
           await expect(desktopNavigation.getByRole('link', { name: linkName })).toBeVisible();
         }
+
+        const projectMenuButton = header.getByRole('button', { name: /project/i });
+        await expect(projectMenuButton).toBeVisible();
+        await projectMenuButton.click();
+        await expect(page.getByRole('menu').getByText(/curation/i)).toBeVisible();
+        await page.keyboard.press('Escape');
 
         return;
       }
@@ -138,13 +146,13 @@ test.describe('responsive top navigation', () => {
       await assertFocusStaysInsideDialog(page, dialog);
       await page.screenshot({ path: `${screenshotDir}/${viewport.name}-open.png`, fullPage: false });
 
-      for (const linkName of [/^home$/i, ...primaryLinks]) {
-        await expect(dialog.getByRole('link', { name: linkName })).toBeVisible();
+      for (const linkName of [/^home$/i, ...mobilePrimaryLinks]) {
+        await expect(dialog.getByRole('link', { name: linkName }).first()).toBeVisible();
       }
-      await expect(dialog.getByRole('button', { name: /submit video/i })).toBeVisible();
-      await expect(dialog.getByRole('button', { name: /login/i })).toBeVisible();
-      await expect(dialog.getByRole('combobox', { name: /language/i })).toBeVisible();
-      await expect(dialog.getByRole('button', { name: /switch to (dark|light) mode/i })).toBeVisible();
+      await expect(dialog.getByRole('button', { name: /submit video/i }).first()).toBeVisible();
+      await expect(dialog.getByRole('button', { name: /login/i }).first()).toBeVisible();
+      await expect(dialog.getByRole('combobox', { name: /language/i }).first()).toBeVisible();
+      await expect(dialog.getByRole('button', { name: /switch to (dark|light) mode/i }).first()).toBeVisible();
       await assertNoHorizontalOverflow(page);
 
       if (viewport.width > 430) {
