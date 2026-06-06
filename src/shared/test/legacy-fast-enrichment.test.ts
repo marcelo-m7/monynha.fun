@@ -9,6 +9,7 @@ import {
 
 const categories: LegacyFastCategory[] = [
   { id: 'cat-cultura', name: 'Cultura', slug: 'cultura' },
+  { id: 'cat-design', name: 'Design', slug: 'design' },
   { id: 'cat-educacao', name: 'Educacao', slug: 'educacao' },
   { id: 'cat-unclassified', name: 'Nao Classificados', slug: 'nao-classificados' },
   { id: 'cat-tech', name: 'Tecnologia', slug: 'tech' },
@@ -58,6 +59,26 @@ describe('legacy fast enrichment helpers', () => {
 
     expect(semanticTags).toEqual(expect.arrayContaining(['banco de dados', 'educação']));
     expect(selected?.id).toBe('cat-educacao');
+  });
+
+  it('detects art history videos from movement and painting terms', () => {
+    const semanticTags = deriveTags({
+      title: 'A Pintura do Renascimento',
+      description: null,
+      channelName: 'Dani Porto',
+      language: 'pt',
+    });
+
+    const selected = pickCategory(categories, {
+      currentCategoryId: null,
+      title: 'A Pintura do Renascimento',
+      description: null,
+      channelName: 'Dani Porto',
+      semanticTags,
+    });
+
+    expect(semanticTags).toContain('história da arte');
+    expect(selected?.id).toBe('cat-design');
   });
 
   it('falls back to education instead of leaving the category empty', () => {

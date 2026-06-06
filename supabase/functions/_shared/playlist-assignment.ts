@@ -52,7 +52,7 @@ export type PlaylistAssignmentResult = {
   signals: Record<SubjectSignal, number>;
 };
 
-export const PLAYLIST_ASSIGNMENT_ALGORITHM_VERSION = 'playlist-assignment-v5-openai-enrichment';
+export const PLAYLIST_ASSIGNMENT_ALGORITHM_VERSION = 'playlist-assignment-v6-art-history';
 export const MIN_PLAYLIST_ASSIGNMENT_CONFIDENCE = 0.65;
 export const MIN_PLAYLIST_ASSIGNMENT_SCORE = 7;
 export const MIN_DETERMINISTIC_PLAYLIST_SCORE = 12;
@@ -176,6 +176,19 @@ const subjectKeywords: Record<SubjectSignal, string[]> = {
     'literatura',
     'cultura',
     'arte',
+    'artes visuais',
+    'pintura',
+    'renascimento',
+    'barroco',
+    'maneirismo',
+    'gotico',
+    'gotica',
+    'bizantina',
+    'rupestre',
+    'paleocrista',
+    'romanica',
+    'egipcia',
+    'grega',
   ],
 };
 
@@ -273,6 +286,39 @@ function isCalculusOnePlaylist(playlist: PlaylistAssignmentPlaylist): boolean {
   return text.includes('analise matematica i') || text.includes('calculo i') || text.includes('calculo 1');
 }
 
+function isArtHistoryPlaylist(playlist: PlaylistAssignmentPlaylist): boolean {
+  const text = normalizeText(playlistText(playlist));
+  return text.includes('historia da arte') || text.includes('artes visuais');
+}
+
+function hasArtHistorySignals(sourceText: string): boolean {
+  const text = normalizeText(sourceText);
+  const artMovements = [
+    'renascimento',
+    'barroco',
+    'maneirismo',
+    'gotico',
+    'gotica',
+    'bizantina',
+    'rupestre',
+    'paleocrista',
+    'romanica',
+    'arte grega',
+    'arte romana',
+    'arte egipcia',
+  ];
+
+  const hasMovement = artMovements.some((keyword) => text.includes(keyword));
+  const hasArtTerm =
+    text.includes('historia da arte') ||
+    text.includes('arte') ||
+    text.includes('artes visuais') ||
+    text.includes('pintura') ||
+    (text.includes('arquitetura') && hasMovement);
+
+  return hasArtTerm || hasMovement;
+}
+
 function hasCalculusOneSignals(sourceText: string): boolean {
   const text = normalizeText(sourceText);
   return (
@@ -333,6 +379,14 @@ function scorePlaylist(params: {
     if (isDatabasePlaylist(playlist)) {
       score += 8;
     } else if (normalizeText(playlistText(playlist)).includes('algoritmos')) {
+      score -= 4;
+    }
+  }
+
+  if (hasArtHistorySignals(sourceText)) {
+    if (isArtHistoryPlaylist(playlist)) {
+      score += 10;
+    } else if (playlistSubjectScore(playlist, 'programming') > 0 || isDatabasePlaylist(playlist)) {
       score -= 4;
     }
   }
@@ -435,6 +489,11 @@ export function assignPlaylist(params: {
       !!bestPlaylist &&
       isDatabasePlaylist(bestPlaylist) &&
       best.score >= MIN_DETERMINISTIC_PLAYLIST_SCORE;
+    const strongArtHistoryMatch =
+      hasArtHistorySignals(sourceText) &&
+      !!bestPlaylist &&
+      isArtHistoryPlaylist(bestPlaylist) &&
+      best.score >= MIN_DETERMINISTIC_PLAYLIST_SCORE;
     const calculusOneCandidate = scoredCandidates.find((candidate) => {
       const playlist = playlists.find((item) => item.id === candidate.playlistId);
       return !!playlist && isCalculusOnePlaylist(playlist);
@@ -449,6 +508,11 @@ export function assignPlaylist(params: {
       assignedPlaylistId = calculusOneCandidate.playlistId;
       score = calculusOneCandidate.score;
       reason = 'Deterministic scoring selected Análise Matemática I for Cálculo 1 signals.';
+      decisionSource = 'deterministic';
+    } else if (strongArtHistoryMatch) {
+      assignedPlaylistId = best.playlistId;
+      score = best.score;
+      reason = 'Deterministic scoring selected História da Arte for art-history signals.';
       decisionSource = 'deterministic';
     } else if (strongDatabaseMatch || (best.score >= MIN_DETERMINISTIC_PLAYLIST_SCORE && margin >= 4)) {
       assignedPlaylistId = best.playlistId;

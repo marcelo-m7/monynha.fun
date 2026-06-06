@@ -50,6 +50,7 @@ export function deriveTags(params: {
   const signals: Array<[string, string[]]> = [
     ['matemática', ['matem', 'calculo', 'cálculo', 'algebra', 'álgebra', 'equacao', 'equação', 'estatistica', 'estatística', 'integral', 'derivada']],
     ['programação', ['programa', 'javascript', 'typescript', 'python', 'codigo', 'código', 'software', 'react', 'node', 'fastapi']],
+    ['história da arte', ['historia da arte', 'história da arte', 'arte', 'artes visuais', 'pintura', 'renascimento', 'barroco', 'maneirismo', 'gótico', 'gotico', 'bizantina', 'rupestre', 'paleocristã', 'paleocrista', 'românica', 'romanica', 'arte grega', 'arte romana', 'arte egípcia', 'arte egipcia']],
     ['design', ['design', 'visual', 'grafico', 'gráfico', 'tipografia', 'indesign', 'composição visual']],
     ['banco de dados', ['sql', 'database', 'dados', 'banco de dados', 'base de dados', 'normalização', 'normalizacao']],
     ['Odoo', ['odoo', 'erp', 'human resources', 'employees', 'expenses', 'fleet', 'time off']],
@@ -77,6 +78,7 @@ function scoreCategory(category: LegacyFastCategory, source: string, semanticTag
     educacao: ['educacao', 'aula', 'curso', 'aprenda', 'tutorial', 'ensino', 'estudo', 'facodi', 'universidade', 'escola'],
     matematica: ['matematica', 'calculo', 'integral', 'derivada', 'algebra', 'equacao', 'vetorial', 'coordenadas', 'estatistica'],
     design: ['design', 'tipografia', 'grafico', 'comunicacao visual', 'indesign', 'composicao visual', 'ilustracao'],
+    'historia-da-arte': ['historia da arte', 'arte', 'artes visuais', 'pintura', 'renascimento', 'barroco', 'maneirismo', 'gotico', 'bizantina', 'rupestre', 'paleocrista', 'romanica', 'arte grega', 'arte romana', 'arte egipcia'],
     'memes-iconicos': ['meme', 'memes', 'viral', 'humor', 'engracado'],
     musica: ['musica', 'music', 'audio', 'som', 'cantor', 'banda', 'instrumento'],
     tech: ['tech', 'tecnologia', 'programacao', 'programa', 'codigo', 'software', 'javascript', 'typescript', 'python', 'sql', 'database', 'dados', 'ia', 'inteligencia artificial', 'odoo', 'erp', 'supabase', 'linux'],
@@ -120,6 +122,13 @@ export function pickCategory(categories: LegacyFastCategory[], params: {
     params.channelName,
     params.semanticTags.join(' '),
   ].filter(Boolean).join(' '));
+
+  if (params.semanticTags.some((tag) => normalizeText(tag) === 'historia da arte')) {
+    const designCategory = categories.find((category) => normalizeText(category.slug) === 'design');
+    const cultureCategory = categories.find((category) => normalizeText(category.slug) === 'cultura');
+    if (designCategory) return designCategory;
+    if (cultureCategory) return cultureCategory;
+  }
 
   let best: { category: LegacyFastCategory | null; score: number } = { category: null, score: 0 };
   for (const category of categories) {

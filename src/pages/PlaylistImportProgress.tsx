@@ -15,7 +15,7 @@ import { getVideoSubmissionMetadata, type VideoSubmission, type VideoSubmissionS
 import { useAuth } from '@/features/auth/useAuth';
 import { startVideoSubmissionProcessing, useVideoSubmissions } from '@/features/video-submissions/queries/useVideoSubmissions';
 
-const terminalStatuses = new Set<VideoSubmissionStatus>(['success', 'failed', 'duplicate', 'recoverable_error']);
+const terminalStatuses = new Set<VideoSubmissionStatus>(['success', 'failed', 'duplicate']);
 
 function parseIds(rawIds: string | null) {
   return Array.from(new Set((rawIds ?? '').split(',').map((id) => id.trim()).filter(Boolean)));
@@ -42,7 +42,7 @@ async function runWithConcurrencyLimit<T>(items: T[], limit: number, worker: (it
 }
 
 function canStartProcessing(submission: VideoSubmission) {
-  return submission.status === 'pending' && !!submission.video_id && !!submission.youtube_url;
+  return (submission.status === 'pending' || submission.status === 'recoverable_error') && !!submission.video_id && !!submission.youtube_url;
 }
 
 function getStatusIcon(status: string) {
@@ -85,7 +85,7 @@ export default function PlaylistImportProgress() {
     let cancelled = false;
     pendingSubmissions.forEach((submission) => startedIdsRef.current.add(submission.id));
 
-    runWithConcurrencyLimit(pendingSubmissions, 3, async (submission) => {
+    runWithConcurrencyLimit(pendingSubmissions, 1, async (submission) => {
       await startVideoSubmissionProcessing({
         submissionId: submission.id,
         videoId: submission.video_id as string,

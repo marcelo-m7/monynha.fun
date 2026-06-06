@@ -47,6 +47,16 @@ const playlists: PlaylistAssignmentPlaylist[] = [
     unit_code: '14541000',
   },
   {
+    id: 'art-history',
+    name: 'Historia da Arte Moderna e Contemporanea - 1º Ano 1º Semestre - LDC',
+    description: 'Roteiro oficial de aprendizagem da unidade curricular 14541196 da licenciatura em Design de Comunicacao.',
+    language: 'pt',
+    is_public: true,
+    is_ordered: true,
+    course_code: 'LDC',
+    unit_code: '14541196',
+  },
+  {
     id: 'programming',
     name: 'Programacao I - 1º Ano 1º Semestre - LESTI',
     description: 'Fundamentos de programacao, algoritmos e codigo.',
@@ -139,6 +149,26 @@ describe('playlist assignment', () => {
 
     expect(result.assignedPlaylistId).toBe('design-i');
     expect(result.rejectedPlaylistId).toBeNull();
+  });
+
+  it('assigns art history imports to the LDC art history playlist', () => {
+    const result = assignPlaylist({
+      playlists,
+      analysis: {
+        ...baseAnalysis,
+        title: 'A Pintura do Renascimento',
+        semanticTags: ['história da arte'],
+        summaryDescription: 'Video do canal Dani Porto sobre A Pintura do Renascimento.',
+        shortSummary: 'A Pintura do Renascimento.',
+        suggestedPlaylistId: null,
+        suggestedPlaylistQuery: 'história da arte',
+        classificationConfidence: null,
+      },
+    });
+
+    expect(result.assignedPlaylistId).toBe('art-history');
+    expect(result.decisionSource).toBe('deterministic');
+    expect(result.reliability).toBe('high');
   });
 
   it('returns null when OpenAI does not choose a playlist and signals are broad', () => {
