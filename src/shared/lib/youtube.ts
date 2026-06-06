@@ -64,7 +64,7 @@ export function extractYouTubePlaylistId(url: string): string | null {
   }
 } 
 
-export function getYouTubeThumbnail(videoId: string, quality: 'default' | 'medium' | 'high' | 'max' = 'max'): string {
+export function getYouTubeThumbnail(videoId: string, quality: 'default' | 'medium' | 'high' | 'max' = 'high'): string {
   const qualityMap = {
     default: 'default',
     medium: 'mqdefault',
@@ -72,6 +72,11 @@ export function getYouTubeThumbnail(videoId: string, quality: 'default' | 'mediu
     max: 'maxresdefault'
   };
   return `https://img.youtube.com/vi/${videoId}/${qualityMap[quality]}.jpg`;
+}
+
+export function getReliableYouTubeThumbnailUrl(src: string | null | undefined, fallbackSrc = '/placeholder.png'): string {
+  if (!src) return fallbackSrc;
+  return src.replace(/\/maxresdefault\.jpg(?=$|[?#])/i, '/hqdefault.jpg');
 }
 
 export function getYouTubeEmbedUrl(videoId: string): string {

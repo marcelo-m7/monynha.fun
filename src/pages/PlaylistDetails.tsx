@@ -16,6 +16,7 @@ import { SortableVideoList } from '@/components/playlist/SortableVideoList';
 import { PlaylistCollaboratorsDialog } from '@/components/playlist/PlaylistCollaboratorsDialog';
 import { AddVideoDialog } from '@/components/playlist/AddVideoDialog';
 import { PlaylistDetailsHeader } from '@/features/playlists/components/PlaylistDetailsHeader';
+import { getReliableYouTubeThumbnailUrl } from '@/shared/lib/youtube';
 
 const PlaylistDetails = () => {
   const { t } = useTranslation();
@@ -103,7 +104,10 @@ const PlaylistDetails = () => {
     );
   }
 
-  const playlistThumbnail = playlist.thumbnail_url || playlistVideos?.[0]?.video?.thumbnail_url || '/placeholder.svg';
+  const playlistThumbnail = getReliableYouTubeThumbnailUrl(
+    playlist.thumbnail_url || playlistVideos?.[0]?.video?.thumbnail_url,
+    '/placeholder.svg',
+  );
 
   return (
     <MainLayout>

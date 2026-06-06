@@ -11,6 +11,7 @@ import { useTranslation } from 'react-i18next';
 import { useVideoViewIncrement } from '@/shared/hooks/useVideoViewIncrement';
 import { KeyboardEvent } from "react";
 import { LazyImage } from "@/shared/components/LazyImage";
+import { getReliableYouTubeThumbnailUrl } from "@/shared/lib/youtube";
 
 interface FeaturedHeroProps {
   video: VideoWithCategory;
@@ -51,8 +52,9 @@ export const FeaturedHero = ({ video }: FeaturedHeroProps) => {
         </div>
 
         <LazyImage
-          src={video.thumbnail_url}
+          src={getReliableYouTubeThumbnailUrl(video.thumbnail_url, '/placeholder.svg')}
           alt={video.title}
+          fallbackSrc="/placeholder.svg"
           className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
         />
         <VideoDurationBadge durationSeconds={video.duration_seconds} className="bottom-4 right-4" />

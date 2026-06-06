@@ -10,6 +10,7 @@ import { Button } from '@/components/ui/button';
 import { VideoDurationBadge } from '@/components/video/VideoDurationBadge';
 import { getVideoRoute } from '@/entities/video/video.routes';
 import { cn } from '@/lib/utils';
+import { getReliableYouTubeThumbnailUrl } from '@/shared/lib/youtube';
 
 interface SortableVideoItemProps {
   item: PlaylistVideo;
@@ -101,7 +102,7 @@ export function SortableVideoItem({
         className="relative w-24 h-14 rounded-lg overflow-hidden shrink-0 group-hover:ring-2 ring-primary/50 transition-shadow duration-150"
       >
         <img
-          src={item.video?.thumbnail_url || '/placeholder.svg'}
+            src={getReliableYouTubeThumbnailUrl(item.video?.thumbnail_url, '/placeholder.svg')}
           alt={item.video?.title}
           className="w-full h-full object-cover"
           onError={(e) => {

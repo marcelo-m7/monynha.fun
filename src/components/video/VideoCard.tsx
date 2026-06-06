@@ -12,6 +12,7 @@ import { useTranslation } from 'react-i18next';
 import { useVideoViewIncrement } from '@/shared/hooks/useVideoViewIncrement';
 import { KeyboardEvent, memo, useCallback } from "react";
 import { LazyImage } from "@/shared/components/LazyImage";
+import { getReliableYouTubeThumbnailUrl } from "@/shared/lib/youtube";
 import { SemanticTagBadge } from "./SemanticTagBadge";
 import { EnrichmentIndicator } from "./EnrichmentIndicator";
 import { VideoDurationBadge } from "./VideoDurationBadge";
@@ -64,8 +65,9 @@ const VideoCardComponent = ({ video, onClick, variant = 'default' }: VideoCardPr
         variant === 'default' ? "h-auto" : "w-28 h-16 flex-shrink-0 rounded-sm"
       )}>
         <LazyImage
-          src={video.thumbnail_url}
+          src={getReliableYouTubeThumbnailUrl(video.thumbnail_url, '/placeholder.svg')}
           alt={video.title}
+          fallbackSrc="/placeholder.svg"
           className="w-full h-full object-cover transition-transform duration-200 motion-safe:group-hover:scale-[1.02]"
         />
 

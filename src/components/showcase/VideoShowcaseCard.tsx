@@ -5,6 +5,7 @@ import type { HomeHeroVideo } from '@/entities/home/home.types';
 import { getVideoRoute } from '@/entities/video/video.routes';
 import { LazyImage } from '@/shared/components/LazyImage';
 import { formatViewCount } from '@/shared/lib/format';
+import { getReliableYouTubeThumbnailUrl } from '@/shared/lib/youtube';
 import { cn } from '@/lib/utils';
 
 interface VideoShowcaseCardProps {
@@ -16,7 +17,7 @@ interface VideoShowcaseCardProps {
 export function VideoShowcaseCard({ video, variant = 'tile', className }: VideoShowcaseCardProps) {
   const navigate = useNavigate();
   const primaryTag = video.semantic_tags?.[0] ?? video.category_name;
-  const image = video.thumbnail_url || '/placeholder.png';
+  const image = getReliableYouTubeThumbnailUrl(video.thumbnail_url, '/placeholder.png');
 
   return (
     <button

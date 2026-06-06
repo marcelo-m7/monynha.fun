@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { cn } from '@/lib/utils';
 import { Skeleton } from '@/components/ui/skeleton';
+import { getReliableYouTubeThumbnailUrl } from '@/shared/lib/youtube';
 
 const DEFAULT_OBSERVER_OPTIONS: IntersectionObserverInit = { rootMargin: '120px', threshold: 0.01 };
 
@@ -45,6 +46,7 @@ export const LazyImage: React.FC<LazyImageProps> = ({
   decoding = 'async',
   ...props
 }) => {
+  const safeSrc = getReliableYouTubeThumbnailUrl(src, src);
   const [isLoaded, setIsLoaded] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [imageSrc, setImageSrc] = useState<string | null>(null);
@@ -57,14 +59,14 @@ export const LazyImage: React.FC<LazyImageProps> = ({
     setImageSrc(null);
 
     if (typeof IntersectionObserver === 'undefined') {
-      setImageSrc(src);
+      setImageSrc(safeSrc);
       return;
     }
 
     const observer = new IntersectionObserver((entries) => {
       entries.forEach((entry) => {
         if (entry.isIntersecting) {
-          setImageSrc(src);
+          setImageSrc(safeSrc);
           observer.unobserve(entry.target);
         }
       });
@@ -82,7 +84,7 @@ export const LazyImage: React.FC<LazyImageProps> = ({
       }
       observer.disconnect();
     };
-  }, [src, observerOptions]);
+  }, [safeSrc, observerOptions]);
 
   const handleLoad = () => {
     setIsLoaded(true);
@@ -90,12 +92,13 @@ export const LazyImage: React.FC<LazyImageProps> = ({
   };
 
   const handleError = () => {
-    const errorMsg = `Failed to load image: ${src}`;
+    const errorMsg = `Failed to load image: ${imageSrc ?? safeSrc}`;
     setError(errorMsg);
     onErrorOccurred?.(new Error(errorMsg));
 
-    // Try fallback image if provided
-    if (fallbackSrc && imageSrc === src) {
+    if (fallbackSrc && imageSrc !== fallbackSrc) {
+      setError(null);
+      setIsLoaded(false);
       setImageSrc(fallbackSrc);
     }
   };

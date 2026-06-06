@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import {
@@ -13,9 +13,17 @@ import type { ConversationSummary, DirectMessage } from '@/entities/direct_messa
 import { useAuth } from '@/features/auth/useAuth';
 import { supabase } from '@/shared/api/supabase/supabaseClient';
 
+let directMessagesRealtimeInstance = 0;
+
 function useDirectMessagesRealtime(otherUsername?: string) {
   const { user } = useAuth();
   const queryClient = useQueryClient();
+  const instanceIdRef = useRef<string | null>(null);
+
+  if (!instanceIdRef.current) {
+    directMessagesRealtimeInstance += 1;
+    instanceIdRef.current = String(directMessagesRealtimeInstance);
+  }
 
   useEffect(() => {
     if (!user?.id || import.meta.env.MODE === 'test') return;
@@ -29,7 +37,7 @@ function useDirectMessagesRealtime(otherUsername?: string) {
     };
 
     const channel = supabase
-      .channel(`direct-messages:${user.id}:${otherUsername ?? 'all'}`)
+      .channel(`direct-messages:${user.id}:${otherUsername ?? 'all'}:${instanceIdRef.current}`)
       .on(
         'postgres_changes',
         {

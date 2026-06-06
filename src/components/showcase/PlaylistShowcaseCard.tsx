@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import type { HomeFacodiHighlight, HomeFeaturedPlaylist } from '@/entities/home/home.types';
 import { LazyImage } from '@/shared/components/LazyImage';
 import { formatDuration } from '@/shared/lib/format';
+import { getReliableYouTubeThumbnailUrl } from '@/shared/lib/youtube';
 import { cn } from '@/lib/utils';
 
 type PlaylistLike = HomeFeaturedPlaylist | HomeFacodiHighlight;
@@ -22,7 +23,10 @@ export function PlaylistShowcaseCard({ playlist, className, compact = false }: P
   const id = isFacodiHighlight(playlist) ? playlist.playlist_id : playlist.id;
   const title = isFacodiHighlight(playlist) ? playlist.playlist_name : playlist.name;
   const description = isFacodiHighlight(playlist) ? playlist.playlist_description : playlist.description;
-  const image = playlist.thumbnail_url || (!isFacodiHighlight(playlist) ? playlist.preview_video_thumbnail_url : null) || '/placeholder.png';
+  const image = getReliableYouTubeThumbnailUrl(
+    playlist.thumbnail_url || (!isFacodiHighlight(playlist) ? playlist.preview_video_thumbnail_url : null),
+    '/placeholder.png',
+  );
   const courseCode = playlist.course_code;
   const unitCode = playlist.unit_code;
   const videoCount = playlist.video_count;

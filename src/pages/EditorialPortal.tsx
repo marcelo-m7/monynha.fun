@@ -13,6 +13,7 @@ import { useAuth } from '@/features/auth/useAuth';
 import { useVideoAnalysisJobs } from '@/features/video-analysis/useVideoAnalysisJob';
 import { usePlaylists } from '@/features/playlists/queries/usePlaylists';
 import { useIsEditor } from '@/features/profile/queries/useProfile';
+import { getReliableYouTubeThumbnailUrl } from '@/shared/lib/youtube';
 import { ArrowLeft, ListVideo, Plus, Search } from 'lucide-react';
 
 const EditorialPortal = () => {
@@ -150,7 +151,7 @@ const EditorialPortal = () => {
                     {job.video?.thumbnail_url ? (
                       <div className="relative h-16 w-24 shrink-0 overflow-hidden rounded-md bg-muted">
                         <img
-                          src={job.video.thumbnail_url}
+                            src={getReliableYouTubeThumbnailUrl(job.video.thumbnail_url, '/placeholder.svg')}
                           alt=""
                           className="h-full w-full object-cover"
                           loading="lazy"

@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { ListVideo, BookOpen, Code, Globe, Lock, GraduationCap, Users, Clock3 } from 'lucide-react';
 import type { Playlist } from '@/entities/playlist/playlist.types';
 import { formatDuration } from '@/shared/lib/format';
+import { getReliableYouTubeThumbnailUrl } from '@/shared/lib/youtube';
 
 interface PlaylistCardProps {
   playlist: Playlist;
@@ -13,7 +14,7 @@ export function PlaylistCard({ playlist, index = 0 }: PlaylistCardProps) {
   const { t } = useTranslation();
 
   // Use thumbnail_url from playlist, fallback to placeholder icon
-  const thumbnailUrl = playlist.thumbnail_url;
+  const thumbnailUrl = getReliableYouTubeThumbnailUrl(playlist.thumbnail_url, '');
   const totalVideos = playlist.video_count ?? 0;
   const totalDuration = playlist.total_duration_seconds ?? 0;
   const collaboratorCount = playlist.collaborator_count ?? 0;

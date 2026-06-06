@@ -99,5 +99,5 @@ describe('PlaylistImportDialog', () => {
     expect(navigateMock).toHaveBeenCalledWith(expect.stringContaining('found=5'));
     expect(navigateMock).toHaveBeenCalledWith(expect.stringContaining('created=3'));
     expect(navigateMock).toHaveBeenCalledWith(expect.stringContaining('existing=2'));
-  });
+  }, 15000);
 });

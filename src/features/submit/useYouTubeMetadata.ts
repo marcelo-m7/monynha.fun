@@ -53,7 +53,7 @@ export function useYouTubeMetadata(url: string): UseYouTubeMetadataResult {
           videoId,
           title: data.title,
           channelName: data.author_name,
-          thumbnailUrl: getYouTubeThumbnail(videoId, 'max'),
+          thumbnailUrl: getYouTubeThumbnail(videoId, 'high'),
           description: ''
         });
       } catch (err) {

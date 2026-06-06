@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { extractYouTubeId, getYouTubeEmbedUrl, getYouTubeThumbnail, getYouTubeWatchUrl, extractYouTubePlaylistId } from './youtube';
+import { extractYouTubeId, getReliableYouTubeThumbnailUrl, getYouTubeEmbedUrl, getYouTubeThumbnail, getYouTubeWatchUrl, extractYouTubePlaylistId } from './youtube';
 
 describe('youtube helpers', () => {
   it('extracts YouTube IDs from supported URLs', () => {
@@ -30,10 +30,23 @@ describe('youtube helpers', () => {
   it('builds embed and thumbnail URLs', () => {
     const videoId = 'abc123DEF45';
     expect(getYouTubeEmbedUrl(videoId)).toBe('https://www.youtube.com/embed/abc123DEF45');
+    expect(getYouTubeThumbnail(videoId)).toBe(
+      'https://img.youtube.com/vi/abc123DEF45/hqdefault.jpg',
+    );
     expect(getYouTubeThumbnail(videoId, 'high')).toBe(
       'https://img.youtube.com/vi/abc123DEF45/hqdefault.jpg',
     );
+    expect(getYouTubeThumbnail(videoId, 'max')).toBe(
+      'https://img.youtube.com/vi/abc123DEF45/maxresdefault.jpg',
+    );
     expect(getYouTubeWatchUrl(videoId)).toBe('https://www.youtube.com/watch?v=abc123DEF45');
+  });
+
+  it('normalizes max-resolution thumbnails to reliable YouTube thumbnails', () => {
+    expect(getReliableYouTubeThumbnailUrl('https://img.youtube.com/vi/abc123DEF45/maxresdefault.jpg')).toBe(
+      'https://img.youtube.com/vi/abc123DEF45/hqdefault.jpg',
+    );
+    expect(getReliableYouTubeThumbnailUrl(null, '/placeholder.svg')).toBe('/placeholder.svg');
   });
 
   it('extracts YouTube playlist IDs from supported URLs', () => {

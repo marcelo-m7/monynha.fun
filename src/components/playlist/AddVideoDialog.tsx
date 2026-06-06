@@ -14,6 +14,7 @@ import { Input } from '@/components/ui/input';
 import { VideoDurationBadge } from '@/components/video/VideoDurationBadge';
 import { useAddVideoToPlaylist, PlaylistVideo } from '@/features/playlists';
 import { useVideos } from '@/features/videos/queries/useVideos';
+import { getReliableYouTubeThumbnailUrl } from '@/shared/lib/youtube';
 import { toast } from 'sonner';
 
 interface AddVideoDialogProps {
@@ -85,7 +86,7 @@ export function AddVideoDialog({ playlistId, existingVideos }: AddVideoDialogPro
                 >
                   <div className="relative h-12 w-20 shrink-0 overflow-hidden rounded-lg bg-muted">
                     <img
-                      src={video.thumbnail_url}
+                       src={getReliableYouTubeThumbnailUrl(video.thumbnail_url, '/placeholder.svg')}
                       alt={video.title}
                       className="h-full w-full object-cover"
                     />
