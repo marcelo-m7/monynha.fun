@@ -16,6 +16,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Loader2, Youtube, ListVideo, Info, CheckCircle, AlertCircle } from 'lucide-react';
 import { toast } from 'sonner';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/features/auth/useAuth';
 import { extractYouTubePlaylistId } from '@/shared/lib/youtube';
 import { getEdgeFunctionErrorDetails, invokeEdgeFunction } from '@/shared/api/supabase/edgeFunctions';
@@ -48,38 +49,20 @@ type ImportYoutubePlaylistResponse = {
   submissions?: ImportedSubmission[];
 };
 
-type EnrichableSubmission = {
+type TrackableSubmission = {
   id: string;
   video_id: string;
   youtube_url: string;
 };
 
-function isEnrichableSubmission(submission: ImportedSubmission): submission is EnrichableSubmission {
+function isTrackableSubmission(submission: ImportedSubmission): submission is TrackableSubmission {
   return !!submission.id && !!submission.video_id && !!submission.youtube_url;
-}
-
-async function runWithConcurrencyLimit<T>(
-  items: T[],
-  limit: number,
-  worker: (item: T) => Promise<void>,
-) {
-  const queue = [...items];
-  const workerCount = Math.max(1, Math.min(limit, queue.length));
-
-  await Promise.all(
-    Array.from({ length: workerCount }, async () => {
-      while (queue.length > 0) {
-        const item = queue.shift();
-        if (!item) return;
-        await worker(item);
-      }
-    }),
-  );
 }
 
 export const PlaylistImportDialog: React.FC<PlaylistImportDialogProps> = ({ children }) => {
   const { t } = useTranslation();
   const { user } = useAuth();
+  const navigate = useNavigate();
   const [open, setOpen] = useState(false);
 
   const {
@@ -139,40 +122,28 @@ export const PlaylistImportDialog: React.FC<PlaylistImportDialogProps> = ({ chil
         throw new Error(t('playlists.import.error.noImportResponse'));
       }
 
-      const submissions = (edgeFunctionData.submissions ?? []).filter(isEnrichableSubmission);
-
-      let processedForEnrichment = 0;
-      let enrichFailedCount = 0;
-
-      await runWithConcurrencyLimit(submissions, 3, async (submission) => {
-        const { error } = await invokeEdgeFunction('enrich-video', {
-          body: {
-            videoId: submission.video_id,
-            youtubeUrl: submission.youtube_url,
-            submissionId: submission.id,
-          },
-          headers: { 'Content-Type': 'application/json' },
-        });
-
-        if (error) {
-          enrichFailedCount += 1;
-          return;
-        }
-
-        processedForEnrichment += 1;
-      });
+      const submissions = (edgeFunctionData.submissions ?? []).filter(isTrackableSubmission);
+      const createdCount = edgeFunctionData.created_submission_count ?? submissions.length;
+      const existingCount = (edgeFunctionData.skipped_existing_enriched_count ?? 0) + (edgeFunctionData.already_queued_count ?? 0);
 
       toast.success(t('playlists.import.success.summaryTitle'), {
         description: t('playlists.import.success.summaryDescription', {
           found: edgeFunctionData.fetched_video_count,
-          created: edgeFunctionData.created_submission_count ?? submissions.length,
-          existing: (edgeFunctionData.skipped_existing_enriched_count ?? 0) + (edgeFunctionData.already_queued_count ?? 0),
-          queued: processedForEnrichment,
+          created: createdCount,
+          existing: existingCount,
+          queued: submissions.length,
         }),
       });
 
-      if (enrichFailedCount > 0) {
-        toast.warning(t('playlists.import.warning.enrichPartial', { failed: enrichFailedCount }));
+      if (submissions.length > 0) {
+        const params = new URLSearchParams({
+          ids: submissions.map((submission) => submission.id).join(','),
+          found: String(edgeFunctionData.fetched_video_count),
+          created: String(createdCount),
+          existing: String(existingCount),
+        });
+
+        navigate(`/playlists/import/progress?${params.toString()}`);
       }
 
       setOpen(false);

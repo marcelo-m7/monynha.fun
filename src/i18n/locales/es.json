@@ -948,7 +948,31 @@
         "enrichPartial": "{{failed}} video(s) no pudieron enviarse a procesamiento por ahora.",
         "noVideosFoundInPlaylist": "No se encontraron videos en la playlist de YouTube."
       },
-      "apiLimitationInfo": "Tube O2 envía videos de playlists públicas de YouTube al mismo flujo de enriquecimiento usado por envíos individuales. Los videos solo entran en playlists educativas cuando el análisis confirma una coincidencia real."
+      "apiLimitationInfo": "Tube O2 envía videos de playlists públicas de YouTube al mismo flujo de enriquecimiento usado por envíos individuales. Los videos solo entran en playlists educativas cuando el análisis confirma una coincidencia real.",
+      "progress": {
+        "backToPlaylists": "Volver a playlists",
+        "kicker": "Importación por lote",
+        "title": "Progreso de importación de la playlist",
+        "description": "Sigue cada video importado mientras Tube O2 enriquece metadatos y asigna playlists educativas.",
+        "progressBadge": "{{done}}/{{total}} finalizados",
+        "progressLabel": "{{progress}}% de la importación llegó a un estado final.",
+        "emptyTitle": "No hay envíos para seguir",
+        "emptyDescription": "Inicia una nueva importación de playlist de YouTube para ver aquí el progreso del lote.",
+        "loadErrorTitle": "No se pudo cargar el progreso",
+        "loadErrorDescription": "Actualiza la página o abre el estado de un envío individual.",
+        "partialTitle": "Algunos videos necesitan atención",
+        "partialDescription": "{{failed}} video(s) importados fallaron o requieren otro intento.",
+        "stageLabel": "Etapa",
+        "openSubmission": "Abrir estado",
+        "refresh": "Actualizar",
+        "metrics": {
+          "found": "Encontrados",
+          "created": "Nuevos envíos",
+          "existing": "Ya gestionados",
+          "processing": "Procesando",
+          "ready": "Listos"
+        }
+      }
     },
     "feedback": {
       "createSuccess": "¡Lista de reproducción creada con éxito!",

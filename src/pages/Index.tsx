@@ -90,6 +90,22 @@ function pickVideos(primary: HomeHeroVideo[], fallback: HomeHeroVideo[], limit =
   return merged.slice(0, limit);
 }
 
+function pickRailVideos(
+  primary: HomeHeroVideo[],
+  fallback: HomeHeroVideo[],
+  usedVideoIds: Set<string>,
+  limit = DEFAULT_RAIL_LIMIT,
+) {
+  const candidates = pickVideos(primary, fallback, limit * 2);
+  const freshVideos = candidates.filter((video) => !usedVideoIds.has(video.id));
+  const repeatedFill = candidates.filter((video) => !freshVideos.some((freshVideo) => freshVideo.id === video.id));
+  const selected = [...freshVideos, ...repeatedFill].slice(0, limit);
+
+  selected.forEach((video) => usedVideoIds.add(video.id));
+
+  return selected;
+}
+
 const Index = () => {
   const { i18n, t } = useTranslation();
   const navigate = useNavigate();
@@ -117,52 +133,53 @@ const Index = () => {
     const communityFavorites = [...allRailsPool].sort(
       (a, b) => b.favorites_count + b.playlist_add_count - (a.favorites_count + a.playlist_add_count),
     );
+    const usedVideoIds = new Set<string>(homeVideos.slice(0, 4).map((video) => video.id));
 
     return [
       {
         key: 'trendingNow',
         title: t('homeExhibition.videoRails.trendingNow.title'),
         description: t('homeExhibition.videoRails.trendingNow.description'),
-        videos: pickVideos(featuredVideos, allRailsPool),
+        videos: pickRailVideos(featuredVideos, allRailsPool, usedVideoIds),
         variant: 'dark' as const,
       },
       {
         key: 'freshDrops',
         title: t('homeExhibition.videoRails.freshDrops.title'),
         description: t('homeExhibition.videoRails.freshDrops.description'),
-        videos: pickVideos(recentVideos, allRailsPool),
+        videos: pickRailVideos(recentVideos, allRailsPool, usedVideoIds),
         variant: 'light' as const,
       },
       {
         key: 'mostViewed',
         title: t('homeExhibition.videoRails.mostViewed.title'),
         description: t('homeExhibition.videoRails.mostViewed.description'),
-        videos: pickVideos(mostViewed, allRailsPool),
+        videos: pickRailVideos(mostViewed, allRailsPool, usedVideoIds),
         variant: 'dark' as const,
       },
       {
         key: 'communityPicks',
         title: t('homeExhibition.videoRails.communityPicks.title'),
         description: t('homeExhibition.videoRails.communityPicks.description'),
-        videos: pickVideos(communityFavorites, allRailsPool),
+        videos: pickRailVideos(communityFavorites, allRailsPool, usedVideoIds),
         variant: 'light' as const,
       },
       {
         key: 'withSummaries',
         title: t('homeExhibition.videoRails.withSummaries.title'),
         description: t('homeExhibition.videoRails.withSummaries.description'),
-        videos: pickVideos(withSummaries, allRailsPool),
+        videos: pickRailVideos(withSummaries, allRailsPool, usedVideoIds),
         variant: 'dark' as const,
       },
       {
         key: 'quickLessons',
         title: t('homeExhibition.videoRails.quickLessons.title'),
         description: t('homeExhibition.videoRails.quickLessons.description'),
-        videos: pickVideos(quickLessons, allRailsPool),
+        videos: pickRailVideos(quickLessons, allRailsPool, usedVideoIds),
         variant: 'light' as const,
       },
     ];
-  }, [allRailsPool, featuredVideos, recentVideos, t]);
+  }, [allRailsPool, featuredVideos, homeVideos, recentVideos, t]);
 
   const learningRails = useMemo(() => {
     const facodi = home?.facodi_highlights ?? [];

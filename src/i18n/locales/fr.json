@@ -946,7 +946,31 @@
         "enrichPartial": "{{failed}} vidéo(s) n'ont pas pu être envoyées au traitement pour le moment.",
         "noVideosFoundInPlaylist": "Aucune vidéo n'a été trouvée dans la playlist YouTube."
       },
-      "apiLimitationInfo": "Tube O2 envoie les vidéos de playlists YouTube publiques dans le même flux d'enrichissement que les soumissions individuelles. Les vidéos ne sont ajoutées aux playlists éducatives qu'après confirmation d'une correspondance réelle."
+      "apiLimitationInfo": "Tube O2 envoie les vidéos de playlists YouTube publiques dans le même flux d'enrichissement que les soumissions individuelles. Les vidéos ne sont ajoutées aux playlists éducatives qu'après confirmation d'une correspondance réelle.",
+      "progress": {
+        "backToPlaylists": "Retour aux playlists",
+        "kicker": "Importation par lot",
+        "title": "Progression de l'importation de playlist",
+        "description": "Suivez chaque vidéo importée pendant que Tube O2 enrichit les métadonnées et attribue des playlists éducatives.",
+        "progressBadge": "{{done}}/{{total}} terminées",
+        "progressLabel": "{{progress}}% de l'importation a atteint un état final.",
+        "emptyTitle": "Aucune soumission à suivre",
+        "emptyDescription": "Lancez une nouvelle importation de playlist YouTube pour voir la progression du lot ici.",
+        "loadErrorTitle": "Impossible de charger la progression",
+        "loadErrorDescription": "Actualisez la page ou ouvrez le statut d'une soumission individuelle.",
+        "partialTitle": "Certaines vidéos demandent une attention",
+        "partialDescription": "{{failed}} vidéo(s) importées ont échoué ou doivent être réessayées.",
+        "stageLabel": "Étape",
+        "openSubmission": "Ouvrir le statut",
+        "refresh": "Actualiser",
+        "metrics": {
+          "found": "Trouvées",
+          "created": "Nouvelles soumissions",
+          "existing": "Déjà traitées",
+          "processing": "Traitement",
+          "ready": "Prêtes"
+        }
+      }
     },
     "feedback": {
       "createSuccess": "Playlist créée avec succès !",

@@ -948,7 +948,31 @@
         "enrichPartial": "{{failed}} video(s) could not be sent to processing right now.",
         "noVideosFoundInPlaylist": "No videos were found in the YouTube playlist."
       },
-      "apiLimitationInfo": "Tube O2 queues videos from public YouTube playlists for the same enrichment flow used by single submissions. Videos are only added to educational playlists after content analysis confirms a real match."
+      "apiLimitationInfo": "Tube O2 queues videos from public YouTube playlists for the same enrichment flow used by single submissions. Videos are only added to educational playlists after content analysis confirms a real match.",
+      "progress": {
+        "backToPlaylists": "Back to playlists",
+        "kicker": "Batch import",
+        "title": "Playlist import progress",
+        "description": "Track each imported video while Tube O2 enriches metadata and assigns educational playlists.",
+        "progressBadge": "{{done}}/{{total}} finished",
+        "progressLabel": "{{progress}}% of the import has reached a final state.",
+        "emptyTitle": "No submissions to track",
+        "emptyDescription": "Start a new YouTube playlist import to see batch progress here.",
+        "loadErrorTitle": "Could not load import progress",
+        "loadErrorDescription": "Refresh the page or open an individual submission status link.",
+        "partialTitle": "Some videos need attention",
+        "partialDescription": "{{failed}} imported video(s) failed or need another attempt.",
+        "stageLabel": "Stage",
+        "openSubmission": "Open status",
+        "refresh": "Refresh",
+        "metrics": {
+          "found": "Found",
+          "created": "New submissions",
+          "existing": "Already handled",
+          "processing": "Processing",
+          "ready": "Ready"
+        }
+      }
     },
     "feedback": {
       "createSuccess": "Playlist created successfully!",

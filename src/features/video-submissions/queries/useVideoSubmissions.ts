@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { getVideoSubmissionById, markVideoSubmissionClientError } from '@/entities/video_submission/video_submission.api';
+import { getVideoSubmissionById, getVideoSubmissionsByIds, markVideoSubmissionClientError } from '@/entities/video_submission/video_submission.api';
 import { videoAnalysisJobKeys } from '@/entities/video_analysis_job/video_analysis_job.keys';
 import { videoSubmissionKeys } from '@/entities/video_submission/video_submission.keys';
 import type { VideoSubmission, VideoSubmissionStatus } from '@/entities/video_submission/video_submission.types';
@@ -31,40 +31,58 @@ export function useVideoSubmission(id: string | undefined) {
   });
 }
 
+export function useVideoSubmissions(ids: string[]) {
+  const uniqueIds = Array.from(new Set(ids.filter(Boolean)));
+
+  return useQuery<VideoSubmission[], Error>({
+    queryKey: videoSubmissionKeys.list(uniqueIds),
+    queryFn: () => getVideoSubmissionsByIds(uniqueIds),
+    enabled: uniqueIds.length > 0,
+    refetchInterval: (query) => {
+      const submissions = query.state.data ?? [];
+      return submissions.length > 0 && submissions.every((submission) => isTerminalStatus(submission.status))
+        ? false
+        : 2500;
+    },
+  });
+}
+
 export interface StartSubmissionProcessingPayload {
   submissionId: string;
   videoId: string;
   youtubeUrl: string;
 }
 
+export async function startVideoSubmissionProcessing(payload: StartSubmissionProcessingPayload) {
+  const { data, error } = await invokeEdgeFunction('enrich-video', {
+    body: payload,
+    headers: { 'Content-Type': 'application/json' },
+  });
+
+  if (error) {
+    const details = await getEdgeFunctionErrorDetails(error);
+    const message = details.requestId
+      ? `${details.message} (request ${details.requestId})`
+      : details.message;
+
+    await markVideoSubmissionClientError({
+      submissionId: payload.submissionId,
+      errorMessage: message,
+      errorCode: details.code,
+      stage: details.stage ?? 'start_processing',
+    }).catch(() => undefined);
+
+    throw new Error(message);
+  }
+
+  return data;
+}
+
 export function useStartSubmissionProcessing() {
   const queryClient = useQueryClient();
 
   return useMutation<unknown, Error, StartSubmissionProcessingPayload>({
-    mutationFn: async (payload) => {
-      const { data, error } = await invokeEdgeFunction('enrich-video', {
-        body: payload,
-        headers: { 'Content-Type': 'application/json' },
-      });
-
-      if (error) {
-        const details = await getEdgeFunctionErrorDetails(error);
-        const message = details.requestId
-          ? `${details.message} (request ${details.requestId})`
-          : details.message;
-
-        await markVideoSubmissionClientError({
-          submissionId: payload.submissionId,
-          errorMessage: message,
-          errorCode: details.code,
-          stage: details.stage ?? 'start_processing',
-        }).catch(() => undefined);
-
-        throw new Error(message);
-      }
-
-      return data;
-    },
+    mutationFn: startVideoSubmissionProcessing,
     onSettled: (_data, _error, variables) => {
       if (variables) {
         queryClient.invalidateQueries({ queryKey: videoSubmissionKeys.detail(variables.submissionId) });

@@ -145,9 +145,9 @@ const VideoCardComponent = ({ video, onClick, variant = 'default' }: VideoCardPr
           {video.channel_name}
         </p>
 
-          {/* Semantic tags - only show on default variant and mobile hidden */}
+          {/* Semantic tags */}
           {variant === 'default' && video.enrichment?.semantic_tags && video.enrichment.semantic_tags.length > 0 && (
-            <div className="flex flex-wrap gap-1.5 hidden sm:flex">
+            <div className="flex min-h-6 flex-wrap gap-1.5 overflow-hidden">
               {video.enrichment.semantic_tags.slice(0, 3).map((tag, index) => (
                 <SemanticTagBadge key={`${tag}-${index}`} tag={tag} />
               ))}

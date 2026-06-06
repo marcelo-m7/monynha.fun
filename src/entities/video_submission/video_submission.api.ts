@@ -30,6 +30,29 @@ export async function getVideoSubmissionById(id: string) {
   return data as VideoSubmission | null;
 }
 
+export async function getVideoSubmissionsByIds(ids: string[]) {
+  const uniqueIds = Array.from(new Set(ids.filter(Boolean)));
+
+  if (uniqueIds.length === 0) {
+    return [];
+  }
+
+  const { data, error } = await supabase
+    .from('video_submissions')
+    .select('*')
+    .in('id', uniqueIds);
+
+  if (error) {
+    throw new Error(getSupabaseErrorMessage(error));
+  }
+
+  const submissionsById = new Map((data ?? []).map((submission) => [submission.id, submission as VideoSubmission]));
+
+  return uniqueIds
+    .map((id) => submissionsById.get(id))
+    .filter((submission): submission is VideoSubmission => Boolean(submission));
+}
+
 export async function markVideoSubmissionClientError(payload: {
   submissionId: string;
   errorMessage: string;

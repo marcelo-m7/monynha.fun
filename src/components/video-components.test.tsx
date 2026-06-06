@@ -20,6 +20,19 @@ const sampleVideo: VideoWithCategory = {
   description: 'React basics',
   channel_name: 'Monynha',
   duration_seconds: 125,
+  enrichment: {
+    id: 'enrichment-1',
+    video_id: 'video-1',
+    cultural_relevance: 'Useful learning material',
+    language: 'en',
+    semantic_tags: ['react', 'frontend', 'learning'],
+    optimized_title: null,
+    short_summary: 'React introduction summary',
+    summary_description: 'React basics for frontend developers',
+    suggested_category_id: 'cat-1',
+    reprocessed_at: null,
+    created_at: new Date().toISOString(),
+  },
   favorites_count: 10,
   thumbnail_url: 'https://example.com/thumb.jpg',
   language: 'en',
@@ -46,6 +59,14 @@ describe('video components', () => {
 
     expect(screen.getByText('Learning React')).toBeInTheDocument();
     expect(screen.getByText('Monynha')).toBeInTheDocument();
+    expect(screen.getByText('2:05')).toBeInTheDocument();
+    expect(screen.getByText('react')).toBeInTheDocument();
+  });
+
+  it('formats hour-long durations on cards', () => {
+    renderWithProviders(<VideoCard video={{ ...sampleVideo, duration_seconds: 3903 }} />);
+
+    expect(screen.getByText('1:05:03')).toBeInTheDocument();
   });
 
   it('renders FeaturedHero headline', () => {

@@ -187,7 +187,7 @@ All global context providers (QueryClient, Auth, i18n, ThemeProvider, Helmet, To
 - API pattern: [src/entities/video/video.api.ts](src/entities/video/video.api.ts)
 - Form pattern: [src/components/comment/CommentForm.tsx](src/components/comment/CommentForm.tsx)
 - Mention UX pattern: [src/components/comment/MentionAutocomplete.tsx](src/components/comment/MentionAutocomplete.tsx)
-- YouTube playlist import UI: [src/components/playlist/PlaylistImportDialog.tsx](src/components/playlist/PlaylistImportDialog.tsx)
+- YouTube playlist import UI: [src/components/playlist/PlaylistImportDialog.tsx](src/components/playlist/PlaylistImportDialog.tsx) and [src/pages/PlaylistImportProgress.tsx](src/pages/PlaylistImportProgress.tsx)
 - Async submission status API: [src/entities/video_submission/video_submission.api.ts](src/entities/video_submission/video_submission.api.ts)
 - SSR preview server: [server/server.ts](server/server.ts)
 - Supabase functions: [supabase/functions](supabase/functions), especially [supabase/functions/enrich-video/index.ts](supabase/functions/enrich-video/index.ts) and [supabase/functions/import-youtube-playlist/index.ts](supabase/functions/import-youtube-playlist/index.ts)

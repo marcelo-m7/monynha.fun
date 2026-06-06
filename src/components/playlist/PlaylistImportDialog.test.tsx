@@ -5,6 +5,7 @@ import { renderWithProviders } from '@/shared/test/renderWithProviders';
 import { PlaylistImportDialog } from './PlaylistImportDialog';
 
 const invokeEdgeFunctionMock = vi.fn();
+const navigateMock = vi.fn();
 
 vi.mock('@/features/auth/useAuth', () => ({
   useAuth: () => ({ user: { id: 'user-1' } }),
@@ -14,6 +15,14 @@ vi.mock('@/shared/api/supabase/edgeFunctions', () => ({
   invokeEdgeFunction: (...args: unknown[]) => invokeEdgeFunctionMock(...args),
   getEdgeFunctionErrorDetails: vi.fn(),
 }));
+
+vi.mock('react-router-dom', async () => {
+  const actual = await vi.importActual<typeof import('react-router-dom')>('react-router-dom');
+  return {
+    ...actual,
+    useNavigate: () => navigateMock,
+  };
+});
 
 vi.mock('sonner', () => ({
   toast: {
@@ -26,29 +35,28 @@ vi.mock('sonner', () => ({
 describe('PlaylistImportDialog', () => {
   beforeEach(() => {
     invokeEdgeFunctionMock.mockReset();
+    navigateMock.mockReset();
 
-    invokeEdgeFunctionMock
-      .mockResolvedValueOnce({
-        data: {
-          fetched_video_count: 5,
-          created_submission_count: 3,
-          skipped_existing_enriched_count: 1,
-          already_queued_count: 1,
-          submissions: [
-            {
-              id: 'sub-1',
-              video_id: 'video-1',
-              youtube_url: 'https://www.youtube.com/watch?v=abcdefghijk',
-              status: 'pending',
-            },
-          ],
-        },
-        error: null,
-      })
-      .mockResolvedValueOnce({ data: { status: 'processing' }, error: null });
+    invokeEdgeFunctionMock.mockResolvedValueOnce({
+      data: {
+        fetched_video_count: 5,
+        created_submission_count: 3,
+        skipped_existing_enriched_count: 1,
+        already_queued_count: 1,
+        submissions: [
+          {
+            id: 'sub-1',
+            video_id: 'video-1',
+            youtube_url: 'https://www.youtube.com/watch?v=abcdefghijk',
+            status: 'pending',
+          },
+        ],
+      },
+      error: null,
+    });
   });
 
-  it('uses snake_case payload for import-youtube-playlist and dispatches enrich-video', async () => {
+  it('uses snake_case payload and navigates to the batch progress page', async () => {
     const user = userEvent.setup();
 
     renderWithProviders(
@@ -81,16 +89,15 @@ describe('PlaylistImportDialog', () => {
     });
 
     expect(invokeEdgeFunctionMock.mock.calls[0]?.[1]?.body).not.toHaveProperty('playlist_id');
+    expect(invokeEdgeFunctionMock).toHaveBeenCalledTimes(1);
+    expect(invokeEdgeFunctionMock).not.toHaveBeenCalledWith('enrich-video', expect.anything());
 
-    expect(invokeEdgeFunctionMock).toHaveBeenCalledWith(
-      'enrich-video',
-      expect.objectContaining({
-        body: {
-          videoId: 'video-1',
-          youtubeUrl: 'https://www.youtube.com/watch?v=abcdefghijk',
-          submissionId: 'sub-1',
-        },
-      }),
-    );
+    await waitFor(() => {
+      expect(navigateMock).toHaveBeenCalledWith(expect.stringContaining('/playlists/import/progress?'));
+    });
+    expect(navigateMock).toHaveBeenCalledWith(expect.stringContaining('ids=sub-1'));
+    expect(navigateMock).toHaveBeenCalledWith(expect.stringContaining('found=5'));
+    expect(navigateMock).toHaveBeenCalledWith(expect.stringContaining('created=3'));
+    expect(navigateMock).toHaveBeenCalledWith(expect.stringContaining('existing=2'));
   });
 });

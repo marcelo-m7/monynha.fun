@@ -50,7 +50,7 @@
 ### YouTube Playlist Import
 - `src/components/playlist/PlaylistImportDialog.tsx` calls `import-youtube-playlist` with `playlist_url`, `language`, and `max_videos`.
 - `supabase/functions/import-youtube-playlist/index.ts` fetches public playlist HTML, extracts video ids, upserts video shells, skips already enriched videos, reuses recent active submissions, and returns new queued submissions.
-- The dialog dispatches `enrich-video` for returned submissions with a small concurrency limit.
+- `/playlists/import/progress` tracks returned submissions, dispatches pending items to `enrich-video` with a small concurrency limit, and polls `video_submissions` until the batch reaches terminal states.
 
 ### Agent/Docs Alignment
 - Repository instructions now describe the current Supabase backend instead of the old FastAPI backend.
@@ -576,7 +576,7 @@ CREATE INDEX idx_videos_featured_created ON public.videos(is_featured, created_a
 2. **Import function reads public playlist** → `import-youtube-playlist`.
 3. **Videos are deduped/upserted** → existing enriched videos are skipped.
 4. **New work is queued** → `video_submissions` rows with playlist metadata.
-5. **Frontend starts enrichment** → returned submissions are sent to `enrich-video` with limited concurrency.
+5. **Progress page starts enrichment** → `/playlists/import/progress` sends pending submissions to `enrich-video` with limited concurrency and keeps polling statuses.
 
 ### Playlist Management Flow
 1. **Create playlist** → `playlists` table, `handle_new_user` trigger

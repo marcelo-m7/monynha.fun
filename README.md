@@ -410,7 +410,7 @@ The local contract is documented in [`docs/features/supabase-db-02-03-04.md`](do
 }
 ```
 
-The Edge Function returns counts plus new queued submissions. The dialog dispatches `enrich-video` for returned submissions with a small concurrency limit, while already enriched or recently queued videos are skipped/reused.
+The Edge Function returns counts plus new queued submissions. The dialog sends users to `/playlists/import/progress`, where the batch is tracked, pending submissions are sent to `enrich-video` with a small concurrency limit, and already enriched or recently queued videos are skipped/reused.
 
 ### Local Edge Function Work
 

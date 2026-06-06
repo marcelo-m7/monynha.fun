@@ -40,6 +40,7 @@ const PrivacyPolicy = lazy(() => import("./pages/PrivacyPolicy"));
 const TermsOfService = lazy(() => import("./pages/TermsOfService"));
 const CookiePolicy = lazy(() => import("./pages/CookiePolicy"));
 const Playlists = lazy(() => import("./pages/Playlists"));
+const PlaylistImportProgress = lazy(() => import("./pages/PlaylistImportProgress"));
 const PlaylistDetails = lazy(() => import("./pages/PlaylistDetails"));
 const CreateEditPlaylist = lazy(() => import("./pages/CreateEditPlaylist"));
 const Profile = lazy(() => import("./pages/Profile"));
@@ -91,6 +92,7 @@ const App = () => (
         <Route path="/terms" element={<TermsOfService />} />
         <Route path="/cookies" element={<CookiePolicy />} />
         <Route path="/playlists" element={<Playlists />} />
+        <Route path="/playlists/import/progress" element={<PlaylistImportProgress />} />
         <Route path="/playlists/new" element={<CreateEditPlaylist />} />
         <Route path="/playlists/:playlistId" element={<PlaylistDetails />} />
         <Route path="/playlists/:playlistId/edit" element={<CreateEditPlaylist />} />
