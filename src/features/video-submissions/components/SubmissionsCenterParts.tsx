@@ -59,10 +59,16 @@ export function SubmissionRowCard({
   submission,
   compact = false,
   showImportBadge = true,
+  canRetry = false,
+  isRetrying = false,
+  onRetry,
 }: {
   submission: VideoSubmission;
   compact?: boolean;
   showImportBadge?: boolean;
+  canRetry?: boolean;
+  isRetrying?: boolean;
+  onRetry?: () => void;
 }) {
   const { t } = useTranslation();
 
@@ -103,6 +109,12 @@ export function SubmissionRowCard({
               {t('playlists.import.progress.openSubmission')}
             </Link>
           </Button>
+          {canRetry && onRetry && (
+            <Button size="sm" variant="outline" onClick={onRetry} disabled={isRetrying}>
+              {isRetrying ? <Loader2 className="mr-2 h-3.5 w-3.5 animate-spin" /> : null}
+              {t('common.retry')}
+            </Button>
+          )}
           {!compact && linkedVideoId && (submission.status === 'success' || submission.status === 'duplicate') && (
             <Button size="sm" asChild>
               <Link to={`/videos/${linkedVideoId}`}>

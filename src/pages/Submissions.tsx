@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
@@ -147,6 +147,7 @@ export default function Submissions() {
   const [searchParams, setSearchParams] = useSearchParams();
   const { user, loading: authLoading } = useAuth();
   const startedIdsRef = useRef(new Set<string>());
+  const [retryingIds, setRetryingIds] = useState<Record<string, boolean>>({});
 
   const focusedIds = useMemo(() => parseIds(searchParams.get('ids')), [searchParams]);
   const foundCount = parseCount(searchParams.get('found'));
@@ -256,6 +257,29 @@ export default function Submissions() {
     setSearchParams(next, { replace: true });
   };
 
+  const handleRetry = async (submission: VideoSubmission) => {
+    if (!submission.video_id || !submission.youtube_url) {
+      return;
+    }
+
+    setRetryingIds((previous) => ({ ...previous, [submission.id]: true }));
+
+    try {
+      await startVideoSubmissionProcessing({
+        submissionId: submission.id,
+        videoId: submission.video_id,
+        youtubeUrl: submission.youtube_url,
+      });
+    } catch {
+      // Error state is persisted by edge error handling and shown in existing status cards.
+    } finally {
+      setRetryingIds((previous) => ({ ...previous, [submission.id]: false }));
+      void refetchFocused();
+      void refetchRecent();
+      queryClient.invalidateQueries({ queryKey: videoSubmissionKeys.detail(submission.id) });
+    }
+  };
+
   const isLoading = authLoading || focusedLoading || recentLoading;
 
   if (isLoading) {
@@ -359,7 +383,13 @@ export default function Submissions() {
               )}
 
               {focusedSubmissions.map((submission) => (
-                <SubmissionRowCard key={submission.id} submission={submission} />
+                <SubmissionRowCard
+                  key={submission.id}
+                  submission={submission}
+                  canRetry={submission.status === 'failed' || submission.status === 'recoverable_error'}
+                  isRetrying={Boolean(retryingIds[submission.id])}
+                  onRetry={() => void handleRetry(submission)}
+                />
               ))}
             </CardContent>
           </Card>
@@ -427,7 +457,14 @@ export default function Submissions() {
 
             <div className="space-y-3">
               {filteredSubmissions.map((submission) => (
-                <SubmissionRowCard key={submission.id} submission={submission} showImportBadge={!isPlaylistImportSubmission(submission)} />
+                <SubmissionRowCard
+                  key={submission.id}
+                  submission={submission}
+                  showImportBadge={!isPlaylistImportSubmission(submission)}
+                  canRetry={submission.status === 'failed' || submission.status === 'recoverable_error'}
+                  isRetrying={Boolean(retryingIds[submission.id])}
+                  onRetry={() => void handleRetry(submission)}
+                />
               ))}
             </div>
           </CardContent>

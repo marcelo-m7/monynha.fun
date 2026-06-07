@@ -8,13 +8,14 @@ import Submissions from './Submissions';
 const useAuthMock = vi.fn();
 const useVideoSubmissionsMock = vi.fn();
 const useRecentVideoSubmissionsMock = vi.fn();
+const startVideoSubmissionProcessingMock = vi.fn();
 
 vi.mock('@/features/auth/useAuth', () => ({
   useAuth: () => useAuthMock(),
 }));
 
 vi.mock('@/features/video-submissions/queries/useVideoSubmissions', () => ({
-  startVideoSubmissionProcessing: vi.fn(),
+  startVideoSubmissionProcessing: (...args: unknown[]) => startVideoSubmissionProcessingMock(...args),
   useVideoSubmissions: (ids: string[]) => useVideoSubmissionsMock(ids),
   useRecentVideoSubmissions: (limit: number, enabled: boolean) => useRecentVideoSubmissionsMock(limit, enabled),
 }));
@@ -39,6 +40,9 @@ function makeSubmission(partial: Partial<VideoSubmission>): VideoSubmission {
 
 describe('Submissions page', () => {
   beforeEach(() => {
+    startVideoSubmissionProcessingMock.mockReset();
+    startVideoSubmissionProcessingMock.mockResolvedValue({});
+
     useAuthMock.mockReturnValue({
       user: { id: 'user-1', email: 'user@example.com' },
       loading: false,
@@ -123,6 +127,23 @@ describe('Submissions page', () => {
       expect(screen.getByText(/failed-video/i)).toBeInTheDocument();
       expect(screen.queryByText(/playlist-video/i)).not.toBeInTheDocument();
       expect(screen.queryByText(/single-video/i)).not.toBeInTheDocument();
+    });
+  });
+
+  it('allows retrying a failed analysis from submissions list', async () => {
+    const user = userEvent.setup();
+
+    renderWithProviders(<Submissions />, { route: '/submissions' });
+
+    const retryButtons = screen.getAllByRole('button', { name: /try again/i });
+    await user.click(retryButtons[0]);
+
+    await waitFor(() => {
+      expect(startVideoSubmissionProcessingMock).toHaveBeenCalledWith({
+        submissionId: 's-3',
+        videoId: 'video-3',
+        youtubeUrl: 'https://www.youtube.com/watch?v=failedvideo',
+      });
     });
   });
 });
