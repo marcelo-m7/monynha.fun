@@ -1313,6 +1313,14 @@
       },
       "error": {
         "notLoggedIn": "You must be logged in to manage social accounts."
+      },
+      "feedback": {
+        "addSuccess": "Social account added successfully.",
+        "addError": "Could not add social account.",
+        "updateSuccess": "Social account updated successfully.",
+        "updateError": "Could not update social account.",
+        "removeSuccess": "Social account removed successfully.",
+        "removeError": "Could not remove social account."
       }
     }
   },

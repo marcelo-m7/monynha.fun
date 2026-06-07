@@ -1267,6 +1267,14 @@
       },
       "error": {
         "notLoggedIn": "Debes iniciar sesión para gestionar redes sociales."
+      },
+      "feedback": {
+        "addSuccess": "Cuenta social agregada correctamente.",
+        "addError": "No se pudo agregar la cuenta social.",
+        "updateSuccess": "Cuenta social actualizada correctamente.",
+        "updateError": "No se pudo actualizar la cuenta social.",
+        "removeSuccess": "Cuenta social eliminada correctamente.",
+        "removeError": "No se pudo eliminar la cuenta social."
       }
     }
   },

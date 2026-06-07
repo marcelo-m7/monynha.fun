@@ -1313,6 +1313,14 @@
       },
       "error": {
         "notLoggedIn": "Você precisa estar logado para gerenciar redes sociais."
+      },
+      "feedback": {
+        "addSuccess": "Conta social adicionada com sucesso.",
+        "addError": "Não foi possível adicionar a conta social.",
+        "updateSuccess": "Conta social atualizada com sucesso.",
+        "updateError": "Não foi possível atualizar a conta social.",
+        "removeSuccess": "Conta social removida com sucesso.",
+        "removeError": "Não foi possível remover a conta social."
       }
     }
   },

@@ -45,6 +45,13 @@ function localizeSubmissionErrorMessage(
   }
 
   if (normalized.includes('429') || normalized.includes('too many requests')) {
+    const retryAfterMatch = normalized.match(/retry after\s+(\d+)s/);
+    const retryAfterSeconds = retryAfterMatch?.[1];
+
+    if (retryAfterSeconds) {
+      return `${t('submitStatus.errorMessages.rateLimited')} (${retryAfterSeconds}s)`;
+    }
+
     return t('submitStatus.errorMessages.rateLimited');
   }
 

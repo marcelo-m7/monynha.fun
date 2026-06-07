@@ -1267,6 +1267,14 @@
       },
       "error": {
         "notLoggedIn": "Vous devez être connecté pour gérer les comptes sociaux."
+      },
+      "feedback": {
+        "addSuccess": "Compte social ajouté avec succès.",
+        "addError": "Impossible d'ajouter le compte social.",
+        "updateSuccess": "Compte social mis à jour avec succès.",
+        "updateError": "Impossible de mettre à jour le compte social.",
+        "removeSuccess": "Compte social supprimé avec succès.",
+        "removeError": "Impossible de supprimer le compte social."
       }
     }
   },

@@ -12,6 +12,7 @@ describe('edge function error helpers', () => {
             stage: 'enrichment',
             recoverable: true,
             requestId: 'request-1',
+            retryAfterSeconds: 45,
           },
         }),
         { status: 503, headers: { 'Content-Type': 'application/json' } },
@@ -24,6 +25,7 @@ describe('edge function error helpers', () => {
       stage: 'enrichment',
       recoverable: true,
       requestId: 'request-1',
+      retryAfterSeconds: 45,
     });
   });
 
@@ -34,6 +36,7 @@ describe('edge function error helpers', () => {
       stage: null,
       recoverable: null,
       requestId: null,
+      retryAfterSeconds: null,
     });
   });
 });

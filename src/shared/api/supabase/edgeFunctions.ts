@@ -18,6 +18,7 @@ export type EdgeFunctionErrorDetails = {
   stage: string | null;
   recoverable: boolean | null;
   requestId: string | null;
+  retryAfterSeconds: number | null;
 };
 
 function isRecord(value: unknown): value is Record<string, unknown> {
@@ -42,6 +43,9 @@ function parseErrorPayload(payload: unknown): EdgeFunctionErrorDetails | null {
     stage: typeof error.stage === 'string' ? error.stage : null,
     recoverable: typeof error.recoverable === 'boolean' ? error.recoverable : null,
     requestId: typeof error.requestId === 'string' ? error.requestId : null,
+    retryAfterSeconds: typeof error.retryAfterSeconds === 'number' && Number.isFinite(error.retryAfterSeconds)
+      ? error.retryAfterSeconds
+      : null,
   };
 }
 
@@ -65,5 +69,6 @@ export async function getEdgeFunctionErrorDetails(error: unknown): Promise<EdgeF
     stage: null,
     recoverable: null,
     requestId: null,
+    retryAfterSeconds: null,
   };
 }

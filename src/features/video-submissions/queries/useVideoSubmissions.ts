@@ -16,6 +16,12 @@ function isTerminalStatus(status: string | null | undefined) {
   return TERMINAL_STATUSES.includes(status as VideoSubmissionStatus);
 }
 
+function submissionRefetchInterval(status: string | null | undefined) {
+  if (!status) return 5000;
+  if (isTerminalStatus(status)) return false;
+  return status === 'processing' ? 1000 : 5000;
+}
+
 export function useVideoSubmission(id: string | undefined) {
   return useQuery<VideoSubmission | null, Error>({
     queryKey: id ? videoSubmissionKeys.detail(id) : videoSubmissionKeys.detail(''),
@@ -26,7 +32,7 @@ export function useVideoSubmission(id: string | undefined) {
     enabled: !!id,
     refetchInterval: (query) => {
       const status = query.state.data?.status;
-      return status && isTerminalStatus(status) ? false : 2500;
+      return submissionRefetchInterval(status);
     },
   });
 }
@@ -40,9 +46,10 @@ export function useVideoSubmissions(ids: string[]) {
     enabled: uniqueIds.length > 0,
     refetchInterval: (query) => {
       const submissions = query.state.data ?? [];
-      return submissions.length > 0 && submissions.every((submission) => isTerminalStatus(submission.status))
-        ? false
-        : 2500;
+      if (submissions.length === 0) return 5000;
+      if (submissions.every((submission) => isTerminalStatus(submission.status))) return false;
+      if (submissions.some((submission) => submission.status === 'processing')) return 1000;
+      return 5000;
     },
   });
 }
@@ -61,9 +68,13 @@ export async function startVideoSubmissionProcessing(payload: StartSubmissionPro
 
   if (error) {
     const details = await getEdgeFunctionErrorDetails(error);
+    const retryAfterSuffix = details.retryAfterSeconds && details.retryAfterSeconds > 0
+      ? ` Retry after ${Math.round(details.retryAfterSeconds)}s.`
+      : '';
+    const messageWithRetry = `${details.message}${retryAfterSuffix}`;
     const message = details.requestId
-      ? `${details.message} (request ${details.requestId})`
-      : details.message;
+      ? `${messageWithRetry} (request ${details.requestId})`
+      : messageWithRetry;
 
     await markVideoSubmissionClientError({
       submissionId: payload.submissionId,

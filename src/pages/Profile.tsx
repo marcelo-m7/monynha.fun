@@ -109,7 +109,7 @@ const Profile = () => {
         {/* Profile Header */}
         <div className="flex flex-col sm:flex-row items-center sm:items-start gap-6 mb-8 p-6 bg-card border border-border rounded-2xl shadow-sm">
           <Avatar className="w-24 h-24 border-2 border-primary">
-            <AvatarImage src={profile.avatar_url || undefined} alt={profile.display_name || profile.username || 'User'} />
+            <AvatarImage src={profile.avatar_url || undefined} alt={profile.display_name || profile.username || t('common.anonymous')} />
             <AvatarFallback className="bg-primary/20 text-primary text-3xl font-semibold">
               {profile.display_name ? profile.display_name[0].toUpperCase() : (profile.username ? profile.username[0].toUpperCase() : <UserIcon className="w-12 h-12" />)}
             </AvatarFallback>
