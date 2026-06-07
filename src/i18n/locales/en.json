@@ -44,6 +44,7 @@
     "switchToLight": "Switch to light mode",
     "community": "Community",
     "editorialPortal": "Editorial Portal",
+    "editorialBoard": "Editorial Board",
     "facodi": "FACODI",
     "curation": "Curation",
     "imports": "Imports",
@@ -1533,5 +1534,86 @@
         ]
       }
     ]
+  },
+  "editorialBoard": {
+    "title": "Editorial Video Board",
+    "description": "Correct, organize, and maintain editable videos with board views.",
+    "refresh": "Refresh",
+    "noAccessTitle": "Restricted area",
+    "noAccessDescription": "Only editors can access this workspace.",
+    "searchPlaceholder": "Search title or channel...",
+    "allLanguages": "All languages",
+    "filters": {
+      "language": "Language"
+    },
+    "columns": {
+      "uncategorized": "Uncategorized"
+    },
+    "scopeDescription": "{{count}} editable videos in current view",
+    "clearFilters": "Clear filters",
+    "emptyTitle": "No editable videos found",
+    "emptyDescription": "There are no videos in this scope right now.",
+    "emptyFilteredTitle": "No videos match the active filters",
+    "emptyFilteredDescription": "Try clearing or adjusting filters to continue.",
+    "views": {
+      "category": "Category",
+      "playlist": "Playlist",
+      "compact": "Compact",
+      "path": "Path (soon)",
+      "status": "Status (soon)"
+    },
+    "card": {
+      "dragHandle": "Drag video",
+      "openVideo": "Open video",
+      "moveTo": "Move to"
+    },
+    "selection": {
+      "selectVideo": "Select video",
+      "count": "{{count}} selected videos",
+      "hiddenCount": "{{count}} outside current filters",
+      "selectVisible": "Select visible",
+      "unselectVisible": "Unselect visible"
+    },
+    "bulkActions": {
+      "changeCategory": "Change category",
+      "addToPlaylist": "Add to playlist",
+      "removeFromPlaylist": "Remove from playlist",
+      "clearSelection": "Clear selection"
+    },
+    "bulkDialogs": {
+      "category": {
+        "title": "Change category for {{count}} videos",
+        "description": "Review impact and choose the destination category.",
+        "currentDistribution": "Current category distribution",
+        "newCategory": "New category",
+        "selectPlaceholder": "Select a category",
+        "apply": "Apply change"
+      },
+      "playlist": {
+        "addTitle": "Add {{count}} videos to playlist",
+        "removeTitle": "Remove {{count}} videos from playlist",
+        "description": "Choose a playlist and confirm the bulk operation.",
+        "targetPlaylist": "Target playlist",
+        "selectPlaceholder": "Select a playlist",
+        "addApply": "Add videos",
+        "removeApply": "Remove videos"
+      }
+    },
+    "notifications": {
+      "updateSuccess": "Category updated successfully.",
+      "updateError": "Could not process this update right now.",
+      "bulkCategorySuccess": "Category updated for {{count}} videos.",
+      "bulkPlaylistAddSuccess": "Videos added to playlist: {{count}}.",
+      "bulkPlaylistRemoveSuccess": "Videos removed from playlist: {{count}}.",
+      "bulkPartialTitle": "Partial update",
+      "bulkPartialDescription": "Updated {{success}} of {{requested}} videos."
+    },
+    "playlistFilter": {
+      "button": "Playlists ({{count}})",
+      "label": "Filter playlists in kanban",
+      "selectAll": "Select all",
+      "clear": "Clear",
+      "hint": "Select playlists to show their columns in playlist kanban view."
+    }
   }
 }

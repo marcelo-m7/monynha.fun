@@ -4,6 +4,8 @@ export interface VideoListParams {
   searchQuery?: string;
   categoryId?: string;
   language?: string;
+  sortBy?: 'recent' | 'mostViewed' | 'mostFavorited';
+  semanticTag?: string;
   submittedBy?: string;
 }
 
@@ -13,6 +15,8 @@ const normalizeVideoListParams = (params: VideoListParams = {}) => ({
   searchQuery: params.searchQuery ?? '',
   categoryId: params.categoryId ?? '',
   language: params.language ?? '',
+  sortBy: params.sortBy ?? 'recent',
+  semanticTag: params.semanticTag ?? '',
   submittedBy: params.submittedBy ?? '',
 });
 

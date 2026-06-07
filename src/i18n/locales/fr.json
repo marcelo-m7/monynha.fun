@@ -42,6 +42,7 @@
     "switchToLight": "Passer en mode clair",
     "community": "Communauté",
     "editorialPortal": "Portail Éditorial",
+    "editorialBoard": "Kanban Editorial",
     "messages": "Messages",
     "notifications": "Notifications",
     "facodi": "FACODI",
@@ -1533,5 +1534,86 @@
         ]
       }
     ]
+  },
+  "editorialBoard": {
+    "title": "Kanban Editorial des Videos",
+    "description": "Corrigez, organisez et maintenez les videos editables avec des vues tableau.",
+    "refresh": "Actualiser",
+    "noAccessTitle": "Zone restreinte",
+    "noAccessDescription": "Seuls les editeurs peuvent acceder a cet espace.",
+    "searchPlaceholder": "Rechercher par titre ou chaine...",
+    "allLanguages": "Toutes les langues",
+    "filters": {
+      "language": "Langue"
+    },
+    "columns": {
+      "uncategorized": "Sans categorie"
+    },
+    "scopeDescription": "{{count}} videos editables dans la vue actuelle",
+    "clearFilters": "Effacer les filtres",
+    "emptyTitle": "Aucune video editable trouvee",
+    "emptyDescription": "Aucune video dans ce perimetre pour le moment.",
+    "emptyFilteredTitle": "Aucune video ne correspond aux filtres actifs",
+    "emptyFilteredDescription": "Essayez d'effacer ou d'ajuster les filtres pour continuer.",
+    "views": {
+      "category": "Categorie",
+      "playlist": "Playlist",
+      "compact": "Compact",
+      "path": "Parcours (bientot)",
+      "status": "Statut (bientot)"
+    },
+    "card": {
+      "dragHandle": "Glisser la video",
+      "openVideo": "Ouvrir la video",
+      "moveTo": "Deplacer vers"
+    },
+    "selection": {
+      "selectVideo": "Selectionner la video",
+      "count": "{{count}} videos selectionnees",
+      "hiddenCount": "{{count}} hors des filtres actifs",
+      "selectVisible": "Selectionner les visibles",
+      "unselectVisible": "Deselectionner les visibles"
+    },
+    "bulkActions": {
+      "changeCategory": "Changer la categorie",
+      "addToPlaylist": "Ajouter a la playlist",
+      "removeFromPlaylist": "Retirer de la playlist",
+      "clearSelection": "Effacer la selection"
+    },
+    "bulkDialogs": {
+      "category": {
+        "title": "Changer la categorie de {{count}} videos",
+        "description": "Verifiez l'impact et choisissez la categorie de destination.",
+        "currentDistribution": "Distribution actuelle des categories",
+        "newCategory": "Nouvelle categorie",
+        "selectPlaceholder": "Selectionnez une categorie",
+        "apply": "Appliquer le changement"
+      },
+      "playlist": {
+        "addTitle": "Ajouter {{count}} videos a la playlist",
+        "removeTitle": "Retirer {{count}} videos de la playlist",
+        "description": "Choisissez une playlist et confirmez l'operation de masse.",
+        "targetPlaylist": "Playlist cible",
+        "selectPlaceholder": "Selectionnez une playlist",
+        "addApply": "Ajouter les videos",
+        "removeApply": "Retirer les videos"
+      }
+    },
+    "notifications": {
+      "updateSuccess": "Categorie mise a jour avec succes.",
+      "updateError": "Impossible de traiter cette mise a jour maintenant.",
+      "bulkCategorySuccess": "Categorie mise a jour sur {{count}} videos.",
+      "bulkPlaylistAddSuccess": "Videos ajoutees a la playlist: {{count}}.",
+      "bulkPlaylistRemoveSuccess": "Videos retirees de la playlist: {{count}}.",
+      "bulkPartialTitle": "Mise a jour partielle",
+      "bulkPartialDescription": "{{success}} videos mises a jour sur {{requested}}."
+    },
+    "playlistFilter": {
+      "button": "Playlists ({{count}})",
+      "label": "Filtrer les playlists dans le kanban",
+      "selectAll": "Tout selectionner",
+      "clear": "Effacer",
+      "hint": "Selectionnez les playlists a afficher comme colonnes dans la vue kanban par playlist."
+    }
   }
 }

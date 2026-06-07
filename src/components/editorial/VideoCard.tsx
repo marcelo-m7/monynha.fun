@@ -1,6 +1,7 @@
 import { useDraggable } from '@dnd-kit/core';
 import { CSS } from '@dnd-kit/utilities';
 import { Button } from '@/components/ui/button';
+import { Checkbox } from '@/components/ui/checkbox';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { resolveCategoryIcon } from '@/entities/category/category.icons';
 import type { Category } from '@/entities/category/category.types';
@@ -15,18 +16,24 @@ interface VideoCardProps {
   categories?: Category[];
   disabled?: boolean;
   hideWhileDragging?: boolean;
+  isSelected?: boolean;
+  selectable?: boolean;
   showMoveSelector?: boolean;
   video: VideoWithCategory;
   onMoveCategory?: (categoryId: string | null) => void;
+  onSelectChange?: (checked: boolean) => void;
 }
 
 export function VideoCard({
   categories = [],
   disabled = false,
   hideWhileDragging = false,
+  isSelected = false,
+  selectable = false,
   showMoveSelector = false,
   video,
   onMoveCategory,
+  onSelectChange,
 }: VideoCardProps) {
   const { t } = useTranslation();
   const { attributes, isDragging, listeners, setNodeRef, transform } = useDraggable({
@@ -50,11 +57,20 @@ export function VideoCard({
       style={style}
       className={cn(
         'rounded-2xl border bg-card p-3 shadow-sm transition-opacity',
+        isSelected && 'border-primary bg-primary/5',
         isDragging && !hideWhileDragging && 'opacity-70',
         isDragging && hideWhileDragging && 'opacity-0',
       )}
     >
       <div className="flex items-start gap-3">
+        {selectable ? (
+          <Checkbox
+            checked={isSelected}
+            onCheckedChange={(checked) => onSelectChange?.(Boolean(checked))}
+            aria-label={t('editorialBoard.selection.selectVideo', { defaultValue: 'Select video' })}
+            className="mt-1"
+          />
+        ) : null}
         <div className="relative h-16 w-24 shrink-0 overflow-hidden rounded-xl bg-muted">
           <img
             src={video.thumbnail_url || '/placeholder.svg'}

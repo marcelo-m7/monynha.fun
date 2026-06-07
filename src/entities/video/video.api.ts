@@ -101,6 +101,8 @@ export interface ListVideosParams {
   searchQuery?: string;
   categoryId?: string;
   language?: string;
+  sortBy?: 'recent' | 'mostViewed' | 'mostFavorited';
+  semanticTag?: string;
   submittedBy?: string;
   includeEnrichment?: boolean;
 }
@@ -116,19 +118,26 @@ export function getVideoLookupColumn(value: string): 'id' | 'youtube_id' | 'slug
 
 export async function listVideos(params: ListVideosParams = {}) {
   const includeEnrichment = params.includeEnrichment !== false; // Default true
+  const sortBy = params.sortBy ?? 'recent';
+  const limit = params.limit ?? 24;
   
   let query = supabase
     .from('v_video_exhibition')
-    .select('*')
-    .order('created_at', { ascending: false });
+    .select('*');
+
+  if (sortBy === 'mostViewed') {
+    query = query.order('view_count', { ascending: false, nullsFirst: false });
+  } else if (sortBy === 'mostFavorited') {
+    query = query.order('favorites_count', { ascending: false, nullsFirst: false });
+  } else {
+    query = query.order('created_at', { ascending: false });
+  }
 
   if (params.featured) {
     query = query.eq('is_featured', true);
   }
 
-  if (params.limit) {
-    query = query.limit(params.limit);
-  }
+  query = query.limit(limit);
 
   if (params.searchQuery) {
     const youtubeId = extractYouTubeId(params.searchQuery);
@@ -146,6 +155,10 @@ export async function listVideos(params: ListVideosParams = {}) {
 
   if (params.language) {
     query = query.eq('language', params.language);
+  }
+
+  if (params.semanticTag) {
+    query = query.contains('enrichment_semantic_tags', [params.semanticTag]);
   }
 
   if (params.submittedBy) {
@@ -407,6 +420,134 @@ export async function updateVideoCategory(videoId: string, categoryId: string | 
 
   if (error) throw error;
   return data as Video;
+}
+
+export interface BulkVideoActionFailure {
+  code?: string | null;
+  message: string;
+  videoId: string;
+}
+
+export interface BulkVideoActionResult {
+  failedCount: number;
+  failures: BulkVideoActionFailure[];
+  requested: number;
+  succeededVideoIds: string[];
+  successCount: number;
+}
+
+function toBulkActionError(error: unknown): { code?: string | null; message: string } {
+  if (error && typeof error === 'object') {
+    const maybeError = error as { code?: string | null; message?: string };
+    return {
+      code: maybeError.code ?? null,
+      message: maybeError.message ?? 'Unknown error',
+    };
+  }
+
+  return {
+    message: 'Unknown error',
+  };
+}
+
+function buildBulkActionResult(
+  videoIds: string[],
+  results: Array<PromiseSettledResult<unknown>>,
+): BulkVideoActionResult {
+  const failures: BulkVideoActionFailure[] = [];
+  const succeededVideoIds: string[] = [];
+
+  results.forEach((result, index) => {
+    const videoId = videoIds[index];
+    if (result.status === 'fulfilled') {
+      succeededVideoIds.push(videoId);
+      return;
+    }
+
+    const normalizedError = toBulkActionError(result.reason);
+    failures.push({
+      videoId,
+      code: normalizedError.code,
+      message: normalizedError.message,
+    });
+  });
+
+  return {
+    requested: videoIds.length,
+    succeededVideoIds,
+    successCount: succeededVideoIds.length,
+    failures,
+    failedCount: failures.length,
+  };
+}
+
+export async function bulkUpdateVideoCategory(videoIds: string[], categoryId: string | null): Promise<BulkVideoActionResult> {
+  if (videoIds.length === 0) {
+    return {
+      requested: 0,
+      succeededVideoIds: [],
+      successCount: 0,
+      failures: [],
+      failedCount: 0,
+    };
+  }
+
+  const results = await Promise.allSettled(videoIds.map((videoId) => updateVideoCategory(videoId, categoryId)));
+  return buildBulkActionResult(videoIds, results);
+}
+
+async function addVideoToPlaylist(playlistId: string, videoId: string) {
+  const { error } = await supabase.from('playlist_videos').upsert(
+    {
+      playlist_id: playlistId,
+      video_id: videoId,
+    },
+    {
+      onConflict: 'playlist_id,video_id',
+    },
+  );
+
+  if (error) throw error;
+}
+
+async function removeVideoFromPlaylist(playlistId: string, videoId: string) {
+  const { error } = await supabase
+    .from('playlist_videos')
+    .delete()
+    .eq('playlist_id', playlistId)
+    .eq('video_id', videoId);
+
+  if (error) throw error;
+}
+
+export async function bulkAddVideosToPlaylist(playlistId: string, videoIds: string[]): Promise<BulkVideoActionResult> {
+  if (videoIds.length === 0) {
+    return {
+      requested: 0,
+      succeededVideoIds: [],
+      successCount: 0,
+      failures: [],
+      failedCount: 0,
+    };
+  }
+
+  const results = await Promise.allSettled(videoIds.map((videoId) => addVideoToPlaylist(playlistId, videoId)));
+  return buildBulkActionResult(videoIds, results);
+}
+
+export async function bulkRemoveVideosFromPlaylist(playlistId: string, videoIds: string[]): Promise<BulkVideoActionResult> {
+  if (videoIds.length === 0) {
+    return {
+      requested: 0,
+      succeededVideoIds: [],
+      successCount: 0,
+      failures: [],
+      failedCount: 0,
+    };
+  }
+
+  const results = await Promise.allSettled(videoIds.map((videoId) => removeVideoFromPlaylist(playlistId, videoId)));
+  return buildBulkActionResult(videoIds, results);
 }
 
 export async function deleteVideo(videoId: string) {

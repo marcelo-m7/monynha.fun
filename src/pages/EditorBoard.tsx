@@ -15,6 +15,9 @@ import { BoardColumn } from '@/components/editorial/BoardColumn';
 import { BoardEmptyState } from '@/components/editorial/BoardEmptyState';
 import { BoardFilters } from '@/components/editorial/BoardFilters';
 import { BoardSkeleton } from '@/components/editorial/BoardSkeleton';
+import { BulkActionsBar } from '@/components/editorial/BulkActionsBar';
+import { BulkChangeCategoryDialog } from '@/components/editorial/BulkChangeCategoryDialog';
+import { BulkPlaylistDialog } from '@/components/editorial/BulkPlaylistDialog';
 import { VideoCard } from '@/components/editorial/VideoCard';
 import { ViewSelector } from '@/components/editorial/ViewSelector';
 import { MainLayout } from '@/components/layout/MainLayout';
@@ -25,8 +28,14 @@ import type { VideoWithCategory } from '@/entities/video/video.types';
 import { useAuth } from '@/features/auth/useAuth';
 import { useCategories } from '@/features/categories/queries/useCategories';
 import { useEditableVideos } from '@/features/editorial-board/queries/useEditableVideos';
+import { useBulkUpdateVideoCategory } from '@/features/editorial-board/queries/useBulkUpdateVideoCategory';
+import {
+  useBulkAddVideosToPlaylist,
+  useBulkRemoveVideosFromPlaylist,
+} from '@/features/editorial-board/queries/useBulkUpdateVideoPlaylist';
 import { useUpdateVideoCategory } from '@/features/editorial-board/queries/useUpdateVideoCategory';
 import { useEditorialBoardFilters } from '@/features/editorial-board/useEditorialBoardFilters';
+import { useEditablePlaylists } from '@/features/playlists/queries/usePlaylists';
 import { useIsEditor } from '@/features/profile/queries/useProfile';
 import { useIsMobile } from '@/shared/hooks/use-mobile';
 import type { LucideIcon } from 'lucide-react';
@@ -52,8 +61,12 @@ const EditorBoard = () => {
   const { isEditor, isLoading: roleLoading } = useIsEditor();
   const isMobile = useIsMobile();
   const { data: categories = [], isLoading: categoriesLoading } = useCategories();
+  const { data: editablePlaylists = [] } = useEditablePlaylists();
   const { data: videos = [], isLoading: videosLoading, refetch, isRefetching } = useEditableVideos();
   const updateCategoryMutation = useUpdateVideoCategory();
+  const bulkCategoryMutation = useBulkUpdateVideoCategory();
+  const bulkAddToPlaylistMutation = useBulkAddVideosToPlaylist();
+  const bulkRemoveFromPlaylistMutation = useBulkRemoveVideosFromPlaylist();
   const {
     filteredVideos,
     language,
@@ -71,6 +84,10 @@ const EditorBoard = () => {
     view,
   } = useEditorialBoardFilters(videos);
   const [activeVideoId, setActiveVideoId] = useState<string | null>(null);
+  const [selectedVideoIds, setSelectedVideoIds] = useState<string[]>([]);
+  const [isCategoryDialogOpen, setIsCategoryDialogOpen] = useState(false);
+  const [isAddPlaylistDialogOpen, setIsAddPlaylistDialogOpen] = useState(false);
+  const [isRemovePlaylistDialogOpen, setIsRemovePlaylistDialogOpen] = useState(false);
 
   useEffect(() => {
     if (!authLoading && !user) {
@@ -138,8 +155,95 @@ const EditorBoard = () => {
     [activeVideoId, videos],
   );
 
+  const selectedVideoIdSet = useMemo(() => new Set(selectedVideoIds), [selectedVideoIds]);
+
+  const selectedVideos = useMemo(
+    () => videos.filter((video) => selectedVideoIdSet.has(video.id)),
+    [selectedVideoIdSet, videos],
+  );
+
+  const selectedVisibleCount = useMemo(
+    () => filteredVideos.filter((video) => selectedVideoIdSet.has(video.id)).length,
+    [filteredVideos, selectedVideoIdSet],
+  );
+
+  const hiddenSelectedCount = selectedVideoIds.length - selectedVisibleCount;
+  const allVisibleSelected = filteredVideos.length > 0 && selectedVisibleCount === filteredVideos.length;
+
+  useEffect(() => {
+    const videoIdSet = new Set(videos.map((video) => video.id));
+    setSelectedVideoIds((previous) => previous.filter((videoId) => videoIdSet.has(videoId)));
+  }, [videos]);
+
   const isLoading = authLoading || roleLoading || categoriesLoading || videosLoading;
   const hasFilters = Boolean(searchQuery.trim()) || language !== 'all';
+
+  const clearSelection = () => {
+    setSelectedVideoIds([]);
+  };
+
+  const toggleVideoSelection = (videoId: string, checked: boolean) => {
+    setSelectedVideoIds((previous) => {
+      if (checked) {
+        if (previous.includes(videoId)) {
+          return previous;
+        }
+        return [...previous, videoId];
+      }
+      return previous.filter((id) => id !== videoId);
+    });
+  };
+
+  const toggleManyVideoSelection = (videoIds: string[], checked: boolean) => {
+    if (videoIds.length === 0) return;
+
+    setSelectedVideoIds((previous) => {
+      const set = new Set(previous);
+      if (checked) {
+        videoIds.forEach((videoId) => set.add(videoId));
+      } else {
+        videoIds.forEach((videoId) => set.delete(videoId));
+      }
+
+      return Array.from(set);
+    });
+  };
+
+  const handleBulkCategorySubmit = async (categoryId: string | null) => {
+    const result = await bulkCategoryMutation.mutateAsync({
+      videoIds: selectedVideoIds,
+      categoryId,
+    });
+
+    if (result.failedCount === 0) {
+      setIsCategoryDialogOpen(false);
+      clearSelection();
+      return;
+    }
+
+    setSelectedVideoIds(result.failures.map((failure) => failure.videoId));
+    setIsCategoryDialogOpen(false);
+  };
+
+  const handleBulkPlaylistSubmit = async (playlistId: string, action: 'add' | 'remove') => {
+    const result =
+      action === 'add'
+        ? await bulkAddToPlaylistMutation.mutateAsync({ videoIds: selectedVideoIds, playlistId })
+        : await bulkRemoveFromPlaylistMutation.mutateAsync({ videoIds: selectedVideoIds, playlistId });
+
+    if (result.failedCount === 0) {
+      clearSelection();
+    } else {
+      setSelectedVideoIds(result.failures.map((failure) => failure.videoId));
+    }
+
+    if (action === 'add') {
+      setIsAddPlaylistDialogOpen(false);
+      return;
+    }
+
+    setIsRemovePlaylistDialogOpen(false);
+  };
 
   const moveVideoToCategory = (video: VideoWithCategory, categoryId: string | null) => {
     const category = categoryId ? categories.find((item) => item.id === categoryId) ?? null : null;
@@ -240,7 +344,40 @@ const EditorBoard = () => {
           <p className="text-sm text-muted-foreground">
             {t('editorialBoard.scopeDescription', { count: filteredVideos.length })}
           </p>
+          <div className="flex flex-wrap items-center gap-2">
+            <Button
+              type="button"
+              size="sm"
+              variant="outline"
+              onClick={() => toggleManyVideoSelection(filteredVideos.map((video) => video.id), !allVisibleSelected)}
+              disabled={filteredVideos.length === 0}
+            >
+              {allVisibleSelected
+                ? t('editorialBoard.selection.unselectVisible', { defaultValue: 'Unselect visible' })
+                : t('editorialBoard.selection.selectVisible', { defaultValue: 'Select visible' })}
+            </Button>
+            <Button
+              type="button"
+              size="sm"
+              variant="ghost"
+              onClick={clearSelection}
+              disabled={selectedVideoIds.length === 0}
+            >
+              {t('editorialBoard.bulkActions.clearSelection', { defaultValue: 'Clear selection' })}
+            </Button>
+          </div>
         </div>
+
+        {selectedVideoIds.length > 0 ? (
+          <BulkActionsBar
+            selectedCount={selectedVideoIds.length}
+            hiddenCount={hiddenSelectedCount}
+            onClearSelection={clearSelection}
+            onChangeCategory={() => setIsCategoryDialogOpen(true)}
+            onAddPlaylist={() => setIsAddPlaylistDialogOpen(true)}
+            onRemovePlaylist={() => setIsRemovePlaylistDialogOpen(true)}
+          />
+        ) : null}
 
         {filteredVideos.length === 0 ? (
           <BoardEmptyState hasFilters={hasFilters} onReset={resetFilters} />
@@ -257,8 +394,12 @@ const EditorBoard = () => {
                 activeVideoId={activeVideoId}
                 colorClassName={column.colorClassName}
                 disabledDrag={view !== 'compact'}
+                selectedVideoIds={selectedVideoIdSet}
+                showSelectionControls
                 showMoveSelector={view === 'compact'}
                 onMoveCategory={view === 'compact' ? moveVideoToCategory : undefined}
+                onToggleVideoSelection={toggleVideoSelection}
+                onToggleColumnSelection={toggleManyVideoSelection}
               />
             ))}
           </div>
@@ -280,12 +421,45 @@ const EditorBoard = () => {
                   videos={column.videos}
                   activeVideoId={activeVideoId}
                   colorClassName={column.colorClassName}
+                  selectedVideoIds={selectedVideoIdSet}
+                  showSelectionControls
+                  onToggleVideoSelection={toggleVideoSelection}
+                  onToggleColumnSelection={toggleManyVideoSelection}
                 />
               ))}
             </div>
             <DragOverlay>{activeVideo ? <VideoCard video={activeVideo} disabled /> : null}</DragOverlay>
           </DndContext>
         )}
+
+        <BulkChangeCategoryDialog
+          open={isCategoryDialogOpen}
+          onOpenChange={setIsCategoryDialogOpen}
+          categories={categories}
+          selectedVideos={selectedVideos}
+          isSubmitting={bulkCategoryMutation.isPending}
+          onSubmit={handleBulkCategorySubmit}
+        />
+
+        <BulkPlaylistDialog
+          action="add"
+          open={isAddPlaylistDialogOpen}
+          onOpenChange={setIsAddPlaylistDialogOpen}
+          playlists={editablePlaylists}
+          selectedCount={selectedVideoIds.length}
+          isSubmitting={bulkAddToPlaylistMutation.isPending}
+          onSubmit={(playlistId) => handleBulkPlaylistSubmit(playlistId, 'add')}
+        />
+
+        <BulkPlaylistDialog
+          action="remove"
+          open={isRemovePlaylistDialogOpen}
+          onOpenChange={setIsRemovePlaylistDialogOpen}
+          playlists={editablePlaylists}
+          selectedCount={selectedVideoIds.length}
+          isSubmitting={bulkRemoveFromPlaylistMutation.isPending}
+          onSubmit={(playlistId) => handleBulkPlaylistSubmit(playlistId, 'remove')}
+        />
       </div>
     </MainLayout>
   );

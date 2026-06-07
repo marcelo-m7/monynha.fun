@@ -42,6 +42,7 @@
     "switchToLight": "Cambiar al modo claro",
     "community": "Comunidad",
     "editorialPortal": "Portal Editorial",
+    "editorialBoard": "Kanban Editorial",
     "messages": "Mensajes",
     "notifications": "Notificaciones",
     "facodi": "FACODI",
@@ -1533,5 +1534,86 @@
         ]
       }
     ]
+  },
+  "editorialBoard": {
+    "title": "Kanban Editorial de Videos",
+    "description": "Corrige, organiza y mantiene videos editables con vistas de tablero.",
+    "refresh": "Actualizar",
+    "noAccessTitle": "Area restringida",
+    "noAccessDescription": "Solo editores pueden acceder a este espacio.",
+    "searchPlaceholder": "Buscar por titulo o canal...",
+    "allLanguages": "Todos los idiomas",
+    "filters": {
+      "language": "Idioma"
+    },
+    "columns": {
+      "uncategorized": "Sin categoria"
+    },
+    "scopeDescription": "{{count}} videos editables en la vista actual",
+    "clearFilters": "Limpiar filtros",
+    "emptyTitle": "No se encontraron videos editables",
+    "emptyDescription": "No hay videos en este alcance por ahora.",
+    "emptyFilteredTitle": "Ningun video coincide con los filtros activos",
+    "emptyFilteredDescription": "Prueba limpiar o ajustar filtros para continuar.",
+    "views": {
+      "category": "Categoria",
+      "playlist": "Playlist",
+      "compact": "Compacto",
+      "path": "Ruta (pronto)",
+      "status": "Estado (pronto)"
+    },
+    "card": {
+      "dragHandle": "Arrastrar video",
+      "openVideo": "Abrir video",
+      "moveTo": "Mover a"
+    },
+    "selection": {
+      "selectVideo": "Seleccionar video",
+      "count": "{{count}} videos seleccionados",
+      "hiddenCount": "{{count}} fuera de los filtros actuales",
+      "selectVisible": "Seleccionar visibles",
+      "unselectVisible": "Deseleccionar visibles"
+    },
+    "bulkActions": {
+      "changeCategory": "Cambiar categoria",
+      "addToPlaylist": "Agregar a playlist",
+      "removeFromPlaylist": "Quitar de playlist",
+      "clearSelection": "Limpiar seleccion"
+    },
+    "bulkDialogs": {
+      "category": {
+        "title": "Cambiar categoria de {{count}} videos",
+        "description": "Revisa el impacto y elige la categoria destino.",
+        "currentDistribution": "Distribucion actual de categorias",
+        "newCategory": "Nueva categoria",
+        "selectPlaceholder": "Selecciona una categoria",
+        "apply": "Aplicar cambio"
+      },
+      "playlist": {
+        "addTitle": "Agregar {{count}} videos a playlist",
+        "removeTitle": "Quitar {{count}} videos de playlist",
+        "description": "Elige una playlist y confirma la operacion masiva.",
+        "targetPlaylist": "Playlist destino",
+        "selectPlaceholder": "Selecciona una playlist",
+        "addApply": "Agregar videos",
+        "removeApply": "Quitar videos"
+      }
+    },
+    "notifications": {
+      "updateSuccess": "Categoria actualizada con exito.",
+      "updateError": "No se pudo procesar esta actualizacion ahora.",
+      "bulkCategorySuccess": "Categoria actualizada en {{count}} videos.",
+      "bulkPlaylistAddSuccess": "Videos agregados a la playlist: {{count}}.",
+      "bulkPlaylistRemoveSuccess": "Videos quitados de la playlist: {{count}}.",
+      "bulkPartialTitle": "Actualizacion parcial",
+      "bulkPartialDescription": "Actualizado {{success}} de {{requested}} videos."
+    },
+    "playlistFilter": {
+      "button": "Playlists ({{count}})",
+      "label": "Filtrar playlists en kanban",
+      "selectAll": "Seleccionar todas",
+      "clear": "Limpiar",
+      "hint": "Selecciona playlists para mostrar sus columnas en la vista kanban por playlist."
+    }
   }
 }
