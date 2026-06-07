@@ -44,7 +44,6 @@
     "switchToLight": "Mudar para modo claro",
     "community": "Comunidade",
     "editorialPortal": "Portal Editorial",
-    "editorialBoard": "Quadro Editorial",
     "facodi": "FACODI",
     "curation": "Curadoria",
     "imports": "Importações",
@@ -1019,50 +1018,6 @@
       "unknownVideo": "Vídeo sem título",
       "reviewVideo": "Revisar vídeo",
       "empty": "Nenhum vídeo aguardando análise no momento."
-    }
-  },
-  "editorialBoard": {
-    "title": "Quadro Editorial de Vídeos",
-    "description": "Organize os seus vídeos por categoria com atualização otimista e revisão rápida do catálogo.",
-    "noAccessTitle": "Acesso editorial necessário",
-    "noAccessDescription": "Este quadro está disponível apenas para perfis editoriais autenticados.",
-    "searchPlaceholder": "Buscar por título, canal ou categoria...",
-    "allLanguages": "Todos os idiomas",
-    "refresh": "Atualizar",
-    "scopeDescription": "Mostrando {{count}} vídeos que você pode reorganizar agora.",
-    "clearFilters": "Limpar filtros",
-    "emptyTitle": "Você ainda não enviou vídeos para organizar.",
-    "emptyDescription": "Quando houver vídeos seus no catálogo, eles aparecerão aqui para revisão e movimentação entre categorias.",
-    "emptyFilteredTitle": "Nenhum vídeo corresponde aos filtros atuais.",
-    "emptyFilteredDescription": "Ajuste a busca ou o idioma para voltar a ver cards no quadro.",
-    "filters": {
-      "language": "Idioma"
-    },
-    "views": {
-      "category": "Kanban por categoria",
-      "compact": "Lista compacta",
-      "playlist": "Kanban por playlist",
-      "path": "Kanban por trilha",
-      "status": "Kanban por status"
-    },
-    "columns": {
-      "uncategorized": "Sem categoria"
-    },
-    "card": {
-      "dragHandle": "Arrastar vídeo",
-      "openVideo": "Abrir vídeo",
-      "moveTo": "Mover para"
-    },
-    "notifications": {
-      "updateSuccess": "Categoria atualizada com sucesso.",
-      "updateError": "Não foi possível mover o vídeo agora."
-    },
-    "playlistFilter": {
-      "button": "Playlists ({{count}})",
-      "label": "Filtrar playlists no kanban",
-      "selectAll": "Selecionar todas",
-      "clear": "Limpar",
-      "hint": "Selecione as playlists para exibir as colunas do kanban por playlist."
     }
   },
   "playlistDetails": {

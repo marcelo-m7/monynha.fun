@@ -42,7 +42,6 @@
     "switchToLight": "Cambiar al modo claro",
     "community": "Comunidad",
     "editorialPortal": "Portal Editorial",
-    "editorialBoard": "Tablero Editorial",
     "messages": "Mensajes",
     "notifications": "Notificaciones",
     "facodi": "FACODI",
@@ -1019,50 +1018,6 @@
       "unknownVideo": "Video sin título",
       "reviewVideo": "Revisar video",
       "empty": "No hay videos esperando análisis en este momento."
-    }
-  },
-  "editorialBoard": {
-    "title": "Tablero Editorial de Videos",
-    "description": "Organiza tus videos por categoría con actualizaciones optimistas y una revisión más rápida del catálogo.",
-    "noAccessTitle": "Se requiere acceso editorial",
-    "noAccessDescription": "Este tablero está disponible solo para perfiles editoriales autenticados.",
-    "searchPlaceholder": "Buscar por título, canal o categoría...",
-    "allLanguages": "Todos los idiomas",
-    "refresh": "Actualizar",
-    "scopeDescription": "Mostrando {{count}} videos que puedes reorganizar ahora mismo.",
-    "clearFilters": "Limpiar filtros",
-    "emptyTitle": "Aún no has enviado videos para organizar.",
-    "emptyDescription": "Cuando tus videos estén en el catálogo aparecerán aquí para revisión y movimiento entre categorías.",
-    "emptyFilteredTitle": "Ningún video coincide con los filtros actuales.",
-    "emptyFilteredDescription": "Ajusta la búsqueda o el idioma para volver a llenar el tablero.",
-    "filters": {
-      "language": "Idioma"
-    },
-    "views": {
-      "category": "Kanban por categoría",
-      "compact": "Lista compacta",
-      "playlist": "Kanban por playlist",
-      "path": "Kanban por ruta",
-      "status": "Kanban por estado"
-    },
-    "columns": {
-      "uncategorized": "Sin categoría"
-    },
-    "card": {
-      "dragHandle": "Arrastrar video",
-      "openVideo": "Abrir video",
-      "moveTo": "Mover a"
-    },
-    "notifications": {
-      "updateSuccess": "Categoría actualizada con éxito.",
-      "updateError": "No se pudo mover el video ahora."
-    },
-    "playlistFilter": {
-      "button": "Playlists ({{count}})",
-      "label": "Filtrar playlists en kanban",
-      "selectAll": "Seleccionar todas",
-      "clear": "Limpiar",
-      "hint": "Selecciona playlists para mostrar sus columnas en la vista kanban por playlist."
     }
   },
   "playlistDetails": {
