@@ -563,6 +563,19 @@
       "mostViewed": "Most viewed",
       "mostFavorited": "Most favorited"
     },
+    "multi": {
+      "categoriesLabel": "Categories (OR)",
+      "languagesLabel": "Languages (OR)",
+      "categoriesSelected": "{{count}} categories",
+      "languagesSelected": "{{count}} languages",
+      "selectAll": "Select all",
+      "clear": "Clear"
+    },
+    "matchMode": {
+      "label": "Match filters",
+      "all": "All (AND)",
+      "any": "Any (OR)"
+    },
     "clearFilters": "Clear Filters",
     "noVideosFound": "No videos found with the search criteria."
   },

@@ -100,9 +100,13 @@ export interface ListVideosParams {
   limit?: number;
   offset?: number;
   searchQuery?: string;
+  filterMode?: 'all' | 'any';
+  categoryIds?: string[];
   categoryId?: string;
+  languages?: string[];
   language?: string;
   sortBy?: 'recent' | 'mostViewed' | 'mostFavorited';
+  semanticTags?: string[];
   semanticTag?: string;
   submittedBy?: string;
   includeEnrichment?: boolean;
@@ -120,8 +124,27 @@ export function getVideoLookupColumn(value: string): 'id' | 'youtube_id' | 'slug
 export async function listVideos(params: ListVideosParams = {}) {
   const includeEnrichment = params.includeEnrichment !== false; // Default true
   const sortBy = params.sortBy ?? 'recent';
+  const filterMode = params.filterMode ?? 'all';
   const limit = params.limit ?? 24;
   const offset = params.offset ?? 0;
+  const categoryIds = [
+    ...new Set([
+      ...(params.categoryIds ?? []).filter(Boolean),
+      ...(params.categoryId ? [params.categoryId] : []),
+    ]),
+  ];
+  const languages = [
+    ...new Set([
+      ...(params.languages ?? []).filter(Boolean),
+      ...(params.language ? [params.language] : []),
+    ]),
+  ];
+  const semanticTags = [
+    ...new Set([
+      ...(params.semanticTags ?? []).filter(Boolean),
+      ...(params.semanticTag ? [params.semanticTag] : []),
+    ]),
+  ];
   
   let query = supabase
     .from('v_video_exhibition')
@@ -151,16 +174,37 @@ export async function listVideos(params: ListVideosParams = {}) {
     }
   }
 
-  if (params.categoryId) {
-    query = query.eq('category_id', params.categoryId);
-  }
+  if (filterMode === 'any') {
+    const orConditions: string[] = [];
 
-  if (params.language) {
-    query = query.eq('language', params.language);
-  }
+    if (categoryIds.length > 0) {
+      orConditions.push(`category_id.in.(${categoryIds.join(',')})`);
+    }
 
-  if (params.semanticTag) {
-    query = query.contains('enrichment_semantic_tags', [params.semanticTag]);
+    if (languages.length > 0) {
+      orConditions.push(`language.in.(${languages.join(',')})`);
+    }
+
+    if (semanticTags.length > 0) {
+      const formattedTags = semanticTags.map((tag) => `"${tag.replace(/"/g, '')}"`).join(',');
+      orConditions.push(`enrichment_semantic_tags.ov.{${formattedTags}}`);
+    }
+
+    if (orConditions.length > 0) {
+      query = query.or(orConditions.join(','));
+    }
+  } else {
+    if (categoryIds.length > 0) {
+      query = query.in('category_id', categoryIds);
+    }
+
+    if (languages.length > 0) {
+      query = query.in('language', languages);
+    }
+
+    if (semanticTags.length > 0) {
+      query = query.overlaps('enrichment_semantic_tags', semanticTags);
+    }
   }
 
   if (params.submittedBy) {

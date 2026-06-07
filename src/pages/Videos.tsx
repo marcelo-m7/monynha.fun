@@ -1,4 +1,4 @@
-import { useMemo, useState, useEffect, useRef } from 'react';
+import { useMemo, useState, useEffect, useRef, type Dispatch, type SetStateAction } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { MainLayout } from '@/components/layout/MainLayout';
 import { PageHero } from '@/components/showcase';
@@ -6,29 +6,48 @@ import { VideoCard } from '@/components/video/VideoCard';
 import { useFeaturedVideos, useInfiniteVideos } from '@/features/videos/queries/useVideos';
 import { useCategories } from '@/features/categories/queries/useCategories';
 import { Input } from '@/components/ui/input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
+import {
+  DropdownMenu,
+  DropdownMenuCheckboxItem,
+  DropdownMenuContent,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Search, X } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
-import { useTranslation } from 'react-i18next'; // Import useTranslation
+import { useTranslation } from 'react-i18next';
 
 const Videos = () => {
-  const { t } = useTranslation(); // Initialize useTranslation
+  const { t } = useTranslation();
   const [searchParams, setSearchParams] = useSearchParams();
 
   const initialSearchQuery = searchParams.get('query') || '';
-  const initialCategoryId = searchParams.get('category') || '';
-  const initialLanguage = searchParams.get('language') || '';
+  const initialCategoryIds = (searchParams.get('category') || '')
+    .split(',')
+    .map((item) => item.trim())
+    .filter(Boolean);
+  const initialLanguages = (searchParams.get('language') || '')
+    .split(',')
+    .map((item) => item.trim())
+    .filter(Boolean);
   const initialSortBy = (searchParams.get('sort') as 'recent' | 'mostViewed' | 'mostFavorited' | null) || 'recent';
-  const initialSemanticTag = searchParams.get('tag') || '';
+  const initialFilterMode = (searchParams.get('match') as 'all' | 'any' | null) || 'all';
+  const initialSemanticTags = (searchParams.get('tag') || '')
+    .split(',')
+    .map((item) => item.trim())
+    .filter(Boolean);
   const isFeatured = searchParams.get('featured') === 'true';
 
   const [searchQuery, setSearchQuery] = useState(initialSearchQuery);
   const [debouncedSearchQuery, setDebouncedSearchQuery] = useState(initialSearchQuery);
-  const [selectedCategory, setSelectedCategory] = useState(initialCategoryId);
-  const [selectedLanguage, setSelectedLanguage] = useState(initialLanguage);
+  const [selectedCategoryIds, setSelectedCategoryIds] = useState<string[]>(initialCategoryIds);
+  const [selectedLanguages, setSelectedLanguages] = useState<string[]>(initialLanguages);
   const [selectedSortBy, setSelectedSortBy] = useState<'recent' | 'mostViewed' | 'mostFavorited'>(initialSortBy);
-  const [selectedSemanticTag, setSelectedSemanticTag] = useState(initialSemanticTag);
+  const [selectedFilterMode, setSelectedFilterMode] = useState<'all' | 'any'>(initialFilterMode);
+  const [selectedSemanticTags, setSelectedSemanticTags] = useState<string[]>(initialSemanticTags);
 
   const loadMoreRef = useRef<HTMLDivElement | null>(null);
 
@@ -43,10 +62,11 @@ const Videos = () => {
     isFetchingNextPage,
   } = useInfiniteVideos({
     searchQuery: debouncedSearchQuery || undefined,
-    categoryId: selectedCategory || undefined,
-    language: selectedLanguage || undefined,
+    categoryIds: selectedCategoryIds,
+    languages: selectedLanguages,
     sortBy: selectedSortBy,
-    semanticTag: selectedSemanticTag || undefined,
+    filterMode: selectedFilterMode,
+    semanticTags: selectedSemanticTags,
     pageSize: 24,
     enabled: !isFeatured,
   });
@@ -83,21 +103,23 @@ const Videos = () => {
   useEffect(() => {
     const newSearchParams = new URLSearchParams();
     if (debouncedSearchQuery) newSearchParams.set('query', debouncedSearchQuery);
-    if (selectedCategory) newSearchParams.set('category', selectedCategory);
-    if (selectedLanguage) newSearchParams.set('language', selectedLanguage);
+    if (selectedCategoryIds.length > 0) newSearchParams.set('category', selectedCategoryIds.join(','));
+    if (selectedLanguages.length > 0) newSearchParams.set('language', selectedLanguages.join(','));
     if (selectedSortBy !== 'recent') newSearchParams.set('sort', selectedSortBy);
-    if (selectedSemanticTag) newSearchParams.set('tag', selectedSemanticTag);
+    if (selectedFilterMode !== 'all') newSearchParams.set('match', selectedFilterMode);
+    if (selectedSemanticTags.length > 0) newSearchParams.set('tag', selectedSemanticTags.join(','));
     if (isFeatured) newSearchParams.set('featured', 'true');
     setSearchParams(newSearchParams);
-  }, [debouncedSearchQuery, selectedCategory, selectedLanguage, selectedSortBy, selectedSemanticTag, isFeatured, setSearchParams]);
+  }, [debouncedSearchQuery, selectedCategoryIds, selectedLanguages, selectedSortBy, selectedFilterMode, selectedSemanticTags, isFeatured, setSearchParams]);
 
   const handleClearFilters = () => {
     setSearchQuery('');
     setDebouncedSearchQuery('');
-    setSelectedCategory('');
-    setSelectedLanguage('');
+    setSelectedCategoryIds([]);
+    setSelectedLanguages([]);
     setSelectedSortBy('recent');
-    setSelectedSemanticTag('');
+    setSelectedFilterMode('all');
+    setSelectedSemanticTags([]);
     const resetParams = new URLSearchParams();
     if (isFeatured) resetParams.set('featured', 'true');
     setSearchParams(resetParams);
@@ -115,7 +137,14 @@ const Videos = () => {
     ? featuredVideos
     : (videosPages?.pages ?? []).flat();
   const isVideoListLoading = isFeatured ? featuredLoading : videosLoading;
-  const hasFilters = !!(searchQuery || selectedCategory || selectedLanguage || selectedSemanticTag || selectedSortBy !== 'recent');
+  const hasFilters = !!(
+    searchQuery ||
+    selectedCategoryIds.length > 0 ||
+    selectedLanguages.length > 0 ||
+    selectedSemanticTags.length > 0 ||
+    selectedSortBy !== 'recent' ||
+    selectedFilterMode !== 'all'
+  );
 
   const sortOptions = useMemo(() => ([
     { value: 'recent', label: t('videos.sort.recent') },
@@ -123,8 +152,16 @@ const Videos = () => {
     { value: 'mostFavorited', label: t('videos.sort.mostFavorited') },
   ]), [t]);
 
+  const toggleArrayValue = (value: string, setValue: Dispatch<SetStateAction<string[]>>) => {
+    setValue((current) =>
+      current.includes(value)
+        ? current.filter((item) => item !== value)
+        : [...current, value],
+    );
+  };
+
   const handleSemanticTagClick = (tag: string) => {
-    setSelectedSemanticTag(tag);
+    toggleArrayValue(tag, setSelectedSemanticTags);
   };
 
   return (
@@ -150,45 +187,109 @@ const Videos = () => {
             />
           </div>
 
-          <Select
-            value={selectedCategory}
-            onValueChange={(value) => setSelectedCategory(value === "all" ? "" : value)}
-            disabled={isFeatured}
-          >
-            <SelectTrigger className="w-full md:w-[200px] bg-muted/50 border-0 focus:ring-primary/30">
-              <SelectValue placeholder={t('videos.allCategories')} />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">{t('videos.allCategories')}</SelectItem>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button
+                type="button"
+                variant="outline"
+                className="w-full justify-between bg-muted/50 md:w-[220px]"
+                disabled={isFeatured}
+              >
+                <span>
+                  {selectedCategoryIds.length > 0
+                    ? t('videos.multi.categoriesSelected', { count: selectedCategoryIds.length })
+                    : t('videos.allCategories')}
+                </span>
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent className="max-h-80 w-72 overflow-y-auto" align="start">
+              <DropdownMenuLabel>{t('videos.multi.categoriesLabel')}</DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              <div className="flex items-center justify-between gap-2 px-2 pb-2">
+                <Button
+                  type="button"
+                  size="sm"
+                  variant="ghost"
+                  className="h-7 px-2 text-xs"
+                  onClick={() => setSelectedCategoryIds(categories?.map((category) => category.id) ?? [])}
+                >
+                  {t('videos.multi.selectAll')}
+                </Button>
+                <Button
+                  type="button"
+                  size="sm"
+                  variant="ghost"
+                  className="h-7 px-2 text-xs"
+                  onClick={() => setSelectedCategoryIds([])}
+                >
+                  {t('videos.multi.clear')}
+                </Button>
+              </div>
               {categoriesLoading ? (
                 <div className="p-2 text-muted-foreground">{t('videos.loadingCategories')}</div>
               ) : (
                 categories?.map((category) => (
-                  <SelectItem key={category.id} value={category.id}>
+                  <DropdownMenuCheckboxItem
+                    key={category.id}
+                    checked={selectedCategoryIds.includes(category.id)}
+                    onCheckedChange={() => toggleArrayValue(category.id, setSelectedCategoryIds)}
+                  >
                     {category.name}
-                  </SelectItem>
+                  </DropdownMenuCheckboxItem>
                 ))
               )}
-            </SelectContent>
-          </Select>
+            </DropdownMenuContent>
+          </DropdownMenu>
 
-          <Select
-            value={selectedLanguage}
-            onValueChange={(value) => setSelectedLanguage(value === "all" ? "" : value)}
-            disabled={isFeatured}
-          >
-            <SelectTrigger className="w-full md:w-[150px] bg-muted/50 border-0 focus:ring-primary/30">
-              <SelectValue placeholder={t('videos.allLanguages')} />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">{t('videos.allLanguages')}</SelectItem>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button
+                type="button"
+                variant="outline"
+                className="w-full justify-between bg-muted/50 md:w-[200px]"
+                disabled={isFeatured}
+              >
+                <span>
+                  {selectedLanguages.length > 0
+                    ? t('videos.multi.languagesSelected', { count: selectedLanguages.length })
+                    : t('videos.allLanguages')}
+                </span>
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent className="max-h-80 w-64 overflow-y-auto" align="start">
+              <DropdownMenuLabel>{t('videos.multi.languagesLabel')}</DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              <div className="flex items-center justify-between gap-2 px-2 pb-2">
+                <Button
+                  type="button"
+                  size="sm"
+                  variant="ghost"
+                  className="h-7 px-2 text-xs"
+                  onClick={() => setSelectedLanguages(availableLanguages.map((lang) => lang.value))}
+                >
+                  {t('videos.multi.selectAll')}
+                </Button>
+                <Button
+                  type="button"
+                  size="sm"
+                  variant="ghost"
+                  className="h-7 px-2 text-xs"
+                  onClick={() => setSelectedLanguages([])}
+                >
+                  {t('videos.multi.clear')}
+                </Button>
+              </div>
               {availableLanguages.map((lang) => (
-                <SelectItem key={lang.value} value={lang.value}>
+                <DropdownMenuCheckboxItem
+                  key={lang.value}
+                  checked={selectedLanguages.includes(lang.value)}
+                  onCheckedChange={() => toggleArrayValue(lang.value, setSelectedLanguages)}
+                >
                   {lang.label}
-                </SelectItem>
+                </DropdownMenuCheckboxItem>
               ))}
-            </SelectContent>
-          </Select>
+            </DropdownMenuContent>
+          </DropdownMenu>
 
           <Select
             value={selectedSortBy}
@@ -207,6 +308,20 @@ const Videos = () => {
             </SelectContent>
           </Select>
 
+          <Select
+            value={selectedFilterMode}
+            onValueChange={(value) => setSelectedFilterMode(value as 'all' | 'any')}
+            disabled={isFeatured}
+          >
+            <SelectTrigger className="w-full md:w-[190px] bg-muted/50 border-0 focus:ring-primary/30">
+              <SelectValue placeholder={t('videos.matchMode.label')} />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">{t('videos.matchMode.all')}</SelectItem>
+              <SelectItem value="any">{t('videos.matchMode.any')}</SelectItem>
+            </SelectContent>
+          </Select>
+
           {hasFilters && (
             <Button variant="outline" onClick={handleClearFilters} className="gap-2" disabled={isFeatured}>
               <X className="w-4 h-4" />
@@ -218,17 +333,18 @@ const Videos = () => {
         {!isVideoListLoading && !videosIsError && !isFeatured && (
           <div className="mb-4 flex flex-wrap items-center gap-3 text-sm text-muted-foreground">
             <span>{t('videos.resultCount', { count: renderedVideos?.length ?? 0 })}</span>
-            {selectedSemanticTag && (
+            {selectedSemanticTags.map((tag) => (
               <Button
+                key={tag}
                 variant="outline"
                 size="sm"
                 className="h-7 gap-2 px-2"
-                onClick={() => setSelectedSemanticTag('')}
+                onClick={() => toggleArrayValue(tag, setSelectedSemanticTags)}
               >
-                <span>{t('videos.activeTag', { tag: selectedSemanticTag })}</span>
+                <span>{t('videos.activeTag', { tag })}</span>
                 <X className="h-3 w-3" />
               </Button>
-            )}
+            ))}
           </div>
         )}
 

@@ -3,21 +3,32 @@ export interface VideoListParams {
   limit?: number;
   offset?: number;
   searchQuery?: string;
+  filterMode?: 'all' | 'any';
+  categoryIds?: string[];
   categoryId?: string;
+  languages?: string[];
   language?: string;
   sortBy?: 'recent' | 'mostViewed' | 'mostFavorited';
+  semanticTags?: string[];
   semanticTag?: string;
   submittedBy?: string;
 }
+
+const normalizeStringArray = (value?: string[] | null) =>
+  [...new Set((value ?? []).map((item) => item.trim()).filter(Boolean))].sort();
 
 const normalizeVideoListParams = (params: VideoListParams = {}) => ({
   featured: params.featured ?? false,
   limit: params.limit ?? null,
   offset: params.offset ?? 0,
   searchQuery: params.searchQuery ?? '',
+  filterMode: params.filterMode ?? 'all',
+  categoryIds: normalizeStringArray(params.categoryIds),
   categoryId: params.categoryId ?? '',
+  languages: normalizeStringArray(params.languages),
   language: params.language ?? '',
   sortBy: params.sortBy ?? 'recent',
+  semanticTags: normalizeStringArray(params.semanticTags),
   semanticTag: params.semanticTag ?? '',
   submittedBy: params.submittedBy ?? '',
 });
