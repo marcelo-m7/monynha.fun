@@ -55,6 +55,7 @@ export function deriveTags(params: {
     ['banco de dados', ['sql', 'database', 'dados', 'banco de dados', 'base de dados', 'normalização', 'normalizacao']],
     ['Odoo', ['odoo', 'erp', 'human resources', 'employees', 'expenses', 'fleet', 'time off']],
     ['educação', ['aula', 'curso', 'aprenda', 'tutorial', 'facodi', 'ensino']],
+    ['música', ['musica', 'música', 'music', 'song', 'songs', 'spotify', 'album', 'lyrics', 'letra', 'cantor', 'banda', 'clipe', 'videoclipe']],
     ['receitas', ['receita', 'receitas', 'culinaria', 'cozinha', 'gastronomia', 'sopa', 'cebola', 'chef', 'ingredientes', 'forno', 'assado', 'sobremesa']],
   ];
 
@@ -163,6 +164,30 @@ export function pickCategory(categories: LegacyFastCategory[], params: {
       return slug === 'receitas-tradicionais' || slug === 'receitas';
     });
     if (recipeCategory) return recipeCategory;
+  }
+
+  const hasMusicSignals =
+    params.semanticTags.some((tag) => normalizeText(tag) === 'musica') ||
+    [
+      'musica',
+      'music',
+      'song',
+      'songs',
+      'spotify',
+      'album',
+      'lyrics',
+      'letra',
+      'cantor',
+      'banda',
+      'clipe',
+      'videoclipe',
+      'oficial video',
+      'official video',
+    ].some((keyword) => source.includes(keyword));
+
+  if (hasMusicSignals) {
+    const musicCategory = categories.find((category) => normalizeText(category.slug) === 'musica');
+    if (musicCategory) return musicCategory;
   }
 
   if (params.semanticTags.some((tag) => normalizeText(tag) === 'historia da arte')) {

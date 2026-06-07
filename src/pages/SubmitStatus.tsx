@@ -119,7 +119,7 @@ export default function SubmitStatus() {
   const noAssignedPlaylist = status === 'success' && !!metadata.assignment && !assignedPlaylistId;
   const processingStage = metadata.processing?.stage ?? metadata.error?.stage ?? metadata.clientError?.stage ?? null;
   const requestId = metadata.processing?.requestId ?? metadata.error?.requestId ?? null;
-  const submissionErrorMessage = localizeSubmissionErrorMessage(submission.error_message, t);
+  const submissionErrorMessage = localizeSubmissionErrorMessage(submission?.error_message, t);
   const startErrorMessage = localizeSubmissionErrorMessage(startProcessing.error?.message, t);
   const analysis = metadata.analysis ?? metadata.transcription ?? null;
   const transcript = metadata.transcription;

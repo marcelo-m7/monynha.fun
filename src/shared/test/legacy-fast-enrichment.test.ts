@@ -11,6 +11,7 @@ const categories: LegacyFastCategory[] = [
   { id: 'cat-cultura', name: 'Cultura', slug: 'cultura' },
   { id: 'cat-design', name: 'Design', slug: 'design' },
   { id: 'cat-educacao', name: 'Educacao', slug: 'educacao' },
+  { id: 'cat-musica', name: 'Musica', slug: 'musica' },
   { id: 'cat-receitas', name: 'Receitas', slug: 'receitas-tradicionais' },
   { id: 'cat-unclassified', name: 'Nao Classificados', slug: 'nao-classificados' },
   { id: 'cat-tech', name: 'Tecnologia', slug: 'tech' },
@@ -112,5 +113,25 @@ describe('legacy fast enrichment helpers', () => {
 
     expect(semanticTags).toContain('receitas');
     expect(selected?.id).toBe('cat-receitas');
+  });
+
+  it('detects music signals and routes music videos to musica category', () => {
+    const semanticTags = deriveTags({
+      title: 'Michael Jackson - Billie Jean (Official Video)',
+      description: 'Official music video from the Thriller album.',
+      channelName: 'michaeljacksonVEVO',
+      language: 'en',
+    });
+
+    const selected = pickCategory(categories, {
+      currentCategoryId: 'cat-educacao',
+      title: 'Michael Jackson - Billie Jean (Official Video)',
+      description: 'Official music video from the Thriller album.',
+      channelName: 'michaeljacksonVEVO',
+      semanticTags,
+    });
+
+    expect(semanticTags).toContain('música');
+    expect(selected?.id).toBe('cat-musica');
   });
 });
