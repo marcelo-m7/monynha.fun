@@ -29,6 +29,16 @@ const VideoCardComponent = ({ video, onClick, onTagClick, variant = 'default' }:
   const navigate = useNavigate();
   const { viewCount, showPlus, handleViewIncrement } = useVideoViewIncrement(video.view_count || 0);
   const hasOptimizedTitleTooltip = !!video.enrichment?.optimized_title && video.enrichment.optimized_title !== video.title;
+  const normalizedLanguage = (video.language || '').toLowerCase();
+  const languageLabel =
+    normalizedLanguage === 'pt' ||
+    normalizedLanguage === 'en' ||
+    normalizedLanguage === 'es' ||
+    normalizedLanguage === 'fr'
+      ? t(`common.language.${normalizedLanguage}`)
+      : normalizedLanguage === 'und' || normalizedLanguage === 'other'
+        ? t('common.language.other')
+        : video.language;
 
   const handleClick = useCallback(() => {
     handleViewIncrement(video.id);
@@ -85,7 +95,7 @@ const VideoCardComponent = ({ video, onClick, onTagClick, variant = 'default' }:
               variant === 'compact' && "px-1.5 py-0 text-[0.55rem]"
             )}
           >
-            {video.language}
+            {languageLabel}
           </Badge>
         </div>
 

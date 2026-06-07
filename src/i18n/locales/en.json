@@ -255,9 +255,9 @@
       "passwordMinLength": "Password must be at least 6 characters",
       "usernameMinLength": "Username must be at least 3 characters",
       "genericAuthError": "An authentication error occurred. Please try again.",
-      "searchPlaceholder": "Buscar videos, canales o temas...",
-      "searchButton": "Buscar",
-      "trendingLabel": "Tendencias:"
+      "searchPlaceholder": "Search videos, channels, or topics...",
+      "searchButton": "Search",
+      "trendingLabel": "Trending:"
     },
     "success": {
       "welcomeBack": "Welcome back!",

@@ -255,9 +255,9 @@
       "passwordMinLength": "Senha deve ter pelo menos 6 caracteres",
       "usernameMinLength": "Username deve ter pelo menos 3 caracteres",
       "genericAuthError": "Ocorreu um erro de autenticação. Tente novamente.",
-      "searchPlaceholder": "Buscar videos, canales o temas...",
+      "searchPlaceholder": "Buscar vídeos, canais ou temas...",
       "searchButton": "Buscar",
-      "trendingLabel": "Tendencias:"
+      "trendingLabel": "Tendências:"
     },
     "success": {
       "welcomeBack": "Bem-vindo de volta!",
@@ -267,7 +267,7 @@
       "passwordResetEmailSent": "Email de redefinição enviado!",
       "checkEmailForReset": "Verifique sua caixa de entrada para o link de redefinição de senha."
     },
-    "termsAgreementPrefix": "Ao continuar, voce concorda com os",
+    "termsAgreementPrefix": "Ao continuar, você concorda com os",
     "termsAgreementAnd": "e a"
   },
   "account": {
