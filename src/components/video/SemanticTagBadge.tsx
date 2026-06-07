@@ -39,7 +39,11 @@ export function SemanticTagBadge({ tag, className, onClick }: SemanticTagBadgePr
         colorClasses,
         className,
       )}
-      onClick={onClick}
+      onClick={(event) => {
+        event.preventDefault();
+        event.stopPropagation();
+        onClick?.();
+      }}
     >
       {tag}
     </Badge>

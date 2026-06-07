@@ -549,6 +549,17 @@
     "allCategories": "All Categories",
     "allLanguages": "All Languages",
     "loadingCategories": "Loading categories...",
+    "resultCount": "{{count}} videos found",
+    "activeTag": "Tag: {{tag}}",
+    "loadingErrorTitle": "Error loading videos",
+    "loadingErrorDescription": "Could not load videos right now. Please try again.",
+    "retry": "Try again",
+    "sort": {
+      "label": "Sort by",
+      "recent": "Most recent",
+      "mostViewed": "Most viewed",
+      "mostFavorited": "Most favorited"
+    },
     "clearFilters": "Clear Filters",
     "noVideosFound": "No videos found with the search criteria."
   },

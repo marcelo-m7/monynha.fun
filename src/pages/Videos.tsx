@@ -8,7 +8,7 @@ import { useCategories } from '@/features/categories/queries/useCategories';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
-import { Search, X, Loader2 } from 'lucide-react';
+import { Search, X } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useTranslation } from 'react-i18next'; // Import useTranslation
 
@@ -20,17 +20,29 @@ const Videos = () => {
   const initialSearchQuery = searchParams.get('query') || '';
   const initialCategoryId = searchParams.get('category') || '';
   const initialLanguage = searchParams.get('language') || '';
+  const initialSortBy = (searchParams.get('sort') as 'recent' | 'mostViewed' | 'mostFavorited' | null) || 'recent';
+  const initialSemanticTag = searchParams.get('tag') || '';
   const isFeatured = searchParams.get('featured') === 'true';
 
   const [searchQuery, setSearchQuery] = useState(initialSearchQuery);
   const [debouncedSearchQuery, setDebouncedSearchQuery] = useState(initialSearchQuery);
   const [selectedCategory, setSelectedCategory] = useState(initialCategoryId);
   const [selectedLanguage, setSelectedLanguage] = useState(initialLanguage);
+  const [selectedSortBy, setSelectedSortBy] = useState<'recent' | 'mostViewed' | 'mostFavorited'>(initialSortBy);
+  const [selectedSemanticTag, setSelectedSemanticTag] = useState(initialSemanticTag);
 
-  const { data: videos, isLoading: videosLoading } = useVideos({
+  const {
+    data: videos,
+    isLoading: videosLoading,
+    isError: videosIsError,
+    error: videosError,
+    refetch: refetchVideos,
+  } = useVideos({
     searchQuery: debouncedSearchQuery || undefined,
     categoryId: selectedCategory || undefined,
     language: selectedLanguage || undefined,
+    sortBy: selectedSortBy,
+    semanticTag: selectedSemanticTag || undefined,
     enabled: !isFeatured,
   });
   const { data: featuredVideos, isLoading: featuredLoading } = useFeaturedVideos(24, 0, isFeatured);
@@ -49,15 +61,19 @@ const Videos = () => {
     if (debouncedSearchQuery) newSearchParams.set('query', debouncedSearchQuery);
     if (selectedCategory) newSearchParams.set('category', selectedCategory);
     if (selectedLanguage) newSearchParams.set('language', selectedLanguage);
+    if (selectedSortBy !== 'recent') newSearchParams.set('sort', selectedSortBy);
+    if (selectedSemanticTag) newSearchParams.set('tag', selectedSemanticTag);
     if (isFeatured) newSearchParams.set('featured', 'true');
     setSearchParams(newSearchParams);
-  }, [debouncedSearchQuery, selectedCategory, selectedLanguage, isFeatured, setSearchParams]);
+  }, [debouncedSearchQuery, selectedCategory, selectedLanguage, selectedSortBy, selectedSemanticTag, isFeatured, setSearchParams]);
 
   const handleClearFilters = () => {
     setSearchQuery('');
     setDebouncedSearchQuery('');
     setSelectedCategory('');
     setSelectedLanguage('');
+    setSelectedSortBy('recent');
+    setSelectedSemanticTag('');
     const resetParams = new URLSearchParams();
     if (isFeatured) resetParams.set('featured', 'true');
     setSearchParams(resetParams);
@@ -73,6 +89,17 @@ const Videos = () => {
 
   const renderedVideos = isFeatured ? featuredVideos : videos;
   const isVideoListLoading = isFeatured ? featuredLoading : videosLoading;
+  const hasFilters = !!(searchQuery || selectedCategory || selectedLanguage || selectedSemanticTag || selectedSortBy !== 'recent');
+
+  const sortOptions = useMemo(() => ([
+    { value: 'recent', label: t('videos.sort.recent') },
+    { value: 'mostViewed', label: t('videos.sort.mostViewed') },
+    { value: 'mostFavorited', label: t('videos.sort.mostFavorited') },
+  ]), [t]);
+
+  const handleSemanticTagClick = (tag: string) => {
+    setSelectedSemanticTag(tag);
+  };
 
   return (
     <MainLayout>
@@ -137,13 +164,47 @@ const Videos = () => {
             </SelectContent>
           </Select>
 
-          {(searchQuery || selectedCategory || selectedLanguage) && (
+          <Select
+            value={selectedSortBy}
+            onValueChange={(value) => setSelectedSortBy(value as 'recent' | 'mostViewed' | 'mostFavorited')}
+            disabled={isFeatured}
+          >
+            <SelectTrigger className="w-full md:w-[190px] bg-muted/50 border-0 focus:ring-primary/30">
+              <SelectValue placeholder={t('videos.sort.label')} />
+            </SelectTrigger>
+            <SelectContent>
+              {sortOptions.map((option) => (
+                <SelectItem key={option.value} value={option.value}>
+                  {option.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+
+          {hasFilters && (
             <Button variant="outline" onClick={handleClearFilters} className="gap-2" disabled={isFeatured}>
               <X className="w-4 h-4" />
               {t('videos.clearFilters')}
             </Button>
           )}
         </div>
+
+        {!isVideoListLoading && !videosIsError && !isFeatured && (
+          <div className="mb-4 flex flex-wrap items-center gap-3 text-sm text-muted-foreground">
+            <span>{t('videos.resultCount', { count: renderedVideos?.length ?? 0 })}</span>
+            {selectedSemanticTag && (
+              <Button
+                variant="outline"
+                size="sm"
+                className="h-7 gap-2 px-2"
+                onClick={() => setSelectedSemanticTag('')}
+              >
+                <span>{t('videos.activeTag', { tag: selectedSemanticTag })}</span>
+                <X className="h-3 w-3" />
+              </Button>
+            )}
+          </div>
+        )}
 
         {/* Video List */}
         {isVideoListLoading ? (
@@ -156,11 +217,19 @@ const Videos = () => {
                 </div>
               ))}
             </div>
+        ) : videosIsError && !isFeatured ? (
+          <div className="rounded-md border border-destructive/30 bg-destructive/5 p-6 text-center">
+            <p className="text-sm text-foreground">{t('videos.loadingErrorTitle')}</p>
+            <p className="mt-2 text-sm text-muted-foreground">{videosError?.message || t('videos.loadingErrorDescription')}</p>
+            <Button className="mt-4" onClick={() => void refetchVideos()}>
+              {t('videos.retry')}
+            </Button>
+          </div>
         ) : renderedVideos && renderedVideos.length > 0 ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
               {renderedVideos.map((video) => (
                 <div key={video.id}>
-                  <VideoCard video={video} variant="default" />
+                  <VideoCard video={video} variant="default" onTagClick={handleSemanticTagClick} />
                 </div>
               ))}
             </div>

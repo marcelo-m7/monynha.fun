@@ -642,6 +642,17 @@
     "allCategories": "Todas las Categorías",
     "allLanguages": "Todos los Idiomas",
     "loadingCategories": "Cargando categorías...",
+    "resultCount": "{{count}} videos encontrados",
+    "activeTag": "Etiqueta: {{tag}}",
+    "loadingErrorTitle": "Error al cargar videos",
+    "loadingErrorDescription": "No se pudieron cargar los videos ahora. Inténtalo de nuevo.",
+    "retry": "Reintentar",
+    "sort": {
+      "label": "Ordenar por",
+      "recent": "Más recientes",
+      "mostViewed": "Más vistos",
+      "mostFavorited": "Más favoritos"
+    },
     "clearFilters": "Limpiar Filtros",
     "noVideosFound": "No se encontraron videos con los criterios de búsqueda."
   },

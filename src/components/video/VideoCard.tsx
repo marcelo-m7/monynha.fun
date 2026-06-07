@@ -20,10 +20,11 @@ import { VideoDurationBadge } from "./VideoDurationBadge";
 interface VideoCardProps {
   video: VideoWithCategory;
   onClick?: () => void;
+  onTagClick?: (tag: string) => void;
   variant?: 'default' | 'compact';
 }
 
-const VideoCardComponent = ({ video, onClick, variant = 'default' }: VideoCardProps) => {
+const VideoCardComponent = ({ video, onClick, onTagClick, variant = 'default' }: VideoCardProps) => {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const { viewCount, showPlus, handleViewIncrement } = useVideoViewIncrement(video.view_count || 0);
@@ -151,7 +152,11 @@ const VideoCardComponent = ({ video, onClick, variant = 'default' }: VideoCardPr
           {variant === 'default' && video.enrichment?.semantic_tags && video.enrichment.semantic_tags.length > 0 && (
             <div className="flex min-h-6 flex-wrap gap-1.5 overflow-hidden">
               {video.enrichment.semantic_tags.slice(0, 3).map((tag, index) => (
-                <SemanticTagBadge key={`${tag}-${index}`} tag={tag} />
+                <SemanticTagBadge
+                  key={`${tag}-${index}`}
+                  tag={tag}
+                  onClick={onTagClick ? () => onTagClick(tag) : undefined}
+                />
               ))}
             </div>
           )}

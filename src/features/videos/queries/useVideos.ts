@@ -27,6 +27,7 @@ export function useVideos(options: UseVideosOptions = {}) {
     queryFn: () => listVideos(params),
     enabled,
     staleTime: 60_000,
+    retry: 2,
   });
 }
 
