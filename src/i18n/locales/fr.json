@@ -653,6 +653,7 @@
     "allCategories": "Toutes les Catégories",
     "allLanguages": "Toutes les Langues",
     "loadingCategories": "Chargement des catégories...",
+    "resultCountOne": "1 vidéo trouvée",
     "resultCount": "{{count}} vidéos trouvées",
     "activeTag": "Tag : {{tag}}",
     "loadingErrorTitle": "Erreur lors du chargement des vidéos",
@@ -670,6 +671,8 @@
     "multi": {
       "categoriesLabel": "Catégories (OR)",
       "languagesLabel": "Langues (OR)",
+      "categorySelected": "1 catégorie",
+      "languageSelected": "1 langue",
       "categoriesSelected": "{{count}} catégories",
       "languagesSelected": "{{count}} langues",
       "selectAll": "Tout sélectionner",

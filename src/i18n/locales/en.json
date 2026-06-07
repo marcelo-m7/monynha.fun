@@ -560,6 +560,7 @@
     "allCategories": "All Categories",
     "allLanguages": "All Languages",
     "loadingCategories": "Loading categories...",
+    "resultCountOne": "1 video found",
     "resultCount": "{{count}} videos found",
     "activeTag": "Tag: {{tag}}",
     "loadingErrorTitle": "Error loading videos",
@@ -577,6 +578,8 @@
     "multi": {
       "categoriesLabel": "Categories (OR)",
       "languagesLabel": "Languages (OR)",
+      "categorySelected": "1 category",
+      "languageSelected": "1 language",
       "categoriesSelected": "{{count}} categories",
       "languagesSelected": "{{count}} languages",
       "selectAll": "Select all",

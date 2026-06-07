@@ -21,6 +21,11 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { useTranslation } from 'react-i18next';
 import { useMetaTags } from '@/shared/hooks/useMetaTags';
 
+const normalizeLanguageFilterValue = (value: string) => {
+  if (value === 'und') return 'other';
+  return value;
+};
+
 const Videos = () => {
   const { t } = useTranslation();
 
@@ -36,10 +41,14 @@ const Videos = () => {
     .split(',')
     .map((item) => item.trim())
     .filter(Boolean);
-  const initialLanguages = (searchParams.get('language') || '')
-    .split(',')
-    .map((item) => item.trim())
-    .filter(Boolean);
+  const initialLanguages = [
+    ...new Set(
+      (searchParams.get('language') || '')
+        .split(',')
+        .map((item) => normalizeLanguageFilterValue(item.trim()))
+        .filter(Boolean),
+    ),
+  ];
   const initialSortBy = (searchParams.get('sort') as 'recent' | 'mostViewed' | 'mostFavorited' | null) || 'recent';
   const initialFilterMode = (searchParams.get('match') as 'all' | 'any' | null) || 'all';
   const initialSemanticTags = (searchParams.get('tag') || '')
@@ -204,7 +213,12 @@ const Videos = () => {
               >
                 <span>
                   {selectedCategoryIds.length > 0
-                    ? t('videos.multi.categoriesSelected', { count: selectedCategoryIds.length })
+                    ? t(
+                        selectedCategoryIds.length === 1
+                          ? 'videos.multi.categorySelected'
+                          : 'videos.multi.categoriesSelected',
+                        { count: selectedCategoryIds.length },
+                      )
                     : t('videos.allCategories')}
                 </span>
               </Button>
@@ -258,7 +272,12 @@ const Videos = () => {
               >
                 <span>
                   {selectedLanguages.length > 0
-                    ? t('videos.multi.languagesSelected', { count: selectedLanguages.length })
+                    ? t(
+                        selectedLanguages.length === 1
+                          ? 'videos.multi.languageSelected'
+                          : 'videos.multi.languagesSelected',
+                        { count: selectedLanguages.length },
+                      )
                     : t('videos.allLanguages')}
                 </span>
               </Button>
@@ -339,7 +358,11 @@ const Videos = () => {
 
         {!isVideoListLoading && !videosIsError && !isFeatured && (
           <div className="mb-4 flex flex-wrap items-center gap-3 text-sm text-muted-foreground">
-            <span>{t('videos.resultCount', { count: renderedVideos?.length ?? 0 })}</span>
+            <span>
+              {t((renderedVideos?.length ?? 0) === 1 ? 'videos.resultCountOne' : 'videos.resultCount', {
+                count: renderedVideos?.length ?? 0,
+              })}
+            </span>
             {selectedSemanticTags.map((tag) => (
               <Button
                 key={tag}
