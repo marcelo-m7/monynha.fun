@@ -100,7 +100,9 @@
     "cookies": "Cookies"
   },
   "labels": {
-    "featured": "Featured"
+    "featured": "Featured",
+    "aiEnhanced": "Enhanced with AI",
+    "aiOptimizedTitle": "AI-optimized title"
   },
   "hero": {
     "badge": "Educational video intelligence",

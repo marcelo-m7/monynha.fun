@@ -100,7 +100,9 @@
     "cookies": "Cookies"
   },
   "labels": {
-    "featured": "En Vedette"
+    "featured": "En Vedette",
+    "aiEnhanced": "Enrichi par IA",
+    "aiOptimizedTitle": "Titre optimisé par IA"
   },
   "hero": {
     "badge": "Intelligence pour vidéos éducatives",
@@ -1367,7 +1369,7 @@
     "defaultMessage": "Vous avez une nouvelle notification.",
     "types": {
       "new_follower": {
-        "title": "Nouveau follower",
+        "title": "Nouvel abonné",
         "message": "Quelqu'un a commencé à vous suivre."
       },
       "new_message": {

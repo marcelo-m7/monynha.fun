@@ -128,7 +128,7 @@ const VideoCardComponent = ({ video, onClick, onTagClick, variant = 'default' }:
                 </h3>
               </TooltipTrigger>
               <TooltipContent side="top" className="max-w-xs">
-                <p className="text-xs font-semibold mb-1">AI-Optimized Title:</p>
+                <p className="text-xs font-semibold mb-1">{t('labels.aiOptimizedTitle')}</p>
                 <p className="text-sm">{video.enrichment?.optimized_title}</p>
               </TooltipContent>
             </Tooltip>
