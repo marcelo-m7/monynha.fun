@@ -1,9 +1,9 @@
-import { useMemo, useState, useEffect } from 'react';
-import { useSearchParams, useNavigate } from 'react-router-dom';
+import { useMemo, useState, useEffect, useRef } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { MainLayout } from '@/components/layout/MainLayout';
 import { PageHero } from '@/components/showcase';
 import { VideoCard } from '@/components/video/VideoCard';
-import { useFeaturedVideos, useVideos } from '@/features/videos/queries/useVideos';
+import { useFeaturedVideos, useInfiniteVideos } from '@/features/videos/queries/useVideos';
 import { useCategories } from '@/features/categories/queries/useCategories';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -15,7 +15,6 @@ import { useTranslation } from 'react-i18next'; // Import useTranslation
 const Videos = () => {
   const { t } = useTranslation(); // Initialize useTranslation
   const [searchParams, setSearchParams] = useSearchParams();
-  const navigate = useNavigate();
 
   const initialSearchQuery = searchParams.get('query') || '';
   const initialCategoryId = searchParams.get('category') || '';
@@ -31,20 +30,45 @@ const Videos = () => {
   const [selectedSortBy, setSelectedSortBy] = useState<'recent' | 'mostViewed' | 'mostFavorited'>(initialSortBy);
   const [selectedSemanticTag, setSelectedSemanticTag] = useState(initialSemanticTag);
 
+  const loadMoreRef = useRef<HTMLDivElement | null>(null);
+
   const {
-    data: videos,
+    data: videosPages,
     isLoading: videosLoading,
     isError: videosIsError,
     error: videosError,
     refetch: refetchVideos,
-  } = useVideos({
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+  } = useInfiniteVideos({
     searchQuery: debouncedSearchQuery || undefined,
     categoryId: selectedCategory || undefined,
     language: selectedLanguage || undefined,
     sortBy: selectedSortBy,
     semanticTag: selectedSemanticTag || undefined,
+    pageSize: 24,
     enabled: !isFeatured,
   });
+    useEffect(() => {
+      if (isFeatured || !hasNextPage || isFetchingNextPage || !loadMoreRef.current) {
+        return;
+      }
+
+      const observer = new IntersectionObserver(
+        (entries) => {
+          const [entry] = entries;
+          if (entry?.isIntersecting) {
+            void fetchNextPage();
+          }
+        },
+        { rootMargin: '250px 0px', threshold: 0.01 },
+      );
+
+      observer.observe(loadMoreRef.current);
+      return () => observer.disconnect();
+    }, [isFeatured, hasNextPage, isFetchingNextPage, fetchNextPage]);
+
   const { data: featuredVideos, isLoading: featuredLoading } = useFeaturedVideos(24, 0, isFeatured);
   const { data: categories, isLoading: categoriesLoading } = useCategories();
 
@@ -87,7 +111,9 @@ const Videos = () => {
     { value: 'other', label: t('common.language.other') },
   ], [t]);
 
-  const renderedVideos = isFeatured ? featuredVideos : videos;
+  const renderedVideos = isFeatured
+    ? featuredVideos
+    : (videosPages?.pages ?? []).flat();
   const isVideoListLoading = isFeatured ? featuredLoading : videosLoading;
   const hasFilters = !!(searchQuery || selectedCategory || selectedLanguage || selectedSemanticTag || selectedSortBy !== 'recent');
 
@@ -226,6 +252,7 @@ const Videos = () => {
             </Button>
           </div>
         ) : renderedVideos && renderedVideos.length > 0 ? (
+          <>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
               {renderedVideos.map((video) => (
                 <div key={video.id}>
@@ -233,6 +260,21 @@ const Videos = () => {
                 </div>
               ))}
             </div>
+            {!isFeatured && (
+              <div className="mt-8 flex flex-col items-center justify-center gap-3 text-sm text-muted-foreground">
+                <div ref={loadMoreRef} className="h-1 w-full" aria-hidden="true" />
+                {isFetchingNextPage ? (
+                  <span>{t('videos.loadingMore')}</span>
+                ) : hasNextPage ? (
+                  <Button variant="outline" size="sm" onClick={() => void fetchNextPage()}>
+                    {t('videos.loadMore')}
+                  </Button>
+                ) : (
+                  <span>{t('videos.endOfResults')}</span>
+                )}
+              </div>
+            )}
+          </>
         ) : (
           <div className="text-center py-12 text-muted-foreground">
             {isFeatured ? t('index.noFeaturedVideos') : t('videos.noVideosFound')}

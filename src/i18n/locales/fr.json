@@ -647,6 +647,9 @@
     "loadingErrorTitle": "Erreur lors du chargement des vidéos",
     "loadingErrorDescription": "Impossible de charger les vidéos pour le moment. Veuillez réessayer.",
     "retry": "Réessayer",
+    "loadingMore": "Chargement de plus de vidéos...",
+    "loadMore": "Charger plus",
+    "endOfResults": "Vous avez atteint la fin de la liste.",
     "sort": {
       "label": "Trier par",
       "recent": "Plus récentes",

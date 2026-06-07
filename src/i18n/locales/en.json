@@ -554,6 +554,9 @@
     "loadingErrorTitle": "Error loading videos",
     "loadingErrorDescription": "Could not load videos right now. Please try again.",
     "retry": "Try again",
+    "loadingMore": "Loading more videos...",
+    "loadMore": "Load more",
+    "endOfResults": "You reached the end of the list.",
     "sort": {
       "label": "Sort by",
       "recent": "Most recent",

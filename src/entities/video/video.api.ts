@@ -98,6 +98,7 @@ function isVideoCategory(value: unknown): value is VideoCategory {
 export interface ListVideosParams {
   featured?: boolean;
   limit?: number;
+  offset?: number;
   searchQuery?: string;
   categoryId?: string;
   language?: string;
@@ -120,6 +121,7 @@ export async function listVideos(params: ListVideosParams = {}) {
   const includeEnrichment = params.includeEnrichment !== false; // Default true
   const sortBy = params.sortBy ?? 'recent';
   const limit = params.limit ?? 24;
+  const offset = params.offset ?? 0;
   
   let query = supabase
     .from('v_video_exhibition')
@@ -137,7 +139,7 @@ export async function listVideos(params: ListVideosParams = {}) {
     query = query.eq('is_featured', true);
   }
 
-  query = query.limit(limit);
+  query = query.range(offset, offset + limit - 1);
 
   if (params.searchQuery) {
     const youtubeId = extractYouTubeId(params.searchQuery);

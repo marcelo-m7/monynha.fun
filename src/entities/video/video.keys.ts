@@ -1,6 +1,7 @@
 export interface VideoListParams {
   featured?: boolean;
   limit?: number;
+  offset?: number;
   searchQuery?: string;
   categoryId?: string;
   language?: string;
@@ -12,6 +13,7 @@ export interface VideoListParams {
 const normalizeVideoListParams = (params: VideoListParams = {}) => ({
   featured: params.featured ?? false,
   limit: params.limit ?? null,
+  offset: params.offset ?? 0,
   searchQuery: params.searchQuery ?? '',
   categoryId: params.categoryId ?? '',
   language: params.language ?? '',
@@ -24,6 +26,11 @@ export const videoKeys = {
   all: ['videos'] as const,
   lists: () => [...videoKeys.all, 'list'] as const,
   list: (params?: VideoListParams) => [...videoKeys.lists(), normalizeVideoListParams(params)] as const,
+  infiniteList: (params?: VideoListParams) => [
+    ...videoKeys.lists(),
+    'infinite',
+    normalizeVideoListParams({ ...params, offset: 0 }),
+  ] as const,
   editable: (submittedBy: string) => [...videoKeys.all, 'editable', submittedBy] as const,
   details: () => [...videoKeys.all, 'detail'] as const,
   detail: (id: string) => [...videoKeys.details(), id] as const,

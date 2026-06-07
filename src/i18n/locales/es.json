@@ -647,6 +647,9 @@
     "loadingErrorTitle": "Error al cargar videos",
     "loadingErrorDescription": "No se pudieron cargar los videos ahora. Inténtalo de nuevo.",
     "retry": "Reintentar",
+    "loadingMore": "Cargando más videos...",
+    "loadMore": "Cargar más",
+    "endOfResults": "Llegaste al final de la lista.",
     "sort": {
       "label": "Ordenar por",
       "recent": "Más recientes",

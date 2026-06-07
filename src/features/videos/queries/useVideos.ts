@@ -1,4 +1,4 @@
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useInfiniteQuery, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import {
   deleteVideo,
   getVideoById,
@@ -19,6 +19,11 @@ interface UseVideosOptions extends VideoListParams {
   enabled?: boolean;
 }
 
+interface UseInfiniteVideosOptions extends Omit<VideoListParams, 'offset' | 'limit'> {
+  enabled?: boolean;
+  pageSize?: number;
+}
+
 export function useVideos(options: UseVideosOptions = {}) {
   const { enabled = true, ...params } = options;
 
@@ -28,6 +33,30 @@ export function useVideos(options: UseVideosOptions = {}) {
     enabled,
     staleTime: 60_000,
     retry: 2,
+  });
+}
+
+export function useInfiniteVideos(options: UseInfiniteVideosOptions = {}) {
+  const { enabled = true, pageSize = 24, ...params } = options;
+
+  return useInfiniteQuery<VideoWithCategory[], Error>({
+    queryKey: videoKeys.infiniteList({ ...params, limit: pageSize }),
+    queryFn: ({ pageParam = 0 }) =>
+      listVideos({
+        ...params,
+        limit: pageSize,
+        offset: Number(pageParam),
+      }),
+    initialPageParam: 0,
+    enabled,
+    staleTime: 60_000,
+    retry: 2,
+    getNextPageParam: (lastPage, allPages) => {
+      if (lastPage.length < pageSize) {
+        return undefined;
+      }
+      return allPages.length * pageSize;
+    },
   });
 }
 
