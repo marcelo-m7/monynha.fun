@@ -64,6 +64,19 @@ beforeEach(() => {
 });
 
 describe('Submit page', () => {
+  it('autofocuses the youtube url field', () => {
+    useYouTubeMetadataMock.mockReturnValue({
+      metadata: null,
+      isLoading: false,
+      error: null,
+    });
+
+    renderWithProviders(<Submit />);
+
+    const youtubeInput = screen.getByLabelText(/youtube url/i);
+    expect(youtubeInput).toHaveFocus();
+  });
+
   it('shows validation errors for invalid input', async () => {
     useYouTubeMetadataMock.mockReturnValue({
       metadata: {
@@ -136,6 +149,35 @@ describe('Submit page', () => {
       }),
     );
     expect(navigateMock).toHaveBeenCalledWith('/submit/status/submission-1');
+  });
+
+  it('submits the form when pressing enter on youtube url field', async () => {
+    useYouTubeMetadataMock.mockReturnValue({
+      metadata: {
+        videoId: 'abc123DEF45',
+        title: 'Learning React',
+        channelName: 'Monynha',
+        thumbnailUrl: 'https://example.com/thumb.jpg',
+        description: 'React basics',
+      },
+      isLoading: false,
+      error: null,
+    });
+
+    renderWithProviders(<Submit />);
+
+    const user = userEvent.setup();
+    const youtubeInput = screen.getByLabelText(/youtube url/i);
+
+    fireEvent.change(youtubeInput, {
+      target: { value: 'https://www.youtube.com/watch?v=abc123DEF45' },
+    });
+
+    await user.type(youtubeInput, '{enter}');
+
+    await waitFor(() => {
+      expect(mutateAsyncMock).toHaveBeenCalled();
+    });
   });
 
   it('does not ask for a manual language during initial submit', () => {

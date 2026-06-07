@@ -41,6 +41,8 @@ export default function Submit() {
     },
   });
 
+  const youtubeUrlField = register('youtubeUrl');
+
   const youtubeUrl = watch('youtubeUrl');
   const description = watch('description');
   const categoryId = watch('categoryId');
@@ -126,7 +128,13 @@ export default function Submit() {
                     id="youtube-url"
                     type="url"
                     placeholder={t('submit.form.youtubeUrlPlaceholder')}
-                    {...register('youtubeUrl')}
+                    {...youtubeUrlField}
+                    autoFocus
+                    onKeyDown={(event) => {
+                      if (event.key !== 'Enter') return;
+                      event.preventDefault();
+                      void handleSubmit(onSubmit)();
+                    }}
                     className="pl-10"
                     aria-invalid={errors.youtubeUrl ? "true" : "false"}
                   />
