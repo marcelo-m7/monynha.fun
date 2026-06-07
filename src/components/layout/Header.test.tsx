@@ -56,7 +56,7 @@ describe('Header', () => {
 
     expect(screen.getByRole('button', { name: /submit video/i })).toBeInTheDocument();
     expect(screen.queryByRole('button', { name: /login/i })).not.toBeInTheDocument();
-    expect(screen.getByRole('link', { name: /imports/i })).toHaveAttribute('href', '/playlists/import/progress');
+    expect(screen.getByRole('link', { name: /imports/i })).toHaveAttribute('href', '/submissions');
 
     await userEvent.click(screen.getByRole('button', { name: /project/i }));
     expect(screen.getByRole('menuitem', { name: /curation/i })).toBeInTheDocument();

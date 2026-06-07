@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { getVideoSubmissionById, getVideoSubmissionsByIds, markVideoSubmissionClientError } from '@/entities/video_submission/video_submission.api';
+import { getRecentVideoSubmissions, getVideoSubmissionById, getVideoSubmissionsByIds, markVideoSubmissionClientError } from '@/entities/video_submission/video_submission.api';
 import { videoAnalysisJobKeys } from '@/entities/video_analysis_job/video_analysis_job.keys';
 import { videoSubmissionKeys } from '@/entities/video_submission/video_submission.keys';
 import type { VideoSubmission, VideoSubmissionStatus } from '@/entities/video_submission/video_submission.types';
@@ -49,6 +49,20 @@ export function useVideoSubmissions(ids: string[]) {
       if (submissions.length === 0) return 5000;
       if (submissions.every((submission) => isTerminalStatus(submission.status))) return false;
       if (submissions.some((submission) => submission.status === 'processing')) return 1000;
+      return 5000;
+    },
+  });
+}
+
+export function useRecentVideoSubmissions(limit = 100, enabled = true) {
+  return useQuery<VideoSubmission[], Error>({
+    queryKey: [...videoSubmissionKeys.all, 'recent', limit],
+    queryFn: () => getRecentVideoSubmissions(limit),
+    enabled,
+    refetchInterval: (query) => {
+      const submissions = query.state.data ?? [];
+      if (submissions.length === 0) return 5000;
+      if (submissions.some((submission) => submission.status === 'processing' || submission.status === 'pending')) return 1500;
       return 5000;
     },
   });

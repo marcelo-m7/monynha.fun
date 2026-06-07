@@ -26,6 +26,7 @@ const Auth = lazy(() => import("./pages/Auth"));
 const VerifyEmail = lazy(() => import("./pages/VerifyEmail"));
 const Submit = lazy(() => import("./pages/Submit"));
 const SubmitStatus = lazy(() => import("./pages/SubmitStatus"));
+const Submissions = lazy(() => import("./pages/Submissions"));
 const VideoDetails = lazy(() => import("./pages/VideoDetails"));
 const Videos = lazy(() => import("./pages/Videos"));
 const Favorites = lazy(() => import("./pages/Favorites"));
@@ -74,6 +75,7 @@ const App = () => (
         <Route path="/auth/verify-email" element={<VerifyEmail />} />
         <Route path="/submit" element={<Submit />} />
         <Route path="/submit/status/:submissionId" element={<SubmitStatus />} />
+        <Route path="/submissions" element={<Submissions />} />
         <Route path="/watch" element={<YouTubeRouteBridge />} />
         <Route path="/shorts/:id" element={<YouTubeRouteBridge />} />
         <Route path="/live/:id" element={<YouTubeRouteBridge />} />

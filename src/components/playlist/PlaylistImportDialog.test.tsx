@@ -56,7 +56,7 @@ describe('PlaylistImportDialog', () => {
     });
   });
 
-  it('uses snake_case payload and navigates to the batch progress page', async () => {
+  it('uses snake_case payload and navigates to the submissions center', async () => {
     const user = userEvent.setup();
 
     renderWithProviders(
@@ -93,7 +93,7 @@ describe('PlaylistImportDialog', () => {
     expect(invokeEdgeFunctionMock).not.toHaveBeenCalledWith('enrich-video', expect.anything());
 
     await waitFor(() => {
-      expect(navigateMock).toHaveBeenCalledWith(expect.stringContaining('/playlists/import/progress?'));
+      expect(navigateMock).toHaveBeenCalledWith(expect.stringContaining('/submissions?'));
     });
     expect(navigateMock).toHaveBeenCalledWith(expect.stringContaining('ids=sub-1'));
     expect(navigateMock).toHaveBeenCalledWith(expect.stringContaining('found=5'));

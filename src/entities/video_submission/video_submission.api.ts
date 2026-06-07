@@ -53,6 +53,22 @@ export async function getVideoSubmissionsByIds(ids: string[]) {
     .filter((submission): submission is VideoSubmission => Boolean(submission));
 }
 
+export async function getRecentVideoSubmissions(limit = 100) {
+  const safeLimit = Math.max(1, Math.min(limit, 500));
+
+  const { data, error } = await supabase
+    .from('video_submissions')
+    .select('*')
+    .order('created_at', { ascending: false })
+    .limit(safeLimit);
+
+  if (error) {
+    throw new Error(getSupabaseErrorMessage(error));
+  }
+
+  return (data ?? []) as VideoSubmission[];
+}
+
 export async function markVideoSubmissionClientError(payload: {
   submissionId: string;
   errorMessage: string;

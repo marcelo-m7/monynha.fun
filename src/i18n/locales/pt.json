@@ -1018,6 +1018,23 @@
           "existing": "Já tratados",
           "processing": "Processando",
           "ready": "Prontos"
+        },
+        "filters": {
+          "typeLabel": "Tipo de conteúdo",
+          "statusLabel": "Status do processamento",
+          "emptyFilteredTitle": "Nenhuma submissão corresponde aos filtros",
+          "emptyFilteredDescription": "Tente outro filtro de tipo ou status para encontrar submissões.",
+          "types": {
+            "all": "Todos os tipos",
+            "playlist": "Importações de playlist",
+            "single": "Submissões individuais"
+          },
+          "status": {
+            "all": "Todos os status",
+            "active": "Ativos",
+            "done": "Concluídos",
+            "failed": "Precisam de atenção"
+          }
         }
       }
     },

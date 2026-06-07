@@ -1018,6 +1018,23 @@
           "existing": "Already handled",
           "processing": "Processing",
           "ready": "Ready"
+        },
+        "filters": {
+          "typeLabel": "Content type",
+          "statusLabel": "Processing status",
+          "emptyFilteredTitle": "No submissions match your filters",
+          "emptyFilteredDescription": "Try another type or status filter to find submissions.",
+          "types": {
+            "all": "All types",
+            "playlist": "Playlist imports",
+            "single": "Single submissions"
+          },
+          "status": {
+            "all": "All statuses",
+            "active": "Active",
+            "done": "Completed",
+            "failed": "Needs attention"
+          }
         }
       }
     },

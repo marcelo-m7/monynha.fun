@@ -143,7 +143,7 @@ export const PlaylistImportDialog: React.FC<PlaylistImportDialogProps> = ({ chil
           existing: String(existingCount),
         });
 
-        navigate(`/playlists/import/progress?${params.toString()}`);
+        navigate(`/submissions?${params.toString()}`);
       }
 
       setOpen(false);

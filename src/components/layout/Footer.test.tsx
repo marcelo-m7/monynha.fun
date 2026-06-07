@@ -24,6 +24,6 @@ describe('Footer', () => {
     expect(screen.getByRole('heading', { name: /learning/i })).toBeInTheDocument();
     expect(screen.getByRole('heading', { name: /community/i })).toBeInTheDocument();
     expect(screen.getByRole('heading', { name: /institutional/i })).toBeInTheDocument();
-    expect(screen.getByRole('link', { name: /imports/i })).toHaveAttribute('href', '/playlists/import/progress');
+    expect(screen.getByRole('link', { name: /imports/i })).toHaveAttribute('href', '/submissions');
   });
 });

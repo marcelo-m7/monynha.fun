@@ -27,7 +27,7 @@ export const primaryNavigationItems: NavigationItem[] = [
   { to: "/", labelKey: "header.home", icon: Home },
   { to: "/videos", labelKey: "header.videos", icon: ListVideo },
   { to: "/playlists", labelKey: "header.playlists", icon: ListVideo },
-  { to: "/playlists/import/progress", labelKey: "header.imports", icon: UploadCloud },
+  { to: "/submissions", labelKey: "header.imports", icon: UploadCloud },
   { to: "/facodi", labelKey: "header.facodi", icon: GraduationCap },
   { to: "/community", labelKey: "header.community", icon: Users },
 ];
@@ -50,7 +50,7 @@ export const mobileNavigationGroups = [
       { to: "/", labelKey: "header.home", icon: Home },
       { to: "/videos", labelKey: "header.videos", icon: ListVideo },
       { to: "/playlists", labelKey: "header.playlists", icon: ListVideo },
-      { to: "/playlists/import/progress", labelKey: "header.imports", icon: UploadCloud },
+      { to: "/submissions", labelKey: "header.imports", icon: UploadCloud },
     ],
   },
   {
@@ -85,7 +85,7 @@ export const footerNavigationSections = [
       { to: "/", labelKey: "header.home" },
       { to: "/videos", labelKey: "header.videos" },
       { to: "/playlists", labelKey: "header.playlists" },
-      { to: "/playlists/import/progress", labelKey: "header.imports" },
+      { to: "/submissions", labelKey: "header.imports" },
     ],
   },
   {

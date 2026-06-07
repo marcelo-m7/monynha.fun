@@ -84,7 +84,7 @@ export const MobileNav: React.FC<MobileNavProps> = ({
           <Button
             variant="outline"
             className="h-11 justify-center gap-2 rounded-xl"
-            onClick={() => handleNavigate('/playlists/import/progress')}
+            onClick={() => handleNavigate('/submissions')}
           >
             <UploadCloud className="h-4 w-4" />
             {t('header.imports')}

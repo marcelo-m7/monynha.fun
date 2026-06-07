@@ -39,6 +39,10 @@ export type VideoSubmissionAssignment = {
 };
 
 export type VideoSubmissionMetadata = {
+  source?: string | null;
+  youtube_playlist_list?: string | null;
+  youtube_playlist_url?: string | null;
+  imported_at?: string | null;
   enrichmentId?: string | null;
   detectedLanguage?: string | null;
   analysisJob?: {

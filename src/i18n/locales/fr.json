@@ -1016,6 +1016,23 @@
           "existing": "Déjà traitées",
           "processing": "Traitement",
           "ready": "Prêtes"
+        },
+        "filters": {
+          "typeLabel": "Type de contenu",
+          "statusLabel": "Statut du traitement",
+          "emptyFilteredTitle": "Aucune soumission ne correspond aux filtres",
+          "emptyFilteredDescription": "Essayez un autre filtre de type ou de statut.",
+          "types": {
+            "all": "Tous les types",
+            "playlist": "Imports de playlist",
+            "single": "Soumissions individuelles"
+          },
+          "status": {
+            "all": "Tous les statuts",
+            "active": "Actifs",
+            "done": "Terminés",
+            "failed": "Nécessitent une attention"
+          }
         }
       }
     },

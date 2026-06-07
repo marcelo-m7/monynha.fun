@@ -1018,6 +1018,23 @@
           "existing": "Ya gestionados",
           "processing": "Procesando",
           "ready": "Listos"
+        },
+        "filters": {
+          "typeLabel": "Tipo de contenido",
+          "statusLabel": "Estado del procesamiento",
+          "emptyFilteredTitle": "Ningún envío coincide con los filtros",
+          "emptyFilteredDescription": "Prueba otro filtro de tipo o estado para encontrar envíos.",
+          "types": {
+            "all": "Todos los tipos",
+            "playlist": "Importaciones de playlist",
+            "single": "Envíos individuales"
+          },
+          "status": {
+            "all": "Todos los estados",
+            "active": "Activos",
+            "done": "Completados",
+            "failed": "Requieren atención"
+          }
         }
       }
     },
