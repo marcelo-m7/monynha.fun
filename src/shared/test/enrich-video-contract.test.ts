@@ -6,21 +6,20 @@ const repoRoot = process.cwd();
 const enrichVideoPath = path.join(repoRoot, 'supabase/functions/enrich-video/index.ts');
 
 describe('enrich-video fast-path contract', () => {
-  it('does not import OpenAI or Gemini providers', () => {
+  it('imports OpenAI primary path with Gemini fallback', () => {
     const source = fs.readFileSync(enrichVideoPath, 'utf8');
 
-    expect(source).not.toMatch(/openai/i);
-    expect(source).not.toMatch(/gemini/i);
-    expect(source).not.toContain('../_shared/openai-client.ts');
-    expect(source).not.toContain('../_shared/gemini-client.ts');
+    expect(source).toContain('../_shared/openai-client.ts');
+    expect(source).toContain('../_shared/gemini-client.ts');
+    expect(source).toContain("provider: 'openai'");
+    expect(source).toContain("provider: 'gemini'");
   });
 
-  it('keeps the public fast-path provider contract', () => {
+  it('stores completed fast-path analysis jobs instead of pending deep jobs', () => {
     const source = fs.readFileSync(enrichVideoPath, 'utf8');
 
-    expect(source).toContain("provider: 'legacy_fast'");
-    expect(source).toContain("provider: 'v2'");
-    expect(source).toContain("status: 'pending'");
+    expect(source).toContain("provider: 'fast_path_ai'");
+    expect(source).toContain("status: 'completed'");
     expect(source).toContain('video_analysis_jobs');
   });
 });

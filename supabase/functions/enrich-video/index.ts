@@ -12,6 +12,8 @@ import {
   type PlaylistAssignmentPlaylist,
   type PlaylistAssignmentResult,
 } from '../_shared/playlist-assignment.ts'
+import { OpenAIClient } from '../_shared/openai-client.ts'
+import { GeminiClient } from '../_shared/gemini-client.ts'
 import { errorResponse, jsonResponse, optionsResponse } from '../_shared/http.ts'
 import { checkEdgeRateLimit } from '../_shared/rate-limit.ts'
 
@@ -230,68 +232,202 @@ async function safeUpdateSubmissionStatus(
   }
 }
 
-async function ensureDeepAnalysisJob(params: {
+type FastEnrichmentResult = {
+  provider: 'openai' | 'gemini' | 'legacy_fast';
+  providerModel: string | null;
+  optimizedTitle: string;
+  summaryDescription: string;
+  shortSummary: string;
+  semanticTags: string[];
+  suggestedCategoryId: string | null;
+  suggestedCategory: string | null;
+  suggestedPlaylistId: string | null;
+  suggestedPlaylistQuery: string | null;
+  classificationConfidence: number | null;
+  culturalRelevance: string;
+  fallbackReason: string | null;
+};
+
+function normalizeSummary(value: string | null | undefined, fallback: string): string {
+  const cleaned = (value ?? '').replace(/\s+/g, ' ').trim();
+  return cleaned ? cleaned.slice(0, 420) : fallback;
+}
+
+function toFastLegacyResult(params: {
+  title: string;
+  videoTitle: string | null;
+  description: string | null;
+  channelName: string | null;
+  youtubeId: string;
+  language: string;
+}): FastEnrichmentResult {
+  const summary = buildVideoSummary({
+    title: params.videoTitle,
+    description: params.description,
+    channelName: params.channelName,
+    youtubeId: params.youtubeId,
+  });
+
+  return {
+    provider: 'legacy_fast',
+    providerModel: null,
+    optimizedTitle: params.title,
+    summaryDescription: summary,
+    shortSummary: summary,
+    semanticTags: deriveTags({
+      title: params.videoTitle,
+      description: params.description,
+      channelName: params.channelName,
+      language: params.language,
+    }),
+    suggestedCategoryId: null,
+    suggestedCategory: null,
+    suggestedPlaylistId: null,
+    suggestedPlaylistQuery: null,
+    classificationConfidence: null,
+    culturalRelevance: 'Curadoria rapida sem analise externa',
+    fallbackReason: 'ai_unavailable',
+  };
+}
+
+async function computeFastEnrichment(params: {
+  title: string;
+  videoTitle: string | null;
+  description: string | null;
+  channelName: string | null;
+  youtubeUrl: string;
+  youtubeId: string;
+  language: string;
+  categories: Array<{ id: string; name: string; slug: string }>;
+  playlists: PlaylistAssignmentPlaylist[];
+}): Promise<FastEnrichmentResult> {
+  const fallback = toFastLegacyResult({
+    title: params.title,
+    videoTitle: params.videoTitle,
+    description: params.description,
+    channelName: params.channelName,
+    youtubeId: params.youtubeId,
+    language: params.language,
+  });
+
+  const openAiKey = Deno.env.get('OPENAI_API_KEY') ?? '';
+  if (openAiKey) {
+    try {
+      const openAiClient = new OpenAIClient({
+        apiKey: openAiKey,
+        model: Deno.env.get('OPENAI_MODEL') || 'gpt-4o-mini',
+        timeout: 12000,
+        maxRetries: 1,
+      });
+
+      const openAiResult = await openAiClient.enrichVideo({
+        title: params.title,
+        description: params.description ?? '',
+        language: params.language,
+        channelName: params.channelName,
+        categories: params.categories,
+        playlists: params.playlists,
+      });
+
+      const summaryDescription = normalizeSummary(openAiResult.summary_description, fallback.summaryDescription);
+      const shortSummary = normalizeSummary(openAiResult.short_summary, summaryDescription);
+
+      return {
+        provider: 'openai',
+        providerModel: openAiClient.modelName,
+        optimizedTitle: normalizeSummary(openAiResult.optimized_title, params.title).slice(0, 120),
+        summaryDescription,
+        shortSummary,
+        semanticTags: openAiResult.semantic_tags?.slice(0, 8) ?? fallback.semanticTags,
+        suggestedCategoryId: openAiResult.suggested_category_id,
+        suggestedCategory: openAiResult.suggested_category,
+        suggestedPlaylistId: openAiResult.suggested_playlist_id,
+        suggestedPlaylistQuery: openAiResult.suggested_playlist_query,
+        classificationConfidence: openAiResult.classification_confidence,
+        culturalRelevance: openAiResult.cultural_relevance || 'Medium',
+        fallbackReason: null,
+      };
+    } catch (error) {
+      console.warn(`[enrich-video] OpenAI fast-path failed: ${error instanceof Error ? error.message : 'unknown error'}`);
+    }
+  }
+
+  const geminiKey = Deno.env.get('GEMINI_API_KEY') ?? '';
+  if (geminiKey) {
+    try {
+      const geminiClient = new GeminiClient({
+        apiKey: geminiKey,
+        model: Deno.env.get('GEMINI_MODEL') || 'gemini-2.5-flash',
+        timeout: 15000,
+        maxRetries: 1,
+      });
+
+      const geminiResult = await geminiClient.analyzeYouTubeVideo({
+        youtubeUrl: params.youtubeUrl,
+        title: params.title,
+        description: params.description,
+        language: params.language,
+      });
+
+      const summaryDescription = normalizeSummary(geminiResult.summaryDescription, fallback.summaryDescription);
+      const shortSummary = normalizeSummary(geminiResult.shortSummary, summaryDescription);
+
+      return {
+        provider: 'gemini',
+        providerModel: geminiClient.modelName,
+        optimizedTitle: params.title,
+        summaryDescription,
+        shortSummary,
+        semanticTags: geminiResult.semanticTags?.slice(0, 8) ?? fallback.semanticTags,
+        suggestedCategoryId: null,
+        suggestedCategory: null,
+        suggestedPlaylistId: null,
+        suggestedPlaylistQuery: null,
+        classificationConfidence: geminiResult.confidence,
+        culturalRelevance: 'Medium',
+        fallbackReason: 'openai_unavailable',
+      };
+    } catch (error) {
+      console.warn(`[enrich-video] Gemini fallback failed: ${error instanceof Error ? error.message : 'unknown error'}`);
+    }
+  }
+
+  return fallback;
+}
+
+async function createCompletedAnalysisJob(params: {
   supabaseServiceRole: ReturnType<typeof createClient>;
   videoId: string;
   submissionId: string | null;
   enrichmentId: string;
   requestId: string;
+  provider: FastEnrichmentResult['provider'];
+  providerModel: string | null;
+  fallbackReason: string | null;
 }) {
-  const { supabaseServiceRole, videoId, submissionId, enrichmentId, requestId } = params;
-  const { data: existing, error: existingError } = await supabaseServiceRole
-    .from('video_analysis_jobs')
-    .select('id, status')
-    .eq('video_id', videoId)
-    .eq('provider', 'v2')
-    .in('status', ['pending', 'processing', 'recoverable_error'])
-    .order('created_at', { ascending: false })
-    .limit(1)
-    .maybeSingle();
-
-  if (existingError) {
-    throw new Error(`Failed to check video analysis jobs: ${existingError.message}`);
-  }
-
-  if (existing) {
-    return existing;
-  }
-
-  const { data, error } = await supabaseServiceRole
+  const { data, error } = await params.supabaseServiceRole
     .from('video_analysis_jobs')
     .insert({
-      video_id: videoId,
-      submission_id: submissionId,
-      status: 'pending',
-      provider: 'v2',
-      provider_model: null,
+      video_id: params.videoId,
+      submission_id: params.submissionId,
+      status: 'completed',
+      provider: 'fast_path_ai',
+      provider_model: params.providerModel,
+      started_at: new Date().toISOString(),
+      completed_at: new Date().toISOString(),
       metadata: {
         source: 'enrich-video',
-        fastProvider: 'legacy_fast',
-        enrichmentId,
-        requestId,
+        requestId: params.requestId,
+        enrichmentId: params.enrichmentId,
+        provider: params.provider,
+        fallbackReason: params.fallbackReason,
       },
     })
     .select('id, status')
     .single();
 
   if (error) {
-    if (error.code === '23505') {
-      const { data: racedJob, error: racedJobError } = await supabaseServiceRole
-        .from('video_analysis_jobs')
-        .select('id, status')
-        .eq('video_id', videoId)
-        .eq('provider', 'v2')
-        .in('status', ['pending', 'processing', 'recoverable_error'])
-        .order('created_at', { ascending: false })
-        .limit(1)
-        .maybeSingle();
-
-      if (!racedJobError && racedJob) {
-        return racedJob;
-      }
-    }
-
-    throw new Error(`Failed to create video analysis job: ${error.message}`);
+    throw new Error(`Failed to create completed analysis job: ${error.message}`);
   }
 
   return data;
@@ -585,20 +721,21 @@ serve(async (req) => {
     const categoryRows = (categoriesData ?? []) as LegacyFastCategory[];
     const language = enrichedLanguage;
     const title = video.title || 'Video do YouTube';
-    const summary = buildVideoSummary({
-      title: video.title,
+    const playlistCandidates = await loadPlaylistCandidates(supabaseServiceRole, language);
+    const fastEnrichment = await computeFastEnrichment({
+      title,
+      videoTitle: video.title,
       description: enrichedDescription,
       channelName: video.channel_name,
+      youtubeUrl,
       youtubeId: requestYoutubeId,
-    });
-    const semanticTags = deriveTags({
-      title: video.title,
-      description: enrichedDescription,
-      channelName: video.channel_name,
       language,
+      categories: categoryRows,
+      playlists: playlistCandidates,
     });
+    const semanticTags = fastEnrichment.semanticTags;
     const selectedCategory = pickCategory(categoryRows, {
-      currentCategoryId: video.category_id ?? null,
+      currentCategoryId: fastEnrichment.suggestedCategoryId ?? video.category_id ?? null,
       title: video.title,
       description: enrichedDescription,
       channelName: video.channel_name,
@@ -620,13 +757,13 @@ serve(async (req) => {
       .from('ai_enrichments')
       .insert({
         video_id: videoId,
-        optimized_title: title,
-        summary_description: summary,
+        optimized_title: fastEnrichment.optimizedTitle,
+        summary_description: fastEnrichment.summaryDescription,
         semantic_tags: semanticTags,
         suggested_category_id: selectedCategory?.id ?? null,
         language,
-        cultural_relevance: 'Curadoria rapida sem analise externa',
-        short_summary: summary,
+        cultural_relevance: fastEnrichment.culturalRelevance,
+        short_summary: fastEnrichment.shortSummary,
       })
       .select()
       .single();
@@ -635,19 +772,18 @@ serve(async (req) => {
       throw new Error(`Failed to save AI enrichment: ${enrichmentError.message}`);
     }
 
-    const playlistCandidates = await loadPlaylistCandidates(supabaseServiceRole, language);
     const playlistAssignment = assignPlaylist({
       playlists: playlistCandidates,
       analysis: {
-        title,
+        title: fastEnrichment.optimizedTitle,
         description: enrichedDescription,
         semanticTags,
-        summaryDescription: summary,
-        shortSummary: summary,
+        summaryDescription: fastEnrichment.summaryDescription,
+        shortSummary: fastEnrichment.shortSummary,
         language,
-        suggestedPlaylistId: null,
-        suggestedPlaylistQuery: semanticTags.join(' '),
-        classificationConfidence: null,
+        suggestedPlaylistId: fastEnrichment.suggestedPlaylistId,
+        suggestedPlaylistQuery: fastEnrichment.suggestedPlaylistQuery ?? semanticTags.join(' '),
+        classificationConfidence: fastEnrichment.classificationConfidence,
       },
     });
     const persistedPlaylistAssignment = await persistPlaylistAssignment({
@@ -657,12 +793,15 @@ serve(async (req) => {
       userId: user.id,
     });
 
-    const analysisJob = await ensureDeepAnalysisJob({
+    const analysisJob = await createCompletedAnalysisJob({
       supabaseServiceRole,
       videoId,
       submissionId,
       enrichmentId: enrichment.id,
       requestId,
+      provider: fastEnrichment.provider,
+      providerModel: fastEnrichment.providerModel,
+      fallbackReason: fastEnrichment.fallbackReason,
     });
 
     if (submissionId) {
@@ -682,14 +821,14 @@ serve(async (req) => {
           analysisJob: {
             id: analysisJob.id,
             status: analysisJob.status,
-            provider: 'v2',
+            provider: 'fast_path_ai',
           },
           enrichment: {
-            provider: 'legacy_fast',
-            model: null,
-            optimizedTitle: title,
-            summaryDescription: summary,
-            shortSummary: summary,
+            provider: fastEnrichment.provider,
+            model: fastEnrichment.providerModel,
+            optimizedTitle: fastEnrichment.optimizedTitle,
+            summaryDescription: fastEnrichment.summaryDescription,
+            shortSummary: fastEnrichment.shortSummary,
             semanticTags,
           },
           assignment: {
@@ -703,7 +842,7 @@ serve(async (req) => {
             assignedCategoryId: selectedCategory?.id ?? null,
             assignedPlaylistId: playlistAssignment.assignedPlaylistId,
             decisionSource: playlistAssignment.decisionSource,
-            provider: 'legacy_fast',
+            provider: fastEnrichment.provider,
             providerConfidence: playlistAssignment.providerConfidence,
             score: playlistAssignment.score,
             algorithmVersion: playlistAssignment.algorithmVersion,
@@ -726,7 +865,7 @@ serve(async (req) => {
     return jsonResponse(req, {
       message: 'AI enrichment saved successfully',
       data: enrichment,
-      provider: 'legacy_fast',
+      provider: fastEnrichment.provider,
       requestId,
     });
   } catch (error) {
