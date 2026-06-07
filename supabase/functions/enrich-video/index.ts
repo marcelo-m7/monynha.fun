@@ -254,6 +254,13 @@ function normalizeSummary(value: string | null | undefined, fallback: string): s
   return cleaned ? cleaned.slice(0, 420) : fallback;
 }
 
+function summarizeSemanticTags(tags: string[]): string {
+  if (tags.length === 0) return 'conteúdo educacional geral';
+  if (tags.length === 1) return tags[0];
+  if (tags.length === 2) return `${tags[0]} e ${tags[1]}`;
+  return `${tags.slice(0, 2).join(', ')} e ${tags[2]}`;
+}
+
 function toFastLegacyResult(params: {
   title: string;
   videoTitle: string | null;
@@ -262,12 +269,23 @@ function toFastLegacyResult(params: {
   youtubeId: string;
   language: string;
 }): FastEnrichmentResult {
-  const summary = buildVideoSummary({
+  const semanticTags = deriveTags({
+    title: params.videoTitle,
+    description: params.description,
+    channelName: params.channelName,
+    language: params.language,
+  });
+
+  const baseSummary = buildVideoSummary({
     title: params.videoTitle,
     description: params.description,
     channelName: params.channelName,
     youtubeId: params.youtubeId,
   });
+
+  const summary = semanticTags.length > 0
+    ? `${baseSummary} Tema provável: ${summarizeSemanticTags(semanticTags)}.`
+    : baseSummary;
 
   return {
     provider: 'legacy_fast',
@@ -275,12 +293,7 @@ function toFastLegacyResult(params: {
     optimizedTitle: params.title,
     summaryDescription: summary,
     shortSummary: summary,
-    semanticTags: deriveTags({
-      title: params.videoTitle,
-      description: params.description,
-      channelName: params.channelName,
-      language: params.language,
-    }),
+    semanticTags,
     suggestedCategoryId: null,
     suggestedCategory: null,
     suggestedPlaylistId: null,
@@ -311,56 +324,14 @@ async function computeFastEnrichment(params: {
     language: params.language,
   });
 
-  const openAiKey = Deno.env.get('OPENAI_API_KEY') ?? '';
-  if (openAiKey) {
-    try {
-      const openAiClient = new OpenAIClient({
-        apiKey: openAiKey,
-        model: Deno.env.get('OPENAI_MODEL') || 'gpt-4o-mini',
-        timeout: 12000,
-        maxRetries: 1,
-      });
-
-      const openAiResult = await openAiClient.enrichVideo({
-        title: params.title,
-        description: params.description ?? '',
-        language: params.language,
-        channelName: params.channelName,
-        categories: params.categories,
-        playlists: params.playlists,
-      });
-
-      const summaryDescription = normalizeSummary(openAiResult.summary_description, fallback.summaryDescription);
-      const shortSummary = normalizeSummary(openAiResult.short_summary, summaryDescription);
-
-      return {
-        provider: 'openai',
-        providerModel: openAiClient.modelName,
-        optimizedTitle: normalizeSummary(openAiResult.optimized_title, params.title).slice(0, 120),
-        summaryDescription,
-        shortSummary,
-        semanticTags: openAiResult.semantic_tags?.slice(0, 8) ?? fallback.semanticTags,
-        suggestedCategoryId: openAiResult.suggested_category_id,
-        suggestedCategory: openAiResult.suggested_category,
-        suggestedPlaylistId: openAiResult.suggested_playlist_id,
-        suggestedPlaylistQuery: openAiResult.suggested_playlist_query,
-        classificationConfidence: openAiResult.classification_confidence,
-        culturalRelevance: openAiResult.cultural_relevance || 'Medium',
-        fallbackReason: null,
-      };
-    } catch (error) {
-      console.warn(`[enrich-video] OpenAI fast-path failed: ${error instanceof Error ? error.message : 'unknown error'}`);
-    }
-  }
-
   const geminiKey = Deno.env.get('GEMINI_API_KEY') ?? '';
   if (geminiKey) {
     try {
       const geminiClient = new GeminiClient({
         apiKey: geminiKey,
         model: Deno.env.get('GEMINI_MODEL') || 'gemini-2.5-flash',
-        timeout: 15000,
-        maxRetries: 1,
+        timeout: 45000,
+        maxRetries: 2,
       });
 
       const geminiResult = await geminiClient.analyzeYouTubeVideo({
@@ -393,10 +364,52 @@ async function computeFastEnrichment(params: {
     }
   }
 
+  const openAiKey = Deno.env.get('OPENAI_API_KEY') ?? '';
+  if (openAiKey) {
+    try {
+      const openAiClient = new OpenAIClient({
+        apiKey: openAiKey,
+        model: Deno.env.get('OPENAI_MODEL') || 'gpt-4o-mini',
+        timeout: 20000,
+        maxRetries: 2,
+      });
+
+      const openAiResult = await openAiClient.enrichVideo({
+        title: params.title,
+        description: params.description ?? '',
+        language: params.language,
+        channelName: params.channelName,
+        categories: params.categories,
+        playlists: params.playlists,
+      });
+
+      const summaryDescription = normalizeSummary(openAiResult.summary_description, fallback.summaryDescription);
+      const shortSummary = normalizeSummary(openAiResult.short_summary, summaryDescription);
+
+      return {
+        provider: 'openai',
+        providerModel: openAiClient.modelName,
+        optimizedTitle: normalizeSummary(openAiResult.optimized_title, params.title).slice(0, 120),
+        summaryDescription,
+        shortSummary,
+        semanticTags: openAiResult.semantic_tags?.slice(0, 8) ?? fallback.semanticTags,
+        suggestedCategoryId: openAiResult.suggested_category_id,
+        suggestedCategory: openAiResult.suggested_category,
+        suggestedPlaylistId: openAiResult.suggested_playlist_id,
+        suggestedPlaylistQuery: openAiResult.suggested_playlist_query,
+        classificationConfidence: openAiResult.classification_confidence,
+        culturalRelevance: openAiResult.cultural_relevance || 'Medium',
+        fallbackReason: 'gemini_unavailable',
+      };
+    } catch (error) {
+      console.warn(`[enrich-video] OpenAI fast-path failed: ${error instanceof Error ? error.message : 'unknown error'}`);
+    }
+  }
+
   return fallback;
 }
 
-async function createCompletedAnalysisJob(params: {
+async function createOrReusePendingDeepAnalysisJob(params: {
   supabaseServiceRole: ReturnType<typeof createClient>;
   videoId: string;
   submissionId: string | null;
@@ -406,29 +419,62 @@ async function createCompletedAnalysisJob(params: {
   providerModel: string | null;
   fallbackReason: string | null;
 }) {
+  const { data: existingActiveJob, error: existingActiveJobError } = await params.supabaseServiceRole
+    .from('video_analysis_jobs')
+    .select('id, status, provider')
+    .eq('video_id', params.videoId)
+    .eq('provider', 'v2')
+    .in('status', ['pending', 'processing', 'recoverable_error'])
+    .order('created_at', { ascending: false })
+    .limit(1)
+    .maybeSingle();
+
+  if (existingActiveJobError) {
+    throw new Error(`Failed to check active deep analysis jobs: ${existingActiveJobError.message}`);
+  }
+
+  if (existingActiveJob) {
+    return existingActiveJob;
+  }
+
   const { data, error } = await params.supabaseServiceRole
     .from('video_analysis_jobs')
     .insert({
       video_id: params.videoId,
       submission_id: params.submissionId,
-      status: 'completed',
-      provider: 'fast_path_ai',
-      provider_model: params.providerModel,
-      started_at: new Date().toISOString(),
-      completed_at: new Date().toISOString(),
+      status: 'pending',
+      provider: 'v2',
+      provider_model: null,
       metadata: {
         source: 'enrich-video',
         requestId: params.requestId,
         enrichmentId: params.enrichmentId,
-        provider: params.provider,
+        fastProvider: params.provider,
+        fastProviderModel: params.providerModel,
         fallbackReason: params.fallbackReason,
       },
     })
-    .select('id, status')
+    .select('id, status, provider')
     .single();
 
   if (error) {
-    throw new Error(`Failed to create completed analysis job: ${error.message}`);
+    if (error.code === '23505') {
+      const { data: racedActiveJob, error: racedActiveJobError } = await params.supabaseServiceRole
+        .from('video_analysis_jobs')
+        .select('id, status, provider')
+        .eq('video_id', params.videoId)
+        .eq('provider', 'v2')
+        .in('status', ['pending', 'processing', 'recoverable_error'])
+        .order('created_at', { ascending: false })
+        .limit(1)
+        .maybeSingle();
+
+      if (!racedActiveJobError && racedActiveJob) {
+        return racedActiveJob;
+      }
+    }
+
+    throw new Error(`Failed to queue deep analysis job: ${error.message}`);
   }
 
   return data;
@@ -503,6 +549,31 @@ async function persistPlaylistAssignment(params: {
     return null;
   }
 
+  const { data: existingAutoAssignments, error: existingAutoAssignmentsError } = await supabaseServiceRole
+    .from('playlist_videos')
+    .select('id, playlist_id')
+    .eq('video_id', videoId)
+    .ilike('notes', 'Assigned by playlist-assignment-v%');
+
+  if (existingAutoAssignmentsError) {
+    throw new Error(`Failed to load existing automatic playlist assignments: ${existingAutoAssignmentsError.message}`);
+  }
+
+  const staleAutoAssignmentIds = (existingAutoAssignments ?? [])
+    .filter((item) => item.playlist_id !== assignment.assignedPlaylistId)
+    .map((item) => item.id);
+
+  if (staleAutoAssignmentIds.length > 0) {
+    const { error: staleAutoAssignmentsDeleteError } = await supabaseServiceRole
+      .from('playlist_videos')
+      .delete()
+      .in('id', staleAutoAssignmentIds);
+
+    if (staleAutoAssignmentsDeleteError) {
+      throw new Error(`Failed to clean stale automatic playlist assignments: ${staleAutoAssignmentsDeleteError.message}`);
+    }
+  }
+
   const { data: existing, error: existingError } = await supabaseServiceRole
     .from('playlist_videos')
     .select('id, playlist_id, position')
@@ -515,7 +586,7 @@ async function persistPlaylistAssignment(params: {
   }
 
   if (existing) {
-    return { ...existing, created: false };
+    return { ...existing, created: false, removedAutoAssignments: staleAutoAssignmentIds.length };
   }
 
   const { data: lastItem, error: lastItemError } = await supabaseServiceRole
@@ -558,14 +629,14 @@ async function persistPlaylistAssignment(params: {
         .maybeSingle();
 
       if (!racedAssignmentError && racedAssignment) {
-        return { ...racedAssignment, created: false };
+        return { ...racedAssignment, created: false, removedAutoAssignments: staleAutoAssignmentIds.length };
       }
     }
 
     throw new Error(`Failed to persist playlist assignment: ${insertError.message}`);
   }
 
-  return { ...inserted, created: true };
+  return { ...inserted, created: true, removedAutoAssignments: staleAutoAssignmentIds.length };
 }
 
 serve(async (req) => {
@@ -593,19 +664,27 @@ serve(async (req) => {
   }
 
   const token = authHeader.replace('Bearer ', '');
-  const supabase = createClient(
-    supabaseUrl,
-    supabaseAnonKey,
-    { global: { headers: { Authorization: `Bearer ${token}` } } },
-  );
+  const isInternalServiceRoleRequest = token === serviceRoleKey;
+  let authenticatedUserId: string | null = null;
 
-  const { data: { user }, error: userError } = await supabase.auth.getUser();
-  if (userError || !user) {
-    return errorResponse(req, 401, 'UNAUTHORIZED_INVALID_TOKEN', 'Invalid or expired authorization token', { requestId });
+  if (!isInternalServiceRoleRequest) {
+    const supabase = createClient(
+      supabaseUrl,
+      supabaseAnonKey,
+      { global: { headers: { Authorization: `Bearer ${token}` } } },
+    );
+
+    const { data: { user }, error: userError } = await supabase.auth.getUser();
+    if (userError || !user) {
+      return errorResponse(req, 401, 'UNAUTHORIZED_INVALID_TOKEN', 'Invalid or expired authorization token', { requestId });
+    }
+
+    authenticatedUserId = user.id;
   }
 
   let submissionId: string | null = null;
   let submissionBelongsToUser = false;
+  let submissionOwnerUserId: string | null = null;
   let supabaseServiceRole: ReturnType<typeof createClient> | null = null;
 
   try {
@@ -632,17 +711,19 @@ serve(async (req) => {
 
     supabaseServiceRole = createClient(supabaseUrl, serviceRoleKey, { auth: { persistSession: false } });
 
-    const rateLimit = await checkEdgeRateLimit(supabaseServiceRole, {
-      functionName: 'enrich-video',
-      userId: user.id,
-      windows: ENRICH_RATE_LIMIT_WINDOWS,
-    });
-
-    if (!rateLimit.allowed) {
-      return errorResponse(req, 429, 'RATE_LIMITED', 'Too many enrichment requests. Try again later.', {
-        requestId,
-        retryAfterSeconds: rateLimit.retryAfterSeconds,
+    if (!isInternalServiceRoleRequest) {
+      const rateLimit = await checkEdgeRateLimit(supabaseServiceRole, {
+        functionName: 'enrich-video',
+        userId: authenticatedUserId,
+        windows: ENRICH_RATE_LIMIT_WINDOWS,
       });
+
+      if (!rateLimit.allowed) {
+        return errorResponse(req, 429, 'RATE_LIMITED', 'Too many enrichment requests. Try again later.', {
+          requestId,
+          retryAfterSeconds: rateLimit.retryAfterSeconds,
+        });
+      }
     }
 
     if (submissionId) {
@@ -662,7 +743,7 @@ serve(async (req) => {
         });
       }
 
-      if (submission.user_id !== user.id) {
+      if (!isInternalServiceRoleRequest && submission.user_id !== authenticatedUserId) {
         throw new HttpError('Submission does not belong to the authenticated user', 403, {
           code: 'SUBMISSION_FORBIDDEN',
           recoverable: false,
@@ -683,7 +764,9 @@ serve(async (req) => {
         });
       }
 
-      submissionBelongsToUser = true;
+      submissionOwnerUserId = submission.user_id;
+      const actingUserId = isInternalServiceRoleRequest ? submissionOwnerUserId : authenticatedUserId;
+      submissionBelongsToUser = Boolean(actingUserId);
       await updateSubmissionStatus(supabaseServiceRole, submissionId, {
         video_id: videoId,
         status: 'processing',
@@ -833,14 +916,19 @@ serve(async (req) => {
         classificationConfidence: fastEnrichment.classificationConfidence,
       },
     });
+    const assignmentUserId = isInternalServiceRoleRequest ? submissionOwnerUserId : authenticatedUserId;
+    if (!assignmentUserId) {
+      throw new Error('Unable to resolve assignment user id');
+    }
+
     const persistedPlaylistAssignment = await persistPlaylistAssignment({
       supabaseServiceRole,
       assignment: playlistAssignment,
       videoId,
-      userId: user.id,
+      userId: assignmentUserId,
     });
 
-    const analysisJob = await createCompletedAnalysisJob({
+    const analysisJob = await createOrReusePendingDeepAnalysisJob({
       supabaseServiceRole,
       videoId,
       submissionId,
@@ -868,7 +956,7 @@ serve(async (req) => {
           analysisJob: {
             id: analysisJob.id,
             status: analysisJob.status,
-            provider: 'fast_path_ai',
+            provider: analysisJob.provider,
           },
           enrichment: {
             provider: fastEnrichment.provider,
@@ -902,6 +990,7 @@ serve(async (req) => {
                 id: persistedPlaylistAssignment.id,
                 position: persistedPlaylistAssignment.position,
                 created: persistedPlaylistAssignment.created,
+                removedAutoAssignments: persistedPlaylistAssignment.removedAutoAssignments,
               }
               : null,
           },

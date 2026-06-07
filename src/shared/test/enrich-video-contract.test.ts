@@ -15,11 +15,12 @@ describe('enrich-video fast-path contract', () => {
     expect(source).toContain("provider: 'gemini'");
   });
 
-  it('stores completed fast-path analysis jobs instead of pending deep jobs', () => {
+  it('queues or reuses pending v2 deep-analysis jobs after fast-path enrichment', () => {
     const source = fs.readFileSync(enrichVideoPath, 'utf8');
 
-    expect(source).toContain("provider: 'fast_path_ai'");
-    expect(source).toContain("status: 'completed'");
+    expect(source).toContain('createOrReusePendingDeepAnalysisJob');
+    expect(source).toContain("provider: 'v2'");
+    expect(source).toContain("status: 'pending'");
     expect(source).toContain('video_analysis_jobs');
   });
 });

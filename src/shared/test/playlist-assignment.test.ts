@@ -296,6 +296,26 @@ describe('playlist assignment', () => {
     expect(result.decisionSource).toBe('deterministic');
   });
 
+  it('routes probability/combinatorics lessons to math playlists, never to art history', () => {
+    const result = assignPlaylist({
+      playlists,
+      analysis: {
+        ...baseAnalysis,
+        title: 'Probabilidade Condicional - Parte 1',
+        semanticTags: ['probabilidade', 'combinatoria', 'matematica'],
+        summaryDescription: 'Aula de probabilidade e combinatoria com exercicios de Bayes e distribuicao binomial.',
+        shortSummary: 'Probabilidade condicional e combinatoria.',
+        suggestedPlaylistId: null,
+        suggestedPlaylistQuery: 'probabilidade combinatoria',
+        classificationConfidence: 0.88,
+      },
+    });
+
+    expect(result.assignedPlaylistId).toMatch(/^math-/);
+    expect(result.assignedPlaylistId).not.toBe('art-history');
+    expect(result.decisionSource).toBe('deterministic');
+  });
+
   it('assigns culinary videos to recipe playlists when cooking signals are strong', () => {
     const result = assignPlaylist({
       playlists,

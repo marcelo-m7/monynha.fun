@@ -53,10 +53,14 @@ export type PlaylistAssignmentResult = {
   signals: Record<SubjectSignal, number>;
 };
 
-export const PLAYLIST_ASSIGNMENT_ALGORITHM_VERSION = 'playlist-assignment-v7-culinary';
+export const PLAYLIST_ASSIGNMENT_ALGORITHM_VERSION = 'playlist-assignment-v8-domain-guards';
 export const MIN_PLAYLIST_ASSIGNMENT_CONFIDENCE = 0.65;
 export const MIN_PLAYLIST_ASSIGNMENT_SCORE = 7;
 export const MIN_DETERMINISTIC_PLAYLIST_SCORE = 12;
+const MIN_DATABASE_DETERMINISTIC_SCORE = 10;
+const MIN_MATH_DETERMINISTIC_SCORE = 8;
+const MIN_ART_HISTORY_DETERMINISTIC_SCORE = 16;
+const MIN_ART_HISTORY_MARGIN = 5;
 
 const subjectKeywords: Record<SubjectSignal, string[]> = {
   math: [
@@ -223,6 +227,22 @@ function tokenize(value: string | null | undefined): string[] {
     .filter((token) => token.length > 2);
 }
 
+function escapeRegExp(value: string): string {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
+function containsKeyword(normalizedText: string, keyword: string): boolean {
+  const normalizedKeyword = normalizeText(keyword);
+  if (!normalizedKeyword) return false;
+
+  if (normalizedKeyword.includes(' ')) {
+    return normalizedText.includes(normalizedKeyword);
+  }
+
+  const boundaryPattern = new RegExp(`(^|[^a-z0-9])${escapeRegExp(normalizedKeyword)}([^a-z0-9]|$)`);
+  return boundaryPattern.test(normalizedText);
+}
+
 function tokenOverlapScore(left: string | null | undefined, right: string | null | undefined): number {
   const leftTokens = new Set(tokenize(left));
   if (leftTokens.size === 0) return 0;
@@ -247,7 +267,7 @@ function meaningfulSemanticTags(tags: string[]): string[] {
 function subjectSignalScore(text: string, subject: SubjectSignal): number {
   const normalized = normalizeText(text);
   return subjectKeywords[subject].reduce(
-    (score, keyword) => score + (normalized.includes(keyword) ? 1 : 0),
+    (score, keyword) => score + (containsKeyword(normalized, keyword) ? 1 : 0),
     0,
   );
 }
@@ -321,6 +341,13 @@ function isRecipePlaylist(playlist: PlaylistAssignmentPlaylist): boolean {
 
 function hasArtHistorySignals(sourceText: string): boolean {
   const text = normalizeText(sourceText);
+  const tokens = new Set(tokenize(sourceText));
+  const artPhrases = [
+    'historia da arte',
+    'artes visuais',
+    'historia da pintura',
+    'teoria da arte',
+  ];
   const artMovements = [
     'renascimento',
     'barroco',
@@ -336,15 +363,12 @@ function hasArtHistorySignals(sourceText: string): boolean {
     'arte egipcia',
   ];
 
-  const hasMovement = artMovements.some((keyword) => text.includes(keyword));
-  const hasArtTerm =
-    text.includes('historia da arte') ||
-    text.includes('arte') ||
-    text.includes('artes visuais') ||
-    text.includes('pintura') ||
-    (text.includes('arquitetura') && hasMovement);
+  const phraseMatches = artPhrases.some((keyword) => containsKeyword(text, keyword));
+  const movementMatches = artMovements.filter((keyword) => containsKeyword(text, keyword)).length;
+  const artTermMatches = ['arte', 'artes', 'pintura', 'escultura', 'arquitetura']
+    .filter((keyword) => tokens.has(keyword)).length;
 
-  return hasArtTerm || hasMovement;
+  return phraseMatches || movementMatches >= 2 || (movementMatches >= 1 && artTermMatches >= 1);
 }
 
 function hasCalculusOneSignals(sourceText: string): boolean {
@@ -383,7 +407,32 @@ function hasRecipeSignals(sourceText: string): boolean {
     'molho',
   ];
 
-  return signals.some((keyword) => text.includes(keyword));
+  return signals.some((keyword) => containsKeyword(text, keyword));
+}
+
+function hasProbabilitySignals(sourceText: string): boolean {
+  const text = normalizeText(sourceText);
+  const signals = [
+    'probabilidade',
+    'combinatoria',
+    'combinatorias',
+    'permutacao',
+    'arranjo',
+    'binomial',
+    'distribuicao',
+    'bayes',
+    'variavel aleatoria',
+  ];
+
+  return signals.some((keyword) => containsKeyword(text, keyword));
+}
+
+function isMathDominantContext(
+  signals: Record<SubjectSignal, number>,
+  sourceText: string,
+): boolean {
+  const hasMathAnchors = hasCalculusOneSignals(sourceText) || hasProbabilitySignals(sourceText) || signals.math >= 2;
+  return hasMathAnchors && signals.math >= signals.humanities + 1;
 }
 
 function playlistSubjectScore(playlist: PlaylistAssignmentPlaylist, subject: SubjectSignal): number {
@@ -412,6 +461,7 @@ function scorePlaylist(params: {
 }): number {
   const { playlist, analysis, sourceText, signals } = params;
   const text = playlistText(playlist);
+  const mathDominant = isMathDominantContext(signals, sourceText);
   let score = 0;
 
   score += Math.min(7, tokenOverlapScore(sourceText, text));
@@ -440,12 +490,16 @@ function scorePlaylist(params: {
     }
   }
 
-  if (hasArtHistorySignals(sourceText)) {
+  if (hasArtHistorySignals(sourceText) && !mathDominant) {
     if (isArtHistoryPlaylist(playlist)) {
       score += 10;
     } else if (playlistSubjectScore(playlist, 'programming') > 0 || isDatabasePlaylist(playlist)) {
       score -= 4;
     }
+  }
+
+  if (mathDominant && isArtHistoryPlaylist(playlist)) {
+    score -= 12;
   }
 
   if (analysis.suggestedPlaylistId === playlist.id) {
@@ -541,25 +595,36 @@ export function assignPlaylist(params: {
   if (!assignedPlaylistId && !suggestedCandidate && best?.compatible) {
     const bestPlaylist = playlists.find((playlist) => playlist.id === best.playlistId) ?? null;
     const margin = best.score - (runnerUp?.score ?? 0);
+    const mathDominant = isMathDominantContext(signals, sourceText);
     const strongDatabaseMatch =
       signals.database >= 2 &&
       !!bestPlaylist &&
       isDatabasePlaylist(bestPlaylist) &&
-      best.score >= MIN_DETERMINISTIC_PLAYLIST_SCORE;
+      best.score >= MIN_DATABASE_DETERMINISTIC_SCORE;
     const strongArtHistoryMatch =
+      !mathDominant &&
       hasArtHistorySignals(sourceText) &&
       !!bestPlaylist &&
       isArtHistoryPlaylist(bestPlaylist) &&
-      best.score >= MIN_DETERMINISTIC_PLAYLIST_SCORE;
+      best.score >= MIN_ART_HISTORY_DETERMINISTIC_SCORE &&
+      margin >= MIN_ART_HISTORY_MARGIN;
     const calculusOneCandidate = scoredCandidates.find((candidate) => {
       const playlist = playlists.find((item) => item.id === candidate.playlistId);
       return !!playlist && isCalculusOnePlaylist(playlist);
     }) ?? null;
     const strongCalculusOneMatch =
-      signals.math >= 1 &&
+      mathDominant &&
       hasCalculusOneSignals(sourceText) &&
       !!calculusOneCandidate &&
-      calculusOneCandidate.score >= 6;
+      calculusOneCandidate.score >= MIN_MATH_DETERMINISTIC_SCORE;
+    const mathCandidate = scoredCandidates.find((candidate) => {
+      const playlist = playlists.find((item) => item.id === candidate.playlistId);
+      return !!playlist && playlistSubjectScore(playlist, 'math') > 0 && !isArtHistoryPlaylist(playlist);
+    }) ?? null;
+    const strongMathMatch =
+      mathDominant &&
+      !!mathCandidate &&
+      mathCandidate.score >= MIN_MATH_DETERMINISTIC_SCORE;
     const recipeCandidate = scoredCandidates.find((candidate) => {
       const playlist = playlists.find((item) => item.id === candidate.playlistId);
       return !!playlist && isRecipePlaylist(playlist);
@@ -580,12 +645,19 @@ export function assignPlaylist(params: {
       score = calculusOneCandidate.score;
       reason = 'Deterministic scoring selected Análise Matemática I for Cálculo 1 signals.';
       decisionSource = 'deterministic';
+    } else if (strongMathMatch) {
+      assignedPlaylistId = mathCandidate.playlistId;
+      score = mathCandidate.score;
+      reason = hasProbabilitySignals(sourceText)
+        ? 'Deterministic scoring selected math playlist for probability/combinatorics signals.'
+        : 'Deterministic scoring selected math playlist for dominant math signals.';
+      decisionSource = 'deterministic';
     } else if (strongArtHistoryMatch) {
       assignedPlaylistId = best.playlistId;
       score = best.score;
       reason = 'Deterministic scoring selected História da Arte for art-history signals.';
       decisionSource = 'deterministic';
-    } else if (strongDatabaseMatch || (best.score >= MIN_DETERMINISTIC_PLAYLIST_SCORE && margin >= 4)) {
+    } else if (strongDatabaseMatch || (best.score >= MIN_DETERMINISTIC_PLAYLIST_SCORE && margin >= 4 && !(mathDominant && !!bestPlaylist && isArtHistoryPlaylist(bestPlaylist)))) {
       assignedPlaylistId = best.playlistId;
       score = best.score;
       reason = strongDatabaseMatch
