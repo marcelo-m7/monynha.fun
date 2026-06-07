@@ -133,10 +133,21 @@ export async function listVideos(params: ListVideosParams = {}) {
       ...(params.categoryId ? [params.categoryId] : []),
     ]),
   ];
+  const normalizedLanguageValues = [
+    ...(params.languages ?? []),
+    ...(params.language ? [params.language] : []),
+  ].flatMap((language) => {
+    if (!language) return [];
+
+    // The UI exposes "other", while stored rows use ISO-like "und" for undefined language.
+    if (language === 'other') return ['und', 'other'];
+
+    return [language];
+  });
+
   const languages = [
     ...new Set([
-      ...(params.languages ?? []).filter(Boolean),
-      ...(params.language ? [params.language] : []),
+      ...normalizedLanguageValues,
     ]),
   ];
   const semanticTags = [
