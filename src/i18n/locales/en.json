@@ -44,6 +44,7 @@
     "switchToLight": "Switch to light mode",
     "community": "Community",
     "editorialPortal": "Editorial Portal",
+    "editorialBoard": "Editorial Board",
     "facodi": "FACODI",
     "curation": "Curation",
     "imports": "Imports",
@@ -1018,6 +1019,50 @@
       "unknownVideo": "Untitled video",
       "reviewVideo": "Review video",
       "empty": "No videos are waiting for analysis right now."
+    }
+  },
+  "editorialBoard": {
+    "title": "Editorial Video Board",
+    "description": "Organize your videos by category with optimistic updates and a faster catalog review flow.",
+    "noAccessTitle": "Editorial access required",
+    "noAccessDescription": "This board is available only to authenticated editorial profiles.",
+    "searchPlaceholder": "Search by title, channel, or category...",
+    "allLanguages": "All languages",
+    "refresh": "Refresh",
+    "scopeDescription": "Showing {{count}} videos you can reorganize right now.",
+    "clearFilters": "Clear filters",
+    "emptyTitle": "You have not submitted any videos to organize yet.",
+    "emptyDescription": "Once your videos are in the catalog, they will appear here for review and category moves.",
+    "emptyFilteredTitle": "No videos match the current filters.",
+    "emptyFilteredDescription": "Adjust the search or language filter to repopulate the board.",
+    "filters": {
+      "language": "Language"
+    },
+    "views": {
+      "category": "Kanban by category",
+      "compact": "Compact list",
+      "playlist": "Kanban by playlist",
+      "path": "Kanban by path",
+      "status": "Kanban by status"
+    },
+    "columns": {
+      "uncategorized": "Uncategorized"
+    },
+    "card": {
+      "dragHandle": "Drag video",
+      "openVideo": "Open video",
+      "moveTo": "Move to"
+    },
+    "notifications": {
+      "updateSuccess": "Category updated successfully.",
+      "updateError": "Could not move the video right now."
+    },
+    "playlistFilter": {
+      "button": "Playlists ({{count}})",
+      "label": "Filter playlists in kanban",
+      "selectAll": "Select all",
+      "clear": "Clear",
+      "hint": "Select playlists to show their columns in playlist kanban view."
     }
   },
   "playlistDetails": {

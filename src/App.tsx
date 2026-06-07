@@ -49,6 +49,7 @@ const AccountSettings = lazy(() => import("./pages/AccountSettings"));
 const Messages = lazy(() => import("./pages/Messages"));
 const Notifications = lazy(() => import("./pages/Notifications"));
 const EditorialPortal = lazy(() => import("./pages/EditorialPortal"));
+const EditorBoard = lazy(() => import("./pages/EditorBoard"));
 const EditorApply = lazy(() => import("./pages/EditorApply"));
 const EditorApplications = lazy(() => import("./pages/EditorApplications"));
 const NotFound = lazy(() => import("./pages/NotFound"));
@@ -102,6 +103,7 @@ const App = () => (
         <Route path="/messages" element={<Messages />} />
         <Route path="/notifications" element={<Notifications />} />
         <Route path="/editorial" element={<EditorialPortal />} />
+        <Route path="/editor/board" element={<EditorBoard />} />
         <Route path="/editor/apply" element={<EditorApply />} />
         <Route path="/editor/applications" element={<EditorApplications />} />
         <Route path="/:username" element={<SmartSlugRoute />} />

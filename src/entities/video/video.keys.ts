@@ -20,6 +20,7 @@ export const videoKeys = {
   all: ['videos'] as const,
   lists: () => [...videoKeys.all, 'list'] as const,
   list: (params?: VideoListParams) => [...videoKeys.lists(), normalizeVideoListParams(params)] as const,
+  editable: (submittedBy: string) => [...videoKeys.all, 'editable', submittedBy] as const,
   details: () => [...videoKeys.all, 'detail'] as const,
   detail: (id: string) => [...videoKeys.details(), id] as const,
   featured: (limit: number, offset = 0) => [...videoKeys.all, 'featured', limit, offset] as const,

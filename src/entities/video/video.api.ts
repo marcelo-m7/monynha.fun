@@ -330,6 +330,41 @@ export async function listRelatedVideos(currentVideoId: string, categoryId: stri
     return data as unknown as VideoWithCategory[];
 }
 
+  export async function listEditableVideos(submittedBy: string) {
+    const { data, error } = await supabase
+      .from('videos')
+      .select(
+        `
+        *,
+          category:categories(id, name, slug, icon, color, created_at),
+          ai_enrichments!video_id(*),
+          playlist_videos!playlist_videos_video_id_fkey(
+            playlist:playlists(id, name, slug, is_ordered, course_code, unit_code)
+          )
+      `,
+      )
+      .eq('submitted_by', submittedBy)
+      .order('created_at', { ascending: false })
+      .order('created_at', { foreignTable: 'ai_enrichments', ascending: false });
+
+    if (error) throw error;
+
+    if (data) {
+      const videos = data as VideoWithRelations[];
+      return videos.map((video) => ({
+        ...video,
+        enrichment: getLatestEnrichment(video.ai_enrichments),
+        assignedPlaylists: (video.playlist_videos ?? [])
+          .map((entry) => entry.playlist)
+          .filter((playlist): playlist is VideoAssignedPlaylist => !!playlist),
+        ai_enrichments: undefined,
+        playlist_videos: undefined,
+      })) as unknown as VideoWithCategory[];
+    }
+
+    return [] as VideoWithCategory[];
+  }
+
 export async function incrementVideoViewCount(videoId: string, sessionId?: string | null) {
   return supabase.rpc('increment_video_view_count', { p_video_id: videoId, p_session_id: sessionId ?? null });
 }
@@ -355,6 +390,18 @@ export async function updateVideo(payload: VideoUpdate & { id: string }) {
     .from('videos')
     .update(updates)
     .eq('id', id)
+    .select()
+    .single();
+
+  if (error) throw error;
+  return data as Video;
+}
+
+export async function updateVideoCategory(videoId: string, categoryId: string | null) {
+  const { data, error } = await supabase
+    .from('videos')
+    .update({ category_id: categoryId })
+    .eq('id', videoId)
     .select()
     .single();
 

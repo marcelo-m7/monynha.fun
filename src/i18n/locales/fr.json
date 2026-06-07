@@ -42,6 +42,7 @@
     "switchToLight": "Passer en mode clair",
     "community": "Communauté",
     "editorialPortal": "Portail Éditorial",
+    "editorialBoard": "Tableau Éditorial",
     "messages": "Messages",
     "notifications": "Notifications",
     "facodi": "FACODI",
@@ -1018,6 +1019,50 @@
       "unknownVideo": "Vidéo sans titre",
       "reviewVideo": "Réviser la vidéo",
       "empty": "Aucune vidéo n'attend d'analyse pour le moment."
+    }
+  },
+  "editorialBoard": {
+    "title": "Tableau éditorial des vidéos",
+    "description": "Organisez vos vidéos par catégorie avec des mises à jour optimistes et une revue plus rapide du catalogue.",
+    "noAccessTitle": "Accès éditorial requis",
+    "noAccessDescription": "Ce tableau est réservé aux profils éditoriaux authentifiés.",
+    "searchPlaceholder": "Rechercher par titre, chaîne ou catégorie...",
+    "allLanguages": "Toutes les langues",
+    "refresh": "Actualiser",
+    "scopeDescription": "Affichage de {{count}} vidéos que vous pouvez réorganiser maintenant.",
+    "clearFilters": "Effacer les filtres",
+    "emptyTitle": "Vous n'avez pas encore soumis de vidéos à organiser.",
+    "emptyDescription": "Lorsque vos vidéos seront dans le catalogue, elles apparaîtront ici pour révision et déplacement entre catégories.",
+    "emptyFilteredTitle": "Aucune vidéo ne correspond aux filtres actuels.",
+    "emptyFilteredDescription": "Ajustez la recherche ou la langue pour remplir à nouveau le tableau.",
+    "filters": {
+      "language": "Langue"
+    },
+    "views": {
+      "category": "Kanban par catégorie",
+      "compact": "Liste compacte",
+      "playlist": "Kanban par playlist",
+      "path": "Kanban par parcours",
+      "status": "Kanban par statut"
+    },
+    "columns": {
+      "uncategorized": "Sans catégorie"
+    },
+    "card": {
+      "dragHandle": "Déplacer la vidéo",
+      "openVideo": "Ouvrir la vidéo",
+      "moveTo": "Déplacer vers"
+    },
+    "notifications": {
+      "updateSuccess": "Catégorie mise à jour avec succès.",
+      "updateError": "Impossible de déplacer la vidéo pour le moment."
+    },
+    "playlistFilter": {
+      "button": "Playlists ({{count}})",
+      "label": "Filtrer les playlists dans le kanban",
+      "selectAll": "Tout sélectionner",
+      "clear": "Effacer",
+      "hint": "Sélectionnez les playlists à afficher comme colonnes dans la vue kanban par playlist."
     }
   },
   "playlistDetails": {

@@ -34,6 +34,8 @@ export const primaryNavigationItems: NavigationItem[] = [
 
 export const projectNavigationItems: NavigationItem[] = [
   { to: "/curadoria", labelKey: "header.curation", icon: Sparkles },
+  { to: "/editorial", labelKey: "header.editorialPortal", icon: ShieldCheck },
+  { to: "/editor/board", labelKey: "header.editorialBoard", icon: ListVideo },
   { to: "/about", labelKey: "footer.about", icon: Info },
   { to: "/rules", labelKey: "footer.rules", icon: BookOpen },
   { to: "/faq", labelKey: "footer.faq", icon: HelpCircle },

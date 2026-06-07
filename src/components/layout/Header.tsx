@@ -1,5 +1,5 @@
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { Plus, Menu, Heart, Globe, User as UserIcon, Settings, KeyRound, LogOut, Bell, MessageCircle, ShieldCheck, ChevronDown } from "lucide-react";
+import { Plus, Menu, Heart, Globe, User as UserIcon, Settings, KeyRound, LogOut, Bell, MessageCircle, ShieldCheck, ChevronDown, ListVideo } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { type ReactNode, useState } from "react";
 import { useAuth } from "@/features/auth/useAuth";
@@ -266,6 +266,10 @@ function UserMenu({ user, profile, onSignOut }: { user: NonNullable<NavigationAc
             <DropdownMenuItem onClick={() => navigate('/editorial')} className="rounded-xl py-2">
               <ShieldCheck className="mr-2 h-4 w-4" />
               <span>{t('header.editorialPortal')}</span>
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => navigate('/editor/board')} className="rounded-xl py-2">
+              <ListVideo className="mr-2 h-4 w-4" />
+              <span>{t('header.editorialBoard')}</span>
             </DropdownMenuItem>
             <DropdownMenuItem onClick={() => navigate('/editor/applications')} className="rounded-xl py-2">
               <ShieldCheck className="mr-2 h-4 w-4" />
