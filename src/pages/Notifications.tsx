@@ -17,6 +17,48 @@ import { useTranslation } from 'react-i18next';
 
 const PAGE_LIMIT = 100;
 
+const GENERIC_NOTIFICATION_MESSAGES = new Set([
+  'someone started following you.',
+  'you have a new message.',
+  'new message',
+]);
+
+function getNotificationCopy(
+  notification: { type: string; title: string; message: string | null },
+  t: (key: string, options?: Record<string, unknown>) => string,
+) {
+  const typeKey = `notifications.types.${notification.type}`;
+  const localizedTitle = t(`${typeKey}.title`, { defaultValue: notification.title });
+  const normalizedMessage = (notification.message ?? '').trim().toLowerCase();
+
+  if (notification.type === 'new_follower') {
+    return {
+      title: localizedTitle,
+      message: t(`${typeKey}.message`, {
+        defaultValue: notification.message || t('notifications.defaultMessage'),
+      }),
+    };
+  }
+
+  if (notification.type === 'new_message' || notification.type === 'direct_message') {
+    if (notification.message && !GENERIC_NOTIFICATION_MESSAGES.has(normalizedMessage)) {
+      return { title: localizedTitle, message: notification.message };
+    }
+
+    return {
+      title: localizedTitle,
+      message: t(`${typeKey}.message`, {
+        defaultValue: notification.message || t('notifications.defaultMessage'),
+      }),
+    };
+  }
+
+  return {
+    title: localizedTitle,
+    message: notification.message,
+  };
+}
+
 const Notifications = () => {
   const { t } = useTranslation();
   const { user, loading: authLoading } = useAuth();
@@ -80,6 +122,10 @@ const Notifications = () => {
               <div className="divide-y divide-border">
                 {notifications.map((notification) => (
                   <div key={notification.id} className={`p-4 md:p-5 ${notification.isRead ? 'bg-background' : 'bg-primary/5'}`}>
+                    {(() => {
+                      const copy = getNotificationCopy(notification, t);
+
+                      return (
                     <div className="flex gap-3 items-start">
                       <Avatar className="h-10 w-10">
                         <AvatarImage src={notification.actorAvatarUrl || undefined} alt={notification.actorDisplayName || notification.actorUsername || 'User'} />
@@ -88,8 +134,8 @@ const Notifications = () => {
                         </AvatarFallback>
                       </Avatar>
                       <div className="min-w-0 flex-1">
-                        <p className="font-medium">{notification.title}</p>
-                        {notification.message && <p className="text-sm text-muted-foreground mt-1">{notification.message}</p>}
+                        <p className="font-medium">{copy.title}</p>
+                        {copy.message && <p className="text-sm text-muted-foreground mt-1">{copy.message}</p>}
                         {notification.actorUsername && (
                           <p className="text-xs text-muted-foreground mt-1">
                             @{notification.actorUsername}
@@ -109,6 +155,8 @@ const Notifications = () => {
                         </Button>
                       )}
                     </div>
+                      );
+                    })()}
                   </div>
                 ))}
               </div>

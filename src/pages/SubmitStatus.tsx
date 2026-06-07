@@ -29,6 +29,32 @@ function languageLabelKey(language?: string | null) {
   return null;
 }
 
+function localizeSubmissionErrorMessage(
+  rawMessage: string | null | undefined,
+  t: (key: string, options?: Record<string, unknown>) => string,
+) {
+  if (!rawMessage) return null;
+
+  const normalized = rawMessage.toLowerCase();
+
+  if (
+    normalized.includes('failed to send a request to the edge function')
+    || normalized.includes('edge function returned a non-2xx status code')
+  ) {
+    return t('submitStatus.errorMessages.edgeFunctionUnavailable');
+  }
+
+  if (normalized.includes('429') || normalized.includes('too many requests')) {
+    return t('submitStatus.errorMessages.rateLimited');
+  }
+
+  if (normalized.includes('network') || normalized.includes('failed to fetch')) {
+    return t('submitStatus.errorMessages.network');
+  }
+
+  return rawMessage;
+}
+
 export default function SubmitStatus() {
   const { t } = useTranslation();
   const navigate = useNavigate();
@@ -86,6 +112,8 @@ export default function SubmitStatus() {
   const noAssignedPlaylist = status === 'success' && !!metadata.assignment && !assignedPlaylistId;
   const processingStage = metadata.processing?.stage ?? metadata.error?.stage ?? metadata.clientError?.stage ?? null;
   const requestId = metadata.processing?.requestId ?? metadata.error?.requestId ?? null;
+  const submissionErrorMessage = localizeSubmissionErrorMessage(submission.error_message, t);
+  const startErrorMessage = localizeSubmissionErrorMessage(startProcessing.error?.message, t);
   const analysis = metadata.analysis ?? metadata.transcription ?? null;
   const transcript = metadata.transcription;
   const transcriptError = analysis?.errorMessage ?? transcript?.error ?? null;
@@ -185,7 +213,7 @@ export default function SubmitStatus() {
               <Alert variant="destructive">
                 <AlertCircle className="h-4 w-4" />
                 <AlertTitle>{t('submitStatus.startErrorTitle')}</AlertTitle>
-                <AlertDescription>{startProcessing.error.message}</AlertDescription>
+                <AlertDescription>{startErrorMessage}</AlertDescription>
               </Alert>
             )}
 
@@ -194,7 +222,7 @@ export default function SubmitStatus() {
                 <AlertCircle className="h-4 w-4" />
                 <AlertTitle>{t('submitStatus.processingErrorTitle')}</AlertTitle>
                 <AlertDescription>
-                  {submission.error_message}
+                  {submissionErrorMessage}
                   {requestId && (
                     <span className="mt-1 block text-xs">
                       {t('submitStatus.requestIdLabel')}: {requestId}

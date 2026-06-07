@@ -236,6 +236,7 @@
       "description": "Nous avons envoyé un lien de confirmation à votre adresse e-mail. Veuillez vérifier votre boîte de réception (et les spams) pour activer votre compte.",
       "sentTo": "Lien envoyé à",
       "goToLogin": "Aller à la Connexion",
+      "successTitle": "E-mail confirmé",
       "successConfirmed": "Votre e-mail a été confirmé avec succès ! Vous pouvez maintenant accéder à l'application.",
       "goToApp": "Aller à l'Application"
     },
@@ -507,6 +508,11 @@
     "notFoundDescription": "Nous n'avons pas trouvé cette soumission, ou vous n'y avez pas accès.",
     "startErrorTitle": "Impossible de démarrer le traitement",
     "processingErrorTitle": "Problème de traitement",
+    "errorMessages": {
+      "edgeFunctionUnavailable": "Impossible de joindre le service de traitement pour le moment. Veuillez réessayer dans quelques instants.",
+      "rateLimited": "Trop de tentatives en peu de temps. Patientez un instant puis réessayez.",
+      "network": "Une erreur réseau est survenue pendant le traitement. Vérifiez votre connexion puis réessayez."
+    },
     "requestIdLabel": "ID de requête",
     "youtubeIdLabel": "ID YouTube",
     "processingTitle": "Traitement des métadonnées vidéo",
@@ -1194,7 +1200,75 @@
     "playlistsLoadError": "Impossible de charger les playlists de ce profil. Veuillez réessayer plus tard.",
     "noPlaylistsTitle": "Aucune playlist créée pour le moment",
     "noPlaylistsDescription": "Les playlists de ce profil apparaîtront ici.",
-    "createFirstPlaylist": "Créer la première playlist"
+    "createFirstPlaylist": "Créer la première playlist",
+    "edit": {
+      "title": "Modifier le profil",
+      "description": "Mettez à jour vos informations publiques et votre présence dans la communauté.",
+      "loadErrorTitle": "Impossible de charger votre profil",
+      "loadErrorDescription": "Veuillez réessayer dans un instant.",
+      "form": {
+        "displayNameLabel": "Nom affiché",
+        "displayNamePlaceholder": "Nom visible publiquement",
+        "bioLabel": "Bio",
+        "bioPlaceholder": "Parlez un peu de vous",
+        "saveButton": "Enregistrer le profil",
+        "savingButton": "Enregistrement..."
+      },
+      "error": {
+        "notLoggedInTitle": "Session invalide",
+        "notLoggedInDescription": "Vous devez être connecté pour modifier votre profil.",
+        "displayNameMinLength": "Le nom affiché doit contenir au moins 3 caractères.",
+        "displayNameMaxLength": "Le nom affiché doit contenir au maximum 50 caractères.",
+        "bioMaxLength": "La bio doit contenir au maximum 300 caractères."
+      }
+    },
+    "avatar": {
+      "upload": "Téléverser un avatar",
+      "remove": "Supprimer l'avatar",
+      "hint": "Utilisez JPG, PNG, WEBP ou GIF jusqu'à 5 Mo.",
+      "invalidType": "Format invalide. Utilisez JPG, PNG, WEBP ou GIF.",
+      "fileTooLarge": "Fichier trop volumineux. Limite: 5 Mo.",
+      "uploadSuccess": "Avatar mis à jour avec succès.",
+      "uploadError": "Impossible de mettre à jour l'avatar.",
+      "removeSuccess": "Avatar supprimé avec succès.",
+      "removeError": "Impossible de supprimer l'avatar.",
+      "cropError": "Impossible de recadrer l'image.",
+      "cropTitle": "Ajuster l'avatar",
+      "cropDescription": "Positionnez l'image pour créer votre nouvel avatar.",
+      "zoom": "Zoom",
+      "rotate": "Rotation",
+      "cropAndUpload": "Recadrer et téléverser"
+    },
+    "social": {
+      "title": "Comptes sociaux",
+      "addAccount": "Ajouter un compte",
+      "editAccount": "Modifier le compte",
+      "dialogDescription": "Ajoutez vos liens pour aider les autres à trouver votre travail.",
+      "noAccounts": "Aucun compte social ajouté pour le moment.",
+      "platform": {
+        "instagram": "Instagram",
+        "github": "GitHub",
+        "youtube": "YouTube",
+        "twitter": "X / Twitter",
+        "linkedin": "LinkedIn",
+        "facebook": "Facebook",
+        "website": "Site web"
+      },
+      "form": {
+        "platformLabel": "Plateforme",
+        "platformPlaceholder": "Sélectionnez une plateforme",
+        "urlLabel": "URL",
+        "urlPlaceholder": "https://...",
+        "platformRequired": "Veuillez sélectionner une plateforme.",
+        "invalidUrl": "Veuillez saisir une URL valide.",
+        "saving": "Enregistrement...",
+        "saveChanges": "Enregistrer",
+        "add": "Ajouter"
+      },
+      "error": {
+        "notLoggedIn": "Vous devez être connecté pour gérer les comptes sociaux."
+      }
+    }
   },
   "editorApplications": {
     "cta": {
@@ -1281,13 +1355,28 @@
     "inbox": "Notifications récentes",
     "empty": "Vous n'avez pas encore de notifications.",
     "markAsRead": "Marquer comme lue",
-    "markAllAsRead": "Tout marquer comme lu"
+    "markAllAsRead": "Tout marquer comme lu",
+    "defaultMessage": "Vous avez une nouvelle notification.",
+    "types": {
+      "new_follower": {
+        "title": "Nouveau follower",
+        "message": "Quelqu'un a commencé à vous suivre."
+      },
+      "new_message": {
+        "title": "Nouveau message",
+        "message": "Vous avez reçu un nouveau message."
+      },
+      "direct_message": {
+        "title": "Nouveau message direct",
+        "message": "Vous avez reçu un nouveau message."
+      }
+    }
   },
   "socialProfile": {
-    "followers": "followers",
-    "following": "following",
-    "follow": "Follow",
-    "unfollow": "Unfollow",
+    "followers": "abonnés",
+    "following": "abonnements",
+    "follow": "Suivre",
+    "unfollow": "Ne plus suivre",
     "sendMessage": "Message"
   },
   "curationPage": {

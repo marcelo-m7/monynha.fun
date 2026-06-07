@@ -67,7 +67,7 @@ const VerifyEmail = () => {
                 <div className="w-12 h-12 bg-green-100 dark:bg-green-900/30 rounded-full flex items-center justify-center mx-auto mb-4">
                   <CheckCircle className="w-6 h-6 text-green-600 dark:text-green-400" />
                 </div>
-                <CardTitle className="text-2xl">{t('auth.resetPassword.successTitle')}</CardTitle>
+                <CardTitle className="text-2xl">{t('auth.verifyEmail.successTitle')}</CardTitle>
                 <CardDescription>
                   {t('auth.verifyEmail.successConfirmed')}
                 </CardDescription>

@@ -236,6 +236,7 @@
       "description": "We sent a confirmation link to your email. Please check your inbox (and spam folder) to activate your account.",
       "sentTo": "Link sent to",
       "goToLogin": "Go to Login",
+      "successTitle": "Email confirmed",
       "successConfirmed": "Your email has been successfully confirmed! You can now access the app.",
       "goToApp": "Go to App"
     },
@@ -414,6 +415,11 @@
     "notFoundDescription": "We could not find this submission, or you do not have access to it.",
     "startErrorTitle": "Processing could not start",
     "processingErrorTitle": "Processing issue",
+    "errorMessages": {
+      "edgeFunctionUnavailable": "We could not reach the processing service right now. Please try again shortly.",
+      "rateLimited": "Too many requests in a short period. Please wait a moment and try again.",
+      "network": "A network error happened while processing. Please check your connection and try again."
+    },
     "requestIdLabel": "Request ID",
     "youtubeIdLabel": "YouTube ID",
     "processingTitle": "Processing video metadata",
@@ -1199,7 +1205,22 @@
     "inbox": "Recent notifications",
     "empty": "You have no notifications yet.",
     "markAsRead": "Mark read",
-    "markAllAsRead": "Mark all as read"
+    "markAllAsRead": "Mark all as read",
+    "defaultMessage": "You have a new notification.",
+    "types": {
+      "new_follower": {
+        "title": "New follower",
+        "message": "Someone started following you."
+      },
+      "new_message": {
+        "title": "New message",
+        "message": "You received a new message."
+      },
+      "direct_message": {
+        "title": "New direct message",
+        "message": "You received a new message."
+      }
+    }
   },
   "socialProfile": {
     "followers": "followers",
@@ -1225,7 +1246,75 @@
     "playlistsLoadError": "Could not load this profile's playlists. Please try again later.",
     "noPlaylistsTitle": "No playlists created yet",
     "noPlaylistsDescription": "This profile's playlists will appear here.",
-    "createFirstPlaylist": "Create first playlist"
+    "createFirstPlaylist": "Create first playlist",
+    "edit": {
+      "title": "Edit profile",
+      "description": "Update your public information and how you appear to the community.",
+      "loadErrorTitle": "Could not load your profile",
+      "loadErrorDescription": "Please try again in a moment.",
+      "form": {
+        "displayNameLabel": "Display name",
+        "displayNamePlaceholder": "How your name should appear",
+        "bioLabel": "Bio",
+        "bioPlaceholder": "Tell people a bit about you",
+        "saveButton": "Save profile",
+        "savingButton": "Saving profile..."
+      },
+      "error": {
+        "notLoggedInTitle": "Invalid session",
+        "notLoggedInDescription": "You must be logged in to edit your profile.",
+        "displayNameMinLength": "Display name must be at least 3 characters.",
+        "displayNameMaxLength": "Display name must be at most 50 characters.",
+        "bioMaxLength": "Bio must be at most 300 characters."
+      }
+    },
+    "avatar": {
+      "upload": "Upload avatar",
+      "remove": "Remove avatar",
+      "hint": "Use JPG, PNG, WEBP or GIF up to 5MB.",
+      "invalidType": "Invalid file type. Use JPG, PNG, WEBP or GIF.",
+      "fileTooLarge": "File is too large. Limit is 5MB.",
+      "uploadSuccess": "Avatar updated successfully.",
+      "uploadError": "Could not update avatar.",
+      "removeSuccess": "Avatar removed successfully.",
+      "removeError": "Could not remove avatar.",
+      "cropError": "Could not crop this image.",
+      "cropTitle": "Adjust avatar",
+      "cropDescription": "Position your image to create the new avatar.",
+      "zoom": "Zoom",
+      "rotate": "Rotate",
+      "cropAndUpload": "Crop and upload"
+    },
+    "social": {
+      "title": "Social accounts",
+      "addAccount": "Add account",
+      "editAccount": "Edit account",
+      "dialogDescription": "Add your links so people can find your work.",
+      "noAccounts": "No social accounts added yet.",
+      "platform": {
+        "instagram": "Instagram",
+        "github": "GitHub",
+        "youtube": "YouTube",
+        "twitter": "X / Twitter",
+        "linkedin": "LinkedIn",
+        "facebook": "Facebook",
+        "website": "Website"
+      },
+      "form": {
+        "platformLabel": "Platform",
+        "platformPlaceholder": "Select a platform",
+        "urlLabel": "URL",
+        "urlPlaceholder": "https://...",
+        "platformRequired": "Please select a platform.",
+        "invalidUrl": "Please enter a valid URL.",
+        "saving": "Saving...",
+        "saveChanges": "Save changes",
+        "add": "Add"
+      },
+      "error": {
+        "notLoggedIn": "You must be logged in to manage social accounts."
+      }
+    }
   },
   "editorApplications": {
     "cta": {

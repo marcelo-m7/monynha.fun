@@ -236,6 +236,7 @@
       "description": "Enviamos un enlace de confirmación a tu correo. Por favor, revisa tu bandeja de entrada (y spam) para activar tu cuenta.",
       "sentTo": "Enlace enviado a",
       "goToLogin": "Ir a Iniciar Sesión",
+      "successTitle": "Correo confirmado",
       "successConfirmed": "¡Tu correo ha sido confirmado exitosamente! Ahora puedes acceder a la aplicación.",
       "goToApp": "Ir a la Aplicación"
     },
@@ -507,6 +508,11 @@
     "notFoundDescription": "No pudimos encontrar este envío, o no tienes acceso a él.",
     "startErrorTitle": "No se pudo iniciar el procesamiento",
     "processingErrorTitle": "Problema de procesamiento",
+    "errorMessages": {
+      "edgeFunctionUnavailable": "No pudimos conectar con el servicio de procesamiento en este momento. Inténtalo de nuevo en unos instantes.",
+      "rateLimited": "Demasiados intentos en poco tiempo. Espera un momento e inténtalo de nuevo.",
+      "network": "Hubo un error de red durante el procesamiento. Verifica tu conexión e inténtalo nuevamente."
+    },
     "requestIdLabel": "ID de solicitud",
     "youtubeIdLabel": "ID de YouTube",
     "processingTitle": "Procesando metadatos del video",
@@ -1194,7 +1200,75 @@
     "playlistsLoadError": "No se pudieron cargar las listas de reproducción de este perfil. Inténtalo de nuevo más tarde.",
     "noPlaylistsTitle": "Aún no hay listas de reproducción creadas",
     "noPlaylistsDescription": "Las listas de reproducción de este perfil aparecerán aquí.",
-    "createFirstPlaylist": "Crear primera lista de reproducción"
+    "createFirstPlaylist": "Crear primera lista de reproducción",
+    "edit": {
+      "title": "Editar perfil",
+      "description": "Actualiza tu información pública y cómo apareces en la comunidad.",
+      "loadErrorTitle": "No se pudo cargar tu perfil",
+      "loadErrorDescription": "Inténtalo de nuevo en unos instantes.",
+      "form": {
+        "displayNameLabel": "Nombre visible",
+        "displayNamePlaceholder": "Cómo debe mostrarse tu nombre",
+        "bioLabel": "Biografía",
+        "bioPlaceholder": "Cuéntale algo de ti a la comunidad",
+        "saveButton": "Guardar perfil",
+        "savingButton": "Guardando perfil..."
+      },
+      "error": {
+        "notLoggedInTitle": "Sesión inválida",
+        "notLoggedInDescription": "Debes iniciar sesión para editar tu perfil.",
+        "displayNameMinLength": "El nombre visible debe tener al menos 3 caracteres.",
+        "displayNameMaxLength": "El nombre visible no puede superar 50 caracteres.",
+        "bioMaxLength": "La biografía no puede superar 300 caracteres."
+      }
+    },
+    "avatar": {
+      "upload": "Subir avatar",
+      "remove": "Eliminar avatar",
+      "hint": "Usa JPG, PNG, WEBP o GIF de hasta 5MB.",
+      "invalidType": "Formato inválido. Usa JPG, PNG, WEBP o GIF.",
+      "fileTooLarge": "El archivo es demasiado grande. El límite es 5MB.",
+      "uploadSuccess": "Avatar actualizado correctamente.",
+      "uploadError": "No se pudo actualizar el avatar.",
+      "removeSuccess": "Avatar eliminado correctamente.",
+      "removeError": "No se pudo eliminar el avatar.",
+      "cropError": "No se pudo recortar la imagen.",
+      "cropTitle": "Ajustar avatar",
+      "cropDescription": "Posiciona la imagen para crear tu nuevo avatar.",
+      "zoom": "Zoom",
+      "rotate": "Rotación",
+      "cropAndUpload": "Recortar y subir"
+    },
+    "social": {
+      "title": "Redes sociales",
+      "addAccount": "Agregar cuenta",
+      "editAccount": "Editar cuenta",
+      "dialogDescription": "Agrega enlaces para que otras personas encuentren tu trabajo.",
+      "noAccounts": "Aún no agregaste redes sociales.",
+      "platform": {
+        "instagram": "Instagram",
+        "github": "GitHub",
+        "youtube": "YouTube",
+        "twitter": "X / Twitter",
+        "linkedin": "LinkedIn",
+        "facebook": "Facebook",
+        "website": "Sitio web"
+      },
+      "form": {
+        "platformLabel": "Plataforma",
+        "platformPlaceholder": "Selecciona una plataforma",
+        "urlLabel": "URL",
+        "urlPlaceholder": "https://...",
+        "platformRequired": "Selecciona una plataforma.",
+        "invalidUrl": "Ingresa una URL válida.",
+        "saving": "Guardando...",
+        "saveChanges": "Guardar cambios",
+        "add": "Agregar"
+      },
+      "error": {
+        "notLoggedIn": "Debes iniciar sesión para gestionar redes sociales."
+      }
+    }
   },
   "editorApplications": {
     "cta": {
@@ -1281,14 +1355,29 @@
     "inbox": "Notificaciones recientes",
     "empty": "Aún no tienes notificaciones.",
     "markAsRead": "Marcar como leída",
-    "markAllAsRead": "Marcar todo como leído"
+    "markAllAsRead": "Marcar todo como leído",
+    "defaultMessage": "Tienes una nueva notificación.",
+    "types": {
+      "new_follower": {
+        "title": "Nuevo seguidor",
+        "message": "Alguien empezó a seguirte."
+      },
+      "new_message": {
+        "title": "Nuevo mensaje",
+        "message": "Recibiste un nuevo mensaje."
+      },
+      "direct_message": {
+        "title": "Nuevo mensaje directo",
+        "message": "Recibiste un nuevo mensaje."
+      }
+    }
   },
   "socialProfile": {
-    "followers": "followers",
-    "following": "following",
-    "follow": "Follow",
-    "unfollow": "Unfollow",
-    "sendMessage": "Message"
+    "followers": "seguidores",
+    "following": "siguiendo",
+    "follow": "Seguir",
+    "unfollow": "Dejar de seguir",
+    "sendMessage": "Mensaje"
   },
   "curationPage": {
     "hero": {

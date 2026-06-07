@@ -8,6 +8,7 @@ import type { Category } from '@/entities/category/category.types';
 import { getVideoRoute } from '@/entities/video/video.routes';
 import type { VideoWithCategory } from '@/entities/video/video.types';
 import { cn } from '@/lib/utils';
+import { getReliableYouTubeThumbnailUrl } from '@/shared/lib/youtube';
 import { ExternalLink, GripVertical } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
@@ -73,10 +74,15 @@ export function VideoCard({
         ) : null}
         <div className="relative h-16 w-24 shrink-0 overflow-hidden rounded-xl bg-muted">
           <img
-            src={video.thumbnail_url || '/placeholder.svg'}
+            src={getReliableYouTubeThumbnailUrl(video.thumbnail_url, '/placeholder.svg')}
             alt=""
             className="h-full w-full object-cover"
             loading="lazy"
+            onError={(event) => {
+              const target = event.currentTarget;
+              if (target.src.endsWith('/placeholder.svg')) return;
+              target.src = '/placeholder.svg';
+            }}
           />
         </div>
         <div className="min-w-0 flex-1">

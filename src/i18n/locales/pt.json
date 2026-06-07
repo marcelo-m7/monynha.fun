@@ -236,6 +236,7 @@
       "description": "Enviamos um link de confirmação para o seu e-mail. Por favor, verifique sua caixa de entrada (e spam) para ativar sua conta.",
       "sentTo": "Link enviado para",
       "goToLogin": "Ir para o Login",
+      "successTitle": "E-mail confirmado",
       "successConfirmed": "Seu e-mail foi confirmado com sucesso! Você já pode acessar o aplicativo.",
       "goToApp": "Ir para o Aplicativo"
     },
@@ -507,6 +508,11 @@
     "notFoundDescription": "Não conseguimos encontrar esta submissão, ou você não tem acesso a ela.",
     "startErrorTitle": "Não foi possível iniciar o processamento",
     "processingErrorTitle": "Problema no processamento",
+    "errorMessages": {
+      "edgeFunctionUnavailable": "Não foi possível conectar ao serviço de processamento agora. Tente novamente em instantes.",
+      "rateLimited": "Muitas tentativas em pouco tempo. Aguarde um instante e tente novamente.",
+      "network": "Falha de rede durante o processamento. Verifique a conexão e tente novamente."
+    },
     "requestIdLabel": "ID da requisição",
     "youtubeIdLabel": "ID do YouTube",
     "processingTitle": "Processando metadados do vídeo",
@@ -1199,7 +1205,22 @@
     "inbox": "Notificações recentes",
     "empty": "Você ainda não tem notificações.",
     "markAsRead": "Marcar como lida",
-    "markAllAsRead": "Marcar tudo como lido"
+    "markAllAsRead": "Marcar tudo como lido",
+    "defaultMessage": "Você tem uma nova notificação.",
+    "types": {
+      "new_follower": {
+        "title": "Novo seguidor",
+        "message": "Alguém começou a seguir você."
+      },
+      "new_message": {
+        "title": "Nova mensagem",
+        "message": "Você recebeu uma nova mensagem."
+      },
+      "direct_message": {
+        "title": "Nova mensagem direta",
+        "message": "Você recebeu uma nova mensagem."
+      }
+    }
   },
   "socialProfile": {
     "followers": "seguidores",
@@ -1225,7 +1246,75 @@
     "playlistsLoadError": "Não foi possível carregar as playlists deste perfil. Tente novamente mais tarde.",
     "noPlaylistsTitle": "Nenhuma playlist criada ainda",
     "noPlaylistsDescription": "As playlists deste perfil aparecerão aqui.",
-    "createFirstPlaylist": "Criar primeira playlist"
+    "createFirstPlaylist": "Criar primeira playlist",
+    "edit": {
+      "title": "Editar perfil",
+      "description": "Atualize suas informações públicas e personalize como você aparece na comunidade.",
+      "loadErrorTitle": "Não foi possível carregar seu perfil",
+      "loadErrorDescription": "Tente novamente em alguns instantes.",
+      "form": {
+        "displayNameLabel": "Nome de exibição",
+        "displayNamePlaceholder": "Como seu nome deve aparecer",
+        "bioLabel": "Biografia",
+        "bioPlaceholder": "Conte um pouco sobre você",
+        "saveButton": "Salvar perfil",
+        "savingButton": "Salvando perfil..."
+      },
+      "error": {
+        "notLoggedInTitle": "Sessão inválida",
+        "notLoggedInDescription": "Você precisa estar logado para editar seu perfil.",
+        "displayNameMinLength": "O nome de exibição precisa ter ao menos 3 caracteres.",
+        "displayNameMaxLength": "O nome de exibição pode ter no máximo 50 caracteres.",
+        "bioMaxLength": "A biografia pode ter no máximo 300 caracteres."
+      }
+    },
+    "avatar": {
+      "upload": "Enviar avatar",
+      "remove": "Remover avatar",
+      "hint": "Use imagem JPG, PNG, WEBP ou GIF com até 5MB.",
+      "invalidType": "Formato inválido. Use JPG, PNG, WEBP ou GIF.",
+      "fileTooLarge": "Arquivo muito grande. O limite é 5MB.",
+      "uploadSuccess": "Avatar atualizado com sucesso.",
+      "uploadError": "Não foi possível atualizar o avatar.",
+      "removeSuccess": "Avatar removido com sucesso.",
+      "removeError": "Não foi possível remover o avatar.",
+      "cropError": "Não foi possível recortar a imagem.",
+      "cropTitle": "Ajustar avatar",
+      "cropDescription": "Posicione a imagem para definir seu novo avatar.",
+      "zoom": "Zoom",
+      "rotate": "Giro",
+      "cropAndUpload": "Recortar e enviar"
+    },
+    "social": {
+      "title": "Redes sociais",
+      "addAccount": "Adicionar conta",
+      "editAccount": "Editar conta",
+      "dialogDescription": "Conecte links para ajudar outras pessoas a encontrarem seu trabalho.",
+      "noAccounts": "Nenhuma rede social adicionada ainda.",
+      "platform": {
+        "instagram": "Instagram",
+        "github": "GitHub",
+        "youtube": "YouTube",
+        "twitter": "X / Twitter",
+        "linkedin": "LinkedIn",
+        "facebook": "Facebook",
+        "website": "Site"
+      },
+      "form": {
+        "platformLabel": "Plataforma",
+        "platformPlaceholder": "Selecione uma plataforma",
+        "urlLabel": "URL",
+        "urlPlaceholder": "https://...",
+        "platformRequired": "Selecione uma plataforma.",
+        "invalidUrl": "Informe uma URL válida.",
+        "saving": "Salvando...",
+        "saveChanges": "Salvar alterações",
+        "add": "Adicionar"
+      },
+      "error": {
+        "notLoggedIn": "Você precisa estar logado para gerenciar redes sociais."
+      }
+    }
   },
   "editorApplications": {
     "cta": {
