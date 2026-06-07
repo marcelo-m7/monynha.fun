@@ -652,7 +652,9 @@
     "searchPlaceholder": "Buscar videos, canales...",
     "allCategories": "Todas las Categorías",
     "allLanguages": "Todos los Idiomas",
+    "allTags": "Todas las Etiquetas",
     "loadingCategories": "Cargando categorías...",
+    "loadingTags": "Cargando etiquetas...",
     "resultCountOne": "1 video encontrado",
     "resultCount": "{{count}} videos encontrados",
     "activeTag": "Etiqueta: {{tag}}",
@@ -671,10 +673,13 @@
     "multi": {
       "categoriesLabel": "Categorías (OR)",
       "languagesLabel": "Idiomas (OR)",
+      "tagsLabel": "Etiquetas (OR)",
       "categorySelected": "1 categoría",
       "languageSelected": "1 idioma",
+      "tagSelected": "1 etiqueta",
       "categoriesSelected": "{{count}} categorías",
       "languagesSelected": "{{count}} idiomas",
+      "tagsSelected": "{{count}} etiquetas",
       "selectAll": "Seleccionar todo",
       "clear": "Limpiar"
     },

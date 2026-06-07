@@ -6,7 +6,9 @@ import {
   listFeaturedVideos,
   listRecentVideos,
   listRelatedVideos,
+  listVideoSemanticTags,
   listVideos,
+  type SemanticTagStat,
   updateVideo,
 } from '@/entities/video/video.api';
 import { videoKeys } from '@/entities/video/video.keys';
@@ -108,6 +110,15 @@ export function useVideoCount() {
   return useQuery<number, Error>({
     queryKey: videoKeys.count(),
     queryFn: () => getVideoCount(),
+  });
+}
+
+export function useVideoSemanticTags(limit = 200, enabled = true) {
+  return useQuery<SemanticTagStat[], Error>({
+    queryKey: videoKeys.semanticTags(limit),
+    queryFn: () => listVideoSemanticTags(limit),
+    enabled,
+    staleTime: 5 * 60_000,
   });
 }
 

@@ -35,6 +35,7 @@ const normalizeVideoListParams = (params: VideoListParams = {}) => ({
 
 export const videoKeys = {
   all: ['videos'] as const,
+  semanticTags: (limit = 200) => [...videoKeys.all, 'semantic-tags', limit] as const,
   lists: () => [...videoKeys.all, 'list'] as const,
   list: (params?: VideoListParams) => [...videoKeys.lists(), normalizeVideoListParams(params)] as const,
   infiniteList: (params?: VideoListParams) => [

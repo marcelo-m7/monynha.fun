@@ -3,7 +3,7 @@ import { useSearchParams } from 'react-router-dom';
 import { MainLayout } from '@/components/layout/MainLayout';
 import { PageHero } from '@/components/showcase';
 import { VideoCard } from '@/components/video/VideoCard';
-import { useFeaturedVideos, useInfiniteVideos } from '@/features/videos/queries/useVideos';
+import { useFeaturedVideos, useInfiniteVideos, useVideoSemanticTags } from '@/features/videos/queries/useVideos';
 import { useCategories } from '@/features/categories/queries/useCategories';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -107,6 +107,7 @@ const Videos = () => {
 
   const { data: featuredVideos, isLoading: featuredLoading } = useFeaturedVideos(24, 0, isFeatured);
   const { data: categories, isLoading: categoriesLoading } = useCategories();
+  const { data: semanticTagStats, isLoading: semanticTagsLoading } = useVideoSemanticTags(200, !isFeatured);
 
   useEffect(() => {
     const timer = window.setTimeout(() => {
@@ -148,6 +149,11 @@ const Videos = () => {
     { value: 'fr', label: t('common.language.fr') },
     { value: 'other', label: t('common.language.other') },
   ], [t]);
+
+  const availableSemanticTags = useMemo(
+    () => (semanticTagStats ?? []).filter((entry) => entry.video_count > 0),
+    [semanticTagStats],
+  );
 
   const renderedVideos = isFeatured
     ? featuredVideos
@@ -314,6 +320,68 @@ const Videos = () => {
                   {lang.label}
                 </DropdownMenuCheckboxItem>
               ))}
+            </DropdownMenuContent>
+          </DropdownMenu>
+
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button
+                type="button"
+                variant="outline"
+                className="w-full justify-between bg-muted/50 md:w-[240px]"
+                disabled={isFeatured}
+              >
+                <span>
+                  {selectedSemanticTags.length > 0
+                    ? t(
+                        selectedSemanticTags.length === 1
+                          ? 'videos.multi.tagSelected'
+                          : 'videos.multi.tagsSelected',
+                        { count: selectedSemanticTags.length },
+                      )
+                    : t('videos.allTags')}
+                </span>
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent className="max-h-80 w-72 overflow-y-auto" align="start">
+              <DropdownMenuLabel>{t('videos.multi.tagsLabel')}</DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              <div className="flex items-center justify-between gap-2 px-2 pb-2">
+                <Button
+                  type="button"
+                  size="sm"
+                  variant="ghost"
+                  className="h-7 px-2 text-xs"
+                  onClick={() => setSelectedSemanticTags(availableSemanticTags.map((entry) => entry.tag))}
+                >
+                  {t('videos.multi.selectAll')}
+                </Button>
+                <Button
+                  type="button"
+                  size="sm"
+                  variant="ghost"
+                  className="h-7 px-2 text-xs"
+                  onClick={() => setSelectedSemanticTags([])}
+                >
+                  {t('videos.multi.clear')}
+                </Button>
+              </div>
+              {semanticTagsLoading ? (
+                <div className="p-2 text-muted-foreground">{t('videos.loadingTags')}</div>
+              ) : (
+                availableSemanticTags.map((entry) => (
+                  <DropdownMenuCheckboxItem
+                    key={entry.tag}
+                    checked={selectedSemanticTags.includes(entry.tag)}
+                    onCheckedChange={() => toggleArrayValue(entry.tag, setSelectedSemanticTags)}
+                  >
+                    <span className="flex w-full items-center justify-between gap-2">
+                      <span className="truncate">{entry.tag}</span>
+                      <span className="text-xs text-muted-foreground">{entry.video_count}</span>
+                    </span>
+                  </DropdownMenuCheckboxItem>
+                ))
+              )}
             </DropdownMenuContent>
           </DropdownMenu>
 

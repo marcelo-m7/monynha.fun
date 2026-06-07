@@ -112,6 +112,11 @@ export interface ListVideosParams {
   includeEnrichment?: boolean;
 }
 
+export interface SemanticTagStat {
+  tag: string;
+  video_count: number;
+}
+
 const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 const YOUTUBE_ID_REGEX = /^[a-zA-Z0-9_-]{11}$/;
 
@@ -229,6 +234,21 @@ export async function listVideos(params: ListVideosParams = {}) {
   return ((data as VideoExhibitionRow[] | null) || []).map((row) =>
     mapExhibitionRowToVideoWithCategory(row, includeEnrichment),
   );
+}
+
+export async function listVideoSemanticTags(limit = 200) {
+  const { data, error } = await supabase.rpc('list_video_semantic_tags', {
+    p_limit: limit,
+  });
+
+  if (error) throw error;
+
+  return ((data as SemanticTagStat[] | null) || [])
+    .filter((entry) => !!entry.tag)
+    .map((entry) => ({
+      tag: entry.tag,
+      video_count: Number(entry.video_count || 0),
+    }));
 }
 
 export async function getVideoById(id: string) {

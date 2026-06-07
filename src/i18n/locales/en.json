@@ -559,7 +559,9 @@
     "searchPlaceholder": "Search videos, channels...",
     "allCategories": "All Categories",
     "allLanguages": "All Languages",
+    "allTags": "All Tags",
     "loadingCategories": "Loading categories...",
+    "loadingTags": "Loading tags...",
     "resultCountOne": "1 video found",
     "resultCount": "{{count}} videos found",
     "activeTag": "Tag: {{tag}}",
@@ -578,10 +580,13 @@
     "multi": {
       "categoriesLabel": "Categories (OR)",
       "languagesLabel": "Languages (OR)",
+      "tagsLabel": "Tags (OR)",
       "categorySelected": "1 category",
       "languageSelected": "1 language",
+      "tagSelected": "1 tag",
       "categoriesSelected": "{{count}} categories",
       "languagesSelected": "{{count}} languages",
+      "tagsSelected": "{{count}} tags",
       "selectAll": "Select all",
       "clear": "Clear"
     },

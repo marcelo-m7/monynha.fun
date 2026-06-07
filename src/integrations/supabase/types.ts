@@ -2584,6 +2584,13 @@ export type Database = {
           youtube_id: string
         }[]
       }
+      list_video_semantic_tags: {
+        Args: { p_limit?: number }
+        Returns: {
+          tag: string
+          video_count: number
+        }[]
+      }
       list_followers_by_username_secure: {
         Args: { p_target_username: string }
         Returns: {
