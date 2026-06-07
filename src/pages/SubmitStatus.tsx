@@ -100,6 +100,10 @@ export default function SubmitStatus() {
   const rejectedPlaylist = metadata.assignment?.rejectedPlaylistId
     ? topCandidates.find((candidate) => candidate.playlistId === metadata.assignment?.rejectedPlaylistId) ?? null
     : null;
+  const suggestedCategoryId = metadata.assignment?.assignedCategoryId ?? metadata.enrichment?.suggestedCategoryId ?? null;
+  const assignedCategory = suggestedCategoryId && linkedVideo?.category_id === suggestedCategoryId
+    ? linkedVideo?.category?.name
+    : metadata.enrichment?.suggestedCategory ?? null;
 
   const handleRetry = () => {
     if (!submission?.video_id || !submission.youtube_url) {
@@ -249,6 +253,12 @@ export default function SubmitStatus() {
                   {detectedLanguageKey ? t(detectedLanguageKey) : detectedLanguage}
                 </p>
               </div>
+              {assignedCategory && (
+                <div className="rounded-md border border-border p-4">
+                  <p className="text-xs font-medium uppercase text-muted-foreground">{t('submitStatus.category.label', { defaultValue: 'Categoria' })}</p>
+                  <p className="mt-1 text-sm">{assignedCategory}</p>
+                </div>
+              )}
               {processingStage && (
                 <div className="rounded-md border border-border p-4">
                   <p className="text-xs font-medium uppercase text-muted-foreground">{t('submitStatus.stage.label')}</p>

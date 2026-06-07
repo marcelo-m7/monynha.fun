@@ -39,13 +39,19 @@ export function useVideos(options: UseVideosOptions = {}) {
 export function useInfiniteVideos(options: UseInfiniteVideosOptions = {}) {
   const { enabled = true, pageSize = 24, ...params } = options;
 
-  return useInfiniteQuery<VideoWithCategory[], Error>({
+  return useInfiniteQuery<
+    VideoWithCategory[],
+    Error,
+    VideoWithCategory[],
+    ReturnType<typeof videoKeys.infiniteList>,
+    number
+  >({
     queryKey: videoKeys.infiniteList({ ...params, limit: pageSize }),
-    queryFn: ({ pageParam = 0 }) =>
+    queryFn: ({ pageParam }) =>
       listVideos({
         ...params,
         limit: pageSize,
-        offset: Number(pageParam),
+        offset: pageParam,
       }),
     initialPageParam: 0,
     enabled,

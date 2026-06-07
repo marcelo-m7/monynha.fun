@@ -518,6 +518,9 @@
       "label": "Idioma detectado",
       "pending": "Detectando automaticamente"
     },
+    "category": {
+      "label": "Categoria detectada"
+    },
     "stage": {
       "label": "Etapa atual",
       "values": {

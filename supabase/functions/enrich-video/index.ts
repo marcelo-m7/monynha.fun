@@ -4,6 +4,7 @@ import {
   buildVideoSummary,
   deriveTags,
   normalizeLanguage,
+  normalizeText,
   pickCategory,
   type LegacyFastCategory,
 } from '../_shared/legacy-fast-enrichment.ts'
@@ -436,6 +437,7 @@ async function createCompletedAnalysisJob(params: {
 async function loadPlaylistCandidates(
   supabaseServiceRole: ReturnType<typeof createClient>,
   language: string,
+  sourceText?: string,
 ): Promise<PlaylistAssignmentPlaylist[]> {
   const { data, error } = await supabaseServiceRole.rpc('list_education_playlists_for_assignment', {
     p_language: language,
@@ -446,7 +448,48 @@ async function loadPlaylistCandidates(
     throw new Error(`Failed to load playlist assignment candidates: ${error.message}`);
   }
 
-  return (data ?? []) as PlaylistAssignmentPlaylist[];
+  const baseCandidates = (data ?? []) as PlaylistAssignmentPlaylist[];
+  const normalizedSource = normalizeText(sourceText);
+  const hasCulinarySignals = [
+    'receita',
+    'receitas',
+    'culinaria',
+    'cozinha',
+    'gastronomia',
+    'sopa',
+    'cebola',
+    'ingrediente',
+    'chef',
+    'forno',
+    'assado',
+  ].some((keyword) => normalizedSource.includes(keyword));
+
+  if (!hasCulinarySignals) {
+    return baseCandidates;
+  }
+
+  const { data: culinaryPlaylists, error: culinaryError } = await supabaseServiceRole
+    .from('playlists')
+    .select('id, name, description, language, is_public, is_ordered, course_code, unit_code')
+    .eq('is_public', true)
+    .or('slug.ilike.%receita%,name.ilike.%receita%,description.ilike.%receita%,slug.ilike.%culinaria%,name.ilike.%culinaria%,description.ilike.%culinaria%')
+    .order('video_count', { ascending: false })
+    .limit(60);
+
+  if (culinaryError) {
+    throw new Error(`Failed to load recipe playlist candidates: ${culinaryError.message}`);
+  }
+
+  const byId = new Map<string, PlaylistAssignmentPlaylist>();
+  for (const item of baseCandidates) {
+    byId.set(item.id, item);
+  }
+
+  for (const item of (culinaryPlaylists ?? []) as PlaylistAssignmentPlaylist[]) {
+    byId.set(item.id, item);
+  }
+
+  return Array.from(byId.values());
 }
 
 async function persistPlaylistAssignment(params: {
@@ -721,7 +764,11 @@ serve(async (req) => {
     const categoryRows = (categoriesData ?? []) as LegacyFastCategory[];
     const language = enrichedLanguage;
     const title = video.title || 'Video do YouTube';
-    const playlistCandidates = await loadPlaylistCandidates(supabaseServiceRole, language);
+    const playlistCandidates = await loadPlaylistCandidates(
+      supabaseServiceRole,
+      language,
+      [video.title, enrichedDescription, video.channel_name].filter(Boolean).join(' '),
+    );
     const fastEnrichment = await computeFastEnrichment({
       title,
       videoTitle: video.title,

@@ -55,6 +55,7 @@ export function deriveTags(params: {
     ['banco de dados', ['sql', 'database', 'dados', 'banco de dados', 'base de dados', 'normalização', 'normalizacao']],
     ['Odoo', ['odoo', 'erp', 'human resources', 'employees', 'expenses', 'fleet', 'time off']],
     ['educação', ['aula', 'curso', 'aprenda', 'tutorial', 'facodi', 'ensino']],
+    ['receitas', ['receita', 'receitas', 'culinaria', 'cozinha', 'gastronomia', 'sopa', 'cebola', 'chef', 'ingredientes', 'forno', 'assado', 'sobremesa']],
   ];
 
   for (const [tag, keywords] of signals) {
@@ -84,7 +85,24 @@ function scoreCategory(category: LegacyFastCategory, source: string, semanticTag
     tech: ['tech', 'tecnologia', 'programacao', 'programa', 'codigo', 'software', 'javascript', 'typescript', 'python', 'sql', 'database', 'dados', 'ia', 'inteligencia artificial', 'odoo', 'erp', 'supabase', 'linux'],
     'tutoriais-antigos': ['tutorial', 'como fazer', 'passo a passo', 'guia', 'dica', 'aprenda'],
     receitas: ['receita', 'receitas', 'cozinha', 'culinaria', 'comida', 'bolo', 'prato'],
-    'receitas-tradicionais': ['receita', 'receitas', 'cozinha', 'culinaria', 'comida', 'bolo', 'prato'],
+    'receitas-tradicionais': [
+      'receita',
+      'receitas',
+      'cozinha',
+      'culinaria',
+      'comida',
+      'bolo',
+      'prato',
+      'sopa',
+      'cebola',
+      'gastronomia',
+      'chef',
+      'ingredientes',
+      'forno',
+      'sobremesa',
+      'molho',
+      'assado',
+    ],
   };
 
   const keywords = [
@@ -122,6 +140,30 @@ export function pickCategory(categories: LegacyFastCategory[], params: {
     params.channelName,
     params.semanticTags.join(' '),
   ].filter(Boolean).join(' '));
+
+  const hasRecipeSignals =
+    params.semanticTags.some((tag) => normalizeText(tag) === 'receitas') ||
+    [
+      'receita',
+      'receitas',
+      'culinaria',
+      'cozinha',
+      'sopa',
+      'cebola',
+      'gastronomia',
+      'chef',
+      'ingredientes',
+      'forno',
+      'assado',
+    ].some((keyword) => source.includes(keyword));
+
+  if (hasRecipeSignals) {
+    const recipeCategory = categories.find((category) => {
+      const slug = normalizeText(category.slug);
+      return slug === 'receitas-tradicionais' || slug === 'receitas';
+    });
+    if (recipeCategory) return recipeCategory;
+  }
 
   if (params.semanticTags.some((tag) => normalizeText(tag) === 'historia da arte')) {
     const designCategory = categories.find((category) => normalizeText(category.slug) === 'design');

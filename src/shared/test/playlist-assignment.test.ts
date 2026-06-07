@@ -76,6 +76,16 @@ const playlists: PlaylistAssignmentPlaylist[] = [
     course_code: 'LESTI',
     unit_code: '19411010',
   },
+  {
+    id: 'receitas-tradicionais',
+    name: 'Receitas Tradicionais Portuguesas',
+    description: 'Sopas, pratos e tecnicas de cozinha tradicional.',
+    language: 'pt',
+    is_public: true,
+    is_ordered: false,
+    course_code: null,
+    unit_code: null,
+  },
 ];
 
 const baseAnalysis: PlaylistAssignmentAnalysis = {
@@ -283,6 +293,25 @@ describe('playlist assignment', () => {
     });
 
     expect(result.assignedPlaylistId).toBe('math-i');
+    expect(result.decisionSource).toBe('deterministic');
+  });
+
+  it('assigns culinary videos to recipe playlists when cooking signals are strong', () => {
+    const result = assignPlaylist({
+      playlists,
+      analysis: {
+        ...baseAnalysis,
+        title: 'A Verdadeira Sopa de Cebola Francesa',
+        semanticTags: ['receitas', 'sopa', 'culinaria'],
+        summaryDescription: 'Receita de sopa de cebola francesa com tecnicas de cozinha tradicional.',
+        shortSummary: 'Sopa de cebola francesa.',
+        suggestedPlaylistId: null,
+        suggestedPlaylistQuery: 'receita sopa culinaria',
+        classificationConfidence: 0.86,
+      },
+    });
+
+    expect(result.assignedPlaylistId).toBe('receitas-tradicionais');
     expect(result.decisionSource).toBe('deterministic');
   });
 });

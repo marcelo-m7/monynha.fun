@@ -11,6 +11,7 @@ const categories: LegacyFastCategory[] = [
   { id: 'cat-cultura', name: 'Cultura', slug: 'cultura' },
   { id: 'cat-design', name: 'Design', slug: 'design' },
   { id: 'cat-educacao', name: 'Educacao', slug: 'educacao' },
+  { id: 'cat-receitas', name: 'Receitas', slug: 'receitas-tradicionais' },
   { id: 'cat-unclassified', name: 'Nao Classificados', slug: 'nao-classificados' },
   { id: 'cat-tech', name: 'Tecnologia', slug: 'tech' },
   { id: 'cat-tutorials', name: 'Tutoriais', slug: 'tutoriais-antigos' },
@@ -91,5 +92,25 @@ describe('legacy fast enrichment helpers', () => {
     });
 
     expect(selected?.id).toBe('cat-educacao');
+  });
+
+  it('detects recipe signals and routes culinary videos to receitas category', () => {
+    const semanticTags = deriveTags({
+      title: 'A Verdadeira Sopa de Cebola Francesa',
+      description: 'Segredos da Paola para um sabor intenso.',
+      channelName: 'Cozinha da Paola',
+      language: 'pt',
+    });
+
+    const selected = pickCategory(categories, {
+      currentCategoryId: 'cat-educacao',
+      title: 'A Verdadeira Sopa de Cebola Francesa',
+      description: 'Segredos da Paola para um sabor intenso.',
+      channelName: 'Cozinha da Paola',
+      semanticTags,
+    });
+
+    expect(semanticTags).toContain('receitas');
+    expect(selected?.id).toBe('cat-receitas');
   });
 });

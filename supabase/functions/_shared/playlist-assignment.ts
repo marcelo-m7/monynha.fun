@@ -3,6 +3,7 @@ export type SubjectSignal =
   | 'design'
   | 'programming'
   | 'database'
+  | 'culinary'
   | 'business'
   | 'language'
   | 'science'
@@ -52,7 +53,7 @@ export type PlaylistAssignmentResult = {
   signals: Record<SubjectSignal, number>;
 };
 
-export const PLAYLIST_ASSIGNMENT_ALGORITHM_VERSION = 'playlist-assignment-v6-art-history';
+export const PLAYLIST_ASSIGNMENT_ALGORITHM_VERSION = 'playlist-assignment-v7-culinary';
 export const MIN_PLAYLIST_ASSIGNMENT_CONFIDENCE = 0.65;
 export const MIN_PLAYLIST_ASSIGNMENT_SCORE = 7;
 export const MIN_DETERMINISTIC_PLAYLIST_SCORE = 12;
@@ -139,6 +140,22 @@ const subjectKeywords: Record<SubjectSignal, string[]> = {
     'stored procedure',
     'sequencia',
     'sequence',
+  ],
+  culinary: [
+    'receita',
+    'receitas',
+    'culinaria',
+    'cozinha',
+    'gastronomia',
+    'sopa',
+    'cebola',
+    'ingredientes',
+    'chef',
+    'forno',
+    'assado',
+    'sobremesa',
+    'molho',
+    'massa',
   ],
   business: [
     'negocio',
@@ -241,6 +258,7 @@ function getSubjectSignals(sourceText: string): Record<SubjectSignal, number> {
     design: subjectSignalScore(sourceText, 'design'),
     programming: subjectSignalScore(sourceText, 'programming'),
     database: subjectSignalScore(sourceText, 'database'),
+    culinary: subjectSignalScore(sourceText, 'culinary'),
     business: subjectSignalScore(sourceText, 'business'),
     language: subjectSignalScore(sourceText, 'language'),
     science: subjectSignalScore(sourceText, 'science'),
@@ -291,6 +309,16 @@ function isArtHistoryPlaylist(playlist: PlaylistAssignmentPlaylist): boolean {
   return text.includes('historia da arte') || text.includes('artes visuais');
 }
 
+function isRecipePlaylist(playlist: PlaylistAssignmentPlaylist): boolean {
+  const text = normalizeText(playlistText(playlist));
+  return (
+    text.includes('receita') ||
+    text.includes('culinaria') ||
+    text.includes('cozinha') ||
+    text.includes('gastronomia')
+  );
+}
+
 function hasArtHistorySignals(sourceText: string): boolean {
   const text = normalizeText(sourceText);
   const artMovements = [
@@ -337,6 +365,27 @@ function hasCalculusOneSignals(sourceText: string): boolean {
   );
 }
 
+function hasRecipeSignals(sourceText: string): boolean {
+  const text = normalizeText(sourceText);
+  const signals = [
+    'receita',
+    'receitas',
+    'culinaria',
+    'cozinha',
+    'gastronomia',
+    'sopa',
+    'cebola',
+    'ingrediente',
+    'chef',
+    'forno',
+    'assado',
+    'sobremesa',
+    'molho',
+  ];
+
+  return signals.some((keyword) => text.includes(keyword));
+}
+
 function playlistSubjectScore(playlist: PlaylistAssignmentPlaylist, subject: SubjectSignal): number {
   return subjectSignalScore(playlistText(playlist), subject);
 }
@@ -380,6 +429,14 @@ function scorePlaylist(params: {
       score += 8;
     } else if (normalizeText(playlistText(playlist)).includes('algoritmos')) {
       score -= 4;
+    }
+  }
+
+  if (hasRecipeSignals(sourceText)) {
+    if (isRecipePlaylist(playlist)) {
+      score += 10;
+    } else if (playlistSubjectScore(playlist, 'programming') > 0 || isDatabasePlaylist(playlist)) {
+      score -= 5;
     }
   }
 
@@ -503,8 +560,22 @@ export function assignPlaylist(params: {
       hasCalculusOneSignals(sourceText) &&
       !!calculusOneCandidate &&
       calculusOneCandidate.score >= 6;
+    const recipeCandidate = scoredCandidates.find((candidate) => {
+      const playlist = playlists.find((item) => item.id === candidate.playlistId);
+      return !!playlist && isRecipePlaylist(playlist);
+    }) ?? null;
+    const strongRecipeMatch =
+      signals.culinary >= 1 &&
+      hasRecipeSignals(sourceText) &&
+      !!recipeCandidate &&
+      recipeCandidate.score >= 6;
 
-    if (strongCalculusOneMatch) {
+    if (strongRecipeMatch) {
+      assignedPlaylistId = recipeCandidate.playlistId;
+      score = recipeCandidate.score;
+      reason = 'Deterministic scoring selected recipe playlist for culinary signals.';
+      decisionSource = 'deterministic';
+    } else if (strongCalculusOneMatch) {
       assignedPlaylistId = calculusOneCandidate.playlistId;
       score = calculusOneCandidate.score;
       reason = 'Deterministic scoring selected Análise Matemática I for Cálculo 1 signals.';

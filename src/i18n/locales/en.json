@@ -425,6 +425,9 @@
       "label": "Detected language",
       "pending": "Detecting automatically"
     },
+    "category": {
+      "label": "Detected category"
+    },
     "stage": {
       "label": "Current stage",
       "values": {
