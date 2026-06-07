@@ -11,6 +11,7 @@ const categories: LegacyFastCategory[] = [
   { id: 'cat-cultura', name: 'Cultura', slug: 'cultura' },
   { id: 'cat-design', name: 'Design', slug: 'design' },
   { id: 'cat-educacao', name: 'Educacao', slug: 'educacao' },
+  { id: 'cat-matematica', name: 'Matematica', slug: 'matematica' },
   { id: 'cat-musica', name: 'Musica', slug: 'musica' },
   { id: 'cat-receitas', name: 'Receitas', slug: 'receitas-tradicionais' },
   { id: 'cat-unclassified', name: 'Nao Classificados', slug: 'nao-classificados' },
@@ -60,7 +61,7 @@ describe('legacy fast enrichment helpers', () => {
     });
 
     expect(semanticTags).toEqual(expect.arrayContaining(['banco de dados', 'educação']));
-    expect(selected?.id).toBe('cat-educacao');
+    expect(selected?.id).toBe('cat-tech');
   });
 
   it('detects art history videos from movement and painting terms', () => {
@@ -133,5 +134,95 @@ describe('legacy fast enrichment helpers', () => {
 
     expect(semanticTags).toContain('música');
     expect(selected?.id).toBe('cat-musica');
+  });
+
+  it('does not classify general software videos with hyphenated titles as musica', () => {
+    const semanticTags = deriveTags({
+      title: 'React Hooks - Guia Completo para Iniciantes',
+      description: 'Aprenda estado e efeitos no React de forma pratica.',
+      channelName: 'Dev Aula',
+      language: 'pt',
+    });
+
+    const selected = pickCategory(categories, {
+      currentCategoryId: 'cat-educacao',
+      title: 'React Hooks - Guia Completo para Iniciantes',
+      description: 'Aprenda estado e efeitos no React de forma pratica.',
+      channelName: 'Dev Aula',
+      semanticTags,
+    });
+
+    expect(selected?.id).not.toBe('cat-musica');
+    expect(selected?.id).toBe('cat-tech');
+  });
+
+  it('accepts musica semantic tag without accent and still routes to musica category', () => {
+    const selected = pickCategory(categories, {
+      currentCategoryId: 'cat-educacao',
+      title: 'Jam Session ao vivo',
+      description: 'Improviso musical com banda independente.',
+      channelName: 'Canal de Musica',
+      semanticTags: ['musica', 'live'],
+    });
+
+    expect(selected?.id).toBe('cat-musica');
+  });
+
+  it('routes Paola Carosella culinary classes to receitas category', () => {
+    const semanticTags = deriveTags({
+      title: 'Uma aula sobre Mandioca com Thiago Castanho!',
+      description: 'Tecnicas de cozinha e preparo de ingredientes.',
+      channelName: 'Paola Carosella',
+      language: 'pt',
+    });
+
+    const selected = pickCategory(categories, {
+      currentCategoryId: 'cat-educacao',
+      title: 'Uma aula sobre Mandioca com Thiago Castanho!',
+      description: 'Tecnicas de cozinha e preparo de ingredientes.',
+      channelName: 'Paola Carosella',
+      semanticTags,
+    });
+
+    expect(semanticTags).toContain('receitas');
+    expect(selected?.id).toBe('cat-receitas');
+  });
+
+  it('routes strong software infrastructure content to tech category', () => {
+    const semanticTags = deriveTags({
+      title: 'Install Coolify on Linux • 2025',
+      description: 'Deploy apps and configure cloud servers.',
+      channelName: 'Airoflare',
+      language: 'en',
+    });
+
+    const selected = pickCategory(categories, {
+      currentCategoryId: 'cat-educacao',
+      title: 'Install Coolify on Linux • 2025',
+      description: 'Deploy apps and configure cloud servers.',
+      channelName: 'Airoflare',
+      semanticTags,
+    });
+
+    expect(selected?.id).toBe('cat-tech');
+  });
+
+  it('routes strong calculus content to matematica category', () => {
+    const semanticTags = deriveTags({
+      title: 'METODO DOS MULTIPLICADORES DE LAGRANGE - AULA 3',
+      description: 'Problemas de calculo com restricoes.',
+      channelName: 'Prof. Matematica',
+      language: 'pt',
+    });
+
+    const selected = pickCategory(categories, {
+      currentCategoryId: 'cat-educacao',
+      title: 'METODO DOS MULTIPLICADORES DE LAGRANGE - AULA 3',
+      description: 'Problemas de calculo com restricoes.',
+      channelName: 'Prof. Matematica',
+      semanticTags,
+    });
+
+    expect(selected?.id).toBe('cat-matematica');
   });
 });

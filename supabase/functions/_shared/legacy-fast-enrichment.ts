@@ -56,7 +56,7 @@ export function deriveTags(params: {
     ['Odoo', ['odoo', 'erp', 'human resources', 'employees', 'expenses', 'fleet', 'time off']],
     ['educação', ['aula', 'curso', 'aprenda', 'tutorial', 'facodi', 'ensino']],
     ['música', ['musica', 'música', 'music', 'song', 'songs', 'spotify', 'album', 'lyrics', 'letra', 'cantor', 'banda', 'clipe', 'videoclipe']],
-    ['receitas', ['receita', 'receitas', 'culinaria', 'cozinha', 'gastronomia', 'sopa', 'cebola', 'chef', 'ingredientes', 'forno', 'assado', 'sobremesa']],
+    ['receitas', ['receita', 'receitas', 'culinaria', 'cozinha', 'gastronomia', 'sopa', 'cebola', 'chef', 'ingredientes', 'forno', 'assado', 'sobremesa', 'mandioca', 'pao', 'massa', 'paola carosella']],
   ];
 
   for (const [tag, keywords] of signals) {
@@ -64,6 +64,20 @@ export function deriveTags(params: {
   }
 
   return [...tags].slice(0, 8);
+}
+
+function hasSemanticTag(semanticTags: string[], expected: string) {
+  const normalizedExpected = normalizeText(expected);
+  return semanticTags.some((tag) => normalizeText(tag) === normalizedExpected);
+}
+
+function countKeywordMatches(source: string, keywords: string[]) {
+  return keywords.reduce((count, keyword) => count + (source.includes(keyword) ? 1 : 0), 0);
+}
+
+function findCategoryBySlug(categories: LegacyFastCategory[], slug: string) {
+  const normalizedSlug = normalizeText(slug);
+  return categories.find((category) => normalizeText(category.slug) === normalizedSlug) ?? null;
 }
 
 function scoreCategory(category: LegacyFastCategory, source: string, semanticTags: string[]) {
@@ -143,7 +157,7 @@ export function pickCategory(categories: LegacyFastCategory[], params: {
   ].filter(Boolean).join(' '));
 
   const hasRecipeSignals =
-    params.semanticTags.some((tag) => normalizeText(tag) === 'receitas') ||
+    hasSemanticTag(params.semanticTags, 'receitas') ||
     [
       'receita',
       'receitas',
@@ -156,43 +170,109 @@ export function pickCategory(categories: LegacyFastCategory[], params: {
       'ingredientes',
       'forno',
       'assado',
+      'mandioca',
+      'pao',
+      'massa',
+      'paola carosella',
     ].some((keyword) => source.includes(keyword));
 
   if (hasRecipeSignals) {
-    const recipeCategory = categories.find((category) => {
-      const slug = normalizeText(category.slug);
-      return slug === 'receitas-tradicionais' || slug === 'receitas';
-    });
+    const recipeCategory = findCategoryBySlug(categories, 'receitas-tradicionais')
+      ?? findCategoryBySlug(categories, 'receitas');
     if (recipeCategory) return recipeCategory;
   }
 
+  const musicKeywordsStrong = [
+    'official video',
+    'oficial video',
+    'music video',
+    'vevo',
+    'spotify',
+    'lyrics',
+    'letra oficial',
+  ];
+  const musicKeywordsGeneral = [
+    'musica',
+    'music',
+    'song',
+    'songs',
+    'album',
+    'cantor',
+    'banda',
+    'clipe',
+    'videoclipe',
+    'ao vivo',
+    'live session',
+  ];
+  const musicTagPresent = hasSemanticTag(params.semanticTags, 'música') || hasSemanticTag(params.semanticTags, 'musica');
+  const strongMusicMatches = countKeywordMatches(source, musicKeywordsStrong);
+  const generalMusicMatches = countKeywordMatches(source, musicKeywordsGeneral);
   const hasMusicSignals =
-    params.semanticTags.some((tag) => normalizeText(tag) === 'musica') ||
-    [
-      'musica',
-      'music',
-      'song',
-      'songs',
-      'spotify',
-      'album',
-      'lyrics',
-      'letra',
-      'cantor',
-      'banda',
-      'clipe',
-      'videoclipe',
-      'oficial video',
-      'official video',
-    ].some((keyword) => source.includes(keyword));
+    musicTagPresent ||
+    strongMusicMatches >= 1 ||
+    generalMusicMatches >= 2;
 
   if (hasMusicSignals) {
-    const musicCategory = categories.find((category) => normalizeText(category.slug) === 'musica');
+    const musicCategory = findCategoryBySlug(categories, 'musica');
     if (musicCategory) return musicCategory;
   }
 
-  if (params.semanticTags.some((tag) => normalizeText(tag) === 'historia da arte')) {
-    const designCategory = categories.find((category) => normalizeText(category.slug) === 'design');
-    const cultureCategory = categories.find((category) => normalizeText(category.slug) === 'cultura');
+  const techKeywordsStrong = [
+    'sql',
+    'python',
+    'javascript',
+    'typescript',
+    'coolify',
+    'linux',
+    'system design',
+  ];
+  const techKeywordsGeneral = [
+    'programador',
+    'programacao',
+    'programming',
+    'deploy',
+    'deployment',
+    'github',
+    'server',
+    'cloud',
+    'database',
+    'banco de dados',
+  ];
+  const techTagPresent = hasSemanticTag(params.semanticTags, 'programação')
+    || hasSemanticTag(params.semanticTags, 'programacao')
+    || hasSemanticTag(params.semanticTags, 'banco de dados')
+    || hasSemanticTag(params.semanticTags, 'odoo');
+  const strongTechMatches = countKeywordMatches(source, techKeywordsStrong);
+  const generalTechMatches = countKeywordMatches(source, techKeywordsGeneral);
+  const hasTechSignals = techTagPresent || strongTechMatches >= 1 || generalTechMatches >= 2;
+
+  if (hasTechSignals) {
+    const techCategory = findCategoryBySlug(categories, 'tech');
+    if (techCategory) return techCategory;
+  }
+
+  const mathKeywordsStrong = [
+    'calculo',
+    'integral',
+    'derivada',
+    'lagrange',
+    'limite',
+    'equacao',
+    'matematica',
+  ];
+  const mathTagPresent = hasSemanticTag(params.semanticTags, 'matemática')
+    || hasSemanticTag(params.semanticTags, 'matematica');
+  const strongMathMatches = countKeywordMatches(source, mathKeywordsStrong);
+  const hasMathSignals = mathTagPresent || strongMathMatches >= 1;
+
+  if (hasMathSignals) {
+    const mathCategory = findCategoryBySlug(categories, 'matematica');
+    if (mathCategory) return mathCategory;
+  }
+
+  if (hasSemanticTag(params.semanticTags, 'história da arte') || hasSemanticTag(params.semanticTags, 'historia da arte')) {
+    const designCategory = findCategoryBySlug(categories, 'design');
+    const cultureCategory = findCategoryBySlug(categories, 'cultura');
     if (designCategory) return designCategory;
     if (cultureCategory) return cultureCategory;
   }
@@ -206,7 +286,7 @@ export function pickCategory(categories: LegacyFastCategory[], params: {
 
   if (best.category && best.score >= 6) return best.category;
 
-  return categories.find((category) => normalizeText(category.slug) === 'educacao')
+  return findCategoryBySlug(categories, 'educacao')
     ?? unclassifiedCategory
     ?? categories[0]
     ?? null;
