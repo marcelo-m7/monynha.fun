@@ -13,6 +13,7 @@ import {
   useMarkNotificationAsRead,
   useNotifications,
 } from '@/features/notifications';
+import { useMetaTags } from '@/shared/hooks/useMetaTags';
 import { useTranslation } from 'react-i18next';
 
 const PAGE_LIMIT = 100;
@@ -63,6 +64,11 @@ const Notifications = () => {
   const { t } = useTranslation();
   const { user, loading: authLoading } = useAuth();
   const navigate = useNavigate();
+
+  useMetaTags({
+    title: `${t('notifications.title')} | Tube O2`,
+    description: t('notifications.description'),
+  });
 
   const { data: notifications = [], isLoading } = useNotifications(PAGE_LIMIT);
   const markNotificationAsRead = useMarkNotificationAsRead();

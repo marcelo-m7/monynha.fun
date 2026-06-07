@@ -19,11 +19,17 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { MainLayout } from '@/components/layout/MainLayout';
 import { VideoPreviewCard } from '@/features/submit/components/VideoPreviewCard';
 import { PageHero } from '@/components/showcase';
+import { useMetaTags } from '@/shared/hooks/useMetaTags';
 
 export default function Submit() {
   const { t } = useTranslation();
   const location = useLocation();
   const navigate = useNavigate();
+
+  useMetaTags({
+    title: `${t('submit.title')} | Tube O2`,
+    description: t('submit.description'),
+  });
   
   const { user, loading: authLoading } = useAuth();
   const { data: categories } = useCategories();

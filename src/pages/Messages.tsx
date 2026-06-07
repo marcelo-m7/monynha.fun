@@ -17,6 +17,7 @@ import {
   useSendDirectMessage,
 } from '@/features/messages';
 import { useCurrentUserProfile } from '@/features/profile/queries/useProfile';
+import { useMetaTags } from '@/shared/hooks/useMetaTags';
 import { useTranslation } from 'react-i18next';
 
 const MAX_MESSAGE_LENGTH = 1000;
@@ -25,6 +26,12 @@ const Messages = () => {
   const { t } = useTranslation();
   const { user, loading: authLoading } = useAuth();
   const navigate = useNavigate();
+
+  useMetaTags({
+    title: `${t('messages.title')} | Tube O2`,
+    description: t('messages.description'),
+  });
+
   const [searchParams, setSearchParams] = useSearchParams();
   const selectedUsername = searchParams.get('with') || undefined;
 

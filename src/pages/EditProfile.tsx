@@ -18,6 +18,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { AvatarUpload } from '@/components/profile/AvatarUpload';
 import { SocialAccountsManager } from '@/components/profile/SocialAccountsManager';
+import { useMetaTags } from '@/shared/hooks/useMetaTags';
 
 const editProfileSchema = z.object({
   display_name: z.string().min(3, 'profile.edit.error.displayNameMinLength').max(50, 'profile.edit.error.displayNameMaxLength'),
@@ -31,6 +32,12 @@ type EditProfileFormValues = z.infer<typeof editProfileSchema>;
 export default function EditProfile() {
   const { t } = useTranslation();
   const navigate = useNavigate();
+
+  useMetaTags({
+    title: `${t('profile.edit.title')} | Tube O2`,
+    description: t('profile.edit.description'),
+  });
+
   const { user, loading: authLoading } = useAuth();
   const { data: profile, isLoading: profileLoading, isError: profileLoadError } = useProfileById(user?.id);
   const updateProfileMutation = useUpdateProfile();

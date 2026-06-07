@@ -16,6 +16,7 @@ import { useCoursePlaylistSummary } from '@/features/courses/queries/useCoursePl
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { PageHero } from '@/components/showcase';
+import { useMetaTags } from '@/shared/hooks/useMetaTags';
 
 function extractSemesterLabel(name: string): string | null {
   const match = name.match(/(\d+[ºo]\s*Ano\s*\d+[ºo]\s*Semestre)/i);
@@ -29,6 +30,12 @@ function extractSemesterLabel(name: string): string | null {
 const Playlists = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
+
+  useMetaTags({
+    title: `${t('playlists.title')} | Tube O2`,
+    description: t('playlists.description'),
+  });
+
   const [searchParams, setSearchParams] = useSearchParams();
   const { user } = useAuth();
 

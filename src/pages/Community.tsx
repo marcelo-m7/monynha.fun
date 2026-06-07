@@ -7,10 +7,17 @@ import { useNavigate, Link } from 'react-router-dom';
 import { useContributorCount, useProfiles } from '@/features/profile/queries/useProfile';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { useMetaTags } from '@/shared/hooks/useMetaTags';
 
 const Community = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
+
+  useMetaTags({
+    title: `${t('community.title')} | Tube O2`,
+    description: t('community.description'),
+  });
+
   const { data: contributorCount, isLoading: contributorCountLoading } = useContributorCount();
   const { data: profiles, isLoading: profilesLoading, isError: profilesError } = useProfiles();
 
@@ -77,7 +84,7 @@ const Community = () => {
                 className="group flex items-center gap-4 p-4 bg-card border border-border rounded-xl shadow-sm transition-[box-shadow,transform] duration-150 motion-safe:hover:scale-[1.01] hover:shadow-md"
               >
                 <Avatar className="w-12 h-12 border-2 border-primary/50">
-                  <AvatarImage src={profile.avatar_url || undefined} alt={profile.display_name || profile.username || 'User'} />
+                  <AvatarImage src={profile.avatar_url || undefined} alt={profile.display_name || profile.username || t('common.anonymous')} />
                   <AvatarFallback className="bg-primary/20 text-primary text-xl font-semibold">
                     {profile.display_name ? profile.display_name[0].toUpperCase() : (profile.username ? profile.username[0].toUpperCase() : <UserIcon className="w-6 h-6" />)}
                   </AvatarFallback>

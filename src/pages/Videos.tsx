@@ -19,9 +19,16 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Search, X } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useTranslation } from 'react-i18next';
+import { useMetaTags } from '@/shared/hooks/useMetaTags';
 
 const Videos = () => {
   const { t } = useTranslation();
+
+  useMetaTags({
+    title: `${t('videos.title')} | Tube O2`,
+    description: t('videos.description'),
+  });
+
   const [searchParams, setSearchParams] = useSearchParams();
 
   const initialSearchQuery = searchParams.get('query') || '';
