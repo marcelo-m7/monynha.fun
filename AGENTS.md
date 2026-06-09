@@ -6,8 +6,8 @@ This file is the fast-start guide for AI coding agents in this repository. Keep 
 
 - Product: Tube O2, the cultural video curation platform.
 - Stack: React 18, TypeScript, Vite, Tailwind, shadcn/ui, Supabase, TanStack Query.
-- Work from the frontend root: [src/tube02-frontend](.).
-- Source of truth: [README.md](README.md), [docs/CODEBASE.md](docs/CODEBASE.md), [CONTRIBUTING.md](CONTRIBUTING.md), and [AI_RULES.md](AI_RULES.md).
+- Work from the repository root: [README.md](README.md).
+- Source of truth: [README.md](README.md), [AI_RULES.md](AI_RULES.md), and the scoped rules in [.github/instructions](.github/instructions).
 - Supabase project ref: `wvkjainfwsyiyfcmbtid`.
 
 ## Quick Start
@@ -65,6 +65,7 @@ There is currently no `backend/` FastAPI service in this tree. Backend work live
 
 - Frontend code rules: [.github/instructions/frontend.instructions.md](.github/instructions/frontend.instructions.md)
 - Supabase/backend code rules: [.github/instructions/backend.instructions.md](.github/instructions/backend.instructions.md)
+- Docs, branding, and SEO rules: [.github/instructions/content-seo.instructions.md](.github/instructions/content-seo.instructions.md)
 - i18n rules (keep locales aligned): [.github/instructions/i18n.instructions.md](.github/instructions/i18n.instructions.md)
 - Test rules: [.github/instructions/testing.instructions.md](.github/instructions/testing.instructions.md)
 
@@ -81,8 +82,6 @@ Use these boundaries when deciding where code belongs:
 - `supabase/functions/*`: Supabase Edge Functions and shared Deno helpers
 - `supabase/migrations/*`: Postgres schema, RLS, functions, triggers, and data fixes
 - `server/*`: Bun runtime server for serving `dist/` and injecting dynamic OG/Twitter tags
-
-Reference architecture details in [docs/CODEBASE.md](docs/CODEBASE.md).
 
 ## Frontend Guardrails
 
@@ -192,12 +191,11 @@ All global context providers (QueryClient, Auth, i18n, ThemeProvider, Helmet, To
 - SSR preview server: [server/server.ts](server/server.ts)
 - Supabase functions: [supabase/functions](supabase/functions), especially [supabase/functions/enrich-video/index.ts](supabase/functions/enrich-video/index.ts) and [supabase/functions/import-youtube-playlist/index.ts](supabase/functions/import-youtube-playlist/index.ts)
 - Supabase project config and Auth templates: [supabase/config.toml](supabase/config.toml) and [supabase/email-templates](supabase/email-templates)
-- Supabase contract notes: [docs/features/supabase-db-02-03-04.md](docs/features/supabase-db-02-03-04.md)
 
 ## Generated Artifacts
 
 - Do not edit [dist](dist) by hand; it is build output.
-- The canonical generic social preview image is [public/placeholder.png](public/placeholder.png). Documentation copies may be refreshed from it when needed.
+- The default social preview used by metadata is [public/social-preview-default.png](public/social-preview-default.png). Keep [public/placeholder.png](public/placeholder.png) for generic documentation or fallback usage unless you intentionally update the metadata layer too.
 
 ## Where To Look First
 
@@ -225,8 +223,14 @@ When editing copy, metadata, URLs, docs, or SEO files, prefer:
 ## Source Of Truth Docs
 
 - Project overview: [README.md](README.md)
-- Architecture and conventions: [docs/CODEBASE.md](docs/CODEBASE.md)
-- Version history: [docs/CHANGELOG.md](docs/CHANGELOG.md)
-- Work backlog and status notes: [docs/TODO.md](docs/TODO.md)
-- React Router migration flags: [docs/REACT_ROUTER_V7_FLAGS.md](docs/REACT_ROUTER_V7_FLAGS.md)
+- Frontend architecture and file-placement rules: [.github/instructions/frontend.instructions.md](.github/instructions/frontend.instructions.md)
+- Backend and Supabase rules: [.github/instructions/backend.instructions.md](.github/instructions/backend.instructions.md)
+- Docs, branding, and SEO rules: [.github/instructions/content-seo.instructions.md](.github/instructions/content-seo.instructions.md)
+- Testing rules: [.github/instructions/testing.instructions.md](.github/instructions/testing.instructions.md)
+- Design direction: [docs/visual-elevation.md](docs/visual-elevation.md)
 - Team coding rules: [AI_RULES.md](AI_RULES.md)
+
+## Instruction Maintenance
+
+- Use `/chronicle improve` to refine [AGENTS.md](AGENTS.md) or scoped instructions only after session summaries exist and a pattern has repeated.
+- If chronicle history is empty, keep guidance lean and prefer local code/doc evidence over speculative workflow rules.

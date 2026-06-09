@@ -5,7 +5,7 @@ applyTo: "src/**/*.{ts,tsx}"
 ---
 # Frontend Architecture Rules
 
-- Keep Feature-Sliced boundaries from [docs/CODEBASE.md](../../docs/CODEBASE.md): entities for domain API/types/keys, features for orchestration hooks, components for UI, pages for routes, shared for cross-domain utilities.
+- Keep Feature-Sliced boundaries used in this repo: entities for domain API/types/keys, features for orchestration hooks, components for UI, pages for routes, shared for cross-domain utilities.
 - Keep server data access in feature query/mutation hooks and domain API modules; do not fetch directly inside presentational components.
 - Reuse shared validation from [src/shared/lib/validation.ts](../../src/shared/lib/validation.ts); do not duplicate email/password/username schemas.
 - Keep Supabase calls in entity API files and invoke edge functions through [src/shared/api/supabase/edgeFunctions.ts](../../src/shared/api/supabase/edgeFunctions.ts).
