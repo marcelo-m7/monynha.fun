@@ -43,6 +43,9 @@ Supabase/backend commands:
 | Apply local migrations | `supabase migration up` |
 | Push Supabase config | `pnpx supabase config push --project-ref wvkjainfwsyiyfcmbtid` |
 
+- Tool availability can vary by machine. Before backend/database work, quickly verify `command -v supabase` and `command -v rg`.
+- If `supabase` CLI is unavailable, prefer Supabase MCP tools for inspection/audits (`list_tables`, `get_advisors`, `get_logs`, `execute_sql`) and avoid guessing schema state from stale docs.
+
 Never run `supabase config push --yes` for this project. Inspect every prompt and accept only the intended diff. Local [supabase/config.toml](supabase/config.toml) must preserve remote API schemas/search paths, Auth URLs/redirects/MFA/email settings, and Storage settings before pushing template changes.
 
 There is currently no `backend/` FastAPI service in this tree. Backend work lives in [supabase/functions](supabase/functions), [supabase/migrations](supabase/migrations), and the Bun SSR preview server in [server/server.ts](server/server.ts).
@@ -101,6 +104,18 @@ Use these boundaries when deciding where code belongs:
 - Edge Functions that are user-triggered should keep `verify_jwt = true`, use shared CORS/JSON helpers from [supabase/functions/_shared/http.ts](supabase/functions/_shared/http.ts), and apply shared rate limiting after auth but before expensive work.
 - Do not use wildcard CORS on deployed functions unless the task explicitly calls for a public unauthenticated endpoint.
 - In Vitest, avoid opening Supabase realtime sockets. Guard realtime hooks with `import.meta.env.MODE === 'test'` or mock the client.
+
+## Database Workflow (Agent)
+
+Use this sequence for Supabase/Postgres tasks to reduce risk and rework:
+
+1. Discover current state first (`list_tables` or local schema inspection), then propose changes.
+2. Run advisors before and after non-trivial DB changes: `get_advisors(type: security)` and `get_advisors(type: performance)`.
+3. Treat advisor warnings as actionable unless intentionally accepted and documented in PR notes.
+4. Prefer explicit indexes for frequently joined/filtering foreign keys; advisor output currently reports missing FK covering indexes in both `public` and `facodi` schemas.
+5. In RLS policies, avoid per-row `auth.*` re-evaluation when possible; use `(select auth.uid())` style patterns to improve execution plans.
+6. For SQL functions, set a fixed `search_path` and avoid exposing `SECURITY DEFINER` functions to `anon` unless explicitly required.
+7. After schema/policy/function updates, verify behavior with targeted queries/tests instead of only relying on migration success.
 
 ## Non-Negotiable Conventions
 
