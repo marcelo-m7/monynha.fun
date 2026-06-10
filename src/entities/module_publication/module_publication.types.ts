@@ -52,6 +52,36 @@ export type ModulePublicationStatusResponse = {
   jobs: ModulePublicationStatusJob[];
 };
 
+export type ModulePublicationCandidatePlaylist = {
+  id: string;
+  name: string;
+  course_code: string | null;
+  unit_code: string | null;
+  video_count: number | null;
+  review_status: string | null;
+};
+
+export type ModulePublicationCandidate = {
+  module_id: string;
+  module_slug: string;
+  module_title: string;
+  module_description: string | null;
+  module_status: string;
+  module_updated_at: string | null;
+  playlist: ModulePublicationCandidatePlaylist | null;
+  latest_job: ModulePublicationStatusJob | null;
+};
+
+export type ListModulePublicationCandidatesParams = {
+  search?: string;
+  limit?: number;
+};
+
+export type ListModulePublicationCandidatesResponse = {
+  ok: boolean;
+  items: ModulePublicationCandidate[];
+};
+
 export function isTerminalPublishJobStatus(status: string | null | undefined) {
   return status === 'succeeded' || status === 'failed' || status === 'cancelled';
 }

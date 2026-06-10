@@ -31,6 +31,11 @@ Pipeline steps:
   - Validates bearer token and applies rate limiting.
   - Returns publication jobs for the authenticated requester (by module or by job).
 
+- `supabase/functions/list-module-publication-candidates-v2/index.ts`
+  - User-triggered candidate endpoint for editorial use.
+  - Validates bearer token, enforces editor/admin role, and applies rate limiting.
+  - Maps legacy FACODI playlists to Tube modules and includes the latest requester job hint per module.
+
 ## Required Secrets
 
 Set these secrets in Supabase for deployed functions:

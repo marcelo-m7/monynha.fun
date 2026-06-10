@@ -59,6 +59,11 @@ describe('query key factories', () => {
 
   it('creates stable module publication keys', () => {
     expect(modulePublicationKeys.enqueue()).toEqual(['module-publications', 'enqueue']);
+    expect(modulePublicationKeys.candidatesList({ search: 'historia', limit: 12 })).toEqual([
+      'module-publications',
+      'candidates-list',
+      { search: 'historia', limit: 12 },
+    ]);
     expect(modulePublicationKeys.detail('job-1')).toEqual([
       'module-publications',
       'detail',

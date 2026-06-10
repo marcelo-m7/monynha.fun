@@ -15,6 +15,7 @@ export function useEnqueueModulePublication() {
     mutationFn: enqueueModulePublication,
     onSuccess: (job) => {
       queryClient.invalidateQueries({ queryKey: modulePublicationKeys.all });
+      queryClient.invalidateQueries({ queryKey: modulePublicationKeys.candidatesLists() });
       queryClient.invalidateQueries({ queryKey: modulePublicationKeys.statusLists() });
       queryClient.setQueryData(modulePublicationKeys.detail(job.job_id), job);
     },

@@ -2,6 +2,9 @@ import { getEdgeFunctionErrorDetails, invokeEdgeFunction } from '@/shared/api/su
 import type {
   EnqueueModulePublicationParams,
   EnqueueModulePublicationResponse,
+  ListModulePublicationCandidatesParams,
+  ListModulePublicationCandidatesResponse,
+  ModulePublicationCandidate,
   ModulePublicationJob,
   ModulePublicationStatusJob,
   ModulePublicationStatusQueryParams,
@@ -66,4 +69,41 @@ export async function getModulePublicationStatus(
   }
 
   return data.jobs;
+}
+
+type CandidatesEdgeResponse = {
+  ok: boolean;
+  candidates?: ModulePublicationCandidate[];
+};
+
+export async function listModulePublicationCandidates(
+  params: ListModulePublicationCandidatesParams = {},
+): Promise<ListModulePublicationCandidatesResponse> {
+  const { data, error } = await invokeEdgeFunction<CandidatesEdgeResponse>(
+    'list-module-publication-candidates-v2',
+    {
+      body: {
+        search: params.search,
+        limit: params.limit ?? 20,
+      },
+      headers: { 'Content-Type': 'application/json' },
+    },
+  );
+
+  if (error) {
+    const details = await getEdgeFunctionErrorDetails(error);
+    const message = details.requestId
+      ? `${details.message} (request ${details.requestId})`
+      : details.message;
+    throw new Error(message);
+  }
+
+  if (!data?.ok || !Array.isArray(data.candidates)) {
+    throw new Error('Invalid publication candidates response');
+  }
+
+  return {
+    ok: true,
+    items: data.candidates,
+  };
 }

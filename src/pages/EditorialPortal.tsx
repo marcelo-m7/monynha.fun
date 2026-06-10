@@ -10,20 +10,42 @@ import { PlaylistCard } from '@/components/playlist/PlaylistCard';
 import { VideoDurationBadge } from '@/components/video/VideoDurationBadge';
 import { getVideoRoute } from '@/entities/video/video.routes';
 import { useAuth } from '@/features/auth/useAuth';
+import { useEnqueueModulePublication } from '@/features/editorial-board/queries/useEnqueueModulePublication';
+import { useModulePublicationCandidates } from '@/features/editorial-board/queries/useModulePublicationCandidates';
+import { useModulePublicationStatusByJob } from '@/features/editorial-board/queries/useModulePublicationStatus';
 import { useVideoAnalysisJobs } from '@/features/video-analysis/useVideoAnalysisJob';
 import { usePlaylists } from '@/features/playlists/queries/usePlaylists';
 import { useIsEditor } from '@/features/profile/queries/useProfile';
+import type { ModulePublicationCandidate } from '@/entities/module_publication/module_publication.types';
+import { notify } from '@/shared/lib/notify';
 import { getReliableYouTubeThumbnailUrl } from '@/shared/lib/youtube';
-import { ArrowLeft, ListVideo, Plus, Search } from 'lucide-react';
+import { AlertCircle, ArrowLeft, CheckCircle2, Clock3, ListVideo, Loader2, Plus, RefreshCw, Search } from 'lucide-react';
 
 const EditorialPortal = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const { user, loading: authLoading } = useAuth();
   const { isEditor, isLoading: roleLoading } = useIsEditor();
+  const [query, setQuery] = useState('');
   const { data: playlists, isLoading: playlistsLoading, isError } = usePlaylists();
   const { data: analysisJobs, isLoading: analysisJobsLoading } = useVideoAnalysisJobs({ limit: 6 });
-  const [query, setQuery] = useState('');
+  const {
+    data: publicationCandidates = [],
+    isLoading: publicationCandidatesLoading,
+    refetch: refetchPublicationCandidates,
+  } = useModulePublicationCandidates({
+    search: query || undefined,
+    limit: 12,
+    enabled: isEditor,
+  });
+  const enqueueModulePublicationMutation = useEnqueueModulePublication();
+  const [activePublicationJobId, setActivePublicationJobId] = useState<string | undefined>();
+  const { data: activePublicationJobs = [] } = useModulePublicationStatusByJob(
+    activePublicationJobId,
+    !!activePublicationJobId,
+  );
+
+  const activePublicationJob = activePublicationJobs[0] ?? null;
 
   useEffect(() => {
     if (!authLoading && !user) {
@@ -50,6 +72,47 @@ const EditorialPortal = () => {
     () => (analysisJobs || []).filter((job) => ['pending', 'processing', 'recoverable_error'].includes(job.status)).length,
     [analysisJobs],
   );
+
+  const handleEnqueueModulePublication = async (candidate: ModulePublicationCandidate) => {
+    try {
+      const job = await enqueueModulePublicationMutation.mutateAsync({
+        moduleId: candidate.module_id,
+        payload: {
+          source: 'editorial_portal',
+          playlistId: candidate.playlist?.id ?? null,
+        },
+      });
+
+      setActivePublicationJobId(job.job_id);
+      notify.success(
+        t('editorialPortal.publish.feedback.queued', {
+          defaultValue: 'Publication job enqueued',
+        }),
+        {
+          description: t('editorialPortal.publish.feedback.queuedDescription', {
+            defaultValue: candidate.module_title,
+          }),
+        },
+      );
+      await refetchPublicationCandidates();
+    } catch (error) {
+      notify.error(
+        t('editorialPortal.publish.feedback.error', {
+          defaultValue: 'Could not enqueue publication',
+        }),
+        {
+          description: error instanceof Error ? error.message : t('common.unknownError', { defaultValue: 'Unknown error' }),
+        },
+      );
+    }
+  };
+
+  const getJobStatusBadgeVariant = (status: string | null | undefined) => {
+    if (status === 'succeeded') return 'default';
+    if (status === 'failed' || status === 'cancelled') return 'destructive';
+    if (status === 'retryable_error') return 'secondary';
+    return 'outline';
+  };
 
   if (authLoading || roleLoading || playlistsLoading) {
     return (
@@ -190,6 +253,125 @@ const EditorialPortal = () => {
           ) : (
             <div className="rounded-xl border bg-card p-6 text-sm text-muted-foreground">
               {t('editorialPortal.analysisQueue.empty')}
+            </div>
+          )}
+        </section>
+
+        <section className="space-y-4">
+          <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
+            <div>
+              <h2 className="text-xl font-bold">
+                {t('editorialPortal.publish.title', {
+                  defaultValue: 'Module publication queue',
+                })}
+              </h2>
+              <p className="text-sm text-muted-foreground">
+                {t('editorialPortal.publish.description', {
+                  defaultValue: 'Queue module publication and monitor async job status from the editorial portal.',
+                })}
+              </p>
+            </div>
+            <Button
+              variant="outline"
+              onClick={() => refetchPublicationCandidates()}
+              disabled={publicationCandidatesLoading}
+            >
+              <RefreshCw className="mr-2 h-4 w-4" />
+              {t('editorialPortal.publish.refresh', { defaultValue: 'Refresh jobs' })}
+            </Button>
+          </div>
+
+          {activePublicationJob ? (
+            <div className="rounded-xl border bg-card p-4">
+              <div className="flex flex-wrap items-center gap-3">
+                <Badge variant={getJobStatusBadgeVariant(activePublicationJob.status)}>
+                  {t(`editorialPortal.publish.status.${activePublicationJob.status}`, {
+                    defaultValue: activePublicationJob.status,
+                  })}
+                </Badge>
+                <span className="text-xs text-muted-foreground">
+                  {t('editorialPortal.publish.jobId', { defaultValue: 'Job' })}: {activePublicationJob.id}
+                </span>
+                <span className="text-xs text-muted-foreground">
+                  {t('editorialPortal.publish.attempts', { defaultValue: 'Attempts' })}: {activePublicationJob.attempt_count}/{activePublicationJob.max_attempts}
+                </span>
+              </div>
+              {activePublicationJob.last_error_message ? (
+                <p className="mt-2 text-sm text-destructive">{activePublicationJob.last_error_message}</p>
+              ) : null}
+            </div>
+          ) : null}
+
+          {publicationCandidatesLoading ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {Array.from({ length: 4 }).map((_, index) => (
+                <Skeleton key={index} className="h-40 rounded-xl" />
+              ))}
+            </div>
+          ) : publicationCandidates.length > 0 ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {publicationCandidates.map((candidate) => {
+                const isPendingCurrentModule =
+                  enqueueModulePublicationMutation.isPending &&
+                  enqueueModulePublicationMutation.variables?.moduleId === candidate.module_id;
+
+                return (
+                  <div key={candidate.module_id} className="rounded-xl border bg-card p-4">
+                    <div className="flex items-start justify-between gap-3">
+                      <div>
+                        <p className="text-sm font-semibold leading-snug">{candidate.module_title}</p>
+                        <p className="mt-1 text-xs text-muted-foreground">{candidate.playlist?.name ?? candidate.module_slug}</p>
+                      </div>
+                      {candidate.latest_job ? (
+                        <Badge variant={getJobStatusBadgeVariant(candidate.latest_job.status)}>
+                          {t(`editorialPortal.publish.status.${candidate.latest_job.status}`, {
+                            defaultValue: candidate.latest_job.status,
+                          })}
+                        </Badge>
+                      ) : (
+                        <Badge variant="outline">{t('editorialPortal.publish.neverQueued', { defaultValue: 'Not queued' })}</Badge>
+                      )}
+                    </div>
+
+                    <div className="mt-3 flex flex-wrap gap-2">
+                      {candidate.playlist?.course_code ? <Badge variant="secondary">{candidate.playlist.course_code}</Badge> : null}
+                      {candidate.playlist?.unit_code ? <Badge variant="secondary">{candidate.playlist.unit_code}</Badge> : null}
+                      <Badge variant="outline">
+                        {t('editorialPortal.publish.videoCount', { defaultValue: '{{count}} videos', count: candidate.playlist?.video_count ?? 0 })}
+                      </Badge>
+                    </div>
+
+                    <div className="mt-4 flex items-center justify-between gap-2">
+                      <span className="inline-flex items-center gap-1 text-xs text-muted-foreground">
+                        {candidate.latest_job?.status === 'succeeded' ? (
+                          <CheckCircle2 className="h-3.5 w-3.5" />
+                        ) : candidate.latest_job?.status === 'failed' ? (
+                          <AlertCircle className="h-3.5 w-3.5" />
+                        ) : (
+                          <Clock3 className="h-3.5 w-3.5" />
+                        )}
+                        {candidate.latest_job?.requested_at
+                          ? new Date(candidate.latest_job.requested_at).toLocaleString()
+                          : t('editorialPortal.publish.neverQueued', { defaultValue: 'Not queued yet' })}
+                      </span>
+                      <Button
+                        size="sm"
+                        onClick={() => handleEnqueueModulePublication(candidate)}
+                        disabled={isPendingCurrentModule}
+                      >
+                        {isPendingCurrentModule ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
+                        {t('editorialPortal.publish.enqueue', { defaultValue: 'Enqueue publish' })}
+                      </Button>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          ) : (
+            <div className="rounded-xl border bg-card p-6 text-sm text-muted-foreground">
+              {t('editorialPortal.publish.empty', {
+                defaultValue: 'No module publication candidates found for this filter.',
+              })}
             </div>
           )}
         </section>
