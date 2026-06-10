@@ -64,5 +64,15 @@ describe('query key factories', () => {
       'detail',
       'job-1',
     ]);
+    expect(modulePublicationKeys.byModule('module-1', 5)).toEqual([
+      'module-publications',
+      'status-list',
+      { moduleId: 'module-1', jobId: '', limit: 5 },
+    ]);
+    expect(modulePublicationKeys.byJob('job-1')).toEqual([
+      'module-publications',
+      'status-list',
+      { moduleId: '', jobId: 'job-1', limit: 1 },
+    ]);
   });
 });

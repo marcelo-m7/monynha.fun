@@ -185,6 +185,7 @@ The new publication pipeline is asynchronous and split into two Edge Functions:
 
 - `enqueue-module-publication-v2`: user-triggered enqueue endpoint (JWT-authenticated + rate-limited).
 - `process-publish-jobs-v2`: worker endpoint for scheduled processing (protected by `PUBLISH_WORKER_SECRET`).
+- `get-module-publication-status-v2`: user-triggered status endpoint (JWT-authenticated + rate-limited) for polling jobs by module/job.
 
 Required runtime secrets for this pipeline:
 

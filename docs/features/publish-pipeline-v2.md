@@ -26,6 +26,11 @@ Pipeline steps:
   - Claims jobs via `tube.claim_publish_jobs(...)`.
   - Applies retry/backoff and writes audit events.
 
+- `supabase/functions/get-module-publication-status-v2/index.ts`
+  - User-triggered status endpoint.
+  - Validates bearer token and applies rate limiting.
+  - Returns publication jobs for the authenticated requester (by module or by job).
+
 ## Required Secrets
 
 Set these secrets in Supabase for deployed functions:
