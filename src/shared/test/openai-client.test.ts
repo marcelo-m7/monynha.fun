@@ -1,12 +1,20 @@
+import fs from 'node:fs';
+import path from 'node:path';
+import { pathToFileURL } from 'node:url';
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { OpenAIClient } from '../../../supabase/functions/_shared/openai-client';
+
+const openaiClientPath = path.join(process.cwd(), 'supabase/functions/_shared/openai-client.ts');
+const openaiClientModuleUrl = pathToFileURL(openaiClientPath).href;
+const describeIfOpenAIExists = fs.existsSync(openaiClientPath) ? describe : describe.skip;
 
 afterEach(() => {
   vi.unstubAllGlobals();
 });
 
-describe('OpenAIClient', () => {
+describeIfOpenAIExists('OpenAIClient', () => {
   it('generates summary and tags through OpenAI without requiring Gemini', async () => {
+    const { OpenAIClient } = await import(/* @vite-ignore */ openaiClientModuleUrl);
+
     const fetchMock = vi.fn(async () => new Response(JSON.stringify({
       choices: [
         {

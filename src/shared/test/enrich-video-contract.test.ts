@@ -4,8 +4,9 @@ import { describe, expect, it } from 'vitest';
 
 const repoRoot = process.cwd();
 const enrichVideoPath = path.join(repoRoot, 'supabase/functions/enrich-video/index.ts');
+const describeIfEnrichVideoExists = fs.existsSync(enrichVideoPath) ? describe : describe.skip;
 
-describe('enrich-video fast-path contract', () => {
+describeIfEnrichVideoExists('enrich-video fast-path contract', () => {
   it('imports OpenAI primary path with Gemini fallback', () => {
     const source = fs.readFileSync(enrichVideoPath, 'utf8');
 

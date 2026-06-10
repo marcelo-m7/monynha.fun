@@ -179,6 +179,29 @@ VITE_SUPABASE_PUBLISHABLE_KEY=your_publishable_key_here
 
 Server-only values such as `SUPABASE_SERVICE_ROLE_KEY`, `OPENAI_API_KEY`, `GEMINI_API_KEY`, and `RESEND_API_KEY` belong in Supabase secrets or runtime server env, not in client-exposed `VITE_*` variables. See [`.env.example`](.env.example) for the full local template.
 
+### Publish Pipeline v2 (Module -> FACODI)
+
+The new publication pipeline is asynchronous and split into two Edge Functions:
+
+- `enqueue-module-publication-v2`: user-triggered enqueue endpoint (JWT-authenticated + rate-limited).
+- `process-publish-jobs-v2`: worker endpoint for scheduled processing (protected by `PUBLISH_WORKER_SECRET`).
+
+Required runtime secrets for this pipeline:
+
+```env
+SUPABASE_SERVICE_ROLE_KEY=...
+EDGE_CORS_ORIGIN=https://tube.open2.tech
+PUBLISH_WORKER_SECRET=...
+EDGE_ENQUEUE_RATE_LIMIT_WINDOW_SECONDS=60
+EDGE_ENQUEUE_RATE_LIMIT_MAX_REQUESTS=20
+```
+
+Scheduling recommendation:
+
+- Configure `process-publish-jobs-v2` as a scheduled invocation every 1-2 minutes.
+- Send `x-worker-secret` header with `PUBLISH_WORKER_SECRET`.
+- Use request body `{ "limit": 10 }` (or tuned batch size) to control processing pressure.
+
 ---
 
 ## 📁 How The Code Is Organized
