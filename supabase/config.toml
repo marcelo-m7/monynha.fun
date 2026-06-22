@@ -44,3 +44,33 @@ verify_jwt = true
 
 [functions.mark-top-featured]
 verify_jwt = true
+
+[functions.v2_import_youtube_video]
+verify_jwt = true
+
+[functions.v2_import_youtube_channel]
+verify_jwt = true
+
+[functions.v2_analyze_video]
+verify_jwt = true
+
+[functions.v2_match_video_to_curriculum]
+verify_jwt = true
+
+[functions.v2_generate_playlist]
+verify_jwt = true
+
+[functions.v2_generate_module]
+verify_jwt = true
+
+[functions.v2_generate_course_structure]
+verify_jwt = true
+
+[functions.v2_sync_object_to_odoo]
+verify_jwt = true
+
+[functions.v2_pull_odoo_records]
+verify_jwt = true
+
+[functions.v2_push_odoo_learning_object]
+verify_jwt = true
