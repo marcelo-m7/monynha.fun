@@ -192,7 +192,7 @@ Required runtime secrets for this pipeline:
 
 ```env
 SUPABASE_SERVICE_ROLE_KEY=...
-EDGE_CORS_ORIGIN=https://tube.open2.tech
+EDGE_CORS_ORIGIN=https://tube.open2.tech,http://localhost:8080,http://127.0.0.1:8080
 PUBLISH_WORKER_SECRET=...
 EDGE_ENQUEUE_RATE_LIMIT_WINDOW_SECONDS=60
 EDGE_ENQUEUE_RATE_LIMIT_MAX_REQUESTS=20

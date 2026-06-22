@@ -41,7 +41,7 @@ Pipeline steps:
 Set these secrets in Supabase for deployed functions:
 
 - `SUPABASE_SERVICE_ROLE_KEY`
-- `EDGE_CORS_ORIGIN` (recommended: `https://tube.open2.tech`)
+- `EDGE_CORS_ORIGIN` (comma-separated allowlist, for example `https://tube.open2.tech,http://localhost:8080,http://127.0.0.1:8080`)
 - `PUBLISH_WORKER_SECRET`
 - `EDGE_ENQUEUE_RATE_LIMIT_WINDOW_SECONDS`
 - `EDGE_ENQUEUE_RATE_LIMIT_MAX_REQUESTS`

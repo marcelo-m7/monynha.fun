@@ -12,7 +12,7 @@ if (!supabaseUrl || !serviceRoleKey) {
 }
 
 Deno.serve(async (req) => {
-  const corsHeaders = buildCorsHeaders(corsOrigin);
+  const corsHeaders = buildCorsHeaders(req.headers.get('Origin'), corsOrigin);
 
   if (req.method === 'OPTIONS') {
     return new Response('ok', { headers: corsHeaders });
