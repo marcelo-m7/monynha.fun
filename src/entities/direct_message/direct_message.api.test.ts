@@ -24,14 +24,14 @@ describe('direct message API', () => {
     rpcMock.mockResolvedValue({
       data: [
         {
-          partner_username: 'monynha',
-          partner_display_name: 'Monynha',
+          partner_username: 'test-user',
+          partner_display_name: 'Test User',
           partner_avatar_url: null,
           last_message_id: 'message-1',
           last_message_content: 'Oi!',
           last_message_created_at: '2026-06-05T10:00:00Z',
           last_message_is_read: false,
-          last_message_sender_username: 'monynha',
+          last_message_sender_username: 'test-user',
           unread_count: 2,
         },
       ],
@@ -40,14 +40,14 @@ describe('direct message API', () => {
 
     await expect(listInboxConversations()).resolves.toEqual([
       {
-        partnerUsername: 'monynha',
-        partnerDisplayName: 'Monynha',
+        partnerUsername: 'test-user',
+        partnerDisplayName: 'Test User',
         partnerAvatarUrl: null,
         lastMessageId: 'message-1',
         lastMessageContent: 'Oi!',
         lastMessageCreatedAt: '2026-06-05T10:00:00Z',
         lastMessageIsRead: false,
-        lastMessageSenderUsername: 'monynha',
+        lastMessageSenderUsername: 'test-user',
         unreadCount: 2,
       },
     ]);
@@ -67,24 +67,24 @@ describe('direct message API', () => {
           receiver_display_name: 'Eu',
           receiver_username: 'me',
           sender_avatar_url: null,
-          sender_display_name: 'Monynha',
-          sender_username: 'monynha',
+          sender_display_name: 'Test User',
+          sender_username: 'test-user',
         },
       ],
       error: null,
     });
 
-    const messages = await getConversationByUsername('monynha');
+    const messages = await getConversationByUsername('test-user');
 
     expect(rpcMock).toHaveBeenCalledWith('get_conversation_by_username_secure', {
-      p_other_username: 'monynha',
+      p_other_username: 'test-user',
     });
     expect(messages[0]).toMatchObject({
       id: 'message-1',
       content: 'Vamos curar esse vídeo?',
       isMine: false,
       isRead: false,
-      senderUsername: 'monynha',
+      senderUsername: 'test-user',
     });
   });
 
@@ -97,38 +97,38 @@ describe('direct message API', () => {
           created_at: '2026-06-05T10:01:00Z',
           is_mine: true,
           is_read: false,
-          receiver_username: 'monynha',
+          receiver_username: 'test-user',
           sender_username: 'me',
         },
       ],
       error: null,
     });
 
-    const message = await sendDirectMessageByUsername(' monynha ', '  Olá  ');
+    const message = await sendDirectMessageByUsername(' test-user ', '  Olá  ');
 
     expect(rpcMock).toHaveBeenCalledWith('send_direct_message_by_username_secure', {
-      p_receiver_username: 'monynha',
+      p_receiver_username: 'test-user',
       p_content: 'Olá',
     });
     expect(message).toMatchObject({
       id: 'message-2',
       content: 'Olá',
       isMine: true,
-      receiverUsername: 'monynha',
+      receiverUsername: 'test-user',
     });
   });
 
   it('rejects empty outbound content before calling Supabase', async () => {
-    await expect(sendDirectMessageByUsername('monynha', '   ')).rejects.toThrow('Message content cannot be empty');
+    await expect(sendDirectMessageByUsername('test-user', '   ')).rejects.toThrow('Message content cannot be empty');
     expect(rpcMock).not.toHaveBeenCalled();
   });
 
   it('marks a conversation as read through the secure RPC', async () => {
     rpcMock.mockResolvedValue({ data: 3, error: null });
 
-    await expect(markConversationAsReadByUsername('monynha')).resolves.toBe(3);
+    await expect(markConversationAsReadByUsername('test-user')).resolves.toBe(3);
     expect(rpcMock).toHaveBeenCalledWith('mark_conversation_as_read_by_username_secure', {
-      p_other_username: 'monynha',
+      p_other_username: 'test-user',
     });
   });
 

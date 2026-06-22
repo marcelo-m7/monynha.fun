@@ -17,7 +17,7 @@ const sampleVideo: VideoWithCategory = {
   youtube_id: 'abc123DEF45',
   title: 'Learning React',
   description: 'React basics',
-  channel_name: 'Monynha',
+  channel_name: 'Test Curator',
   duration_seconds: 125,
   favorites_count: 10,
   thumbnail_url: 'https://example.com/thumb.jpg',
@@ -46,7 +46,7 @@ describe('VideoCard', () => {
     const article = screen.getByRole('link', { name: 'Learning React' });
 
     expect(screen.getByText('Learning React')).toBeInTheDocument();
-    expect(screen.getByText('Monynha')).toBeInTheDocument();
+    expect(screen.getByText('Test Curator')).toBeInTheDocument();
     expect(screen.getByText('2:05')).toBeInTheDocument();
     expect(article).toHaveClass('min-h-[320px]');
   });
