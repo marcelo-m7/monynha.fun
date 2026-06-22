@@ -152,10 +152,10 @@ Tag users in comments with autocomplete that actually works. Type `@` and boom â
 
 ```bash
 # Clone the repo
-git clone https://github.com/marcelo-m7/monynha.fun
+git clone https://github.com/marcelo-m7/tube-o2
 
 # Go into the folder
-cd monynha.fun
+cd tube-o2
 
 # Install dependencies
 pnpm install

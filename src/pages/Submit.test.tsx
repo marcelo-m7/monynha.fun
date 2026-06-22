@@ -82,7 +82,7 @@ describe('Submit page', () => {
       metadata: {
         videoId: 'abc123DEF45',
         title: 'Learning React',
-        channelName: 'Monynha',
+        channelName: 'Test Curator',
         thumbnailUrl: 'https://example.com/thumb.jpg',
         description: 'React basics',
       },
@@ -110,7 +110,7 @@ describe('Submit page', () => {
       metadata: {
         videoId: 'abc123DEF45',
         title: 'Learning React',
-        channelName: 'Monynha',
+        channelName: 'Test Curator',
         thumbnailUrl: 'https://example.com/thumb.jpg',
         description: 'React basics',
       },

@@ -258,7 +258,8 @@ function tokenOverlapScore(left: string | null | undefined, right: string | null
 }
 
 function meaningfulSemanticTags(tags: string[]): string[] {
-  const placeholderTags = new Set(['monynha', 'fun', 'ia', 'curadoria', 'youtube', 'und']);
+  // Fallback tags to filter out (low-signal or placeholder values)
+  const placeholderTags = new Set(['ia', 'curadoria', 'youtube', 'und', 'general', 'featured', 'trending']);
   return tags
     .map((tag) => tag.trim())
     .filter((tag) => tag.length > 0 && !placeholderTags.has(normalizeText(tag)));

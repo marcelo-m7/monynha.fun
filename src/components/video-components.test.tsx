@@ -18,7 +18,7 @@ const sampleVideo: VideoWithCategory = {
   youtube_id: 'abc123DEF45',
   title: 'Learning React',
   description: 'React basics',
-  channel_name: 'Monynha',
+  channel_name: 'Test Curator',
   duration_seconds: 125,
   enrichment: {
     id: 'enrichment-1',
@@ -58,7 +58,7 @@ describe('video components', () => {
     renderWithProviders(<VideoCard video={sampleVideo} />);
 
     expect(screen.getByText('Learning React')).toBeInTheDocument();
-    expect(screen.getByText('Monynha')).toBeInTheDocument();
+    expect(screen.getByText('Test Curator')).toBeInTheDocument();
     expect(screen.getByText('2:05')).toBeInTheDocument();
     expect(screen.getByText('react')).toBeInTheDocument();
   });
