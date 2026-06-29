@@ -8,12 +8,11 @@ ARG VITE_SUPABASE_URL
 
 WORKDIR /app
 
-# Copy package.json and bun.lockb first to leverage Docker cache
+# Copy package.json and bun.lock first to leverage Docker cache
 COPY package.json bun.lock ./
 
-# Install dependencies
-# Note: Not using --frozen-lockfile to allow Bun to regenerate lockfile in compatible format
-RUN bun install || bun install --no-save
+# Install dependencies from the committed Bun lockfile
+RUN bun install --frozen-lockfile
 
 # Copy the rest of the application code
 COPY . .

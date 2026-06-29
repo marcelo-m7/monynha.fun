@@ -24,7 +24,7 @@ We're creating a space where **human taste matters**. A place where curators (li
 
 ---
 
-## 📌 Documentation & Instructions (Updated June 6, 2026)
+## 📌 Documentation & Instructions (Updated June 29, 2026)
 
 To keep onboarding and AI-assisted edits consistent, treat these as the primary references:
 
@@ -108,9 +108,11 @@ I chose a stack that's modern, scalable, and – honestly – a joy to work with
 - **i18next** – Portuguese, English, and more
 
 ### Code Quality & CI/CD 🔧
+- **Bun** – The only package manager/runtime used for installs and scripts
 - **ESLint** + **TypeScript** – Catch errors before they happen
 - **Vitest** – Fast, modern testing framework
-- **GitHub Actions** – Automated CI with intelligent caching
+- **GitHub Actions** – Automated CI with `bun install --frozen-lockfile`
+- **Cloudflare Wrangler** – Static SPA deploys through `wrangler.jsonc`
 - **Feature-Sliced Design** – Organized by domain (entities, features, shared)
 
 ---
@@ -165,6 +167,10 @@ bun run dev
 ```
 
 Open **http://localhost:8080** and boom – you're in.
+
+### Package Manager
+
+This repository is **Bun-only**. Use `bun install`, `bun run <script>`, and `bunx <tool>` from the repository root. Keep [`bun.lock`](bun.lock) committed and do not add secondary package-manager files such as `pnpm-lock.yaml`, `pnpm-workspace.yaml`, `package-lock.json`, or `yarn.lock`.
 
 ### Environment Setup
 
@@ -225,6 +231,8 @@ supabase/
 
 server/
 └── server.ts                # Bun runtime server for static assets + dynamic social metadata
+
+wrangler.jsonc               # Cloudflare Workers/Assets static SPA deployment config
 ```
 
 ### Custom Hooks
@@ -292,7 +300,34 @@ bun run build:analyze
 
 ---
 
-## 🐳 Deploying This Thing
+## 🚢 Deploying This Thing
+
+There are two supported deployment shapes. Pick the one that matches what the host needs to do at request time.
+
+### Cloudflare Workers/Assets
+
+[`wrangler.jsonc`](wrangler.jsonc) is committed so Wrangler does not try to auto-configure Vite during CI. It publishes the built [`dist/`](dist/) assets and uses SPA fallback for client-side routes.
+
+```bash
+# Build static assets
+bun run build
+
+# Publish through Wrangler
+bunx wrangler deploy
+```
+
+Recommended Cloudflare settings:
+
+| Setting | Value |
+|---|---|
+| Install command | `bun install --frozen-lockfile` |
+| Build command | `bun run build` |
+| Deploy command | `bunx wrangler deploy` |
+| Output directory | `dist` |
+
+This path serves the React SPA as static assets. It does not run [`server/server.ts`](server/server.ts), so dynamic OG/Twitter HTML injection for `/videos/:id` requires the Docker/Bun server path below.
+
+### Docker + Bun Runtime Server
 
 We use Docker to keep everything consistent. Production now uses a **Bun runtime server** that serves `dist/` and injects dynamic OG/Twitter tags for `/videos/:id` in the initial HTML.
 
@@ -310,9 +345,10 @@ docker run -p 80:80 \
 Then hit `http://localhost` and you're golden.
 
 ### Platforms That Work
-- **Coolify** (recommended – simple, clean)
+- **Cloudflare Workers/Assets** for static SPA deploys through Wrangler
+- **Coolify** for Docker + Bun runtime deploys
 - Any Docker-compatible host (AWS, DigitalOcean, Heroku, whatever)
-- Vercel/Netlify (if you prefer that workflow)
+- Vercel/Netlify for static SPA workflows
 
 Just make sure your Supabase env vars are set. That's it.
 

@@ -10,6 +10,7 @@
 - **React Hook Form** with **Zod** for form state management and validation
 - **ESLint** + TypeScript for code quality and static checks
 - **Vite** as the build tool and dev server (already configured)
+- **Bun** as the only package manager and script runner
 - **Vitest** + React Testing Library for unit and component tests
 
 ## Library Usage Rules
@@ -25,6 +26,7 @@
 | **Icons & Images** | lucide-react for icons; public static assets in `public/`; imported code assets may live under `src/assets/` if introduced | Keep the generic social preview at `public/placeholder.png` |
 | **Utilities / Helpers** | Keep `src/lib/utils.ts` for `cn()` only; place business/shared utilities in `src/shared/lib/` | Matches project architecture conventions |
 | **Testing** | Vitest + React Testing Library + user-event | Follow React Testing Library guidelines; avoid testing implementation details |
+| **Package Manager** | Bun only (`bun install`, `bun run`, `bunx`) | Keep `bun.lock` as the only lockfile; do not add pnpm, npm, or Yarn lockfiles |
 | **Code Quality** | ESLint plus `bun run typecheck` | Run `bun run lint` and `bun run typecheck` when relevant; do not disable rules without justification |
 | **Absolute Imports** | Configured via `tsconfig.json` (`@/*`) | Use `@/` alias for imports from `src/`; avoid relative paths like `../../../components` |
 | **File Organization** | - Entities: `src/entities/` (types/api/query keys) <br> - Features: `src/features/` (query/mutation orchestration) <br> - Components: `src/components/` (UI by domain) <br> - Pages: `src/pages/` (routes) <br> - Shared: `src/shared/` (cross-domain code, validation, API clients) <br> - `src/lib/utils.ts`: shadcn `cn()` utility only | Follow Feature-Sliced conventions used by the current codebase |

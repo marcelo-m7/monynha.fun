@@ -6,6 +6,7 @@ This file is the fast-start guide for AI coding agents in this repository. Keep 
 
 - Product: Tube O2, the cultural video curation platform.
 - Stack: React 18, TypeScript, Vite, Tailwind, shadcn/ui, Supabase, TanStack Query.
+- Package manager: Bun only (`bun install`, `bun run <script>`, `bunx <tool>`).
 - Work from the repository root: [README.md](README.md).
 - Source of truth: [README.md](README.md), [AI_RULES.md](AI_RULES.md), and the scoped rules in [.github/instructions](.github/instructions).
 - Supabase project ref: `wvkjainfwsyiyfcmbtid`.
@@ -32,6 +33,7 @@ Run from repository root:
 
 - Prefer targeted checks on the touched slice before broad test runs.
 - Use `bun run dev` for UI verification and `bun run build` before final handoff.
+- Keep `bun.lock` as the only dependency lockfile. Do not reintroduce pnpm, npm, or Yarn lock/workspace files.
 
 Supabase/backend commands:
 
@@ -52,6 +54,7 @@ There is currently no `backend/` FastAPI service in this tree. Backend work live
 - Frontend dev server runs on port `8080` (see [vite.config.ts](vite.config.ts)).
 - SSR preview server runs on port `3000` by default (see [server/server.ts](server/server.ts)); override with `PORT`.
 - Production preview flow: run `bun run build` then `bun run preview`.
+- Cloudflare static SPA deploys use [wrangler.jsonc](wrangler.jsonc), `dist/`, and SPA fallback. Docker/Bun server deploys are required for dynamic OG/Twitter injection.
 - Supabase Edge Functions run through the Supabase CLI. Check `supabase functions --help` before assuming command flags.
 
 ## Test Runner Notes

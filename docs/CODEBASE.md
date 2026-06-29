@@ -6,6 +6,16 @@ This document describes the architectural organization of Tube O2 and the conven
 
 ---
 
+## Runtime, Package Manager, And Deploy
+
+- Bun is the only package manager/runtime used for project installs and scripts.
+- Commit and update `bun.lock`; do not add `pnpm-lock.yaml`, `pnpm-workspace.yaml`, `package-lock.json`, or `yarn.lock`.
+- CI uses `bun install --frozen-lockfile`, then `bun run lint`, `bun run typecheck`, `bun run test`, `bun run test:coverage`, and `bun run build`.
+- Cloudflare static SPA deploys are configured in `wrangler.jsonc` with `assets.directory = "./dist"` and SPA fallback.
+- Docker deploys run `server/server.ts` with Bun when runtime OG/Twitter metadata injection is required.
+
+---
+
 ## Architecture Boundaries
 
 Use these boundaries when deciding where code belongs:
@@ -35,6 +45,8 @@ supabase/
 
 server/
 └── server.ts         # Bun runtime SSR server for serving dist/ and OG/Twitter tags
+
+wrangler.jsonc        # Cloudflare Workers/Assets config for static SPA deploys
 ```
 
 ---
@@ -318,6 +330,20 @@ bun run test -- <pattern>    # Targeted tests
 bun run test:coverage        # Coverage report
 bun run test:e2e             # E2E tests
 ```
+
+---
+
+## Deployment Notes
+
+Cloudflare Workers/Assets deploys should build with Bun and publish the generated `dist/` directory through Wrangler:
+
+```bash
+bun install --frozen-lockfile
+bun run build
+bunx wrangler deploy
+```
+
+Docker deploys use the Bun runtime server in `server/server.ts`. Use this path when the deployment must inject dynamic OG/Twitter metadata into `/videos/:id` HTML before the client app hydrates.
 
 ---
 
