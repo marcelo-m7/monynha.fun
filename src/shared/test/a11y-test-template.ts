@@ -22,7 +22,7 @@ import {
  * 1. Create file: src/pages/MyPage.a11y.test.tsx
  * 2. Replace "MyPage" and "MyComponent" with actual component
  * 3. Add specific interactions for your component
- * 4. Run: pnpm test MyPage.a11y.test.tsx
+ * 4. Run: bun run test MyPage.a11y.test.tsx
  */
 
 // Replace with your actual component

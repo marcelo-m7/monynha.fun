@@ -11,4 +11,4 @@ applyTo: "src/**/*.test.{ts,tsx}"
 - Keep async tests explicit with await and waitFor patterns; avoid timer-based flakiness.
 - Co-locate tests with source files and mirror existing naming conventions.
 - When query keys or query behavior changes, keep [src/entities/queryKeys.test.ts](../../src/entities/queryKeys.test.ts) aligned.
-- Validate test changes with pnpm test and, when needed, pnpm test:coverage.
+- Validate test changes with `bun run test` and, when needed, `bun run test:coverage`.

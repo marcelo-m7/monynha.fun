@@ -21,17 +21,17 @@ Run from repository root:
 
 | Goal | Command |
 |---|---|
-| Development | `pnpm dev` |
-| Build | `pnpm build` |
-| Analyze build | `pnpm build:analyze` |
-| Lint | `pnpm lint` |
-| Type check | `pnpm typecheck` |
-| Tests | `pnpm test` |
-| Coverage | `pnpm test:coverage` |
-| E2E tests | `pnpm test:e2e` |
+| Development | `bun run dev` |
+| Build | `bun run build` |
+| Analyze build | `bun run build:analyze` |
+| Lint | `bun run lint` |
+| Type check | `bun run typecheck` |
+| Tests | `bun run test` |
+| Coverage | `bun run test:coverage` |
+| E2E tests | `bun run test:e2e` |
 
 - Prefer targeted checks on the touched slice before broad test runs.
-- Use `pnpm dev` for UI verification and `pnpm build` before final handoff.
+- Use `bun run dev` for UI verification and `bun run build` before final handoff.
 
 Supabase/backend commands:
 
@@ -41,7 +41,7 @@ Supabase/backend commands:
 | Serve an Edge Function locally | `supabase functions serve <function-name> --env-file .env` |
 | Create a migration | `supabase migration new <descriptive-name>` |
 | Apply local migrations | `supabase migration up` |
-| Push Supabase config | `pnpx supabase config push --project-ref wvkjainfwsyiyfcmbtid` |
+| Push Supabase config | `bunx supabase config push --project-ref wvkjainfwsyiyfcmbtid` |
 
 Never run `supabase config push --yes` for this project. Inspect every prompt and accept only the intended diff. Local [supabase/config.toml](supabase/config.toml) must preserve remote API schemas/search paths, Auth URLs/redirects/MFA/email settings, and Storage settings before pushing template changes.
 
@@ -51,13 +51,13 @@ There is currently no `backend/` FastAPI service in this tree. Backend work live
 
 - Frontend dev server runs on port `8080` (see [vite.config.ts](vite.config.ts)).
 - SSR preview server runs on port `3000` by default (see [server/server.ts](server/server.ts)); override with `PORT`.
-- Production preview flow: run `pnpm build` then `pnpm preview`.
+- Production preview flow: run `bun run build` then `bun run preview`.
 - Supabase Edge Functions run through the Supabase CLI. Check `supabase functions --help` before assuming command flags.
 
 ## Test Runner Notes
 
 - Tests use Vitest + jsdom with shared setup in [src/shared/test/setup.ts](src/shared/test/setup.ts).
-- Use `pnpm test -- <pattern>` for targeted tests.
+- Use `bun run test -- <pattern>` for targeted tests.
 - Do **not** use Jest-style `--testPathPattern` with Vitest in this repo.
 - Networked frontend tests should follow MSW patterns in [src/shared/test/mswHandlers.ts](src/shared/test/mswHandlers.ts).
 
@@ -95,7 +95,7 @@ Use these boundaries when deciding where code belongs:
 ## Supabase Operational Guardrails
 
 - Treat [supabase/config.toml](supabase/config.toml) as deployment-as-code for hosted Supabase settings, including Auth email templates under [supabase/email-templates](supabase/email-templates).
-- Push config with `pnpx supabase config push --project-ref wvkjainfwsyiyfcmbtid` and confirm the CLI diff before answering prompts.
+- Push config with `bunx supabase config push --project-ref wvkjainfwsyiyfcmbtid` and confirm the CLI diff before answering prompts.
 - Keep `api.schemas` and `api.extra_search_path` aligned with the remote project, including the `facodi` schema.
 - Keep production Auth settings intact: `site_url`, redirect URLs, manual linking, MFA TOTP, email confirmations, and OTP length.
 - Edge Functions that are user-triggered should keep `verify_jwt = true`, use shared CORS/JSON helpers from [supabase/functions/_shared/http.ts](supabase/functions/_shared/http.ts), and apply shared rate limiting after auth but before expensive work.
@@ -164,7 +164,7 @@ Use these boundaries when deciding where code belongs:
 - Calling `supabase.functions.invoke` directly instead of using `invokeEdgeFunction()`.
 - Running `supabase config push --yes` and accidentally overwriting production settings.
 - Updating one locale file but leaving other locales missing the same key.
-- Running `pnpm test -- --testPathPattern=...` (unsupported by Vitest in this repo).
+- Running `bun run test -- --testPathPattern=...` (unsupported by Vitest in this repo).
 
 ## Adding New Pages
 

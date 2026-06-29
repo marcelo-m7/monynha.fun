@@ -18,43 +18,37 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Enable Corepack
-        run: corepack enable
-
-      - name: Setup Node
-        uses: actions/setup-node@v4
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
         with:
-          node-version: 20
-
-      - name: Install pnpm
-        run: corepack prepare pnpm@10 --activate
+          bun-version: 1.2.15
 
       - name: Install dependencies
-        run: pnpm install
+        run: bun install --frozen-lockfile
 
       - name: Lint
-        run: pnpm run lint
+        run: bun run lint
 
       - name: Type check
-        run: pnpm run typecheck
+        run: bun run typecheck
 
       - name: Test
         env:
           VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
           VITE_SUPABASE_PUBLISHABLE_KEY: ${{ secrets.VITE_SUPABASE_PUBLISHABLE_KEY }}
-        run: pnpm run test
+        run: bun run test
 
       - name: Test Coverage
         env:
           VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
           VITE_SUPABASE_PUBLISHABLE_KEY: ${{ secrets.VITE_SUPABASE_PUBLISHABLE_KEY }}
-        run: pnpm run test:coverage
+        run: bun run test:coverage
 
       - name: Build
         env:
           VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
           VITE_SUPABASE_PUBLISHABLE_KEY: ${{ secrets.VITE_SUPABASE_PUBLISHABLE_KEY }}
-        run: pnpm run build
+        run: bun run build
 
       - name: Analyze Bundle Size
         run: |

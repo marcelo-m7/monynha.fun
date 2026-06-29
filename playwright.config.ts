@@ -19,7 +19,7 @@ export default defineConfig({
     serviceWorkers: 'block',
   },
   webServer: {
-    command: `pnpm dev -- --host 127.0.0.1 --port ${port}`,
+    command: `bun run dev -- --host 127.0.0.1 --port ${port}`,
     url: baseURL,
     reuseExistingServer: true,
     timeout: 120_000,

@@ -158,12 +158,10 @@ git clone https://github.com/marcelo-m7/tube-o2
 cd tube-o2
 
 # Install dependencies
-pnpm install
-# or if you prefer npm:
-npm install
+bun install
 
 # Fire it up!
-pnpm dev
+bun run dev
 ```
 
 Open **http://localhost:8080** and boom – you're in.
@@ -259,37 +257,37 @@ Every folder has a purpose. No random files lying around.
 
 ```bash
 # Development server with hot reload (what you'll use most)
-pnpm dev
+bun run dev
 
 # Build for production (minified, optimized)
-pnpm build
+bun run build
 
 # Build with dev settings (if debugging production)
-pnpm build:dev
+bun run build:dev
 
 # Preview the production build locally
-pnpm preview
+bun run preview
 
 # Run the linter (keep code clean)
-pnpm lint
+bun run lint
 
 # Type-check the project
-pnpm typecheck
+bun run typecheck
 
 # Run tests (one-off)
-pnpm test
+bun run test
 
 # Run tests in watch mode
-pnpm test:watch
+bun run test:watch
 
 # Run tests with coverage
-pnpm test:coverage
+bun run test:coverage
 
 # Run Playwright E2E tests
-pnpm test:e2e
+bun run test:e2e
 
 # Generate bundle analysis report
-pnpm build:analyze
+bun run build:analyze
 ```
 
 ---
@@ -382,7 +380,7 @@ Hosted Supabase project settings that must be reproducible live in [`supabase/co
 Deploy config changes from this repository root:
 
 ```bash
-pnpx supabase config push --project-ref wvkjainfwsyiyfcmbtid
+bunx supabase config push --project-ref wvkjainfwsyiyfcmbtid
 ```
 
 Do not use `--yes` for config pushes. The CLI may propose changes to production API/Auth/Storage settings when local config drifts; inspect prompts and accept only the intended diff. A successful verification should report API, DB, Auth, and Storage config as up to date.
@@ -487,8 +485,8 @@ Great! You can work locally or directly on GitHub. Here's how:
 ```bash
 git clone https://github.com/marcelo-m7/tube-o2
 cd tube-o2
-pnpm install
-pnpm dev
+bun install
+bun run dev
 ```
 Make changes, test locally, push to your branch.
 
@@ -534,21 +532,21 @@ Nothing creepy. No ads. No surveillance.
 
 ### Port Already In Use?
 ```bash
-pnpm dev -- --port 3000
+bun run dev -- --port 3000
 ```
 
 ### Dependencies Missing?
 ```bash
 # Clear and reinstall
-rm pnpm-lock.yaml
-pnpm install
+rm -rf node_modules
+bun install
 ```
 
 ### Build Failing?
 ```bash
 # Clear the cache
 rm -rf dist
-pnpm build
+bun run build
 ```
 
 ### Something Else?

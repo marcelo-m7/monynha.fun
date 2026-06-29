@@ -295,7 +295,7 @@ Do not add providers to `main.tsx` or component files. Follow the pattern in `Ap
 ## Supabase Operational Guardrails
 
 - Treat `supabase/config.toml` as deployment-as-code
-- Confirm CLI diff before running `pnpx supabase config push`
+- Confirm CLI diff before running `bunx supabase config push`
 - Keep auth settings intact (site_url, redirects, MFA, email confirmations)
 - Edge Functions should use `verify_jwt = true` for user-triggered operations
 - Avoid wildcard CORS unless explicitly needed for public endpoints
@@ -313,10 +313,10 @@ Do not add providers to `main.tsx` or component files. Follow the pattern in `Ap
 
 Run tests with:
 ```bash
-pnpm test                    # All tests
-pnpm test -- <pattern>       # Targeted tests
-pnpm test:coverage          # Coverage report
-pnpm test:e2e               # E2E tests
+bun run test                 # All tests
+bun run test -- <pattern>    # Targeted tests
+bun run test:coverage        # Coverage report
+bun run test:e2e             # E2E tests
 ```
 
 ---
