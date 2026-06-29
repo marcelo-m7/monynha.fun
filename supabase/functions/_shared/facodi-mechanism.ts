@@ -6,13 +6,10 @@ type MechanismKind = 'analysis' | 'odoo';
 
 type ServiceClient = {
   schema: (schema: string) => {
-    from: (table: string) => {
-      insert: (values: Record<string, unknown>) => {
-        select: (columns: string) => {
-          single: () => Promise<{ data: Record<string, unknown> | null; error: { message?: string } | null }>;
-        };
-      };
-    };
+    rpc: (
+      functionName: string,
+      args: Record<string, unknown>,
+    ) => Promise<{ data: unknown; error: { message?: string } | null }>;
   };
   rpc: (
     functionName: string,
@@ -39,6 +36,14 @@ function objectIdFromBody(body: Record<string, unknown>) {
   return stringValue(body.learning_object_id) ?? stringValue(body.object_id);
 }
 
+function rpcRecord(value: unknown) {
+  if (Array.isArray(value)) {
+    return value[0] && typeof value[0] === 'object' ? value[0] as Record<string, unknown> : null;
+  }
+
+  return value && typeof value === 'object' ? value as Record<string, unknown> : null;
+}
+
 async function getAuthenticatedUser(req: Request, supabaseUrl: string, anonKey: string) {
   const authHeader = req.headers.get('Authorization');
   if (!authHeader) return { user: null, error: 'Missing authorization header' };
@@ -62,27 +67,23 @@ async function createAnalysisJob(params: {
 }) {
   const { data, error } = await params.supabase
     .schema('facodi')
-    .from('analysis_jobs')
-    .insert({
-      learning_object_id: objectIdFromBody(params.body),
-      video_id: stringValue(params.body.video_id),
-      youtube_video_id: stringValue(params.body.youtube_video_id),
-      input_url: stringValue(params.body.url) ?? stringValue(params.body.youtube_url),
-      job_type: params.jobType,
-      status: 'queued',
-      current_step: 'queued',
-      requested_by: params.userId,
-      request_source: params.jobType,
-      input_payload: {
+    .rpc('queue_analysis_job', {
+      p_learning_object_id: objectIdFromBody(params.body),
+      p_video_id: stringValue(params.body.video_id),
+      p_youtube_video_id: stringValue(params.body.youtube_video_id),
+      p_input_url: stringValue(params.body.url) ?? stringValue(params.body.youtube_url),
+      p_job_type: params.jobType,
+      p_current_step: 'queued',
+      p_requested_by: params.userId,
+      p_request_source: params.jobType,
+      p_input_payload: {
         ...params.body,
         requestId: params.requestId,
       },
-    })
-    .select('id, status, job_type')
-    .single();
+    });
 
   if (error) throw new Error(error.message);
-  return data;
+  return rpcRecord(data);
 }
 
 async function createOdooJob(params: {
@@ -93,21 +94,17 @@ async function createOdooJob(params: {
 }) {
   const { data, error } = await params.supabase
     .schema('facodi')
-    .from('odoo_sync_jobs')
-    .insert({
-      instance_id: stringValue(params.body.instance_id),
-      learning_object_id: objectIdFromBody(params.body),
-      odoo_record_id: stringValue(params.body.odoo_record_id),
-      job_type: params.jobType,
-      status: 'queued',
-      requested_by: params.userId,
-      payload: params.body,
-    })
-    .select('id, status, job_type')
-    .single();
+    .rpc('queue_odoo_sync_job', {
+      p_instance_id: stringValue(params.body.instance_id),
+      p_learning_object_id: objectIdFromBody(params.body),
+      p_odoo_record_id: stringValue(params.body.odoo_record_id),
+      p_job_type: params.jobType,
+      p_requested_by: params.userId,
+      p_payload: params.body,
+    });
 
   if (error) throw new Error(error.message);
-  return data;
+  return rpcRecord(data);
 }
 
 export async function handleFacodiMechanism(req: Request, options: FacodiMechanismOptions) {
