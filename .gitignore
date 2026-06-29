@@ -33,3 +33,4 @@ test-results
 .dyad/
 docker-compose.yml
 skills-lock.json
+.wrangler/
