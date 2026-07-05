@@ -13,6 +13,10 @@ import {
   type PlaylistAssignmentPlaylist,
   type PlaylistAssignmentResult,
 } from '../_shared/playlist-assignment.ts'
+import {
+  loadAssociationPlaylists,
+  persistPlaylistAssignment,
+} from '../_shared/association.ts';
 import { OpenAIClient } from '../_shared/openai-client.ts'
 import { GeminiClient } from '../_shared/gemini-client.ts'
 import { errorResponse, jsonResponse, optionsResponse } from '../_shared/http.ts'
@@ -769,106 +773,6 @@ serve(async (req) => {
       submissionBelongsToUser = Boolean(actingUserId);
       await updateSubmissionStatus(supabaseServiceRole, submissionId, {
         video_id: videoId,
-        status: 'processing',
-        error_message: null,
-        recoverable: false,
-        processing_started_at: new Date().toISOString(),
-        completed_at: null,
-        metadata: {
-          processing: {
-            requestId,
-            stage: 'legacy_fast_enrichment',
-            updatedAt: new Date().toISOString(),
-          },
-        },
-      });
-    }
-
-    const { data: video, error: videoError } = await supabaseServiceRole
-      .from('videos')
-      .select('youtube_id, title, description, channel_name, language, category_id')
-      .eq('id', videoId)
-      .single();
-
-    if (videoError || !video) {
-      if (videoError) {
-        console.error(`[enrich-video] ${requestId} video lookup failed: ${videoError.message}`);
-      }
-      throw new HttpError('Video not found', 404, {
-        code: 'VIDEO_NOT_FOUND',
-        recoverable: false,
-      });
-    }
-
-    if (video.youtube_id !== requestYoutubeId) {
-      throw new HttpError('Request YouTube URL does not match the stored video', 400, {
-        code: 'VIDEO_YOUTUBE_ID_MISMATCH',
-        recoverable: false,
-      });
-    }
-
-    const publicMetadata = await fetchPublicYouTubeMetadata(requestYoutubeId);
-    const storedDescriptionIsGeneric = isGenericYouTubeDescription(video.description);
-    const storedDescription = storedDescriptionIsGeneric ? null : video.description;
-    const enrichedDescription = storedDescription || publicMetadata.description;
-    const inferredLanguage = publicMetadata.language ?? detectLanguage(video.title, video.channel_name, enrichedDescription);
-    const enrichedLanguage = normalizeLanguage(inferredLanguage);
-
-    const videoPatch: Record<string, unknown> = {};
-    if (!video.description || storedDescriptionIsGeneric) {
-      videoPatch.description = publicMetadata.description ?? null;
-    }
-    if (publicMetadata.durationSeconds !== null) {
-      videoPatch.duration_seconds = publicMetadata.durationSeconds;
-    }
-    if (!video.language || video.language === 'und' || video.language !== enrichedLanguage) {
-      videoPatch.language = enrichedLanguage;
-    }
-
-    if (Object.keys(videoPatch).length > 0) {
-      const { error: videoMetadataUpdateError } = await supabaseServiceRole
-        .from('videos')
-        .update(videoPatch)
-        .eq('id', videoId);
-
-      if (videoMetadataUpdateError) {
-        throw new Error(`Failed to update video public metadata: ${videoMetadataUpdateError.message}`);
-      }
-    }
-
-    const { data: categoriesData, error: categoriesError } = await supabaseServiceRole
-      .from('categories')
-      .select('id, name, slug');
-
-    if (categoriesError) {
-      throw new Error(`Failed to load categories: ${categoriesError.message}`);
-    }
-
-    const categoryRows = (categoriesData ?? []) as LegacyFastCategory[];
-    const language = enrichedLanguage;
-    const title = video.title || 'Video do YouTube';
-    const playlistCandidates = await loadPlaylistCandidates(
-      supabaseServiceRole,
-      language,
-      [video.title, enrichedDescription, video.channel_name].filter(Boolean).join(' '),
-    );
-    const fastEnrichment = await computeFastEnrichment({
-      title,
-      videoTitle: video.title,
-      description: enrichedDescription,
-      channelName: video.channel_name,
-      youtubeUrl,
-      youtubeId: requestYoutubeId,
-      language,
-      categories: categoryRows,
-      playlists: playlistCandidates,
-    });
-    const semanticTags = fastEnrichment.semanticTags;
-    const selectedCategory = pickCategory(categoryRows, {
-      currentCategoryId: fastEnrichment.suggestedCategoryId ?? video.category_id ?? null,
-      title: video.title,
-      description: enrichedDescription,
-      channelName: video.channel_name,
       semanticTags,
     });
 
