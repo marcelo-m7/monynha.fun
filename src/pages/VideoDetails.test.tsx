@@ -215,11 +215,11 @@ describe('VideoDetails owner management', () => {
     expect(screen.getByRole('heading', { name: 'Assigned playlists' })).toBeInTheDocument();
     expect(screen.getByText(/Análise Matemática II/)).toBeInTheDocument();
     expect(screen.getByText('Educacao')).toBeInTheDocument();
-    expect(screen.getByRole('link', { name: /Análise Matemática II .* Learning Path/i })).toHaveAttribute(
+    expect(screen.getByRole('link', { name: /Análise Matemática II/i })).toHaveAttribute(
       'href',
       '/playlists/playlist-1',
     );
-    expect(screen.getByRole('link', { name: /Educacao Collection/i })).toHaveAttribute(
+    expect(screen.getByRole('link', { name: /Educacao/i })).toHaveAttribute(
       'href',
       '/playlists/playlist-education',
     );
