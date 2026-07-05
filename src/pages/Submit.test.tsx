@@ -57,9 +57,9 @@ beforeEach(() => {
   useAddVideoToPlaylistMock.mockReturnValue({ mutateAsync: vi.fn(), isPending: false });
   useProfileByIdMock.mockReturnValue({ data: null, isLoading: false, isError: false });
   mutateAsyncMock.mockResolvedValue({
-    status: 'created',
-    video: { id: 'video-1' },
-    submission: { id: 'submission-1' },
+    status: 'processing',
+    videoId: 'video-1',
+    submissionId: 'submission-1',
   });
 });
 

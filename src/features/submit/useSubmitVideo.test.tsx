@@ -2,17 +2,29 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { act, renderHook } from '@testing-library/react';
 import type { ReactNode } from 'react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { createVideo, findVideoByYoutubeId } from '@/entities/video/video.api';
+import { findVideoByYoutubeId } from '@/entities/video/video.api';
 import { createVideoSubmission } from '@/entities/video_submission/video_submission.api';
+import { invokeEdgeFunction } from '@/shared/api/supabase/edgeFunctions';
 import { useSubmitVideo } from './useSubmitVideo';
 
 vi.mock('@/entities/video/video.api', () => ({
-  createVideo: vi.fn(),
   findVideoByYoutubeId: vi.fn(),
 }));
 
 vi.mock('@/entities/video_submission/video_submission.api', () => ({
   createVideoSubmission: vi.fn(),
+}));
+
+vi.mock('@/shared/api/supabase/edgeFunctions', () => ({
+  invokeEdgeFunction: vi.fn(),
+  getEdgeFunctionErrorDetails: vi.fn(async () => ({
+    code: null,
+    message: 'Edge function error',
+    stage: null,
+    recoverable: null,
+    requestId: null,
+    retryAfterSeconds: null,
+  })),
 }));
 
 const metadata = {
@@ -37,16 +49,22 @@ function createWrapper() {
 }
 
 beforeEach(() => {
-  vi.mocked(createVideo).mockReset();
   vi.mocked(findVideoByYoutubeId).mockReset();
   vi.mocked(createVideoSubmission).mockReset();
+  vi.mocked(invokeEdgeFunction).mockReset();
 });
 
 describe('useSubmitVideo', () => {
-  it('creates a pending submission without assigning a playlist before processing', async () => {
+  it('queues processing via import-video for non-duplicate videos', async () => {
     vi.mocked(findVideoByYoutubeId).mockResolvedValue(null);
-    vi.mocked(createVideo).mockResolvedValue({ id: 'video-1' } as Awaited<ReturnType<typeof createVideo>>);
-    vi.mocked(createVideoSubmission).mockResolvedValue({ id: 'submission-1' } as Awaited<ReturnType<typeof createVideoSubmission>>);
+    vi.mocked(invokeEdgeFunction).mockResolvedValue({
+      data: {
+        status: 'processing',
+        submissionId: 'submission-1',
+        videoId: 'video-1',
+      },
+      error: null,
+    });
 
     const { result } = renderHook(() => useSubmitVideo(), { wrapper: createWrapper() });
 
@@ -58,13 +76,15 @@ describe('useSubmitVideo', () => {
       });
     });
 
-    expect(createVideoSubmission).toHaveBeenCalledWith({
-      user_id: 'user-1',
-      video_id: 'video-1',
-      youtube_id: 'BORLLC3FG2I',
-      youtube_url: 'https://youtu.be/BORLLC3FG2I',
-      status: 'pending',
+    expect(invokeEdgeFunction).toHaveBeenCalledWith('import-video', {
+      body: expect.objectContaining({
+        youtubeUrl: 'https://youtu.be/BORLLC3FG2I',
+        submissionId: expect.any(String),
+        idempotencyKey: expect.any(String),
+      }),
+      headers: { 'Content-Type': 'application/json' },
     });
+    expect(createVideoSubmission).not.toHaveBeenCalled();
   });
 
   it('marks duplicate submissions without assigning a playlist before processing', async () => {
@@ -81,7 +101,7 @@ describe('useSubmitVideo', () => {
       });
     });
 
-    expect(createVideo).not.toHaveBeenCalled();
+    expect(invokeEdgeFunction).not.toHaveBeenCalled();
     expect(createVideoSubmission).toHaveBeenCalledWith({
       user_id: 'user-1',
       youtube_id: 'BORLLC3FG2I',

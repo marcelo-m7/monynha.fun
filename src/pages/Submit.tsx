@@ -88,17 +88,15 @@ export default function Submit() {
         return;
       }
 
-      const newVideo = result.video;
-
       if (values.playlistId && values.playlistId !== 'none') {
         await addVideoToPlaylistMutation.mutateAsync({
           playlistId: values.playlistId,
-          videoId: newVideo.id,
+          videoId: result.videoId,
         });
       }
 
       notify.success(t('submit.success.videoQueuedTitle'));
-      navigate(`/submit/status/${result.submission.id}`);
+      navigate(`/submit/status/${result.submissionId}`);
     } catch (err) {
       notify.error(t('submit.error.genericSubmitTitle'));
     }

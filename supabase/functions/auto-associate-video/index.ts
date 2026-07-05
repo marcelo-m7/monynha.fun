@@ -90,7 +90,7 @@ Deno.serve(async (req: Request) => {
     .limit(1);
 
   if (enrichmentError) {
-    return errorResponse(req, 500, 'ENRICHMENT_LOOKUP_FAILED', 'Could not load enrichment data', { requestId });
+    console.warn(`[auto-associate-video] ${requestId} enrichment lookup failed, using video-only fallback: ${enrichmentError.message}`);
   }
 
   const enrichment = (enrichmentRows ?? [])[0] as {

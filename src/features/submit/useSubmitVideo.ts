@@ -1,10 +1,9 @@
 import { useMutation } from '@tanstack/react-query';
-import { createVideo, findVideoByYoutubeId } from '@/entities/video/video.api';
-import type { Video } from '@/entities/video/video.types';
+import { findVideoByYoutubeId } from '@/entities/video/video.api';
 import { createVideoSubmission } from '@/entities/video_submission/video_submission.api';
 import type { VideoSubmission } from '@/entities/video_submission/video_submission.types';
 import type { YouTubeMetadata } from './useYouTubeMetadata';
-import { generateSlug } from '@/shared/lib/slug';
+import { getEdgeFunctionErrorDetails, invokeEdgeFunction } from '@/shared/api/supabase/edgeFunctions';
 
 export interface SubmitVideoPayload {
   metadata: YouTubeMetadata;
@@ -16,7 +15,14 @@ export interface SubmitVideoPayload {
 
 export type SubmitVideoResult =
   | { status: 'duplicate'; submission: VideoSubmission; videoId: string }
-  | { status: 'created'; video: Video; submission: VideoSubmission };
+  | { status: 'processing'; submissionId: string; videoId: string; requestId?: string };
+
+interface ImportVideoResponse {
+  status: 'processing';
+  submissionId: string;
+  videoId: string;
+  requestId?: string;
+}
 
 export function useSubmitVideo() {
   return useMutation<SubmitVideoResult, Error, SubmitVideoPayload>({
@@ -37,26 +43,30 @@ export function useSubmitVideo() {
         return { status: 'duplicate', submission, videoId: existingVideo.id } as const;
       }
 
-      const newVideo = await createVideo({
-        youtube_id: payload.metadata.videoId,
-        slug: generateSlug(payload.metadata.title),
-        title: payload.metadata.title,
-        description: payload.description || payload.metadata.description || null,
-        channel_name: payload.metadata.channelName,
-        thumbnail_url: payload.metadata.thumbnailUrl,
-        category_id: payload.categoryId || null,
-        submitted_by: payload.userId,
+      const { data, error } = await invokeEdgeFunction<ImportVideoResponse>('import-video', {
+        body: {
+          youtubeUrl: payload.youtubeUrl,
+          submissionId: crypto.randomUUID(),
+          idempotencyKey: crypto.randomUUID(),
+        },
+        headers: { 'Content-Type': 'application/json' },
       });
 
-      const submission = await createVideoSubmission({
-        user_id: payload.userId,
-        video_id: newVideo.id,
-        youtube_id: payload.metadata.videoId,
-        youtube_url: payload.youtubeUrl,
-        status: 'pending',
-      });
+      if (error) {
+        const details = await getEdgeFunctionErrorDetails(error);
+        throw new Error(details.requestId ? `${details.message} (request ${details.requestId})` : details.message);
+      }
 
-      return { status: 'created', video: newVideo, submission } as const;
+      if (!data?.videoId || !data?.submissionId) {
+        throw new Error('No import response returned');
+      }
+
+      return {
+        status: 'processing',
+        submissionId: data.submissionId,
+        videoId: data.videoId,
+        requestId: data.requestId,
+      } as const;
     },
   });
 }
