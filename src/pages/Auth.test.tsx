@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { screen } from '@testing-library/react';
+import { screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import Auth from './Auth';
 import { renderWithProviders } from '@/shared/test/renderWithProviders';
@@ -51,6 +51,29 @@ describe('Auth page', () => {
     await user.click(screen.getByRole('button', { name: /login/i }));
 
     expect(signInMock).toHaveBeenCalledWith('user@example.com', 'password123');
+
+    await waitFor(() => {
+      expect(screen.getByRole('status')).toHaveTextContent(/.+/);
+    });
+  });
+
+  it('shows inline error feedback when login fails', async () => {
+    signInMock.mockResolvedValue({ error: new Error('Invalid login credentials') });
+
+    renderWithProviders(<Auth />);
+
+    const user = userEvent.setup();
+
+    await user.type(screen.getByLabelText(/email/i), 'user@example.com');
+    await user.type(screen.getByLabelText(/password/i), 'wrong-password');
+
+    await user.click(screen.getByRole('button', { name: /login/i }));
+
+    expect(signInMock).toHaveBeenCalledWith('user@example.com', 'wrong-password');
+
+    await waitFor(() => {
+      expect(screen.getByRole('alert')).toHaveTextContent(/.+/);
+    });
   });
 
   it('switches to signup and calls signUp', async () => {
@@ -60,12 +83,18 @@ describe('Auth page', () => {
 
     await user.click(screen.getByText(/don't have an account\? sign up/i));
 
+    await waitFor(() => {
+      expect(screen.getByLabelText(/username/i)).toHaveFocus();
+    });
+
     await user.type(screen.getByLabelText(/username/i), 'newuser');
     await user.type(screen.getByLabelText(/email/i), 'newuser@example.com');
     await user.type(screen.getByLabelText(/password/i), 'password123');
 
     await user.click(screen.getByRole('button', { name: /create account/i }));
 
-    expect(signUpMock).toHaveBeenCalledWith('newuser@example.com', 'password123', 'newuser');
+    await waitFor(() => {
+      expect(signUpMock).toHaveBeenCalledWith('newuser@example.com', 'password123', 'newuser');
+    });
   });
 });

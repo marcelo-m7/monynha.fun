@@ -278,7 +278,7 @@ const Index = () => {
         title={t('homeExhibition.hero.monynhaTitle')}
         description={t('homeExhibition.hero.description')}
         actions={
-          <>
+          <div className="flex flex-col items-start gap-3 sm:flex-row sm:items-center">
             <Button
               size="xl"
               className="h-14 justify-between px-6 text-sm transition-transform duration-200 hover:scale-[1.03] active:scale-[0.97]"
@@ -288,15 +288,15 @@ const Index = () => {
               <ArrowRight className="h-5 w-5" />
             </Button>
             <Button
-              variant="outline"
-              size="xl"
-              className="h-14 justify-between border-border bg-background px-6 text-sm transition-transform duration-200 hover:scale-[1.03] active:scale-[0.97]"
+              variant="ghost"
+              size="lg"
+              className="h-11 justify-between px-3 text-xs font-semibold text-muted-foreground hover:bg-secondary hover:text-foreground"
               onClick={() => navigate('/submit')}
             >
               {t('homeExhibition.hero.secondaryCta')}
-              <Send className="h-5 w-5" />
+              <Send className="h-4 w-4" />
             </Button>
-          </>
+          </div>
         }
         aside={
           <div className="grid gap-3 lg:ml-auto lg:grid-cols-[minmax(0,1fr)_14rem] lg:items-start xl:grid-cols-[minmax(0,1fr)_15rem]">
