@@ -4,19 +4,17 @@ import {
   buildVideoSummary,
   deriveTags,
   normalizeLanguage,
-  normalizeText,
   pickCategory,
   type LegacyFastCategory,
 } from '../_shared/legacy-fast-enrichment.ts'
 import {
   assignPlaylist,
   type PlaylistAssignmentPlaylist,
-  type PlaylistAssignmentResult,
 } from '../_shared/playlist-assignment.ts'
 import {
   loadAssociationPlaylists,
   persistPlaylistAssignment,
-} from '../_shared/association.ts';
+} from '../_shared/association.ts'
 import { OpenAIClient } from '../_shared/openai-client.ts'
 import { GeminiClient } from '../_shared/gemini-client.ts'
 import { errorResponse, jsonResponse, optionsResponse } from '../_shared/http.ts'
@@ -258,13 +256,6 @@ function normalizeSummary(value: string | null | undefined, fallback: string): s
   return cleaned ? cleaned.slice(0, 420) : fallback;
 }
 
-function summarizeSemanticTags(tags: string[]): string {
-  if (tags.length === 0) return 'conteúdo educacional geral';
-  if (tags.length === 1) return tags[0];
-  if (tags.length === 2) return `${tags[0]} e ${tags[1]}`;
-  return `${tags.slice(0, 2).join(', ')} e ${tags[2]}`;
-}
-
 function toFastLegacyResult(params: {
   title: string;
   videoTitle: string | null;
@@ -273,23 +264,12 @@ function toFastLegacyResult(params: {
   youtubeId: string;
   language: string;
 }): FastEnrichmentResult {
-  const semanticTags = deriveTags({
-    title: params.videoTitle,
-    description: params.description,
-    channelName: params.channelName,
-    language: params.language,
-  });
-
-  const baseSummary = buildVideoSummary({
+  const summary = buildVideoSummary({
     title: params.videoTitle,
     description: params.description,
     channelName: params.channelName,
     youtubeId: params.youtubeId,
   });
-
-  const summary = semanticTags.length > 0
-    ? `${baseSummary} Tema provável: ${summarizeSemanticTags(semanticTags)}.`
-    : baseSummary;
 
   return {
     provider: 'legacy_fast',
@@ -297,7 +277,12 @@ function toFastLegacyResult(params: {
     optimizedTitle: params.title,
     summaryDescription: summary,
     shortSummary: summary,
-    semanticTags,
+    semanticTags: deriveTags({
+      title: params.videoTitle,
+      description: params.description,
+      channelName: params.channelName,
+      language: params.language,
+    }),
     suggestedCategoryId: null,
     suggestedCategory: null,
     suggestedPlaylistId: null,
@@ -328,14 +313,56 @@ async function computeFastEnrichment(params: {
     language: params.language,
   });
 
+  const openAiKey = Deno.env.get('OPENAI_API_KEY') ?? '';
+  if (openAiKey) {
+    try {
+      const openAiClient = new OpenAIClient({
+        apiKey: openAiKey,
+        model: Deno.env.get('OPENAI_MODEL') || 'gpt-4o-mini',
+        timeout: 12000,
+        maxRetries: 1,
+      });
+
+      const openAiResult = await openAiClient.enrichVideo({
+        title: params.title,
+        description: params.description ?? '',
+        language: params.language,
+        channelName: params.channelName,
+        categories: params.categories,
+        playlists: params.playlists,
+      });
+
+      const summaryDescription = normalizeSummary(openAiResult.summary_description, fallback.summaryDescription);
+      const shortSummary = normalizeSummary(openAiResult.short_summary, summaryDescription);
+
+      return {
+        provider: 'openai',
+        providerModel: openAiClient.modelName,
+        optimizedTitle: normalizeSummary(openAiResult.optimized_title, params.title).slice(0, 120),
+        summaryDescription,
+        shortSummary,
+        semanticTags: openAiResult.semantic_tags?.slice(0, 8) ?? fallback.semanticTags,
+        suggestedCategoryId: openAiResult.suggested_category_id,
+        suggestedCategory: openAiResult.suggested_category,
+        suggestedPlaylistId: openAiResult.suggested_playlist_id,
+        suggestedPlaylistQuery: openAiResult.suggested_playlist_query,
+        classificationConfidence: openAiResult.classification_confidence,
+        culturalRelevance: openAiResult.cultural_relevance || 'Medium',
+        fallbackReason: null,
+      };
+    } catch (error) {
+      console.warn(`[enrich-video] OpenAI fast-path failed: ${error instanceof Error ? error.message : 'unknown error'}`);
+    }
+  }
+
   const geminiKey = Deno.env.get('GEMINI_API_KEY') ?? '';
   if (geminiKey) {
     try {
       const geminiClient = new GeminiClient({
         apiKey: geminiKey,
         model: Deno.env.get('GEMINI_MODEL') || 'gemini-2.5-flash',
-        timeout: 45000,
-        maxRetries: 2,
+        timeout: 15000,
+        maxRetries: 1,
       });
 
       const geminiResult = await geminiClient.analyzeYouTubeVideo({
@@ -365,48 +392,6 @@ async function computeFastEnrichment(params: {
       };
     } catch (error) {
       console.warn(`[enrich-video] Gemini fallback failed: ${error instanceof Error ? error.message : 'unknown error'}`);
-    }
-  }
-
-  const openAiKey = Deno.env.get('OPENAI_API_KEY') ?? '';
-  if (openAiKey) {
-    try {
-      const openAiClient = new OpenAIClient({
-        apiKey: openAiKey,
-        model: Deno.env.get('OPENAI_MODEL') || 'gpt-4o-mini',
-        timeout: 20000,
-        maxRetries: 2,
-      });
-
-      const openAiResult = await openAiClient.enrichVideo({
-        title: params.title,
-        description: params.description ?? '',
-        language: params.language,
-        channelName: params.channelName,
-        categories: params.categories,
-        playlists: params.playlists,
-      });
-
-      const summaryDescription = normalizeSummary(openAiResult.summary_description, fallback.summaryDescription);
-      const shortSummary = normalizeSummary(openAiResult.short_summary, summaryDescription);
-
-      return {
-        provider: 'openai',
-        providerModel: openAiClient.modelName,
-        optimizedTitle: normalizeSummary(openAiResult.optimized_title, params.title).slice(0, 120),
-        summaryDescription,
-        shortSummary,
-        semanticTags: openAiResult.semantic_tags?.slice(0, 8) ?? fallback.semanticTags,
-        suggestedCategoryId: openAiResult.suggested_category_id,
-        suggestedCategory: openAiResult.suggested_category,
-        suggestedPlaylistId: openAiResult.suggested_playlist_id,
-        suggestedPlaylistQuery: openAiResult.suggested_playlist_query,
-        classificationConfidence: openAiResult.classification_confidence,
-        culturalRelevance: openAiResult.cultural_relevance || 'Medium',
-        fallbackReason: 'gemini_unavailable',
-      };
-    } catch (error) {
-      console.warn(`[enrich-video] OpenAI fast-path failed: ${error instanceof Error ? error.message : 'unknown error'}`);
     }
   }
 
@@ -484,165 +469,6 @@ async function createOrReusePendingDeepAnalysisJob(params: {
   return data;
 }
 
-async function loadPlaylistCandidates(
-  supabaseServiceRole: ReturnType<typeof createClient>,
-  language: string,
-  sourceText?: string,
-): Promise<PlaylistAssignmentPlaylist[]> {
-  const { data, error } = await supabaseServiceRole.rpc('list_education_playlists_for_assignment', {
-    p_language: language,
-    p_limit: 120,
-  });
-
-  if (error) {
-    throw new Error(`Failed to load playlist assignment candidates: ${error.message}`);
-  }
-
-  const baseCandidates = (data ?? []) as PlaylistAssignmentPlaylist[];
-  const normalizedSource = normalizeText(sourceText);
-  const hasCulinarySignals = [
-    'receita',
-    'receitas',
-    'culinaria',
-    'cozinha',
-    'gastronomia',
-    'sopa',
-    'cebola',
-    'ingrediente',
-    'chef',
-    'forno',
-    'assado',
-  ].some((keyword) => normalizedSource.includes(keyword));
-
-  if (!hasCulinarySignals) {
-    return baseCandidates;
-  }
-
-  const { data: culinaryPlaylists, error: culinaryError } = await supabaseServiceRole
-    .from('playlists')
-    .select('id, name, description, language, is_public, is_ordered, course_code, unit_code')
-    .eq('is_public', true)
-    .or('slug.ilike.%receita%,name.ilike.%receita%,description.ilike.%receita%,slug.ilike.%culinaria%,name.ilike.%culinaria%,description.ilike.%culinaria%')
-    .order('video_count', { ascending: false })
-    .limit(60);
-
-  if (culinaryError) {
-    throw new Error(`Failed to load recipe playlist candidates: ${culinaryError.message}`);
-  }
-
-  const byId = new Map<string, PlaylistAssignmentPlaylist>();
-  for (const item of baseCandidates) {
-    byId.set(item.id, item);
-  }
-
-  for (const item of (culinaryPlaylists ?? []) as PlaylistAssignmentPlaylist[]) {
-    byId.set(item.id, item);
-  }
-
-  return Array.from(byId.values());
-}
-
-async function persistPlaylistAssignment(params: {
-  supabaseServiceRole: ReturnType<typeof createClient>;
-  assignment: PlaylistAssignmentResult;
-  videoId: string;
-  userId: string;
-}) {
-  const { supabaseServiceRole, assignment, videoId, userId } = params;
-  if (!assignment.assignedPlaylistId) {
-    return null;
-  }
-
-  const { data: existingAutoAssignments, error: existingAutoAssignmentsError } = await supabaseServiceRole
-    .from('playlist_videos')
-    .select('id, playlist_id')
-    .eq('video_id', videoId)
-    .ilike('notes', 'Assigned by playlist-assignment-v%');
-
-  if (existingAutoAssignmentsError) {
-    throw new Error(`Failed to load existing automatic playlist assignments: ${existingAutoAssignmentsError.message}`);
-  }
-
-  const staleAutoAssignmentIds = (existingAutoAssignments ?? [])
-    .filter((item) => item.playlist_id !== assignment.assignedPlaylistId)
-    .map((item) => item.id);
-
-  if (staleAutoAssignmentIds.length > 0) {
-    const { error: staleAutoAssignmentsDeleteError } = await supabaseServiceRole
-      .from('playlist_videos')
-      .delete()
-      .in('id', staleAutoAssignmentIds);
-
-    if (staleAutoAssignmentsDeleteError) {
-      throw new Error(`Failed to clean stale automatic playlist assignments: ${staleAutoAssignmentsDeleteError.message}`);
-    }
-  }
-
-  const { data: existing, error: existingError } = await supabaseServiceRole
-    .from('playlist_videos')
-    .select('id, playlist_id, position')
-    .eq('playlist_id', assignment.assignedPlaylistId)
-    .eq('video_id', videoId)
-    .maybeSingle();
-
-  if (existingError) {
-    throw new Error(`Failed to check playlist assignment: ${existingError.message}`);
-  }
-
-  if (existing) {
-    return { ...existing, created: false, removedAutoAssignments: staleAutoAssignmentIds.length };
-  }
-
-  const { data: lastItem, error: lastItemError } = await supabaseServiceRole
-    .from('playlist_videos')
-    .select('position')
-    .eq('playlist_id', assignment.assignedPlaylistId)
-    .order('position', { ascending: false })
-    .limit(1)
-    .maybeSingle();
-
-  if (lastItemError) {
-    throw new Error(`Failed to resolve playlist position: ${lastItemError.message}`);
-  }
-
-  const nextPosition = typeof lastItem?.position === 'number' ? lastItem.position + 1 : 0;
-  const notes = [
-    `Assigned by ${assignment.algorithmVersion}`,
-    assignment.reason,
-  ].join(': ');
-
-  const { data: inserted, error: insertError } = await supabaseServiceRole
-    .from('playlist_videos')
-    .insert({
-      playlist_id: assignment.assignedPlaylistId,
-      video_id: videoId,
-      position: nextPosition,
-      added_by: userId,
-      notes,
-    })
-    .select('id, playlist_id, position')
-    .single();
-
-  if (insertError) {
-    if (insertError.code === '23505') {
-      const { data: racedAssignment, error: racedAssignmentError } = await supabaseServiceRole
-        .from('playlist_videos')
-        .select('id, playlist_id, position')
-        .eq('playlist_id', assignment.assignedPlaylistId)
-        .eq('video_id', videoId)
-        .maybeSingle();
-
-      if (!racedAssignmentError && racedAssignment) {
-        return { ...racedAssignment, created: false, removedAutoAssignments: staleAutoAssignmentIds.length };
-      }
-    }
-
-    throw new Error(`Failed to persist playlist assignment: ${insertError.message}`);
-  }
-
-  return { ...inserted, created: true, removedAutoAssignments: staleAutoAssignmentIds.length };
-}
-
 serve(async (req) => {
   const requestId = crypto.randomUUID();
 
@@ -668,27 +494,19 @@ serve(async (req) => {
   }
 
   const token = authHeader.replace('Bearer ', '');
-  const isInternalServiceRoleRequest = token === serviceRoleKey;
-  let authenticatedUserId: string | null = null;
+  const supabase = createClient(
+    supabaseUrl,
+    supabaseAnonKey,
+    { global: { headers: { Authorization: `Bearer ${token}` } } },
+  );
 
-  if (!isInternalServiceRoleRequest) {
-    const supabase = createClient(
-      supabaseUrl,
-      supabaseAnonKey,
-      { global: { headers: { Authorization: `Bearer ${token}` } } },
-    );
-
-    const { data: { user }, error: userError } = await supabase.auth.getUser();
-    if (userError || !user) {
-      return errorResponse(req, 401, 'UNAUTHORIZED_INVALID_TOKEN', 'Invalid or expired authorization token', { requestId });
-    }
-
-    authenticatedUserId = user.id;
+  const { data: { user }, error: userError } = await supabase.auth.getUser();
+  if (userError || !user) {
+    return errorResponse(req, 401, 'UNAUTHORIZED_INVALID_TOKEN', 'Invalid or expired authorization token', { requestId });
   }
 
   let submissionId: string | null = null;
   let submissionBelongsToUser = false;
-  let submissionOwnerUserId: string | null = null;
   let supabaseServiceRole: ReturnType<typeof createClient> | null = null;
 
   try {
@@ -715,19 +533,17 @@ serve(async (req) => {
 
     supabaseServiceRole = createClient(supabaseUrl, serviceRoleKey, { auth: { persistSession: false } });
 
-    if (!isInternalServiceRoleRequest) {
-      const rateLimit = await checkEdgeRateLimit(supabaseServiceRole, {
-        functionName: 'enrich-video',
-        userId: authenticatedUserId,
-        windows: ENRICH_RATE_LIMIT_WINDOWS,
-      });
+    const rateLimit = await checkEdgeRateLimit(supabaseServiceRole, {
+      functionName: 'enrich-video',
+      userId: user.id,
+      windows: ENRICH_RATE_LIMIT_WINDOWS,
+    });
 
-      if (!rateLimit.allowed) {
-        return errorResponse(req, 429, 'RATE_LIMITED', 'Too many enrichment requests. Try again later.', {
-          requestId,
-          retryAfterSeconds: rateLimit.retryAfterSeconds,
-        });
-      }
+    if (!rateLimit.allowed) {
+      return errorResponse(req, 429, 'RATE_LIMITED', 'Too many enrichment requests. Try again later.', {
+        requestId,
+        retryAfterSeconds: rateLimit.retryAfterSeconds,
+      });
     }
 
     if (submissionId) {
@@ -747,7 +563,7 @@ serve(async (req) => {
         });
       }
 
-      if (!isInternalServiceRoleRequest && submission.user_id !== authenticatedUserId) {
+      if (submission.user_id !== user.id) {
         throw new HttpError('Submission does not belong to the authenticated user', 403, {
           code: 'SUBMISSION_FORBIDDEN',
           recoverable: false,
@@ -768,11 +584,109 @@ serve(async (req) => {
         });
       }
 
-      submissionOwnerUserId = submission.user_id;
-      const actingUserId = isInternalServiceRoleRequest ? submissionOwnerUserId : authenticatedUserId;
-      submissionBelongsToUser = Boolean(actingUserId);
+      submissionBelongsToUser = true;
       await updateSubmissionStatus(supabaseServiceRole, submissionId, {
         video_id: videoId,
+        status: 'processing',
+        error_message: null,
+        recoverable: false,
+        processing_started_at: new Date().toISOString(),
+        completed_at: null,
+        metadata: {
+          processing: {
+            requestId,
+            stage: 'legacy_fast_enrichment',
+            updatedAt: new Date().toISOString(),
+          },
+        },
+      });
+    }
+
+    const { data: video, error: videoError } = await supabaseServiceRole
+      .from('videos')
+      .select('youtube_id, title, description, channel_name, language, category_id')
+      .eq('id', videoId)
+      .single();
+
+    if (videoError || !video) {
+      if (videoError) {
+        console.error(`[enrich-video] ${requestId} video lookup failed: ${videoError.message}`);
+      }
+      throw new HttpError('Video not found', 404, {
+        code: 'VIDEO_NOT_FOUND',
+        recoverable: false,
+      });
+    }
+
+    if (video.youtube_id !== requestYoutubeId) {
+      throw new HttpError('Request YouTube URL does not match the stored video', 400, {
+        code: 'VIDEO_YOUTUBE_ID_MISMATCH',
+        recoverable: false,
+      });
+    }
+
+    const publicMetadata = await fetchPublicYouTubeMetadata(requestYoutubeId);
+    const storedDescriptionIsGeneric = isGenericYouTubeDescription(video.description);
+    const storedDescription = storedDescriptionIsGeneric ? null : video.description;
+    const enrichedDescription = storedDescription || publicMetadata.description;
+    const inferredLanguage = publicMetadata.language ?? detectLanguage(video.title, video.channel_name, enrichedDescription);
+    const enrichedLanguage = normalizeLanguage(inferredLanguage);
+
+    const videoPatch: Record<string, unknown> = {};
+    if (!video.description || storedDescriptionIsGeneric) {
+      videoPatch.description = publicMetadata.description ?? null;
+    }
+    if (publicMetadata.durationSeconds !== null) {
+      videoPatch.duration_seconds = publicMetadata.durationSeconds;
+    }
+    if (!video.language || video.language === 'und' || video.language !== enrichedLanguage) {
+      videoPatch.language = enrichedLanguage;
+    }
+
+    if (Object.keys(videoPatch).length > 0) {
+      const { error: videoMetadataUpdateError } = await supabaseServiceRole
+        .from('videos')
+        .update(videoPatch)
+        .eq('id', videoId);
+
+      if (videoMetadataUpdateError) {
+        throw new Error(`Failed to update video public metadata: ${videoMetadataUpdateError.message}`);
+      }
+    }
+
+    const { data: categoriesData, error: categoriesError } = await supabaseServiceRole
+      .from('categories')
+      .select('id, name, slug');
+
+    if (categoriesError) {
+      throw new Error(`Failed to load categories: ${categoriesError.message}`);
+    }
+
+    const categoryRows = (categoriesData ?? []) as LegacyFastCategory[];
+    const language = enrichedLanguage;
+    const title = video.title || 'Video do YouTube';
+    const playlistCandidates = await loadAssociationPlaylists(
+      supabaseServiceRole,
+      language,
+      enrichedDescription ?? title,
+    );
+    const fastEnrichment = await computeFastEnrichment({
+      title,
+      videoTitle: video.title,
+      description: enrichedDescription,
+      channelName: video.channel_name,
+      youtubeUrl,
+      youtubeId: requestYoutubeId,
+      language,
+      categories: categoryRows,
+      playlists: playlistCandidates,
+    });
+    const semanticTags = fastEnrichment.semanticTags;
+    const selectedCategory = pickCategory(categoryRows, {
+      currentCategoryId: fastEnrichment.suggestedCategoryId ?? video.category_id ?? null,
+      title: video.title,
+      description: enrichedDescription,
+      channelName: video.channel_name,
       semanticTags,
     });
 
@@ -820,16 +734,11 @@ serve(async (req) => {
         classificationConfidence: fastEnrichment.classificationConfidence,
       },
     });
-    const assignmentUserId = isInternalServiceRoleRequest ? submissionOwnerUserId : authenticatedUserId;
-    if (!assignmentUserId) {
-      throw new Error('Unable to resolve assignment user id');
-    }
-
     const persistedPlaylistAssignment = await persistPlaylistAssignment({
       supabaseServiceRole,
       assignment: playlistAssignment,
       videoId,
-      userId: assignmentUserId,
+      userId: user.id,
     });
 
     const analysisJob = await createOrReusePendingDeepAnalysisJob({
@@ -894,7 +803,6 @@ serve(async (req) => {
                 id: persistedPlaylistAssignment.id,
                 position: persistedPlaylistAssignment.position,
                 created: persistedPlaylistAssignment.created,
-                removedAutoAssignments: persistedPlaylistAssignment.removedAutoAssignments,
               }
               : null,
           },
