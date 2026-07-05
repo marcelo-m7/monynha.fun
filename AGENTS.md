@@ -11,6 +11,15 @@ This file is the fast-start guide for AI coding agents in this repository. Keep 
 - Source of truth: [README.md](README.md), [AI_RULES.md](AI_RULES.md), and the scoped rules in [.github/instructions](.github/instructions).
 - Supabase project ref: `wvkjainfwsyiyfcmbtid`.
 
+## Dependency Baseline (July 2026)
+
+- Toolchain baseline: React 19, React Router 7, Vite 8, TypeScript 6, Supabase JS 2.110.
+- Bun baseline: `bun@1.3.14` (see `package.json` `packageManager`).
+- Temporary compatibility pins in this repository:
+	- `tailwindcss@3.4.19` is intentional (Tailwind 4 migration is not yet completed).
+	- `lucide-react@0.462.0` is intentional (newer major renamed/removed icon exports used in current UI files).
+- TS6 note: `tsconfig.json` uses `"ignoreDeprecations": "6.0"` while alias migration away from `baseUrl` is pending.
+
 ## Quick Start
 
 - Product: Tube O2 (https://tube.open2.tech)

@@ -24,7 +24,7 @@ We're creating a space where **human taste matters**. A place where curators (li
 
 ---
 
-## 📌 Documentation & Instructions (Updated June 29, 2026)
+## 📌 Documentation & Instructions (Updated July 5, 2026)
 
 To keep onboarding and AI-assisted edits consistent, treat these as the primary references:
 
@@ -38,6 +38,15 @@ To keep onboarding and AI-assisted edits consistent, treat these as the primary 
 - Testing rules: [`.github/instructions/testing.instructions.md`](.github/instructions/testing.instructions.md)
 
 > Note: when guidance conflicts, follow `AGENTS.md` + `.github/instructions/*` first, then use older historical notes as context.
+
+### Dependency Baseline (July 2026 refresh)
+
+- Core stack upgraded: Vite 8, React 19, React Router 7, TypeScript 6, Supabase JS 2.110.
+- `packageManager` is now `bun@1.3.14`; keep using Bun-only workflows.
+- Compatibility pins kept intentionally to avoid broad migrations in this pass:
+	- `tailwindcss` remains on `3.4.19` (Tailwind 4 migration not yet applied).
+	- `lucide-react` is pinned to `0.462.0` (current codebase icon imports depend on this export set).
+- `tsconfig.json` includes `"ignoreDeprecations": "6.0"` to preserve existing `baseUrl` alias behavior during TS6 adoption.
 
 ---
 
