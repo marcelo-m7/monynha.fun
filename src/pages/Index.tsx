@@ -344,7 +344,7 @@ const Index = () => {
         }
       />
 
-      <section className="border-y-2 border-border bg-secondary py-5 text-secondary-foreground">
+      <section className="border-y-2 border-border bg-secondary py-4 text-secondary-foreground md:py-5">
         <div className="container grid gap-4 md:grid-cols-[auto_repeat(4,1fr)] md:items-center">
           <div className="animate-signal-pulse inline-flex w-fit items-center gap-2 bg-primary px-3 py-2 text-xs font-black uppercase text-primary-foreground">
             <Radio className="h-4 w-4" />
@@ -366,7 +366,7 @@ const Index = () => {
         </div>
       </section>
 
-      <section className="border-b-2 border-border bg-[#efff00] py-6 text-black">
+      <section className="border-b-2 border-border bg-[#efff00] py-4 text-black md:py-5">
         <div className="container grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {metricKeys.map((key) => (
             <div
@@ -382,7 +382,7 @@ const Index = () => {
         </div>
       </section>
 
-      <section className="border-y-2 border-border bg-background py-14 text-foreground md:py-18">
+      <section className="border-y-2 border-border bg-background py-12 text-foreground md:py-14">
         <div className="container space-y-6">
           <SectionHeader
             title={t('homeExhibition.intentSwitcher.title')}
