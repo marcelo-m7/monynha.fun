@@ -1,7 +1,7 @@
 # AI Rules for This Project
 
 ## Tech Stack (Bullet Points)
-- **React 18** with **TypeScript** as the primary frontend framework
+- **React 19** with **TypeScript** as the primary frontend framework
 - **React Router** for client-side routing (routes defined in `src/App.tsx`)
 - **Tailwind CSS** for utility‑first styling and responsive design
 - **shadcn/ui** component library (built on Radix UI) for accessible, pre‑styled UI components
@@ -9,9 +9,14 @@
 - **React Query (tanstack/react-query)** for data fetching, caching, and background updates
 - **React Hook Form** with **Zod** for form state management and validation
 - **ESLint** + TypeScript for code quality and static checks
-- **Vite** as the build tool and dev server (already configured)
+- **Vite 8** as the build tool and dev server (already configured)
 - **Bun** as the only package manager and script runner
 - **Vitest** + React Testing Library for unit and component tests
+
+## Current Compatibility Notes (July 2026)
+- `tailwindcss` remains pinned to `3.4.19` until a dedicated Tailwind 4 migration is completed.
+- `lucide-react` remains pinned to `0.462.0` because current icon imports rely on that export set.
+- TypeScript 6 is enabled; `tsconfig.json` currently uses `"ignoreDeprecations": "6.0"` while `baseUrl` alias migration is pending.
 
 ## Library Usage Rules
 | Concern / Feature | Allowed Library / Approach | Reason / Note |

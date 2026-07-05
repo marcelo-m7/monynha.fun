@@ -33,6 +33,7 @@ const forgotPasswordSchema = z.object({
 
 export default function Auth() {
   const { t } = useTranslation();
+  const [authFeedback, setAuthFeedback] = useState<{ type: 'info' | 'success' | 'error'; message: string } | null>(null);
   const [isLogin, setIsLogin] = useState(true);
   const [showForgotPassword, setShowForgotPassword] = useState(false);
   const [showResetPassword, setShowResetPassword] = useState(false);
@@ -106,6 +107,7 @@ export default function Auth() {
 
   useEffect(() => {
     reset(); // Reset form fields when switching between login/signup
+    setAuthFeedback(null);
     
     // Focus appropriate field
     const timer = setTimeout(() => {
@@ -122,6 +124,8 @@ export default function Auth() {
 
   const onSubmit = async (values: z.infer<typeof loginSchema> | z.infer<typeof signupSchema>) => {
     try {
+      setAuthFeedback({ type: 'info', message: t('auth.submittingButton') });
+
       if (isLogin) {
         const { data, error } = await signIn(values.email, values.password);
         
@@ -135,6 +139,7 @@ export default function Auth() {
           notify.error(t('auth.error.loginGeneric'), {
             description: message,
           });
+          setAuthFeedback({ type: 'error', message });
           return;
         }
 
@@ -145,6 +150,7 @@ export default function Auth() {
           notify.error(t('auth.error.emailNotConfirmed'), { 
             description: t('auth.error.confirmBeforeLogin') 
           });
+          setAuthFeedback({ type: 'error', message: t('auth.error.confirmBeforeLogin') });
           // Redirect to verification page to allow resend
           navigate(`/auth/verify-email?email=${encodeURIComponent(values.email)}`);
           return;
@@ -153,6 +159,7 @@ export default function Auth() {
         notify.success(t('auth.success.welcomeBack'), {
           description: t('auth.success.loginSuccess')
         });
+        setAuthFeedback({ type: 'success', message: t('auth.success.loginSuccess') });
         reset(); // Clear form on successful login
         
       } else {
@@ -167,6 +174,7 @@ export default function Auth() {
           notify.error(t('auth.error.signupGeneric'), {
             description: message,
           });
+          setAuthFeedback({ type: 'error', message });
           return;
         }
 
@@ -178,6 +186,7 @@ export default function Auth() {
         notify.success(t('auth.success.accountCreated'), {
           description: t('auth.success.confirmEmail')
         });
+        setAuthFeedback({ type: 'success', message: t('auth.success.confirmEmail') });
         
         reset(); // Clear form on successful signup
         setIsLogin(true); // Switch to login mode
@@ -187,9 +196,11 @@ export default function Auth() {
       }
     } catch (err) {
       console.error('Auth submission error:', err);
+      const message = err instanceof Error ? err.message : String(err);
       notify.error(t('auth.error.genericAuthError'), {
-        description: err instanceof Error ? err.message : String(err),
+        description: message,
       });
+      setAuthFeedback({ type: 'error', message });
     }
   };
 
@@ -314,6 +325,21 @@ export default function Auth() {
               </form>
             ) : (
               <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
+                <div
+                  aria-live="polite"
+                  role={authFeedback?.type === 'error' ? 'alert' : 'status'}
+                  className={authFeedback
+                    ? authFeedback.type === 'error'
+                      ? 'rounded-md border border-destructive/30 bg-destructive/10 px-3 py-2 text-sm text-destructive'
+                      : authFeedback.type === 'success'
+                        ? 'rounded-md border border-emerald-500/40 bg-emerald-500/10 px-3 py-2 text-sm text-emerald-700 dark:text-emerald-300'
+                        : 'rounded-md border border-border bg-muted px-3 py-2 text-sm text-muted-foreground'
+                    : 'sr-only'
+                  }
+                >
+                  {authFeedback?.message ?? ''}
+                </div>
+
                 {!isLogin && (
                   <div className="space-y-2">
                     <Label htmlFor="username" className="text-foreground">
@@ -401,6 +427,7 @@ export default function Auth() {
                   className="w-full"
                   size="lg"
                   disabled={isSubmitting}
+                  aria-busy={isSubmitting}
                 >
                   {isSubmitting
                     ? t('auth.submittingButton')
@@ -417,7 +444,10 @@ export default function Auth() {
                 {!showForgotPassword && (
                   <button
                     type="button"
-                    onClick={() => setIsLogin(!isLogin)}
+                    onClick={() => {
+                      setIsLogin(!isLogin);
+                      setAuthFeedback(null);
+                    }}
                     className="text-sm text-muted-foreground hover:text-primary transition-colors"
                   >
                     {isLogin

@@ -1,5 +1,5 @@
-import { ArrowRight, BookOpen, Radio, Send, ShieldCheck, Users } from 'lucide-react';
-import { useMemo } from 'react';
+import { ArrowRight, Radio, Send, Users } from 'lucide-react';
+import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import type { HomeHeroVideo } from '@/entities/home/home.types';
@@ -35,35 +35,99 @@ const liveSignalKeys = [
   'transcripts_completed',
 ] as const;
 
-const ctaCards = [
-  {
-    key: 'learners',
-    icon: BookOpen,
-    href: '/videos',
-  },
-  {
-    key: 'contributors',
-    icon: Send,
-    href: '/submit',
-  },
-  {
-    key: 'editors',
-    icon: ShieldCheck,
-    href: '/editor/apply',
-  },
-] as const;
-
 const DEFAULT_RAIL_LIMIT = 12;
+const MAX_HOMEPAGE_PLAYLISTS = 3;
+
+const INVALID_LANGUAGE_TOKENS = new Set([
+  'und',
+  'unknown',
+  'n/a',
+  'na',
+  'null',
+  'undefined',
+  '-',
+]);
+
+const LOW_CONFIDENCE_PATTERNS = [
+  /t[ií]tulo\s+otimizado/i,
+  /optimized\s+title/i,
+  /interesting\s+video/i,
+  /v[ií]deo\s+interessante/i,
+  /lorem\s+ipsum/i,
+  /placeholder/i,
+  /[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}/i,
+];
+
+const DEFAULT_FALLBACK_TITLE = 'Untitled video';
+
+function normalizeLanguage(language: string | null | undefined) {
+  if (!language) return '';
+
+  const normalized = language.trim();
+  if (!normalized) return '';
+
+  const lowered = normalized.toLowerCase();
+  if (INVALID_LANGUAGE_TOKENS.has(lowered)) return '';
+
+  return normalized.length <= 3 ? normalized.toUpperCase() : normalized;
+}
+
+function isLowConfidenceText(value: string | null | undefined) {
+  if (!value) return true;
+
+  const trimmed = value.trim();
+  if (!trimmed) return true;
+
+  if (trimmed.length < 12) return true;
+
+  return LOW_CONFIDENCE_PATTERNS.some((pattern) => pattern.test(trimmed));
+}
+
+function sanitizeTitle(optimized: string | null | undefined, original: string | null | undefined) {
+  if (!isLowConfidenceText(optimized)) return optimized!.trim();
+  if (!isLowConfidenceText(original)) return original!.trim();
+  return (original || optimized || DEFAULT_FALLBACK_TITLE).trim();
+}
+
+function sanitizeSummary(summary: string | null | undefined, transcriptSummary: string | null | undefined) {
+  if (summary && !isLowConfidenceText(summary) && summary.trim().length >= 32) return summary.trim();
+  if (transcriptSummary && !isLowConfidenceText(transcriptSummary) && transcriptSummary.trim().length >= 32) {
+    return transcriptSummary.trim();
+  }
+  return null;
+}
+
+function sanitizeSemanticTags(tags: string[] | null | undefined) {
+  if (!tags?.length) return null;
+
+  const sanitized = tags
+    .map((tag) => tag.trim())
+    .filter((tag) => tag.length >= 2)
+    .filter((tag) => !isLowConfidenceText(tag));
+
+  return sanitized.length ? sanitized.slice(0, 5) : null;
+}
+
+function sanitizeChannelName(channelName: string | null | undefined) {
+  if (!channelName) return '';
+
+  const trimmed = channelName.trim();
+  if (!trimmed) return '';
+
+  return isLowConfidenceText(trimmed) ? '' : trimmed;
+}
 
 function mapVideoToShowcase(video: VideoWithCategory): HomeHeroVideo {
+  const sanitizedTags = sanitizeSemanticTags(video.enrichment?.semantic_tags);
+
   return {
     id: video.id,
     slug: video.slug,
     youtube_id: video.youtube_id,
-    title: video.enrichment?.optimized_title || video.title,
-    channel_name: video.channel_name,
+    title: sanitizeTitle(video.enrichment?.optimized_title, video.title),
+    channel_name: sanitizeChannelName(video.channel_name),
     thumbnail_url: video.thumbnail_url,
-    language: video.transcriptLanguage || video.language || 'N/A',
+    language: normalizeLanguage(video.transcriptLanguage || video.language),
     duration_seconds: video.duration_seconds,
     view_count: video.view_count,
     favorites_count: video.favorites_count,
@@ -71,8 +135,8 @@ function mapVideoToShowcase(video: VideoWithCategory): HomeHeroVideo {
     category_name: video.category?.name || null,
     category_slug: video.category?.slug || null,
     category_color: video.category?.color || null,
-    summary: video.enrichment?.short_summary || video.transcriptSummary || null,
-    semantic_tags: video.enrichment?.semantic_tags || null,
+    summary: sanitizeSummary(video.enrichment?.short_summary, video.transcriptSummary),
+    semantic_tags: sanitizedTags,
   };
 }
 
@@ -109,6 +173,7 @@ function pickRailVideos(
 const Index = () => {
   const { i18n, t } = useTranslation();
   const navigate = useNavigate();
+  const [activeIntent, setActiveIntent] = useState<'discover' | 'decide' | 'community'>('discover');
   const { data: home, isLoading, isError } = useHomeExhibition();
   const { data: featuredVideosData = [], isLoading: isFeaturedLoading } = useFeaturedVideos(24, 0);
   const { data: recentVideosData = [], isLoading: isRecentLoading } = useRecentVideos(24);
@@ -124,7 +189,7 @@ const Index = () => {
   );
   const railsLoading = isLoading || isFeaturedLoading || isRecentLoading;
 
-  const videoRails = useMemo(() => {
+  const intentRails = useMemo(() => {
     const withSummaries = allRailsPool.filter((video) => !!video.summary);
     const quickLessons = allRailsPool
       .filter((video) => !!video.duration_seconds && (video.duration_seconds || 0) <= 900)
@@ -135,51 +200,38 @@ const Index = () => {
     );
     const usedVideoIds = new Set<string>(homeVideos.slice(0, 4).map((video) => video.id));
 
-    return [
-      {
-        key: 'trendingNow',
-        title: t('homeExhibition.videoRails.trendingNow.title'),
-        description: t('homeExhibition.videoRails.trendingNow.description'),
-        videos: pickRailVideos(featuredVideos, allRailsPool, usedVideoIds),
+    return {
+      discover: {
+        key: 'discover',
+        title: t('homeExhibition.intentSwitcher.intents.discover.title'),
+        description: t('homeExhibition.intentSwitcher.intents.discover.description'),
+        actionLabel: t('homeExhibition.intentSwitcher.intents.discover.cta'),
+        action: () => navigate('/videos?sort=recent'),
+        videos: pickRailVideos(featuredVideos, recentVideos, usedVideoIds),
         variant: 'dark' as const,
       },
-      {
-        key: 'freshDrops',
-        title: t('homeExhibition.videoRails.freshDrops.title'),
-        description: t('homeExhibition.videoRails.freshDrops.description'),
-        videos: pickRailVideos(recentVideos, allRailsPool, usedVideoIds),
+      decide: {
+        key: 'decide',
+        title: t('homeExhibition.intentSwitcher.intents.decide.title'),
+        description: t('homeExhibition.intentSwitcher.intents.decide.description'),
+        actionLabel: t('homeExhibition.intentSwitcher.intents.decide.cta'),
+        action: () => navigate('/videos?has_summary=true'),
+        videos: pickRailVideos(withSummaries, quickLessons, usedVideoIds),
         variant: 'light' as const,
       },
-      {
-        key: 'mostViewed',
-        title: t('homeExhibition.videoRails.mostViewed.title'),
-        description: t('homeExhibition.videoRails.mostViewed.description'),
-        videos: pickRailVideos(mostViewed, allRailsPool, usedVideoIds),
+      community: {
+        key: 'community',
+        title: t('homeExhibition.intentSwitcher.intents.community.title'),
+        description: t('homeExhibition.intentSwitcher.intents.community.description'),
+        actionLabel: t('homeExhibition.intentSwitcher.intents.community.cta'),
+        action: () => navigate('/videos?sort=popular'),
+        videos: pickRailVideos(communityFavorites, mostViewed, usedVideoIds),
         variant: 'dark' as const,
       },
-      {
-        key: 'communityPicks',
-        title: t('homeExhibition.videoRails.communityPicks.title'),
-        description: t('homeExhibition.videoRails.communityPicks.description'),
-        videos: pickRailVideos(communityFavorites, allRailsPool, usedVideoIds),
-        variant: 'light' as const,
-      },
-      {
-        key: 'withSummaries',
-        title: t('homeExhibition.videoRails.withSummaries.title'),
-        description: t('homeExhibition.videoRails.withSummaries.description'),
-        videos: pickRailVideos(withSummaries, allRailsPool, usedVideoIds),
-        variant: 'dark' as const,
-      },
-      {
-        key: 'quickLessons',
-        title: t('homeExhibition.videoRails.quickLessons.title'),
-        description: t('homeExhibition.videoRails.quickLessons.description'),
-        videos: pickRailVideos(quickLessons, allRailsPool, usedVideoIds),
-        variant: 'light' as const,
-      },
-    ];
-  }, [allRailsPool, featuredVideos, homeVideos, recentVideos, t]);
+    };
+  }, [allRailsPool, featuredVideos, homeVideos, recentVideos, t, navigate]);
+
+  const currentIntentRail = intentRails[activeIntent];
 
   const learningRails = useMemo(() => {
     const facodi = home?.facodi_highlights ?? [];
@@ -211,6 +263,7 @@ const Index = () => {
       },
     ].filter((rail) => rail.playlists.length > 0);
   }, [home?.facodi_highlights, home?.featured_playlists, t]);
+
   const formatNumber = useMemo(
     () => new Intl.NumberFormat(i18n.language || 'pt-PT').format,
     [i18n.language],
@@ -225,21 +278,25 @@ const Index = () => {
         title={t('homeExhibition.hero.monynhaTitle')}
         description={t('homeExhibition.hero.description')}
         actions={
-          <>
-            <Button size="xl" className="h-14 justify-between px-6 text-sm transition-transform duration-200 hover:scale-[1.03] active:scale-[0.97]" onClick={() => navigate('/videos')}>
+          <div className="flex flex-col items-start gap-3 sm:flex-row sm:items-center">
+            <Button
+              size="xl"
+              className="h-14 justify-between px-6 text-sm transition-transform duration-200 hover:scale-[1.03] active:scale-[0.97]"
+              onClick={() => navigate('/videos')}
+            >
               {t('homeExhibition.hero.primaryCta')}
               <ArrowRight className="h-5 w-5" />
             </Button>
             <Button
-              variant="outline"
-              size="xl"
-              className="h-14 justify-between border-border bg-background px-6 text-sm transition-transform duration-200 hover:scale-[1.03] active:scale-[0.97]"
+              variant="ghost"
+              size="lg"
+              className="h-11 justify-between px-3 text-xs font-semibold text-muted-foreground hover:bg-secondary hover:text-foreground"
               onClick={() => navigate('/submit')}
             >
               {t('homeExhibition.hero.secondaryCta')}
-              <Send className="h-5 w-5" />
+              <Send className="h-4 w-4" />
             </Button>
-          </>
+          </div>
         }
         aside={
           <div className="grid gap-3 lg:ml-auto lg:grid-cols-[minmax(0,1fr)_14rem] lg:items-start xl:grid-cols-[minmax(0,1fr)_15rem]">
@@ -263,7 +320,9 @@ const Index = () => {
                   className="border-border bg-card text-card-foreground hover:border-primary"
                 />
                 <div className="border-2 border-border bg-card p-2 shadow-[8px_8px_0_hsl(var(--primary))]">
-                  <p className="mb-2 px-1 text-[0.62rem] font-black uppercase text-card-foreground/70">{t('homeExhibition.hero.railTitle')}</p>
+                  <p className="mb-2 px-1 text-[0.62rem] font-black uppercase text-card-foreground/70">
+                    {t('homeExhibition.hero.railTitle')}
+                  </p>
                   <div className="space-y-2">
                     {heroTiles.map((video) => (
                       <VideoShowcaseCard
@@ -277,21 +336,28 @@ const Index = () => {
                 </div>
               </>
             ) : (
-              <div className="border-2 border-border p-8 text-muted-foreground lg:col-span-2">{t('homeExhibition.empty.hero')}</div>
+              <div className="border-2 border-border p-8 text-muted-foreground lg:col-span-2">
+                {t('homeExhibition.empty.hero')}
+              </div>
             )}
           </div>
         }
       />
 
-      <section className="border-y-2 border-border bg-secondary py-5 text-secondary-foreground">
+      <section className="border-y-2 border-border bg-secondary py-4 text-secondary-foreground md:py-5">
         <div className="container grid gap-4 md:grid-cols-[auto_repeat(4,1fr)] md:items-center">
           <div className="animate-signal-pulse inline-flex w-fit items-center gap-2 bg-primary px-3 py-2 text-xs font-black uppercase text-primary-foreground">
             <Radio className="h-4 w-4" />
             {t('homeExhibition.live.label')}
           </div>
           {liveSignalKeys.map((key) => (
-            <div key={key} className="flex items-end justify-between gap-4 border-border/20 py-1 md:border-r md:pr-5 last:md:border-r-0">
-              <span className="text-3xl font-black leading-none">{formatNumber(home?.curation_signals[key] ?? 0)}</span>
+            <div
+              key={key}
+              className="flex items-end justify-between gap-4 border-border/20 py-1 md:border-r md:pr-5 last:md:border-r-0"
+            >
+              <span className="text-3xl font-black leading-none">
+                {formatNumber(home?.curation_signals[key] ?? 0)}
+              </span>
               <span className="max-w-36 text-right text-[0.65rem] font-black uppercase text-secondary-foreground/70">
                 {t(`homeExhibition.curation.signals.${key}`)}
               </span>
@@ -300,32 +366,60 @@ const Index = () => {
         </div>
       </section>
 
-      <section className="border-b-2 border-border bg-[#efff00] py-6 text-black">
-        <div className="container grid gap-4 md:grid-cols-4">
+      <section className="border-b-2 border-border bg-[#efff00] py-4 text-black md:py-5">
+        <div className="container grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {metricKeys.map((key) => (
-            <div key={key} className="flex items-end justify-between gap-4 border-black/30 py-2 md:border-r md:pr-6 last:md:border-r-0">
+            <div
+              key={key}
+              className="flex items-end justify-between gap-4 border-black/30 py-2 sm:pr-6 lg:border-r lg:pr-6 lg:last:border-r-0"
+            >
               <span className="text-3xl font-black leading-none">{formatNumber(home?.metrics[key] ?? 0)}</span>
-              <span className="max-w-32 text-right text-[0.65rem] font-black uppercase">{t(`homeExhibition.metrics.${key}`)}</span>
+              <span className="max-w-32 text-right text-[0.65rem] font-black uppercase">
+                {t(`homeExhibition.metrics.${key}`)}
+              </span>
             </div>
           ))}
         </div>
       </section>
 
-      <div className="space-y-0">
-        {videoRails.map((rail) => (
+      <section className="border-y-2 border-border bg-background py-12 text-foreground md:py-14">
+        <div className="container space-y-6">
+          <SectionHeader
+            title={t('homeExhibition.intentSwitcher.title')}
+            description={t('homeExhibition.intentSwitcher.description')}
+            className="mb-0"
+          />
+
+          <div className="flex flex-wrap gap-3">
+            {(['discover', 'decide', 'community'] as const).map((intent) => (
+              <button
+                key={intent}
+                type="button"
+                onClick={() => setActiveIntent(intent)}
+                className={`group inline-flex items-center gap-2 border-2 px-4 py-2 text-xs font-black uppercase tracking-[0.08em] transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 ${
+                  activeIntent === intent
+                    ? 'border-foreground bg-primary text-primary-foreground shadow-[4px_4px_0_rgba(0,0,0,0.18)]'
+                    : 'border-border bg-card text-card-foreground hover:border-foreground hover:-translate-y-0.5'
+                }`}
+              >
+                <span>{t(`homeExhibition.intentSwitcher.intents.${intent}.chip`)}</span>
+              </button>
+            ))}
+          </div>
+
           <VideoCarouselRail
-            key={rail.key}
-            title={rail.title}
-            description={rail.description}
-            videos={rail.videos}
+            key={currentIntentRail.key}
+            title={currentIntentRail.title}
+            description={currentIntentRail.description}
+            videos={currentIntentRail.videos}
             isLoading={railsLoading}
             emptyMessage={t('homeExhibition.empty.hero')}
-            actionLabel={t('homeExhibition.actions.viewAllVideos')}
-            onAction={() => navigate('/videos')}
-            variant={rail.variant}
+            actionLabel={currentIntentRail.actionLabel}
+            onAction={currentIntentRail.action}
+            variant={currentIntentRail.variant}
           />
-        ))}
-      </div>
+        </div>
+      </section>
 
       <section className="bg-background py-16 text-foreground md:py-20">
         <div className="container">
@@ -352,7 +446,9 @@ const Index = () => {
               ))}
             </div>
           ) : (
-            <div className="border-2 border-border p-8 text-muted-foreground">{t('homeExhibition.empty.categories')}</div>
+            <div className="border-2 border-border p-8 text-muted-foreground">
+              {t('homeExhibition.empty.categories')}
+            </div>
           )}
         </div>
       </section>
@@ -363,7 +459,11 @@ const Index = () => {
             title={t('homeExhibition.playlists.title')}
             description={t('homeExhibition.playlists.description')}
             action={
-              <Button variant="outline" className="border-border bg-background text-foreground hover:bg-primary hover:text-primary-foreground" onClick={() => navigate('/playlists')}>
+              <Button
+                variant="outline"
+                className="border-border bg-background text-foreground hover:bg-primary hover:text-primary-foreground"
+                onClick={() => navigate('/playlists')}
+              >
                 {t('homeExhibition.actions.viewAllPlaylists')}
                 <ArrowRight className="h-4 w-4" />
               </Button>
@@ -371,18 +471,24 @@ const Index = () => {
           />
           {isLoading ? (
             <div className="grid gap-5 md:grid-cols-3">
-              {Array.from({ length: 6 }).map((_, index) => (
+              {Array.from({ length: MAX_HOMEPAGE_PLAYLISTS }).map((_, index) => (
                 <Skeleton key={index} className="h-72 border-2 border-border" />
               ))}
             </div>
           ) : home?.featured_playlists.length ? (
             <div className="grid gap-5 md:grid-cols-3">
-              {home.featured_playlists.map((playlist) => (
-                <PlaylistShowcaseCard key={playlist.id} playlist={playlist} className="border-border bg-card text-card-foreground hover:border-primary" />
+              {home.featured_playlists.slice(0, MAX_HOMEPAGE_PLAYLISTS).map((playlist) => (
+                <PlaylistShowcaseCard
+                  key={playlist.id}
+                  playlist={playlist}
+                  className="border-border bg-card text-card-foreground hover:border-primary"
+                />
               ))}
             </div>
           ) : (
-            <div className="border-2 border-border p-8 text-secondary-foreground/70">{t('homeExhibition.empty.playlists')}</div>
+            <div className="border-2 border-border p-8 text-secondary-foreground/70">
+              {t('homeExhibition.empty.playlists')}
+            </div>
           )}
         </div>
       </section>
@@ -430,39 +536,24 @@ const Index = () => {
         </section>
       )}
 
-      <section className="bg-background py-16 md:py-20">
-        <div className="container">
-          <SectionHeader title={t('homeExhibition.cta.title')} description={t('homeExhibition.cta.description')} />
-          <div className="grid gap-4 md:grid-cols-3">
-            {ctaCards.map(({ key, icon: Icon, href }) => (
-              <button
-                key={key}
-                type="button"
-                onClick={() => navigate(href)}
-                className="group min-h-56 border-2 border-border p-5 text-left transition-transform duration-150 motion-safe:hover:scale-[1.01] active:scale-[0.99] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
-              >
-                <div className="mb-10 flex items-center justify-between">
-                  <Icon className="h-7 w-7" />
-                  <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
-                </div>
-                <h3 className="text-2xl font-black leading-none">{t(`homeExhibition.cta.cards.${key}.title`)}</h3>
-                <p className="mt-4 text-sm leading-6 text-muted-foreground">{t(`homeExhibition.cta.cards.${key}.description`)}</p>
-              </button>
-            ))}
-          </div>
-        </div>
-      </section>
-
       <CtaBand
         title={t('homeExhibition.finalCta.title')}
         description={t('homeExhibition.finalCta.description')}
         actions={
           <>
-            <Button variant="outline" className="border-black bg-white text-black hover:bg-black hover:text-white transition-transform duration-200 hover:scale-[1.03] active:scale-[0.97]" onClick={() => navigate('/submit')}>
+            <Button
+              variant="outline"
+              className="border-black bg-white text-black hover:bg-black hover:text-white transition-transform duration-200 hover:scale-[1.03] active:scale-[0.97]"
+              onClick={() => navigate('/submit')}
+            >
               {t('homeExhibition.finalCta.submit')}
               <Send className="h-4 w-4" />
             </Button>
-            <Button variant="outline" className="border-black bg-[#efff00] text-black hover:bg-black hover:text-white transition-transform duration-200 hover:scale-[1.03] active:scale-[0.97]" onClick={() => navigate('/editor/apply')}>
+            <Button
+              variant="outline"
+              className="border-black bg-[#efff00] text-black hover:bg-black hover:text-white transition-transform duration-200 hover:scale-[1.03] active:scale-[0.97]"
+              onClick={() => navigate('/editor/apply')}
+            >
               {t('homeExhibition.finalCta.editor')}
               <Users className="h-4 w-4" />
             </Button>

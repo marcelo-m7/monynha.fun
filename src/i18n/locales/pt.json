@@ -767,7 +767,34 @@
     "error": "Não foi possível atualizar alguns dados da homepage agora.",
     "actions": {
       "viewAllVideos": "Explorar vídeos",
-      "viewAllPlaylists": "Ver playlists"
+      "viewAllPlaylists": "Ver playlists",
+      "viewRecent": "Ver novidades",
+      "viewWithSummaries": "Ver com resumo",
+      "viewPopular": "Ver mais populares"
+    },
+    "intentSwitcher": {
+      "title": "Escolha o modo de exploração",
+      "description": "Um scanner editorial: alterne o foco para descobrir rápido, decidir melhor ou seguir sinais da comunidade.",
+      "intents": {
+        "discover": {
+          "chip": "Descobrir",
+          "title": "Novidades que valem a atenção",
+          "description": "Fluxo rápido para encontrar vídeos recentes e relevantes sem navegar por trilhos repetidos.",
+          "cta": "Ver novidades"
+        },
+        "decide": {
+          "chip": "Decidir",
+          "title": "Decida antes do play",
+          "description": "Prioriza vídeos com resumo e duração objetiva para reduzir ruído e acelerar escolhas.",
+          "cta": "Ver com resumo"
+        },
+        "community": {
+          "chip": "Comunidade",
+          "title": "Sinais da comunidade",
+          "description": "Mostra o que está concentrando favoritos e playlists públicas no momento.",
+          "cta": "Ver mais populares"
+        }
+      }
     },
     "hero": {
       "title": "Vídeos do YouTube que viram caminhos de aprendizagem",

@@ -14,10 +14,26 @@ interface VideoShowcaseCardProps {
   className?: string;
 }
 
+const UNKNOWN_CHANNEL = 'Unknown channel';
+
+function isDisplayableLanguage(language: string | null | undefined) {
+  if (!language) return false;
+
+  const normalized = language.trim().toLowerCase();
+  return !!normalized && normalized !== 'und' && normalized !== 'n/a' && normalized !== 'unknown';
+}
+
+function hasDisplayableSummary(summary: string | null | undefined) {
+  return !!summary && summary.trim().length >= 32;
+}
+
 export function VideoShowcaseCard({ video, variant = 'tile', className }: VideoShowcaseCardProps) {
   const navigate = useNavigate();
   const primaryTag = video.semantic_tags?.[0] ?? video.category_name;
   const image = getReliableYouTubeThumbnailUrl(video.thumbnail_url, '/placeholder.png');
+  const hasLanguageBadge = isDisplayableLanguage(video.language);
+  const channelName = video.channel_name?.trim() || UNKNOWN_CHANNEL;
+  const canRenderSummary = variant !== 'row' && hasDisplayableSummary(video.summary);
 
   return (
     <button
@@ -39,9 +55,11 @@ export function VideoShowcaseCard({ video, variant = 'tile', className }: VideoS
       >
         <LazyImage src={image} fallbackSrc="/placeholder.png" alt={video.title} className="object-cover" />
         <VideoDurationBadge durationSeconds={video.duration_seconds} className="font-black" />
-        <span className="absolute left-2 top-2 border border-black bg-[#efff00] px-2 py-1 text-[0.62rem] font-black uppercase text-black">
-          {video.language}
-        </span>
+        {hasLanguageBadge && (
+          <span className="absolute left-2 top-2 border border-black bg-[#efff00] px-2 py-1 text-[0.62rem] font-black uppercase text-black">
+            {video.language}
+          </span>
+        )}
         <span className="absolute inset-0 flex items-center justify-center bg-black/0 transition-colors group-hover:bg-black/20">
           <span className="flex h-10 w-10 scale-95 items-center justify-center border-2 border-black bg-[#efff00] text-black opacity-0 transition-[opacity,transform] duration-150 motion-safe:group-hover:scale-100 group-hover:opacity-100">
             <Play className="h-4 w-4 fill-current" />
@@ -67,9 +85,9 @@ export function VideoShowcaseCard({ video, variant = 'tile', className }: VideoS
         <h3 className={cn('font-black uppercase leading-tight', variant === 'feature' ? 'text-xl md:text-2xl' : 'text-sm', variant === 'row' && 'line-clamp-2')}>
           {video.title}
         </h3>
-        {variant !== 'row' && video.summary && <p className="line-clamp-2 text-sm leading-6 text-foreground/80">{video.summary}</p>}
+        {canRenderSummary && <p className="line-clamp-2 text-sm leading-6 text-foreground/80">{video.summary}</p>}
         <div className="flex min-w-0 flex-wrap items-center gap-3 text-[0.7rem] font-bold uppercase text-muted-foreground">
-          <span className="max-w-full truncate">{video.channel_name}</span>
+          <span className="max-w-full truncate">{channelName}</span>
           <span>{formatViewCount(video.view_count)}</span>
           <span className="inline-flex items-center gap-1">
             <Heart className="h-3 w-3" />
