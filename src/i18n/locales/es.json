@@ -801,7 +801,34 @@
     },
     "actions": {
       "viewAllVideos": "Ver todos los vídeos",
-      "viewAllPlaylists": "Ver playlists"
+      "viewAllPlaylists": "Ver playlists",
+      "viewRecent": "Ver novedades",
+      "viewWithSummaries": "Ver con resumen",
+      "viewPopular": "Ver más populares"
+    },
+    "intentSwitcher": {
+      "title": "Elige tu modo de exploración",
+      "description": "Un escáner editorial: cambia el foco para descubrir más rápido, decidir mejor o seguir el pulso de la comunidad.",
+      "intents": {
+        "discover": {
+          "chip": "Descubrir",
+          "title": "Novedades que merecen atención",
+          "description": "Ruta rápida para encontrar vídeos recientes y relevantes sin repetir carruseles similares.",
+          "cta": "Ver novedades"
+        },
+        "decide": {
+          "chip": "Decidir",
+          "title": "Decide antes de reproducir",
+          "description": "Prioriza vídeos con resumen y duración práctica para reducir ruido y acelerar decisiones.",
+          "cta": "Ver con resumen"
+        },
+        "community": {
+          "chip": "Comunidad",
+          "title": "Señales de la comunidad",
+          "description": "Muestra lo que concentra más favoritos y guardados en playlists públicas.",
+          "cta": "Ver más populares"
+        }
+      }
     },
     "playlists": {
       "title": "Playlists destacadas",

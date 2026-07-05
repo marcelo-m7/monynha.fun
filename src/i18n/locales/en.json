@@ -708,7 +708,34 @@
     },
     "actions": {
       "viewAllVideos": "View all videos",
-      "viewAllPlaylists": "View playlists"
+      "viewAllPlaylists": "View playlists",
+      "viewRecent": "View recent",
+      "viewWithSummaries": "View with summaries",
+      "viewPopular": "View most popular"
+    },
+    "intentSwitcher": {
+      "title": "Choose your exploration mode",
+      "description": "An editorial scanner: switch intent to discover faster, decide better, or follow community momentum.",
+      "intents": {
+        "discover": {
+          "chip": "Discover",
+          "title": "Fresh videos worth attention",
+          "description": "Fast track for finding recent and relevant videos without repetitive rail hopping.",
+          "cta": "View recent"
+        },
+        "decide": {
+          "chip": "Decide",
+          "title": "Decide before pressing play",
+          "description": "Prioritizes videos with summary and practical duration so decisions are faster and cleaner.",
+          "cta": "View with summaries"
+        },
+        "community": {
+          "chip": "Community",
+          "title": "Community momentum signals",
+          "description": "Shows what is concentrating favorites and playlist saves right now.",
+          "cta": "View most popular"
+        }
+      }
     },
     "playlists": {
       "title": "Featured playlists",
