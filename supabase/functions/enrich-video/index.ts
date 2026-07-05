@@ -293,6 +293,11 @@ function toFastLegacyResult(params: {
   };
 }
 
+function compactErrorMessage(error: unknown): string {
+  const raw = error instanceof Error ? error.message : 'unknown_error';
+  return raw.replace(/\s+/g, ' ').trim().slice(0, 120);
+}
+
 async function computeFastEnrichment(params: {
   title: string;
   videoTitle: string | null;
@@ -312,6 +317,9 @@ async function computeFastEnrichment(params: {
     youtubeId: params.youtubeId,
     language: params.language,
   });
+
+  let openAiFallbackReason: string | null = null;
+  let geminiFallbackReason: string | null = null;
 
   const openAiKey = Deno.env.get('OPENAI_API_KEY') ?? '';
   if (openAiKey) {
@@ -351,8 +359,11 @@ async function computeFastEnrichment(params: {
         fallbackReason: null,
       };
     } catch (error) {
+      openAiFallbackReason = `openai_error:${compactErrorMessage(error)}`;
       console.warn(`[enrich-video] OpenAI fast-path failed: ${error instanceof Error ? error.message : 'unknown error'}`);
     }
+  } else {
+    openAiFallbackReason = 'openai_key_missing';
   }
 
   const geminiKey = Deno.env.get('GEMINI_API_KEY') ?? '';
@@ -361,12 +372,13 @@ async function computeFastEnrichment(params: {
       const geminiClient = new GeminiClient({
         apiKey: geminiKey,
         model: Deno.env.get('GEMINI_MODEL') || 'gemini-2.5-flash',
-        timeout: 15000,
+        timeout: 12000,
         maxRetries: 1,
       });
 
-      const geminiResult = await geminiClient.analyzeYouTubeVideo({
-        youtubeUrl: params.youtubeUrl,
+      // Use text-only enrichment in the fast path — avoids video download
+      // latency for long videos. Deep video analysis is handled by v2 pipeline.
+      const geminiResult = await geminiClient.enrichFromText({
         title: params.title,
         description: params.description,
         language: params.language,
@@ -391,11 +403,17 @@ async function computeFastEnrichment(params: {
         fallbackReason: 'openai_unavailable',
       };
     } catch (error) {
+      geminiFallbackReason = `gemini_error:${compactErrorMessage(error)}`;
       console.warn(`[enrich-video] Gemini fallback failed: ${error instanceof Error ? error.message : 'unknown error'}`);
     }
+  } else {
+    geminiFallbackReason = 'gemini_key_missing';
   }
 
-  return fallback;
+  return {
+    ...fallback,
+    fallbackReason: [openAiFallbackReason, geminiFallbackReason].filter(Boolean).join('|') || fallback.fallbackReason,
+  };
 }
 
 async function createOrReusePendingDeepAnalysisJob(params: {

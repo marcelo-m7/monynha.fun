@@ -234,6 +234,25 @@ export class GeminiClient {
     return this.parseVideoAnalysisResponse(response);
   }
 
+  /**
+   * Text-only fast enrichment — does NOT send the YouTube URL to Gemini.
+   * Use this for the fast-path enrichment where video duration may be long.
+   * analyzeYouTubeVideo is better for deep analysis of short/medium videos.
+   */
+  async enrichFromText(params: {
+    title: string;
+    description?: string | null;
+    language?: string | null;
+  }): Promise<GeminiVideoAnalysisResult> {
+    const prompt = this.buildVideoAnalysisPrompt(params);
+    const response = await this.callWithRetry(() => this.callGemini({
+      // no youtubeUrl — text-only, much faster
+      prompt,
+      maxOutputTokens: 1600,
+    }));
+    return this.parseVideoAnalysisResponse(response);
+  }
+
   async assignPlaylistFromAnalysis(params: {
     analysis: GeminiVideoAnalysisResult;
     playlists: GeminiPlaylistAssignmentPlaylist[];
